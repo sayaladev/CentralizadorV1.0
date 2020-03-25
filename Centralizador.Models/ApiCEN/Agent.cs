@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Net;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -24,13 +25,13 @@ namespace Centralizador.Models.ApiCEN
         public string Address { get; set; }
 
         [JsonProperty("phones")]
-        public IEnumerable<string> Phones { get; set; }
+        public IList<string> Phones { get; set; }
 
         [JsonProperty("profile")]
         public int Profile { get; set; }
 
         [JsonProperty("participants")]
-        public IEnumerable<Participant> Participants { get; set; }
+        public IList<ResultParticipant> Participants { get; set; } 
 
         [JsonProperty("created_ts")]
         public DateTime CreatedTs { get; set; }
@@ -52,7 +53,35 @@ namespace Centralizador.Models.ApiCEN
         public object Previous { get; set; }
 
         [JsonProperty("results")]
-        public IEnumerable<ResultAgent> Results { get; set; }
+        public IList<ResultAgent> Results { get; set; }
+
+        public static ResultAgent GetAgetByEmail(ResultAgent agent)
+        {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                string res = wc.DownloadString($"api/v1/resources/agents/?email={agent.Email}");
+                if (res != null)
+                {
+                    Agent a = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    return a.Results[0];
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
     }
 
 

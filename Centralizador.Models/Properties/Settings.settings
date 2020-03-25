@@ -5,5 +5,11 @@
     <Setting Name="BaseAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://ppagos-sen.coordinadorelectrico.cl/</Value>
     </Setting>
+    <Setting Name="UserCEN" Type="System.String" Scope="User">
+      <Value Profile="(Default)">german.gomez@cvegroup.com</Value>
+    </Setting>
+    <Setting Name="PasswordCEN" Type="System.String" Scope="User">
+      <Value Profile="(Default)">cvepagos2017</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

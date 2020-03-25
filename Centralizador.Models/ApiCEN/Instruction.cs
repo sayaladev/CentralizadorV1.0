@@ -75,7 +75,7 @@ namespace Centralizador.Models.ApiCEN
         public object Previous { get; set; }
 
         [JsonProperty("results")]
-        public IEnumerable<ResultInstruction> Results { get; set; }
+        public IList<ResultInstruction> Results { get; set; }
     }
 
 

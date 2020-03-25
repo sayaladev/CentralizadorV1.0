@@ -20,7 +20,7 @@ namespace Centralizador.Models.ApiCEN
         public string Address { get; set; }
 
         [JsonProperty("phones")]
-        public IEnumerable<string> Phones { get; set; }
+        public IList<string> Phones { get; set; }
 
         [JsonProperty("email")]
         public string Email { get; set; }
@@ -39,7 +39,7 @@ namespace Centralizador.Models.ApiCEN
         public string Address { get; set; }
 
         [JsonProperty("phones")]
-        public IEnumerable<string> Phones { get; set; }
+        public IList<string> Phones { get; set; }
 
         [JsonProperty("email")]
         public string Email { get; set; }
@@ -47,6 +47,11 @@ namespace Centralizador.Models.ApiCEN
 
     public class ResultParticipant
     {
+        [JsonProperty("is_coordinator")]
+        public bool IsCoordinator { get; set; } //Agent
+
+        [JsonProperty("participant")]
+        public int ParticipantId { get; set; } //Agent
 
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -100,12 +105,6 @@ namespace Centralizador.Models.ApiCEN
     public class Participant
     {
 
-        [JsonProperty("is_coordinator")]
-        public bool IsCoordinator { get; set; }
-
-        [JsonProperty("participant")]
-        public int ParticipantId { get; set; }
-
         [JsonProperty("count")]
         public int Count { get; set; }
 
@@ -116,10 +115,10 @@ namespace Centralizador.Models.ApiCEN
         public object Previous { get; set; }
 
         [JsonProperty("results")]
-        public IEnumerable<ResultParticipant> Results { get; set; }
+        public IList<ResultParticipant> Results { get; set; }
 
-        
-        public static Participant GetParticipante(Participant participante)
+
+        public static ResultParticipant GetParticipantById(ResultParticipant participant)
         {
             WebClient wc = new WebClient
             {
@@ -129,11 +128,11 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string result = wc.DownloadString($"api/v1/resources/participants/?id={participante.ParticipantId}");
-                if (result != null)
+                string res = wc.DownloadString($"api/v1/resources/participants/?id={participant.ParticipantId}");
+                if (res != null)
                 {
-                    participante = JsonConvert.DeserializeObject<Participant>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    //return participante.Results[;
+                    Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    return p.Results[0];
                 }
             }
             catch (Exception)

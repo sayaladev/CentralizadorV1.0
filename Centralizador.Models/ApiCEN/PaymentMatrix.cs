@@ -84,7 +84,7 @@ namespace Centralizador.Models.ApiCEN
         public object Previous { get; set; }
 
         [JsonProperty("results")]
-        public IEnumerable<ResultPaymentMatrix> Results { get; set; }
+        public IList<ResultPaymentMatrix> Results { get; set; }
     }
 
 

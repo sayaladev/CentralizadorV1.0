@@ -34,5 +34,29 @@ namespace Centralizador.Models.Properties {
                 this["BaseAddress"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("german.gomez@cvegroup.com")]
+        public string UserCEN {
+            get {
+                return ((string)(this["UserCEN"]));
+            }
+            set {
+                this["UserCEN"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("cvepagos2017")]
+        public string PasswordCEN {
+            get {
+                return ((string)(this["PasswordCEN"]));
+            }
+            set {
+                this["PasswordCEN"] = value;
+            }
+        }
     }
 }
