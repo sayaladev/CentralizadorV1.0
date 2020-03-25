@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Text;
 
 using Newtonsoft.Json;
 
@@ -115,6 +117,35 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonProperty("results")]
         public IEnumerable<ResultParticipant> Results { get; set; }
+
+        
+        public static Participant GetParticipante(Participant participante)
+        {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                string result = wc.DownloadString($"api/v1/resources/participants/?id={participante.ParticipantId}");
+                if (result != null)
+                {
+                    participante = JsonConvert.DeserializeObject<Participant>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    //return participante.Results[;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
     }
 
 
