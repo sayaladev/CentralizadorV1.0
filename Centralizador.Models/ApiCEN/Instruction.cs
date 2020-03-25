@@ -1,21 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
 {
-    public class AuxiliaryData
-    {
 
-        [JsonProperty("payment_matrix_natural_key")]
-        public string PaymentMatrixNaturalKey { get; set; }
-
-        [JsonProperty("payment_matrix_concept")]
-        public string PaymentMatrixConcept { get; set; }
-    }
 
     public class ResultInstruction
     {
