@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+namespace Centralizador.Models.ApiCEN
+{
+    public class AuxiliaryData
+    {
+
+        [JsonProperty("payment_matrix_natural_key")]
+        public string PaymentMatrixNaturalKey { get; set; }
+
+        [JsonProperty("payment_matrix_concept")]
+        public string PaymentMatrixConcept { get; set; }
+    }
+
+    public class ResultInstruction
+    {
+
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("payment_matrix")]
+        public int PaymentMatrix { get; set; }
+
+        [JsonProperty("creditor")]
+        public int Creditor { get; set; }
+
+        [JsonProperty("debtor")]
+        public int Debtor { get; set; }
+
+        [JsonProperty("amount")]
+        public int Amount { get; set; }
+
+        [JsonProperty("amount_gross")]
+        public int AmountGross { get; set; }
+
+        [JsonProperty("closed")]
+        public bool Closed { get; set; }
+
+        [JsonProperty("status")]
+        public string Status { get; set; }
+
+        [JsonProperty("status_billed")]
+        public int StatusBilled { get; set; }
+
+        [JsonProperty("status_paid")]
+        public int StatusPaid { get; set; }
+
+        [JsonProperty("resolution")]
+        public string Resolution { get; set; }
+
+        [JsonProperty("max_payment_date")]
+        public string MaxPaymentDate { get; set; }
+
+        [JsonProperty("informed_paid_amount")]
+        public int InformedPaidAmount { get; set; }
+
+        [JsonProperty("is_paid")]
+        public bool IsPaid { get; set; }
+
+        [JsonProperty("auxiliary_data")]
+        public AuxiliaryData AuxiliaryData { get; set; }
+
+        [JsonProperty("created_ts")]
+        public DateTime CreatedTs { get; set; }
+
+        [JsonProperty("updated_ts")]
+        public DateTime UpdatedTs { get; set; }
+    }
+
+    public class Instruction
+    {
+
+        [JsonProperty("count")]
+        public int Count { get; set; }
+
+        [JsonProperty("next")]
+        public object Next { get; set; }
+
+        [JsonProperty("previous")]
+        public object Previous { get; set; }
+
+        [JsonProperty("results")]
+        public IEnumerable<ResultInstruction> Results { get; set; }
+    }
+
+
+}
