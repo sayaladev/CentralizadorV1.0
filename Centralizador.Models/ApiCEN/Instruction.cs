@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Text;
 
 using Newtonsoft.Json;
 
@@ -60,6 +62,14 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonProperty("updated_ts")]
         public DateTime UpdatedTs { get; set; }
+
+        //Mapping (new properties)    
+
+        [JsonIgnore]
+        public ResultParticipant ResultParticipantMapping { get; set; }
+
+        [JsonIgnore]
+        public ResultPaymentMatrix PaymentMatrixMapping { get; set; }
     }
 
     public class Instruction
@@ -76,7 +86,42 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonProperty("results")]
         public IList<ResultInstruction> Results { get; set; }
+
+        public static IList<ResultInstruction> GetInstructions(ResultPaymentMatrix matrix, ResultParticipant participant)
+        {
+
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                string res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}");
+                if (res != null)
+                {
+                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (instruction.Results.Count == 0)
+                    {
+                        return null;
+                    }
+                    return instruction.Results;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
     }
-
-
 }
+
+
+
+

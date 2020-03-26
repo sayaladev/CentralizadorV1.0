@@ -25,7 +25,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinadorelectrico.cl/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinadorelectrico.cl/api/v1/resources/")]
         public string BaseAddress {
             get {
                 return ((string)(this["BaseAddress"]));

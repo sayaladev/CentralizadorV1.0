@@ -128,7 +128,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/participants/?id={participant.ParticipantId}");
+                string res = wc.DownloadString($"participants/?id={participant.ParticipantId}");
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

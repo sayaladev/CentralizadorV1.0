@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Text;
 
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
 {
-
 
     public class ResultPaymentMatrix
     {
@@ -85,6 +86,72 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonProperty("results")]
         public IList<ResultPaymentMatrix> Results { get; set; }
+
+        public static IList<ResultPaymentMatrix> GetPaymentMatrix(DateTime date)
+        {
+            DateTime createdBefore = date.AddMonths(1);
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                string res = wc.DownloadString($"payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
+                if (res != null)
+                {
+                    PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    return p.Results;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+
+        }
+
+        #region Testing Async
+
+
+
+        //private static readonly HttpClient client = new HttpClient();
+        //public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
+        //{
+        //    DateTime createdBefore = date.AddMonths(1);
+        //    client.BaseAddress =  new Uri(Properties.Settings.Default.BaseAddress);
+        //    client.DefaultRequestHeaders.Accept.Clear();          
+        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //    try
+        //    {
+        //        HttpResponseMessage res = await client.GetAsync($"payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}").ConfigureAwait(false);
+        //        string jSon = await res.Content.ReadAsStringAsync();
+
+        //        if (res.IsSuccessStatusCode)
+        //        {
+        //            PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(jSon, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+        //            return p.Results;
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //    finally
+        //    {
+
+        //    }
+        //    return null;
+
+        //}
+        #endregion
+
     }
 
 

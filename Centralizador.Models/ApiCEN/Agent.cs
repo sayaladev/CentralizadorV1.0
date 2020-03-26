@@ -55,7 +55,7 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultAgent> Results { get; set; }
 
-        public static ResultAgent GetAgetByEmail(ResultAgent agent)
+        public static ResultAgent GetAgetByEmail()
         {
             WebClient wc = new WebClient
             {
@@ -65,11 +65,11 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/agents/?email={agent.Email}");
+                string res = wc.DownloadString($"agents/?email={Properties.Settings.Default.UserCEN}");
                 if (res != null)
                 {
-                    Agent a = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    return a.Results[0];
+                    Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    return agent.Results[0];
                 }
             }
             catch (Exception)

@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="BaseAddress" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://ppagos-sen.coordinadorelectrico.cl/</Value>
+      <Value Profile="(Default)">https://ppagos-sen.coordinadorelectrico.cl/api/v1/resources/</Value>
     </Setting>
     <Setting Name="UserCEN" Type="System.String" Scope="User">
       <Value Profile="(Default)">german.gomez@cvegroup.com</Value>
