@@ -132,7 +132,10 @@ namespace Centralizador.Models.ApiCEN
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    return p.Results[0];
+                    if (p.Results.Count == 1)
+                    {
+                        return p.Results[0];
+                    }
                 }
             }
             catch (Exception)

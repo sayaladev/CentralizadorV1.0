@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
+using Centralizador.Models.DataBase;
 
 using TenTec.Windows.iGridLib;
 
@@ -16,7 +17,8 @@ namespace Centralizador.WinApp.GUI
 
     public partial class FormMain : Form
     {
-        private ResultParticipant ResultParticipant = new ResultParticipant();
+        private ResultParticipant resultParticipant = new ResultParticipant();
+        private CultureInfo info = CultureInfo.GetCultureInfo("es-CL");
 
         public FormMain()
         {
@@ -55,16 +57,12 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-
-
-
-        [STAThread]
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
+
             DateTime date = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
-
-
             BackgroundW.RunWorkerAsync(date);
+            BtnCreditor.Enabled = false;
 
         }
 
@@ -107,21 +105,35 @@ namespace Centralizador.WinApp.GUI
                     BackgroundW.ReportProgress(0, "");
                     // Get list of instructions
                     IList<ResultInstruction> instructions;
-                    instructions = Instruction.GetInstructions(matrix, ResultParticipant);
+                    instructions = Instruction.GetInstructions(matrix, resultParticipant);
                     if (instructions != null)
                     {
                         foreach (ResultInstruction instruction in instructions)
                         {
                             if (instruction.Status == "Publicado")
                             {
-                                // Mapping matrix
-                                instruction.PaymentMatrixMapping = matrix;
-                                //Mapping participant
+                                // Mapping matrix from CEN
+                                instruction.ResultPaymentMatrixMapping = matrix;
+                                // Mapping participant from CEN
                                 ResultParticipant participant = new ResultParticipant
                                 {
                                     ParticipantId = instruction.Debtor
                                 };
                                 instruction.ResultParticipantMapping = Participant.GetParticipantById(participant);
+                                // Mapping dte from Softland
+                                instruction.ResultDteMapping = DBReference.GetReferenceByGlosa(instruction);
+
+                                // Mapping Dte from CEN
+                                if (instruction.StatusBilled == 2) // 2 significa que fue enviado paso 1 y 2
+                                {
+                                    ResultDte dte = Dte.GetDte(instruction);
+                                    instruction.ResultDteMapping = dte;
+                                }
+
+                                // Mapping status send Sii from Softland                                
+                                instruction.DBSendSiiMapping = DBSendSii.GetSendSiiByFolio(resultParticipant, instruction);
+
+
                                 instructionsL.Add(instruction);
                             }
                             i++;
@@ -171,6 +183,16 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Cols.Add("Rut");
                 IGridMain.Cols.Add("dv");
                 IGridMain.Cols.Add("Amount");
+                IGridMain.Cols.Add("Folio");
+                IGridMain.Cols.Add("Fecha");
+                IGridMain.Cols.Add("Paso 1");
+                IGridMain.Cols.Add("Paso 2");
+                IGridMain.Cols.Add("Paso 3");
+                IGridMain.Cols.Add("Paso 4");
+                IGridMain.Cols.Add("Enviado sii");
+                IGridMain.Cols.Add("Aceptado sii");
+                IGridMain.Cols.Add("Enviado cliente");
+                IGridMain.Cols.Add("Aceptado cliente");
 
                 // General config Grid
                 IGridMain.SelectionMode = iGSelectionMode.MultiExtended;
@@ -192,7 +214,20 @@ namespace Centralizador.WinApp.GUI
                     myRow.Cells[2].Value = item.Id;
                     myRow.Cells[3].Value = item.ResultParticipantMapping.Rut;
                     myRow.Cells[4].Value = item.ResultParticipantMapping.VerificationCode;
-                    myRow.Cells[5].Value = item.Amount;
+                    myRow.Cells[5].Value = string.Format(info, "{0:C0}", item.Amount);
+                    myRow.Cells[6].Value = item.ResultDteMapping.Folio;
+                    myRow.Cells[7].Value = string.Format("{0:dd/MM/yyyy}", item.ResultDteMapping.EmissionDt);
+                    myRow.Cells[8].Value = item.StatusBilled;
+                    myRow.Cells[9].Value = item.StatusBilled;
+                    myRow.Cells[10].Value = "p3";
+                    myRow.Cells[11].Value = "p4";
+                    //if (item.DBSendSiiMapping != null)
+                    //{
+                        myRow.Cells[12].Value = item.DBSendSiiMapping.EnviadoSII;
+                        myRow.Cells[13].Value = item.DBSendSiiMapping.AceptadoSII;
+                        myRow.Cells[14].Value = item.DBSendSiiMapping.EnviadoCliente;
+                        myRow.Cells[15].Value = item.DBSendSiiMapping.AceptadoCliente;
+                   // }
 
 
 
@@ -226,7 +261,7 @@ namespace Centralizador.WinApp.GUI
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
-            ResultParticipant = (ResultParticipant)comboBox.SelectedItem;
+            resultParticipant = (ResultParticipant)comboBox.SelectedItem;
         }
 
         private void BackgroundW_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
@@ -234,6 +269,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.EndUpdate();
             IGridMain.Focus();
             TssLblProgBar.Value = 0;
+            BtnCreditor.Enabled = true;
         }
     }
 }

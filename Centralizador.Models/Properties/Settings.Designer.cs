@@ -58,5 +58,18 @@ namespace Centralizador.Models.Properties {
                 this["PasswordCEN"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<DatosEmpresas>\r\n  <Empresa id=\"189\">SAN" +
+            "FRANCISCO</Empresa>\r\n  <Empresa id=\"190\">QUINTA</Empresa>\r\n</DatosEmpresas>")]
+        public global::System.Xml.XmlDocument DBSoftland {
+            get {
+                return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
+            }
+            set {
+                this["DBSoftland"] = value;
+            }
+        }
     }
 }

@@ -11,5 +11,12 @@
     <Setting Name="PasswordCEN" Type="System.String" Scope="User">
       <Value Profile="(Default)">cvepagos2017</Value>
     </Setting>
+    <Setting Name="DBSoftland" Type="System.Xml.XmlDocument" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;DatosEmpresas&gt;
+  &lt;Empresa id="189"&gt;SANFRANCISCO&lt;/Empresa&gt;
+  &lt;Empresa id="190"&gt;QUINTA&lt;/Empresa&gt;
+&lt;/DatosEmpresas&gt;</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

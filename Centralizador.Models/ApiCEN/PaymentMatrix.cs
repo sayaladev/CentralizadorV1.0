@@ -102,7 +102,10 @@ namespace Centralizador.Models.ApiCEN
                 if (res != null)
                 {
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    return p.Results;
+                    if (p.Results.Count > 0)
+                    {
+                        return p.Results;
+                    }
                 }
             }
             catch (Exception)

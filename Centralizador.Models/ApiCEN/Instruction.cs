@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-
+using Centralizador.Models.DataBase;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -69,7 +69,13 @@ namespace Centralizador.Models.ApiCEN
         public ResultParticipant ResultParticipantMapping { get; set; }
 
         [JsonIgnore]
-        public ResultPaymentMatrix PaymentMatrixMapping { get; set; }
+        public ResultPaymentMatrix ResultPaymentMatrixMapping { get; set; }
+
+        [JsonIgnore]
+        public ResultDte ResultDteMapping { get; set; }
+        [JsonIgnore]
+        public DBSendSii DBSendSiiMapping { get; set; }
+
     }
 
     public class Instruction
@@ -102,11 +108,11 @@ namespace Centralizador.Models.ApiCEN
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (instruction.Results.Count == 0)
+                    if (instruction.Results.Count >0)
                     {
-                        return null;
+                        return instruction.Results;
                     }
-                    return instruction.Results;
+
                 }
             }
             catch (Exception)

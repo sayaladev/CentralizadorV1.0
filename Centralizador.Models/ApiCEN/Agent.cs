@@ -69,7 +69,10 @@ namespace Centralizador.Models.ApiCEN
                 if (res != null)
                 {
                     Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    return agent.Results[0];
+                    if (agent.Results.Count == 1)
+                    {
+                        return agent.Results[0];
+                    }
                 }
             }
             catch (Exception)
