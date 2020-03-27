@@ -101,43 +101,57 @@ namespace Centralizador.WinApp.GUI
                 IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(date);
                 foreach (ResultPaymentMatrix matrix in matrices)
                 {
-                    int i = 0;
-                    BackgroundW.ReportProgress(0, "");
-                    // Get list of instructions
-                    IList<ResultInstruction> instructions;
-                    instructions = Instruction.GetInstructions(matrix, resultParticipant);
-                    if (instructions != null)
+
+                    // ONLY TESTER
+                    if (matrix.Id == 680)
                     {
-                        foreach (ResultInstruction instruction in instructions)
+
+
+                        int i = 0;
+                        BackgroundW.ReportProgress(0, "");
+                        // Get list of instructions
+                        IList<ResultInstruction> instructions;
+                        instructions = Instruction.GetInstructions(matrix, resultParticipant);
+                        if (instructions != null)
                         {
-                            if (instruction.Status == "Publicado")
+                            foreach (ResultInstruction instruction in instructions)
                             {
-                                // Mapping matrix from CEN
-                                instruction.ResultPaymentMatrixMapping = matrix;
-                                // Mapping participant from CEN
-                                ResultParticipant participant = new ResultParticipant
+                                if (instruction.Status == "Publicado")
                                 {
-                                    ParticipantId = instruction.Debtor
-                                };
-                                instruction.ResultParticipantMapping = Participant.GetParticipantById(participant);
-                                // Mapping dte from Softland
-                                instruction.ResultDteMapping = DBReference.GetReferenceByGlosa(instruction);
+                                    // Mapping matrix from CEN
+                                    instruction.ResultPaymentMatrixMapping = matrix;
 
-                                // Mapping Dte from CEN
-                                if (instruction.StatusBilled == 2) // 2 significa que fue enviado paso 1 y 2
-                                {
-                                    ResultDte dte = Dte.GetDte(instruction);
-                                    instruction.ResultDteMapping = dte;
+                                    // Mapping participant from CEN
+                                    ResultParticipant participant = new ResultParticipant
+                                    {
+                                        ParticipantId = instruction.Debtor
+                                    };
+                                    instruction.ResultParticipantMapping = Participant.GetParticipantById(participant);
+
+                                    // Mapping dte from Softland
+                                    instruction.ResultDteMapping = DBReference.GetReferenceByGlosa(instruction);
+
+                                    // Mapping Dte from CEN
+                                    if (instruction.StatusBilled == 2) // 2 significa que fue enviado paso 1 y 2
+                                    {
+                                        ResultDte dte = Dte.GetDte(instruction);
+                                        instruction.ResultDteMapping = dte;
+                                    }
+
+                                    // Mapping status send Sii from Softland 
+                                    if (instruction.DBSendSiiMapping != null)
+                                    {
+                                        instruction.DBSendSiiMapping = DBSendSii.GetSendSiiByFolio(resultParticipant, instruction);
+                                    }
+
+
+
+                                    instructionsL.Add(instruction);
+
                                 }
-
-                                // Mapping status send Sii from Softland                                
-                                instruction.DBSendSiiMapping = DBSendSii.GetSendSiiByFolio(resultParticipant, instruction);
-
-
-                                instructionsL.Add(instruction);
+                                i++;
+                                BackgroundW.ReportProgress(100 * i / instructions.Count, $"Working...in: {matrix.NaturalKey}");
                             }
-                            i++;
-                            BackgroundW.ReportProgress(100 * i / instructions.Count, $"Working...in: {matrix.NaturalKey}");
                         }
                     }
                 }
@@ -215,19 +229,21 @@ namespace Centralizador.WinApp.GUI
                     myRow.Cells[3].Value = item.ResultParticipantMapping.Rut;
                     myRow.Cells[4].Value = item.ResultParticipantMapping.VerificationCode;
                     myRow.Cells[5].Value = string.Format(info, "{0:C0}", item.Amount);
-                    myRow.Cells[6].Value = item.ResultDteMapping.Folio;
-                    myRow.Cells[7].Value = string.Format("{0:dd/MM/yyyy}", item.ResultDteMapping.EmissionDt);
+
+
                     myRow.Cells[8].Value = item.StatusBilled;
                     myRow.Cells[9].Value = item.StatusBilled;
                     myRow.Cells[10].Value = "p3";
                     myRow.Cells[11].Value = "p4";
-                    //if (item.DBSendSiiMapping != null)
-                    //{
+                    if (item.DBSendSiiMapping != null)
+                    {
+                        myRow.Cells[6].Value = item.ResultDteMapping.Folio;
+                        myRow.Cells[7].Value = string.Format("{0:dd/MM/yyyy}", item.ResultDteMapping.EmissionDt);
                         myRow.Cells[12].Value = item.DBSendSiiMapping.EnviadoSII;
                         myRow.Cells[13].Value = item.DBSendSiiMapping.AceptadoSII;
                         myRow.Cells[14].Value = item.DBSendSiiMapping.EnviadoCliente;
                         myRow.Cells[15].Value = item.DBSendSiiMapping.AceptadoCliente;
-                   // }
+                    }
 
 
 

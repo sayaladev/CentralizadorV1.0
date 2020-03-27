@@ -34,6 +34,7 @@ namespace Centralizador.Models.DataBase
                 if (item.Attributes["id"].Value == instruction.Creditor.ToString())
                 {
                     DataBaseName = item.FirstChild.InnerText;
+                    break;
                 }
             }
 

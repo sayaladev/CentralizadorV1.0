@@ -29,7 +29,9 @@
         private void InitializeComponent()
         {
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
+            this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblProgBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.TssLblMensaje = new System.Windows.Forms.ToolStripStatusLabel();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
@@ -43,8 +45,8 @@
             this.CboCerts = new System.Windows.Forms.ComboBox();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
-            this.TssLblMensaje = new System.Windows.Forms.ToolStripStatusLabel();
-            this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -66,10 +68,20 @@
             this.StatusStrip.TabIndex = 0;
             this.StatusStrip.Text = "statusStrip1";
             // 
+            // TssLblFechaHora
+            // 
+            this.TssLblFechaHora.Name = "TssLblFechaHora";
+            this.TssLblFechaHora.Size = new System.Drawing.Size(0, 17);
+            // 
             // TssLblProgBar
             // 
             this.TssLblProgBar.Name = "TssLblProgBar";
             this.TssLblProgBar.Size = new System.Drawing.Size(300, 16);
+            // 
+            // TssLblMensaje
+            // 
+            this.TssLblMensaje.Name = "TssLblMensaje";
+            this.TssLblMensaje.Size = new System.Drawing.Size(0, 17);
             // 
             // SplitContainer
             // 
@@ -83,6 +95,8 @@
             // 
             // SplitContainer.Panel2
             // 
+            this.SplitContainer.Panel2.Controls.Add(this.groupBox3);
+            this.SplitContainer.Panel2.Controls.Add(this.groupBox2);
             this.SplitContainer.Panel2.Controls.Add(this.label1);
             this.SplitContainer.Panel2.Controls.Add(this.GroupBox1);
             this.SplitContainer.Size = new System.Drawing.Size(1350, 707);
@@ -112,6 +126,8 @@
             // 
             // GroupBox1
             // 
+            this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.GroupBox1.Controls.Add(this.button2);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.CboYears);
@@ -188,15 +204,28 @@
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
             // 
-            // TssLblMensaje
+            // groupBox2
             // 
-            this.TssLblMensaje.Name = "TssLblMensaje";
-            this.TssLblMensaje.Size = new System.Drawing.Size(0, 17);
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Location = new System.Drawing.Point(13, 243);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(285, 177);
+            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "groupBox2";
             // 
-            // TssLblFechaHora
+            // groupBox3
             // 
-            this.TssLblFechaHora.Name = "TssLblFechaHora";
-            this.TssLblFechaHora.Size = new System.Drawing.Size(0, 17);
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Location = new System.Drawing.Point(13, 427);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(285, 231);
+            this.groupBox3.TabIndex = 3;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "groupBox3";
             // 
             // FormMain
             // 
@@ -241,5 +270,7 @@
         private System.ComponentModel.BackgroundWorker BackgroundW;
         private System.Windows.Forms.ToolStripStatusLabel TssLblMensaje;
         private System.Windows.Forms.ToolStripStatusLabel TssLblFechaHora;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }
