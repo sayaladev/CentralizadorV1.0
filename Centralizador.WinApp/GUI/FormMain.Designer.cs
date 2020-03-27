@@ -36,17 +36,17 @@
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
+            this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.button2 = new System.Windows.Forms.Button();
             this.BtnCreditor = new System.Windows.Forms.Button();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.CboCerts = new System.Windows.Forms.ComboBox();
-            this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -115,6 +115,29 @@
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Location = new System.Drawing.Point(13, 453);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(285, 205);
+            this.groupBox3.TabIndex = 3;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "groupBox3";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Location = new System.Drawing.Point(13, 243);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(285, 204);
+            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "groupBox2";
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -128,18 +151,28 @@
             // 
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBox1.Controls.Add(this.CboParticipants);
             this.GroupBox1.Controls.Add(this.button2);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
             this.GroupBox1.Controls.Add(this.CboCerts);
-            this.GroupBox1.Controls.Add(this.CboParticipants);
             this.GroupBox1.Location = new System.Drawing.Point(13, 12);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(285, 209);
+            this.GroupBox1.Size = new System.Drawing.Size(285, 225);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "groupBox1";
+            // 
+            // CboParticipants
+            // 
+            this.CboParticipants.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CboParticipants.FormattingEnabled = true;
+            this.CboParticipants.Location = new System.Drawing.Point(8, 46);
+            this.CboParticipants.Name = "CboParticipants";
+            this.CboParticipants.Size = new System.Drawing.Size(261, 21);
+            this.CboParticipants.TabIndex = 0;
+            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
             // 
             // button2
             // 
@@ -164,38 +197,28 @@
             // 
             this.CboYears.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboYears.FormattingEnabled = true;
-            this.CboYears.Location = new System.Drawing.Point(160, 110);
+            this.CboYears.Location = new System.Drawing.Point(167, 19);
             this.CboYears.Name = "CboYears";
-            this.CboYears.Size = new System.Drawing.Size(81, 21);
+            this.CboYears.Size = new System.Drawing.Size(102, 21);
             this.CboYears.TabIndex = 3;
             // 
             // CboMonths
             // 
             this.CboMonths.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboMonths.FormattingEnabled = true;
-            this.CboMonths.Location = new System.Drawing.Point(16, 111);
+            this.CboMonths.Location = new System.Drawing.Point(8, 19);
             this.CboMonths.Name = "CboMonths";
-            this.CboMonths.Size = new System.Drawing.Size(121, 21);
+            this.CboMonths.Size = new System.Drawing.Size(132, 21);
             this.CboMonths.TabIndex = 2;
             // 
             // CboCerts
             // 
             this.CboCerts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboCerts.FormattingEnabled = true;
-            this.CboCerts.Location = new System.Drawing.Point(16, 71);
+            this.CboCerts.Location = new System.Drawing.Point(6, 90);
             this.CboCerts.Name = "CboCerts";
             this.CboCerts.Size = new System.Drawing.Size(263, 21);
             this.CboCerts.TabIndex = 1;
-            // 
-            // CboParticipants
-            // 
-            this.CboParticipants.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CboParticipants.FormattingEnabled = true;
-            this.CboParticipants.Location = new System.Drawing.Point(16, 32);
-            this.CboParticipants.Name = "CboParticipants";
-            this.CboParticipants.Size = new System.Drawing.Size(145, 21);
-            this.CboParticipants.TabIndex = 0;
-            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
             // 
             // BackgroundW
             // 
@@ -203,29 +226,6 @@
             this.BackgroundW.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundW_DoWork);
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Location = new System.Drawing.Point(13, 243);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(285, 177);
-            this.groupBox2.TabIndex = 2;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "groupBox2";
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox3.Location = new System.Drawing.Point(13, 427);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(285, 231);
-            this.groupBox3.TabIndex = 3;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "groupBox3";
             // 
             // FormMain
             // 

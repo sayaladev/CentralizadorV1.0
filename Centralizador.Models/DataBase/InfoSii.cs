@@ -6,7 +6,7 @@ using Centralizador.Models.ApiCEN;
 
 namespace Centralizador.Models.DataBase
 {
-    public class DBSendSii
+    public class InfoSii
     {
         public byte EnviadoSII { get; set; }
         public byte AceptadoSII { get; set; }
@@ -25,7 +25,7 @@ namespace Centralizador.Models.DataBase
         public string OrigenDestino { get; set; }
 
 
-        public static DBSendSii GetSendSiiByFolio(ResultParticipant participante, ResultInstruction instruction)
+        public static InfoSii GetSendSiiByFolio(ResultParticipant participante, ResultInstruction instruction)
         {
             XmlDocument document = Properties.Settings.Default.DBSoftland;
             string DataBaseName = "";
@@ -43,7 +43,7 @@ namespace Centralizador.Models.DataBase
                 return null;
             }
 
-            DBSendSii dte = new DBSendSii();
+            InfoSii dte = new InfoSii();
             DBConn con = new DBConn
             {
                 Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID=sa;Password=123456"
@@ -58,7 +58,7 @@ namespace Centralizador.Models.DataBase
             con.Query += "on DDC.TipoDTE = DSII.DocCod  ";
             con.Query += "left JOIN softland.DTE_LogRecEnv DLog  ";
             con.Query += "ON DDC.RutEmisor = DLog.RutEmisor AND DDC.IDSetDTESII = DLog.IDSetDTE  ";
-            con.Query += $"Where DSII.Tipo = 'F' and DSII.SubTipoDocto = 'T' AND DDC.Folio = {instruction.ResultDteMapping.Folio} and ";
+           // con.Query += $"Where DSII.Tipo = 'F' and DSII.SubTipoDocto = 'T' AND DDC.Folio = {instruction.ResultDteM.Folio} and ";
             con.Query += $"DDC.RutEmisor = '{participante.Rut}-{participante.VerificationCode}' ";
 
 

@@ -66,15 +66,14 @@ namespace Centralizador.Models.ApiCEN
         //Mapping (new properties)    
 
         [JsonIgnore]
-        public ResultParticipant ResultParticipantMapping { get; set; }
+        public ResultParticipant ParticipantM { get; set; }
 
         [JsonIgnore]
-        public ResultPaymentMatrix ResultPaymentMatrixMapping { get; set; }
+        public ResultPaymentMatrix PaymentMatrixM { get; set; }
 
         [JsonIgnore]
-        public ResultDte ResultDteMapping { get; set; }
-        [JsonIgnore]
-        public DBSendSii DBSendSiiMapping { get; set; }
+        public Softland Softland { get; set; }
+
 
     }
 

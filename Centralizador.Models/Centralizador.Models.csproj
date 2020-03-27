@@ -51,8 +51,8 @@
     <Compile Include="ApiCEN\Participant.cs" />
     <Compile Include="ApiCEN\PaymentMatrix.cs" />
     <Compile Include="DataBase\DBConn.cs" />
-    <Compile Include="DataBase\DBReference.cs" />
-    <Compile Include="DataBase\DBSendSii.cs" />
+    <Compile Include="DataBase\Reference.cs" />
+    <Compile Include="DataBase\InfoSii.cs" />
     <Compile Include="DataBase\Softland.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
