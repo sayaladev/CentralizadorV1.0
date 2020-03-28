@@ -21,8 +21,8 @@ namespace Centralizador.WinApp.GUI
         #region Global variables/prop
 
         private ResultParticipant UserParticipant { get; set; }
-        private IList<ResultPaymentMatrix> PaymentMatrixCreditor { get; set; }
-        private IList<ResultPaymentMatrix> PaymentMatrixDebitor { get; set; }
+        private IList<ResultInstruction> InstructionsCreditor { get; set; }
+        private IList<ResultInstruction> InstructionsDebitor { get; set; }
         private ServiceLibro LibroCompraDebtor { get; set; }
 
         private DateTime DateTimeCbo { get; set; }
@@ -46,7 +46,7 @@ namespace Centralizador.WinApp.GUI
             IList<ResultParticipant> participants = new List<ResultParticipant>();
             foreach (ResultParticipant item in agent.Participants)
             {
-                participants.Add(Participant.GetParticipantById(item));
+                participants.Add(Participant.GetParticipantById(item.ParticipantId));
             }
             CboParticipants.DisplayMember = "Name";
             CboParticipants.DataSource = participants;
@@ -74,9 +74,9 @@ namespace Centralizador.WinApp.GUI
             DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
             UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
 
-            // Get list of payments matrix              
-            PaymentMatrixCreditor = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
-            BackgroundW.RunWorkerAsync(PaymentMatrixCreditor);
+            // Get list of payments matrix            
+            IList<ResultPaymentMatrix> matrices  = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
+            BackgroundW.RunWorkerAsync(matrices);
 
         }
 
@@ -86,8 +86,10 @@ namespace Centralizador.WinApp.GUI
             UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
 
             // Get libro compra
-
-            // Get list of payments matrix 
+            //Debo llegar desde outlook a matrices por el natural_key
+            
+            // Get list of payments matrix            
+            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
 
 
         }
@@ -118,7 +120,7 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void IGridDesign(IList<ResultInstruction> instructions)
+        private void IGridDesign()
         {
             try
             {
@@ -147,18 +149,27 @@ namespace Centralizador.WinApp.GUI
 
                 // Add data columns.                
                 IGridMain.Cols.Add("Instruction");
+                IGridMain.Cols.Add("Cod Prod");
+                IGridMain.Cols.Add("Paso1");
+                IGridMain.Cols.Add("Paso2");
+                IGridMain.Cols.Add("Paso3");
+                IGridMain.Cols.Add("Paso4");
                 IGridMain.Cols.Add("Rut");
-                IGridMain.Cols.Add("dv");
+                IGridMain.Cols.Add("Dv");
                 IGridMain.Cols.Add("Amount");
+                IGridMain.Cols.Add("Exent amount");
+                IGridMain.Cols.Add("Iva");
+                IGridMain.Cols.Add("Total");
                 IGridMain.Cols.Add("Folio");
-                IGridMain.Cols.Add("Fecha");
-                IGridMain.Cols.Add("Paso 1");
-                IGridMain.Cols.Add("Paso 2");
-                IGridMain.Cols.Add("Paso 3");
-                IGridMain.Cols.Add("Paso 4");
-                IGridMain.Cols.Add("Enviado sii");
-                IGridMain.Cols.Add("Aceptado sii");
-                IGridMain.Cols.Add("Enviado cliente");
+                IGridMain.Cols.Add("F. emisión");
+                IGridMain.Cols.Add("Cbte.");
+                IGridMain.Cols.Add("F. de pago");
+                IGridMain.Cols.Add("pic");
+                IGridMain.Cols.Add("F. de envío");
+                IGridMain.Cols.Add("flag");
+                IGridMain.Cols.Add("status");
+                IGridMain.Cols.Add("F. de envío");
+                IGridMain.Cols.Add("M");
                 IGridMain.Cols.Add("Aceptado cliente");
 
                 // General config Grid
@@ -174,18 +185,19 @@ namespace Centralizador.WinApp.GUI
 
                 // Fill up the cells with data.                
                 iGRow myRow;
-                foreach (ResultInstruction item in instructions)
+                
+                foreach (ResultInstruction instruction in InstructionsCreditor)
                 {
                     // Add rows.                    
                     myRow = IGridMain.Rows.Add();
-                    myRow.Cells[2].Value = item.Id;
-                    myRow.Cells[3].Value = item.ParticipantM.Rut;
-                    myRow.Cells[4].Value = item.ParticipantM.VerificationCode;
-                    myRow.Cells[5].Value = string.Format(CultureInfo, "{0:C0}", item.Amount);
+                    myRow.Cells[2].Value = instruction.Id;
+                    myRow.Cells[3].Value = instruction.PaymentMatrix.NaturalKey;
+                    //myRow.Cells[4].Value = item.ParticipantM.VerificationCode;
+                    myRow.Cells[5].Value = string.Format(CultureInfo, "{0:C0}", instruction.Amount);
 
 
-                    myRow.Cells[8].Value = item.StatusBilled;
-                    myRow.Cells[9].Value = item.StatusBilled;
+                    myRow.Cells[8].Value = instruction.StatusBilled;
+                    myRow.Cells[9].Value = instruction.StatusBilled;
                     myRow.Cells[10].Value = "p3";
                     myRow.Cells[11].Value = "p4";
                     //if (item.DBSendSiiMapping != null)
@@ -212,6 +224,7 @@ namespace Centralizador.WinApp.GUI
                 throw;
             }
             IGridMain.EndUpdate();
+            IGridMain.Focus();
 
         }
 
@@ -223,95 +236,29 @@ namespace Centralizador.WinApp.GUI
             BackgroundW.ReportProgress(0, "");
             foreach (ResultPaymentMatrix matrix in matrices)
             {
-                IList<ResultInstruction> instructions = Instruction.GetInstructions(matrix, UserParticipant);
-                foreach (ResultInstruction instruction in instructions)
+                if (matrix.Id == 680)
                 {
-                    if (instruction.Status == "Publicado")
+                    InstructionsCreditor = Instruction.GetInstructions(matrix, UserParticipant);
+                    foreach (ResultInstruction instruction in InstructionsCreditor)
                     {
-                        instruction.PaymentMatrix = matrix;
-                        instruction.Participant = Participant.GetParticipantById(instruction.Debtor);
-                        //Softland Class
-                        Softland softland = new Softland
+                        int i = 0;
+                        if (instruction.Status == "Publicado")
                         {
-                            Reference = Reference.GetReferenceByGlosa(instruction),
-                            InfoSii = InfoSii.GetSendSiiByFolio(instruction)
-                        };
+                            instruction.PaymentMatrix = matrix;
+                            instruction.Participant = Participant.GetParticipantById(instruction.Debtor);
+                            Softland softland = new Softland();
+                            softland.GetSoftlandData(instruction);
 
-                        if (instruction.StatusBilled == 2)
-                        {
-                            instruction.Dte = Dte.GetDte(instruction);
+                            if (instruction.StatusBilled == 2)
+                            {
+                                instruction.Dte = Dte.GetDte(instruction);
+                            }
                         }
-
-
-
+                        i++;
+                        BackgroundW.ReportProgress(100 * i / InstructionsCreditor.Count, $"Working...in: {matrix.NaturalKey}");
                     }
-
-
-
                 }
-
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //        // ONLY TESTER
-            //        if (matrix.Id == 680)
-            //      
-            //                    
-            //                     
-
-            //                        // Mapping Dte from CEN
-            //                        //if (instruction.StatusBilled == 2) // 2 significa que fue enviado paso 1 y 2
-            //                        //{
-            //                        //    ResultDte dte = Dte.GetDte(instruction);
-            //                        //    //instruction.ResultDteMapping = dte;
-            //                        //}
-
-            //                        // Mapping status send Sii from Softland 
-            //                        //if (instruction.DBSendSiiMapping != null)
-            //                        //{
-            //                        //    instruction.DBSendSiiMapping = DBSendSii.GetSendSiiByFolio(resultParticipant, instruction);
-            //                        //}
-
-
-
-            //                        instructionsList.Add(instruction);
-
-            //                    }
-            //                    i++;
-            //                    BackgroundW.ReportProgress(100 * i / instructions.Count, $"Working...in: {matrix.NaturalKey}");
-            //                }
-            //            }
-            //        }
-            //    }
-            //    BackgroundW.ReportProgress(100, "Complete!");
-
-
-            //}
-
-            //catch (Exception)
-            //{
-
-            //}
-            //finally
-            //{
-
-            //}
-
-
-
         }
 
         private void BackgroundW_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
@@ -322,8 +269,8 @@ namespace Centralizador.WinApp.GUI
 
         private void BackgroundW_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            IGridMain.EndUpdate();
-            IGridMain.Focus();
+
+            IGridDesign();
             TssLblProgBar.Value = 0;
             BtnCreditor.Enabled = true;
         }

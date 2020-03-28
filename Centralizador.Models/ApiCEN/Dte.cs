@@ -102,7 +102,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"dtes/?folio={instruction.Debtor}&reported_by_creditor={true}&instruction={instruction.Id}&creditor={instruction.Creditor}");
+                string res = wc.DownloadString($"dtes/?debtor={instruction.Debtor}&reported_by_creditor={true}&instruction={instruction.Id}&creditor={instruction.Creditor}");
                 if (res != null)
                 {
                     Dte dte = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

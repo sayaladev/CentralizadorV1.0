@@ -172,7 +172,7 @@
             this.CboParticipants.Name = "CboParticipants";
             this.CboParticipants.Size = new System.Drawing.Size(261, 21);
             this.CboParticipants.TabIndex = 0;
-            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
+        
             // 
             // BtnDebitor
             // 
