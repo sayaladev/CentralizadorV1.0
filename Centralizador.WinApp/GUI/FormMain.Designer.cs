@@ -41,7 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.BtnDebitor = new System.Windows.Forms.Button();
             this.BtnCreditor = new System.Windows.Forms.Button();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
@@ -152,7 +152,7 @@
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GroupBox1.Controls.Add(this.CboParticipants);
-            this.GroupBox1.Controls.Add(this.button2);
+            this.GroupBox1.Controls.Add(this.BtnDebitor);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
@@ -174,14 +174,15 @@
             this.CboParticipants.TabIndex = 0;
             this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
             // 
-            // button2
+            // BtnDebitor
             // 
-            this.button2.Location = new System.Drawing.Point(150, 147);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 46);
-            this.button2.TabIndex = 5;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
+            this.BtnDebitor.Location = new System.Drawing.Point(150, 147);
+            this.BtnDebitor.Name = "BtnDebitor";
+            this.BtnDebitor.Size = new System.Drawing.Size(75, 46);
+            this.BtnDebitor.TabIndex = 5;
+            this.BtnDebitor.Text = "button2";
+            this.BtnDebitor.UseVisualStyleBackColor = true;
+            this.BtnDebitor.Click += new System.EventHandler(this.BtnDebitor_Click);
             // 
             // BtnCreditor
             // 
@@ -263,7 +264,7 @@
         private System.Windows.Forms.ComboBox CboParticipants;
         private System.Windows.Forms.ComboBox CboYears;
         private System.Windows.Forms.ComboBox CboMonths;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button BtnDebitor;
         private System.Windows.Forms.Button BtnCreditor;
         private System.Windows.Forms.ToolStripProgressBar TssLblProgBar;
         private System.Windows.Forms.Label label1;

@@ -71,5 +71,25 @@ namespace Centralizador.Models.Properties {
                 this["DBSoftland"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://palena.sii.cl/DTEWS/CrSeed.jws")]
+        public string Centralizador_Models_CrSeed_CrSeedService {
+            get {
+                return ((string)(this["Centralizador_Models_CrSeed_CrSeedService"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://palena.sii.cl/DTEWS/GetTokenFromSeed.jws")]
+        public string Centralizador_Models_GetTokenFromSeed_GetTokenFromSeedService {
+            get {
+                return ((string)(this["Centralizador_Models_GetTokenFromSeed_GetTokenFromSeedService"]));
+            }
+        }
     }
 }

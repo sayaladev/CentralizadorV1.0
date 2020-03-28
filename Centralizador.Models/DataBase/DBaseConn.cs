@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 
 namespace Centralizador.Models.DataBase
 {
-    public class DBConn
+    public class DBaseConn
     {
         public string Cnn { get; set; }
         public string Query { get; set; }
@@ -12,7 +12,7 @@ namespace Centralizador.Models.DataBase
         public static SqlDataReader SqlDataReader { get; set; }
 
 
-        public static DataTable ConexionBdQuery(DBConn conn)
+        public static DataTable ConexionBdQuery(DBaseConn conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {

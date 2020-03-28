@@ -17,7 +17,7 @@ namespace Centralizador.Models.DataBase
 
         public string FolioRef { get; set; }
 
-        public DateTime FechaRef { get; set; }        
+        public DateTime FechaRef { get; set; }
 
         public string Glosa { get; set; }
 
@@ -39,20 +39,20 @@ namespace Centralizador.Models.DataBase
             if (DataBaseName == null)
             {
                 yield break;
-            }            
+            }
             IEnumerable<Reference> dtes = new List<Reference>();
-            DBConn con = new DBConn
+            DBaseConn con = new DBaseConn
             {
                 Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID=sa;Password=123456"
             };
             con.Query += "select r.NroInt, g.Folio, g.Fecha, r.FolioRef, r.FechaRef, r.Glosa, g.FmaPago, m.DetProd ";
             con.Query += "from softland.IW_GSaEn_RefDTE r inner join softland.iw_gsaen g on r.NroInt = g.NroInt and r.CodRefSII = 'SEN' and r.Tipo = 'F' ";
             con.Query += $"left join softland.iw_gmovi m on g.NroInt = m.NroInt and g.Tipo = r.Tipo where g.NetoAfecto = {instruction.Amount} and ";
-            con.Query += $"g.CodAux = '{instruction.ParticipantM.Rut}' and r.Glosa = '{instruction.PaymentMatrixM.NaturalKey}' ";
-            con.Query += $"and r.FolioRef = '{instruction.PaymentMatrixM.ReferenceCode}'";
+            con.Query += $"g.CodAux = '{instruction.Participant.Rut}' and r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' ";
+            con.Query += $"and r.FolioRef = '{instruction.PaymentMatrix.ReferenceCode}'";
 
             DataTable dataTable = new DataTable();
-            dataTable = DBConn.ConexionBdQuery(con);
+            dataTable = DBaseConn.ConexionBdQuery(con);
             if (dataTable != null)
             {
                 foreach (DataRow item in dataTable.Rows)

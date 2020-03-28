@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Xml;
 
@@ -25,7 +26,7 @@ namespace Centralizador.Models.DataBase
         public string OrigenDestino { get; set; }
 
 
-        public static InfoSii GetSendSiiByFolio(ResultParticipant participante, ResultInstruction instruction)
+        public static IEnumerable<InfoSii> GetSendSiiByFolio(ResultInstruction instruction)
         {
             XmlDocument document = Properties.Settings.Default.DBSoftland;
             string DataBaseName = "";
@@ -40,11 +41,11 @@ namespace Centralizador.Models.DataBase
 
             if (DataBaseName == null)
             {
-                return null;
+                yield break;
             }
 
             InfoSii dte = new InfoSii();
-            DBConn con = new DBConn
+            DBaseConn con = new DBaseConn
             {
                 Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID=sa;Password=123456"
             };
@@ -58,32 +59,36 @@ namespace Centralizador.Models.DataBase
             con.Query += "on DDC.TipoDTE = DSII.DocCod  ";
             con.Query += "left JOIN softland.DTE_LogRecEnv DLog  ";
             con.Query += "ON DDC.RutEmisor = DLog.RutEmisor AND DDC.IDSetDTESII = DLog.IDSetDTE  ";
-           // con.Query += $"Where DSII.Tipo = 'F' and DSII.SubTipoDocto = 'T' AND DDC.Folio = {instruction.ResultDteM.Folio} and ";
-            con.Query += $"DDC.RutEmisor = '{participante.Rut}-{participante.VerificationCode}' ";
+            // con.Query += $"Where DSII.Tipo = 'F' and DSII.SubTipoDocto = 'T' AND DDC.Folio = {instruction.ResultDteM.Folio} and ";
+            con.Query += $"DDC.RutEmisor = '{instruction.Participant.Rut}-{instruction.Participant.VerificationCode}' ";
 
 
             DataTable dataTable = new DataTable();
-            dataTable = DBConn.ConexionBdQuery(con);
-            if (dataTable != null && dataTable.Rows.Count == 1)
+            dataTable = DBaseConn.ConexionBdQuery(con);
+            if (dataTable != null)
             {
-                dte.EnviadoSII = Convert.ToByte(dataTable.Rows[0].ItemArray[0]);
-                dte.AceptadoSII = Convert.ToByte(dataTable.Rows[0].ItemArray[1]);
-                dte.EnviadoCliente = Convert.ToByte(dataTable.Rows[0].ItemArray[2]);
-                dte.AceptadoCliente = Convert.ToByte(dataTable.Rows[0].ItemArray[3]);
-                dte.Motivo = dataTable.Rows[0].ItemArray[4].ToString();
-                dte.IdSetDTESII = dataTable.Rows[0].ItemArray[5].ToString();
-                dte.TrackID = Convert.ToUInt64(dataTable.Rows[0].ItemArray[6]);
-                dte.XMLEnviado = Convert.ToUInt32(dataTable.Rows[0].ItemArray[7]);
-                dte.FileEnviado = dataTable.Rows[0].ItemArray[8].ToString();
-                dte.Archivo = dataTable.Rows[0].ItemArray[9].ToString();
-                dte.FechaEnvioSII = Convert.ToDateTime(dataTable.Rows[0].ItemArray[10]);
-                dte.FechaEnvioCliente = Convert.ToDateTime(dataTable.Rows[0].ItemArray[11]);
-                dte.XMLBasico = Convert.ToUInt32(dataTable.Rows[0].ItemArray[12]);
-                dte.FileBasico = dataTable.Rows[0].ItemArray[13].ToString();
-                dte.OrigenDestino = dataTable.Rows[0].ItemArray[14].ToString();
-                return dte;
+                foreach (DataRow item in dataTable.Rows)
+                {
+                    yield return new InfoSii
+                    {
+                        EnviadoSII = Convert.ToByte(dataTable.Rows[0].ItemArray[0]),
+                        AceptadoSII = Convert.ToByte(dataTable.Rows[0].ItemArray[1]),
+                        EnviadoCliente = Convert.ToByte(dataTable.Rows[0].ItemArray[2]),
+                        AceptadoCliente = Convert.ToByte(dataTable.Rows[0].ItemArray[3]),
+                        Motivo = dataTable.Rows[0].ItemArray[4].ToString(),
+                        IdSetDTESII = dataTable.Rows[0].ItemArray[5].ToString(),
+                        TrackID = Convert.ToUInt64(dataTable.Rows[0].ItemArray[6]),
+                        XMLEnviado = Convert.ToUInt32(dataTable.Rows[0].ItemArray[7]),
+                        FileEnviado = dataTable.Rows[0].ItemArray[8].ToString(),
+                        Archivo = dataTable.Rows[0].ItemArray[9].ToString(),
+                        FechaEnvioSII = Convert.ToDateTime(dataTable.Rows[0].ItemArray[10]),
+                        FechaEnvioCliente = Convert.ToDateTime(dataTable.Rows[0].ItemArray[11]),
+                        XMLBasico = Convert.ToUInt32(dataTable.Rows[0].ItemArray[12]),
+                        FileBasico = dataTable.Rows[0].ItemArray[13].ToString(),
+                        OrigenDestino = dataTable.Rows[0].ItemArray[14].ToString(),
+                    };
+                }
             }
-            return null;
         }
     }
 }

@@ -70,6 +70,8 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonProperty("payment_due_type")]
         public int PaymentDueType { get; set; }
+
+
     }
 
     public class PaymentMatrix

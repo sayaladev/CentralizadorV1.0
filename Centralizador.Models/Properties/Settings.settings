@@ -18,5 +18,11 @@
   &lt;Empresa id="190"&gt;QUINTA&lt;/Empresa&gt;
 &lt;/DatosEmpresas&gt;</Value>
     </Setting>
+    <Setting Name="Centralizador_Models_CrSeed_CrSeedService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://palena.sii.cl/DTEWS/CrSeed.jws</Value>
+    </Setting>
+    <Setting Name="Centralizador_Models_GetTokenFromSeed_GetTokenFromSeedService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://palena.sii.cl/DTEWS/GetTokenFromSeed.jws</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

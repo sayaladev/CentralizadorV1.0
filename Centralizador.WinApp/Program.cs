@@ -12,6 +12,9 @@ namespace Centralizador.WinApp
         [STAThread]
         private static void Main()
         {
+            //ACÁ DEBO COMPROBAR VARIABLES DE INICIO...
+            //COMPROBAR ESTADO DE DB SOFTLAND POR EJEMPLO
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormMain());

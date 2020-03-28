@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+
 using Centralizador.Models.DataBase;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -11,12 +13,11 @@ namespace Centralizador.Models.ApiCEN
 
     public class ResultInstruction
     {
-
         [JsonProperty("id")]
         public int Id { get; set; }
 
         [JsonProperty("payment_matrix")]
-        public int PaymentMatrix { get; set; }
+        public int PaymentMatrixId { get; set; }
 
         [JsonProperty("creditor")]
         public int Creditor { get; set; }
@@ -65,14 +66,14 @@ namespace Centralizador.Models.ApiCEN
 
         //Mapping (new properties)    
 
-        [JsonIgnore]
-        public ResultParticipant ParticipantM { get; set; }
+        public ResultParticipant Participant { get; set; }
 
-        [JsonIgnore]
-        public ResultPaymentMatrix PaymentMatrixM { get; set; }
+        public ResultPaymentMatrix PaymentMatrix { get; set; }
 
-        [JsonIgnore]
+        public ResultDte Dte { get; set; }
+
         public Softland Softland { get; set; }
+
 
 
     }
@@ -107,7 +108,7 @@ namespace Centralizador.Models.ApiCEN
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (instruction.Results.Count >0)
+                    if (instruction.Results.Count > 0)
                     {
                         return instruction.Results;
                     }
