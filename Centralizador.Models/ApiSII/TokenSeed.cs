@@ -12,12 +12,25 @@ using Centralizador.Models.GetTokenFromSeed;
 
 namespace Centralizador.Models.ApiSII
 {
-    internal class TokenSeed
+    public class TokenSeed
     {
         public string Seed { get; set; }
 
-        public static string GETTokenFromSii(X509Certificate2 cert)
+        public static string GETTokenFromSii()
         {
+            // Get digital cert  
+            X509Certificate2 cert = null;
+            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+            foreach (X509Certificate2 item in store.Certificates)
+            {
+                if (item.SerialNumber == Properties.Settings.Default.SerialDigitalCert)
+                {
+                    cert = item;
+                }
+            }
+            store.Close();
+
             try
             {
                 RESPUESTA XmlObject;

@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
@@ -20,13 +19,24 @@ namespace Centralizador.WinApp.GUI
     {
         #region Global variables/prop
 
-        private ResultParticipant UserParticipant { get; set; }
+
+
+        //Creditor
         private IList<ResultInstruction> InstructionsCreditor { get; set; }
+        private IList<ResultPaymentMatrix> MatricesCreditor { get; set; }
+
+        //Debitor
         private IList<ResultInstruction> InstructionsDebitor { get; set; }
+        private IList<ResultPaymentMatrix> MatricesDebitor { get; set; }
         private ServiceLibro LibroCompraDebtor { get; set; }
 
+        //General
+        private ResultParticipant UserParticipant { get; set; }
         private DateTime DateTimeCbo { get; set; }
         private CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
+        private IEnumerable<ResultBilingType> BillingTypes { get; set; }
+        private string Periodo1 { get; set; }
+        private string Periodo2 { get; set; }
 
 
         #endregion
@@ -52,12 +62,7 @@ namespace Centralizador.WinApp.GUI
             CboParticipants.DataSource = participants;
             CboParticipants.SelectedIndex = -1;
 
-            //Load ComboBox certificates
-            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
-            CboCerts.DisplayMember = "FriendlyName";
-            CboCerts.DataSource = store.Certificates;
-            store.Close();
+
             //Load ComboBox months
             CboMonths.DataSource = DateTimeFormatInfo.InvariantInfo.MonthNames.Take(12).ToList();
             CboMonths.SelectedIndex = DateTime.Today.Month - 1;
@@ -65,7 +70,8 @@ namespace Centralizador.WinApp.GUI
             CboYears.DataSource = Enumerable.Range(2019, 2).ToList();
             CboYears.SelectedItem = DateTime.Today.Year;
 
-
+            //Biling types
+            BillingTypes = BilingType.GetBilinTypes();
 
         }
 
@@ -73,10 +79,17 @@ namespace Centralizador.WinApp.GUI
         {
             DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
             UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+            Periodo1 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}";
+            Periodo2 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 2)}";
 
-            // Get list of payments matrix            
-            IList<ResultPaymentMatrix> matrices  = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
-            BackgroundW.RunWorkerAsync(matrices);
+            //Models.Outlook.ServiceOutlook.Test();
+
+            //return;
+
+
+            BtnCreditor.Enabled = false;
+
+            BackgroundW.RunWorkerAsync("Creditor");
 
         }
 
@@ -87,7 +100,7 @@ namespace Centralizador.WinApp.GUI
 
             // Get libro compra
             //Debo llegar desde outlook a matrices por el natural_key
-            
+
             // Get list of payments matrix            
             IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
 
@@ -185,38 +198,47 @@ namespace Centralizador.WinApp.GUI
 
                 // Fill up the cells with data.                
                 iGRow myRow;
-                
-                foreach (ResultInstruction instruction in InstructionsCreditor)
+                if (InstructionsCreditor != null)
                 {
-                    // Add rows.                    
-                    myRow = IGridMain.Rows.Add();
-                    myRow.Cells[2].Value = instruction.Id;
-                    myRow.Cells[3].Value = instruction.PaymentMatrix.NaturalKey;
-                    //myRow.Cells[4].Value = item.ParticipantM.VerificationCode;
-                    myRow.Cells[5].Value = string.Format(CultureInfo, "{0:C0}", instruction.Amount);
 
+                    foreach (ResultInstruction instruction in InstructionsCreditor)
+                    {
+                        // Add rows.                    
+                        myRow = IGridMain.Rows.Add();
+                        myRow.Cells[2].Value = instruction.Id;
+                        myRow.Cells[3].Value = BillingTypes.FirstOrDefault(x => x.Id == instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                        myRow.Cells[4].Value = "p1";
+                        myRow.Cells[5].Value = "p2";
+                        myRow.Cells[6].Value = "p3";
+                        myRow.Cells[7].Value = "p4";
+                        myRow.Cells[8].Value = instruction.Participant.Rut;
+                        myRow.Cells[9].Value = instruction.Participant.VerificationCode;
+                        myRow.Cells[10].Value = string.Format(CultureInfo, "{0:C0}", instruction.Amount);
+                        //exent
+                        //iva
+                        //total
+                        uint folio = 0;
 
-                    myRow.Cells[8].Value = instruction.StatusBilled;
-                    myRow.Cells[9].Value = instruction.StatusBilled;
-                    myRow.Cells[10].Value = "p3";
-                    myRow.Cells[11].Value = "p4";
-                    //if (item.DBSendSiiMapping != null)
-                    //{
-                    //    myRow.Cells[6].Value = item.ResultDteMapping.Folio;
-                    //    myRow.Cells[7].Value = string.Format("{0:dd/MM/yyyy}", item.ResultDteMapping.EmissionDt);
-                    //    myRow.Cells[12].Value = item.DBSendSiiMapping.EnviadoSII;
-                    //    myRow.Cells[13].Value = item.DBSendSiiMapping.AceptadoSII;
-                    //    myRow.Cells[14].Value = item.DBSendSiiMapping.EnviadoCliente;
-                    //    myRow.Cells[15].Value = item.DBSendSiiMapping.AceptadoCliente;
-                    //}
+                        if (instruction.Softland.References != null)
+                        {
+                            folio = instruction.Softland.References.Max(x => x.Folio); //Folio mayor de la lista
+                            myRow.Cells[14].Value = folio;
+                            myRow.Cells[15].Value = instruction.Softland.References.Max(x => x.FechaEmision);
+                        }
 
+                        if (instruction.Softland.InfoSiis != null)
+                        {
 
+                            myRow.Cells[18].Value = instruction.Softland.InfoSiis.FirstOrDefault(x => x.Folio == folio).EnviadoSII;
+                            myRow.Cells[19].Value = instruction.Softland.InfoSiis.FirstOrDefault(x => x.Folio == folio).FechaEnvioSII;
+                            myRow.Cells[20].Value = "flag";
+                            myRow.Cells[21].Value = instruction.Softland.InfoSiis.FirstOrDefault(x => x.Folio == folio).EnviadoSII;
+                        }
 
+                    }
+                    // Fit the columns' width.
+                    IGridMain.Cols.AutoWidth();
                 }
-
-                // Fit the columns' width.
-                IGridMain.Cols.AutoWidth();
-
             }
             catch (Exception)
             {
@@ -232,34 +254,79 @@ namespace Centralizador.WinApp.GUI
 
         private void BackgroundW_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
-            BackgroundW.ReportProgress(0, "");
-            foreach (ResultPaymentMatrix matrix in matrices)
-            {
-                if (matrix.Id == 680)
-                {
-                    InstructionsCreditor = Instruction.GetInstructions(matrix, UserParticipant);
-                    foreach (ResultInstruction instruction in InstructionsCreditor)
-                    {
-                        int i = 0;
-                        if (instruction.Status == "Publicado")
-                        {
-                            instruction.PaymentMatrix = matrix;
-                            instruction.Participant = Participant.GetParticipantById(instruction.Debtor);
-                            Softland softland = new Softland();
-                            softland.GetSoftlandData(instruction);
+            string UserType = e.Argument.ToString();
 
-                            if (instruction.StatusBilled == 2)
-                            {
-                                instruction.Dte = Dte.GetDte(instruction);
-                            }
+            switch (UserType)
+            {
+                case "Creditor":
+                    // Get list of payments matrix            
+                    MatricesCreditor = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
+                    if (MatricesCreditor != null)
+                    {
+                        //Get libro
+                        IList<Detalle> detalles1 = new List<Detalle>();
+                        IList<Detalle> detalles2 = new List<Detalle>();
+                        detalles1 = ServiceLibro.GetLibro("Creditor", UserParticipant, "33", Periodo1);
+                        detalles2 = ServiceLibro.GetLibro("Creditor", UserParticipant, "33", Periodo2);
+
+                        detalles1 = detalles1.Concat(detalles2).ToList();
+
+                        if (detalles1 == null)
+                        {
+                            break;
                         }
-                        i++;
-                        BackgroundW.ReportProgress(100 * i / InstructionsCreditor.Count, $"Working...in: {matrix.NaturalKey}");
+
+                        InstructionsCreditor = new List<ResultInstruction>();
+                        int m = 1;
+                        foreach (ResultPaymentMatrix matrix in MatricesCreditor)
+                        {
+                            // if (matrix.Id == 680)
+                            //{
+                            IList<ResultInstruction> instructions = Instruction.GetInstructions(matrix, UserParticipant, "Creditor");
+                            if (instructions != null)
+                            {
+                                BackgroundW.ReportProgress(0, "");
+                                int i = 0;
+                                foreach (ResultInstruction instruction in instructions)
+                                {
+                                    instruction.PaymentMatrix = matrix;
+                                    Softland softland = new Softland(detalles1);
+                                    softland.GetSoftlandData(instruction);
+                                    instruction.Softland = softland;
+
+
+
+
+
+
+
+
+                                    //Add
+                                    InstructionsCreditor.Add(instruction);
+                                    i++;
+                                    BackgroundW.ReportProgress(100 * i / instructions.Count, $"Working...in: {matrix.NaturalKey} ({m} de {MatricesCreditor.Count})");
+                                }
+                            }
+                            m++;
+                            //}
+                        }
                     }
-                }
+                    BackgroundW.ReportProgress(100, "Complete!...");
+                    break;
+
+
+
+
+
+                case "Debtor":
+
+                    break;
             }
+
+
+
         }
+
 
         private void BackgroundW_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {

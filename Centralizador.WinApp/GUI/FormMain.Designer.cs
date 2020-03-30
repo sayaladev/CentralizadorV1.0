@@ -45,14 +45,20 @@
             this.BtnCreditor = new System.Windows.Forms.Button();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
-            this.CboCerts = new System.Windows.Forms.ComboBox();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
+            this.BtnInsertNV = new System.Windows.Forms.Button();
+            this.BtnInsertRef = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.BtnPdfConvert = new System.Windows.Forms.Button();
+            this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
             this.SplitContainer.Panel2.SuspendLayout();
             this.SplitContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).BeginInit();
+            this.groupBox3.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.GroupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -61,7 +67,8 @@
             this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.TssLblFechaHora,
             this.TssLblProgBar,
-            this.TssLblMensaje});
+            this.TssLblMensaje,
+            this.TssLblUserEmail});
             this.StatusStrip.Location = new System.Drawing.Point(0, 707);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(1350, 22);
@@ -70,8 +77,9 @@
             // 
             // TssLblFechaHora
             // 
+            this.TssLblFechaHora.AutoSize = false;
             this.TssLblFechaHora.Name = "TssLblFechaHora";
-            this.TssLblFechaHora.Size = new System.Drawing.Size(0, 17);
+            this.TssLblFechaHora.Size = new System.Drawing.Size(250, 17);
             // 
             // TssLblProgBar
             // 
@@ -80,8 +88,9 @@
             // 
             // TssLblMensaje
             // 
+            this.TssLblMensaje.AutoSize = false;
             this.TssLblMensaje.Name = "TssLblMensaje";
-            this.TssLblMensaje.Size = new System.Drawing.Size(0, 17);
+            this.TssLblMensaje.Size = new System.Drawing.Size(400, 17);
             // 
             // SplitContainer
             // 
@@ -95,12 +104,13 @@
             // 
             // SplitContainer.Panel2
             // 
+            this.SplitContainer.Panel2.Controls.Add(this.BtnPdfConvert);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox3);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox2);
             this.SplitContainer.Panel2.Controls.Add(this.label1);
             this.SplitContainer.Panel2.Controls.Add(this.GroupBox1);
             this.SplitContainer.Size = new System.Drawing.Size(1350, 707);
-            this.SplitContainer.SplitterDistance = 1036;
+            this.SplitContainer.SplitterDistance = 1087;
             this.SplitContainer.TabIndex = 1;
             // 
             // IGridMain
@@ -110,7 +120,7 @@
             this.IGridMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
-            this.IGridMain.Size = new System.Drawing.Size(1036, 707);
+            this.IGridMain.Size = new System.Drawing.Size(1087, 707);
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
@@ -120,9 +130,10 @@
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this.textBox1);
             this.groupBox3.Location = new System.Drawing.Point(13, 453);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(285, 205);
+            this.groupBox3.Size = new System.Drawing.Size(234, 190);
             this.groupBox3.TabIndex = 3;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "groupBox3";
@@ -131,9 +142,11 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.BtnInsertRef);
+            this.groupBox2.Controls.Add(this.BtnInsertNV);
             this.groupBox2.Location = new System.Drawing.Point(13, 243);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(285, 204);
+            this.groupBox2.Size = new System.Drawing.Size(234, 204);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "groupBox2";
@@ -156,10 +169,9 @@
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
-            this.GroupBox1.Controls.Add(this.CboCerts);
             this.GroupBox1.Location = new System.Drawing.Point(13, 12);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(285, 225);
+            this.GroupBox1.Size = new System.Drawing.Size(234, 225);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "groupBox1";
@@ -170,27 +182,26 @@
             this.CboParticipants.FormattingEnabled = true;
             this.CboParticipants.Location = new System.Drawing.Point(8, 46);
             this.CboParticipants.Name = "CboParticipants";
-            this.CboParticipants.Size = new System.Drawing.Size(261, 21);
+            this.CboParticipants.Size = new System.Drawing.Size(220, 21);
             this.CboParticipants.TabIndex = 0;
-        
             // 
             // BtnDebitor
             // 
-            this.BtnDebitor.Location = new System.Drawing.Point(150, 147);
+            this.BtnDebitor.Location = new System.Drawing.Point(140, 159);
             this.BtnDebitor.Name = "BtnDebitor";
             this.BtnDebitor.Size = new System.Drawing.Size(75, 46);
             this.BtnDebitor.TabIndex = 5;
-            this.BtnDebitor.Text = "button2";
+            this.BtnDebitor.Text = "Debtor";
             this.BtnDebitor.UseVisualStyleBackColor = true;
             this.BtnDebitor.Click += new System.EventHandler(this.BtnDebitor_Click);
             // 
             // BtnCreditor
             // 
-            this.BtnCreditor.Location = new System.Drawing.Point(34, 147);
+            this.BtnCreditor.Location = new System.Drawing.Point(18, 159);
             this.BtnCreditor.Name = "BtnCreditor";
             this.BtnCreditor.Size = new System.Drawing.Size(75, 46);
             this.BtnCreditor.TabIndex = 4;
-            this.BtnCreditor.Text = "button1";
+            this.BtnCreditor.Text = "Creditor";
             this.BtnCreditor.UseVisualStyleBackColor = true;
             this.BtnCreditor.Click += new System.EventHandler(this.BtnCreditor_Click);
             // 
@@ -198,9 +209,9 @@
             // 
             this.CboYears.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboYears.FormattingEnabled = true;
-            this.CboYears.Location = new System.Drawing.Point(167, 19);
+            this.CboYears.Location = new System.Drawing.Point(150, 19);
             this.CboYears.Name = "CboYears";
-            this.CboYears.Size = new System.Drawing.Size(102, 21);
+            this.CboYears.Size = new System.Drawing.Size(78, 21);
             this.CboYears.TabIndex = 3;
             // 
             // CboMonths
@@ -209,17 +220,8 @@
             this.CboMonths.FormattingEnabled = true;
             this.CboMonths.Location = new System.Drawing.Point(8, 19);
             this.CboMonths.Name = "CboMonths";
-            this.CboMonths.Size = new System.Drawing.Size(132, 21);
+            this.CboMonths.Size = new System.Drawing.Size(136, 21);
             this.CboMonths.TabIndex = 2;
-            // 
-            // CboCerts
-            // 
-            this.CboCerts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CboCerts.FormattingEnabled = true;
-            this.CboCerts.Location = new System.Drawing.Point(6, 90);
-            this.CboCerts.Name = "CboCerts";
-            this.CboCerts.Size = new System.Drawing.Size(263, 21);
-            this.CboCerts.TabIndex = 1;
             // 
             // BackgroundW
             // 
@@ -227,6 +229,46 @@
             this.BackgroundW.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundW_DoWork);
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
+            // 
+            // BtnInsertNV
+            // 
+            this.BtnInsertNV.Location = new System.Drawing.Point(18, 150);
+            this.BtnInsertNV.Name = "BtnInsertNV";
+            this.BtnInsertNV.Size = new System.Drawing.Size(75, 23);
+            this.BtnInsertNV.TabIndex = 0;
+            this.BtnInsertNV.Text = "Insert NV";
+            this.BtnInsertNV.UseVisualStyleBackColor = true;
+            // 
+            // BtnInsertRef
+            // 
+            this.BtnInsertRef.Location = new System.Drawing.Point(140, 150);
+            this.BtnInsertRef.Name = "BtnInsertRef";
+            this.BtnInsertRef.Size = new System.Drawing.Size(75, 23);
+            this.BtnInsertRef.TabIndex = 1;
+            this.BtnInsertRef.Text = "Insert RF";
+            this.BtnInsertRef.UseVisualStyleBackColor = true;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(6, 29);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(222, 20);
+            this.textBox1.TabIndex = 0;
+            // 
+            // BtnPdfConvert
+            // 
+            this.BtnPdfConvert.Location = new System.Drawing.Point(31, 649);
+            this.BtnPdfConvert.Name = "BtnPdfConvert";
+            this.BtnPdfConvert.Size = new System.Drawing.Size(75, 39);
+            this.BtnPdfConvert.TabIndex = 4;
+            this.BtnPdfConvert.Text = "Pdf";
+            this.BtnPdfConvert.UseVisualStyleBackColor = true;
+            // 
+            // TssLblUserEmail
+            // 
+            this.TssLblUserEmail.AutoSize = false;
+            this.TssLblUserEmail.Name = "TssLblUserEmail";
+            this.TssLblUserEmail.Size = new System.Drawing.Size(200, 17);
             // 
             // FormMain
             // 
@@ -246,6 +288,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).EndInit();
             this.SplitContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).EndInit();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -260,7 +305,6 @@
         private TenTec.Windows.iGridLib.iGCellStyle iGrid1DefaultCellStyle;
         private TenTec.Windows.iGridLib.iGColHdrStyle iGrid1DefaultColHdrStyle;
         private System.Windows.Forms.GroupBox GroupBox1;
-        private System.Windows.Forms.ComboBox CboCerts;
         private System.Windows.Forms.ComboBox CboParticipants;
         private System.Windows.Forms.ComboBox CboYears;
         private System.Windows.Forms.ComboBox CboMonths;
@@ -273,5 +317,10 @@
         private System.Windows.Forms.ToolStripStatusLabel TssLblFechaHora;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.ToolStripStatusLabel TssLblUserEmail;
+        private System.Windows.Forms.Button BtnPdfConvert;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button BtnInsertRef;
+        private System.Windows.Forms.Button BtnInsertNV;
     }
 }

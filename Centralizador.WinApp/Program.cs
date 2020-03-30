@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+
 using Centralizador.WinApp.GUI;
 
 namespace Centralizador.WinApp
@@ -14,6 +15,9 @@ namespace Centralizador.WinApp
         {
             //ACÁ DEBO COMPROBAR VARIABLES DE INICIO...
             //COMPROBAR ESTADO DE DB SOFTLAND POR EJEMPLO
+
+            // Load digital cert.
+
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

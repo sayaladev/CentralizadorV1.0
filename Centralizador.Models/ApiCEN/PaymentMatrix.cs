@@ -66,11 +66,13 @@ namespace Centralizador.Models.ApiCEN
         public string ReferenceCode { get; set; }
 
         [JsonProperty("billing_window")]
-        public int BillingWindow { get; set; }
+        public int BillingWindowId { get; set; }
 
         [JsonProperty("payment_due_type")]
         public int PaymentDueType { get; set; }
 
+        //New 
+        public ResultBillingWindow BillingWindow { get; set; }
 
     }
 
@@ -106,6 +108,11 @@ namespace Centralizador.Models.ApiCEN
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     if (p.Results.Count > 0)
                     {
+                        //Billing windows
+                        foreach (ResultPaymentMatrix matrix in p.Results)
+                        {
+                            matrix.BillingWindow = BillingWindow.GetBillingWindowById(matrix);
+                        }
                         return p.Results;
                     }
                 }
@@ -121,43 +128,5 @@ namespace Centralizador.Models.ApiCEN
             return null;
 
         }
-
-        #region Testing Async
-
-
-
-        //private static readonly HttpClient client = new HttpClient();
-        //public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
-        //{
-        //    DateTime createdBefore = date.AddMonths(1);
-        //    client.BaseAddress =  new Uri(Properties.Settings.Default.BaseAddress);
-        //    client.DefaultRequestHeaders.Accept.Clear();          
-        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //    try
-        //    {
-        //        HttpResponseMessage res = await client.GetAsync($"payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}").ConfigureAwait(false);
-        //        string jSon = await res.Content.ReadAsStringAsync();
-
-        //        if (res.IsSuccessStatusCode)
-        //        {
-        //            PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(jSon, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-        //            return p.Results;
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return null;
-        //    }
-        //    finally
-        //    {
-
-        //    }
-        //    return null;
-
-        //}
-        #endregion
-
     }
-
-
 }

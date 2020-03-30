@@ -93,9 +93,10 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultInstruction> Results { get; set; }
 
-        public static IList<ResultInstruction> GetInstructions(ResultPaymentMatrix matrix, ResultParticipant participant)
+        public static IList<ResultInstruction> GetInstructions(ResultPaymentMatrix matrix, ResultParticipant participant, string userType)
         {
-
+            IList<ResultInstruction> instructions = new List<ResultInstruction>();
+            string res = "";
             WebClient wc = new WebClient
             {
                 BaseAddress = Properties.Settings.Default.BaseAddress
@@ -104,13 +105,44 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}");
+                if (userType == "Creditor")
+                {
+                     res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}");
+                }
+                else
+                {
+                     res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&debitor={participant.Id}");
+                }
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     if (instruction.Results.Count > 0)
                     {
-                        return instruction.Results;
+                        foreach (ResultInstruction item in instruction.Results)
+                        {
+                            if (item.Id == 1434430)
+                            {
+                                System.Windows.Forms.MessageBox.Show("Test");
+                            }
+                            if (item.Status == "Publicado")
+                            {
+                                if (userType == "Creditor")
+                                {
+                                    item.Participant = Participant.GetParticipantById(item.Debtor);
+                                }
+                                else
+                                {
+                                    item.Participant = Participant.GetParticipantById(item.Creditor);
+                                }
+                                if (item.StatusBilled == 2)
+                                {
+                                    item.Dte = Dte.GetDte(item);  
+                                }
+                                instructions.Add(item);
+
+                            }
+                        }
+                        return instructions;
                     }
 
                 }

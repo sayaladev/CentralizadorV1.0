@@ -2,27 +2,40 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Centralizador.Models.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="BaseAddress" Type="System.String" Scope="User">
+    <Setting Name="BaseAddress" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://ppagos-sen.coordinadorelectrico.cl/api/v1/resources/</Value>
     </Setting>
-    <Setting Name="UserCEN" Type="System.String" Scope="User">
+    <Setting Name="UserCEN" Type="System.String" Scope="Application">
       <Value Profile="(Default)">german.gomez@cvegroup.com</Value>
     </Setting>
-    <Setting Name="PasswordCEN" Type="System.String" Scope="User">
+    <Setting Name="PasswordCEN" Type="System.String" Scope="Application">
       <Value Profile="(Default)">cvepagos2017</Value>
-    </Setting>
-    <Setting Name="DBSoftland" Type="System.Xml.XmlDocument" Scope="User">
-      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;DatosEmpresas&gt;
-  &lt;Empresa id="189"&gt;SANFRANCISCO&lt;/Empresa&gt;
-  &lt;Empresa id="190"&gt;QUINTA&lt;/Empresa&gt;
-&lt;/DatosEmpresas&gt;</Value>
     </Setting>
     <Setting Name="Centralizador_Models_CrSeed_CrSeedService" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://palena.sii.cl/DTEWS/CrSeed.jws</Value>
     </Setting>
     <Setting Name="Centralizador_Models_GetTokenFromSeed_GetTokenFromSeedService" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://palena.sii.cl/DTEWS/GetTokenFromSeed.jws</Value>
+    </Setting>
+    <Setting Name="Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://ws1.sii.cl/WSREGISTRORECLAMODTE/registroreclamodteservice</Value>
+    </Setting>
+    <Setting Name="SerialDigitalCert" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">0138BF</Value>
+    </Setting>
+    <Setting Name="DBSoftland" Type="System.Xml.XmlDocument" Scope="Application">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;DatosEmpresas&gt;
+  &lt;Empresa id="189"&gt;SANFRANCISCO&lt;/Empresa&gt;
+  &lt;Empresa id="190"&gt;QUINTA&lt;/Empresa&gt;
+  &lt;Empresa id="194"&gt;VALLE&lt;/Empresa&gt;
+  &lt;Empresa id="364"&gt;OCOA&lt;/Empresa&gt;
+  &lt;Empresa id="415"&gt;ST4&lt;/Empresa&gt;
+  &lt;Empresa id="427"&gt;ST10&lt;/Empresa&gt;
+  &lt;Empresa id="428"&gt;TRICAHUESOLAR&lt;/Empresa&gt;
+  &lt;Empresa id="469"&gt;ST11&lt;/Empresa&gt;
+  &lt;Empresa id="470"&gt;PILPILEN&lt;/Empresa&gt;
+&lt;/DatosEmpresas&gt;</Value>
     </Setting>
   </Settings>
 </SettingsFile>

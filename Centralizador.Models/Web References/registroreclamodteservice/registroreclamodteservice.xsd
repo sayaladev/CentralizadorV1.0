@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://ws.registroreclamodte.diii.sdi.sii.cl" targetNamespace="http://ws.registroreclamodte.diii.sdi.sii.cl" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Exception" type="tns:Exception" />
+  <xs:complexType name="respuestaTo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codResp" type="xs:int" />
+      <xs:element minOccurs="0" name="descResp" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="listaEventosDoc" nillable="true" type="tns:DteEventoDocTo" />
+      <xs:element minOccurs="0" name="rutToken" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DteEventoDocTo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codEvento" type="xs:string" />
+      <xs:element minOccurs="0" name="descEvento" type="xs:string" />
+      <xs:element minOccurs="0" name="rutResponsable" type="xs:string" />
+      <xs:element minOccurs="0" name="dvResponsable" type="xs:string" />
+      <xs:element minOccurs="0" name="fechaEvento" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Exception">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="message" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

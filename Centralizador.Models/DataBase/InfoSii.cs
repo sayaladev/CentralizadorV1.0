@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Xml;
 
 using Centralizador.Models.ApiCEN;
+using Centralizador.Models.ApiSII;
 
 namespace Centralizador.Models.DataBase
 {
@@ -20,10 +22,14 @@ namespace Centralizador.Models.DataBase
         public string FileEnviado { get; set; }
         public string FileBasico { get; set; }
 
+       
+
         public static InfoSii GetSendSiiByFolio(ResultInstruction instruction, uint folio)
         {
             XmlDocument document = Properties.Settings.Default.DBSoftland;
             string DataBaseName = "";
+            InfoSii i = new InfoSii();
+
             foreach (XmlNode item in document.ChildNodes[0])
             {
                 if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -32,14 +38,11 @@ namespace Centralizador.Models.DataBase
                     break;
                 }
             }
-
             if (DataBaseName == null)
             {
                 return null;
             }
-
-            InfoSii infoSii = new InfoSii();
-            DBaseConn con = new DBaseConn
+            Conexion con = new Conexion
             {
                 Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID=sa;Password=123456"
             };
@@ -52,23 +55,23 @@ namespace Centralizador.Models.DataBase
             con.Query += $"where d.Tipo = 'F' and d.TipoDTE = 33 and d.RUTRecep = '{instruction.Participant.Rut}-{instruction.Participant.VerificationCode}' and d.Folio = {folio} ";
 
             DataTable dataTable = new DataTable();
-            dataTable = DBaseConn.ConexionBdQuery(con);
+            dataTable = Conexion.ConexionBdQuery(con);
             if (dataTable != null)
             {
-                infoSii.NroInt = Convert.ToUInt32(dataTable.Rows[0].ItemArray[0]);
-                infoSii.Folio = Convert.ToUInt32(dataTable.Rows[0].ItemArray[1]);
-                infoSii.EnviadoSII = Convert.ToByte(dataTable.Rows[0].ItemArray[2]);
-                infoSii.FechaEnvioSII = Convert.ToDateTime(dataTable.Rows[0].ItemArray[3]);
-                infoSii.IdxmlDoc = Convert.ToUInt32( dataTable.Rows[0].ItemArray[4].ToString());
-                infoSii.TrackID = Convert.ToUInt64(dataTable.Rows[0].ItemArray[5].ToString());
-                infoSii.OrigenDestino = dataTable.Rows[0].ItemArray[6].ToString();
-                infoSii.XmlSet = Convert.ToUInt32(dataTable.Rows[0].ItemArray[7].ToString());
-                infoSii.FileEnviado = dataTable.Rows[0].ItemArray[8].ToString();
-                infoSii.FileBasico = dataTable.Rows[0].ItemArray[9].ToString();
-
-                return infoSii;                
+                i.NroInt = Convert.ToUInt32(dataTable.Rows[0].ItemArray[0]);
+                i.Folio = Convert.ToUInt32(dataTable.Rows[0].ItemArray[1]);
+                i.EnviadoSII = Convert.ToByte(dataTable.Rows[0].ItemArray[2]);
+                i.FechaEnvioSII = Convert.ToDateTime(dataTable.Rows[0].ItemArray[3]);
+                i.IdxmlDoc = Convert.ToUInt32(dataTable.Rows[0].ItemArray[4].ToString());
+                i.TrackID = Convert.ToUInt64(dataTable.Rows[0].ItemArray[5].ToString());
+                i.OrigenDestino = dataTable.Rows[0].ItemArray[6].ToString();
+                i.XmlSet = Convert.ToUInt32(dataTable.Rows[0].ItemArray[7].ToString());
+                i.FileEnviado = dataTable.Rows[0].ItemArray[8].ToString();
+                i.FileBasico = dataTable.Rows[0].ItemArray[9].ToString();
+                //i.Status = detalles.FirstOrDefault(x => x.Folio == i.Folio).DehDescripcion;
+                return i;
             }
             return null;
         }
-    }    
+    }
 }

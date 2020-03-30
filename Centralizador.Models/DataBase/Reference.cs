@@ -25,10 +25,12 @@ namespace Centralizador.Models.DataBase
 
         public string DetProduct { get; set; }
 
-        public static IEnumerable<Reference> GetReferenceByGlosa(ResultInstruction instruction)
+        public static IList<Reference> GetReferenceByGlosa(ResultInstruction instruction)
         {
             XmlDocument document = Properties.Settings.Default.DBSoftland;
             string DataBaseName = "";
+            IList<Reference> references = new List<Reference>();
+
             foreach (XmlNode item in document.ChildNodes[0])
             {
                 if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -38,26 +40,25 @@ namespace Centralizador.Models.DataBase
             }
             if (DataBaseName == null)
             {
-                yield break;
+                return null;
             }
-            IEnumerable<Reference> dtes = new List<Reference>();
-            DBaseConn con = new DBaseConn
+            Conexion con = new Conexion
             {
                 Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID=sa;Password=123456"
             };
             con.Query += "select r.NroInt, g.Folio, g.Fecha, r.FolioRef, r.FechaRef, r.Glosa, g.FmaPago, m.DetProd ";
             con.Query += "from softland.IW_GSaEn_RefDTE r inner join softland.iw_gsaen g on r.NroInt = g.NroInt and r.CodRefSII = 'SEN' and r.Tipo = 'F' ";
             con.Query += $"left join softland.iw_gmovi m on g.NroInt = m.NroInt and g.Tipo = r.Tipo where g.NetoAfecto = {instruction.Amount} and ";
-            con.Query += $"g.CodAux = '{instruction.Participant.Rut}' and r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' ";
-            con.Query += $"and r.FolioRef = '{instruction.PaymentMatrix.ReferenceCode}'";
+            con.Query += $"g.CodAux = '{instruction.Participant.Rut}' and (r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' or ";
+            con.Query += $"r.FolioRef = '{instruction.PaymentMatrix.ReferenceCode}')";
 
             DataTable dataTable = new DataTable();
-            dataTable = DBaseConn.ConexionBdQuery(con);
+            dataTable = Conexion.ConexionBdQuery(con);
             if (dataTable != null)
             {
                 foreach (DataRow item in dataTable.Rows)
                 {
-                    yield return new Reference
+                    Reference r = new Reference
                     {
                         NroInt = Convert.ToUInt32(dataTable.Rows[0].ItemArray[0]),
                         Folio = Convert.ToUInt32(dataTable.Rows[0].ItemArray[1]),
@@ -67,14 +68,17 @@ namespace Centralizador.Models.DataBase
                         Glosa = dataTable.Rows[0].ItemArray[5].ToString(),
                         FormaPago = Convert.ToByte(dataTable.Rows[0].ItemArray[6]),
                         DetProduct = dataTable.Rows[0].ItemArray[7].ToString(),
+                        // Status 
+
+
                     };
+                    references.Add(r);
                 }
+                return references;
             }
-
+            return null;
         }
-
     }
-
 }
 
 

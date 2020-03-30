@@ -25,21 +25,21 @@ namespace Centralizador.Models.ApiSII
             Data = data;
         }
 
-        private static string TokenSii { get; set; }
-
-        public static DetalleLibro GetLibro(string tipoLibro, ResultParticipant participante, string tipoDoc, string periodo)
+        
+        public static IList<Detalle> GetLibro(string tipoLibro, ResultParticipant participante, string tipoDoc, string periodo)
         {
             string ns = "", url = "";
+            string token = TokenSeed.GETTokenFromSii();
             byte op = 0;
-        AgainProcess:
+       
             switch (tipoLibro)
             {
-                case "Compra":
+                case "Debitor":
                     ns = "cl.sii.sdi.lob.diii.consemitidos.data.api.interfaces.FacadeService/getDetalleRecibidos";
                     op = 2;
                     url = "https://www4.sii.cl/consemitidosinternetui/services/data/facadeService/getDetalleRecibidos";
                     break;
-                case "Venta":
+                case "Creditor":
                     ns = "cl.sii.sdi.lob.diii.consemitidos.data.api.interfaces.FacadeService/getDetalle";
                     op = 1;
                     url = "https://www4.sii.cl/consemitidosinternetui/services/data/facadeService/getDetalle";
@@ -49,7 +49,7 @@ namespace Centralizador.Models.ApiSII
             MetaData metaData = new MetaData
             {
                 Namespace = ns,
-                ConversationId = TokenSii,
+                ConversationId = token,
                 TransactionId = "0"
             };
 
@@ -73,7 +73,7 @@ namespace Centralizador.Models.ApiSII
                 WebClient wc = new WebClient();
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={participante.Rut}; DV_NS={participante.VerificationCode};TOKEN={TokenSii}";
+                wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={participante.Rut}; DV_NS={participante.VerificationCode};TOKEN={token}";
                 string result = wc.UploadString(url, "POST", jSon);
                 if (result != null)
                 {
@@ -89,7 +89,7 @@ namespace Centralizador.Models.ApiSII
                         MessageBox.Show($"Message from Sii:{Environment.NewLine}{detalleLibro.RespEstado.MsgeRespuesta}");
                         return null;
                     }
-                    return detalleLibro;
+                    return detalleLibro.DataResp.Detalles;
                 }
             }
             catch (WebException e)
@@ -99,9 +99,7 @@ namespace Centralizador.Models.ApiSII
                 HttpStatusCode code = http.StatusCode;
                 if (code.ToString() == "Unauthorized")
                 {
-                    //GetLibro(tipoLibro, participante, "33", periodo);
-                    // TokenSii = TokenSeed.GETTokenFromSii(participante.Certificate2);
-                    goto AgainProcess;
+                                     
 
                 }
                 else
@@ -169,7 +167,7 @@ namespace Centralizador.Models.ApiSII
     {
 
         [JsonProperty("detalles")]
-        public List<Detalle> Detalles { get; set; }
+        public IList<Detalle> Detalles { get; set; }
 
         [JsonProperty("totMntExe")]
         public int TotMntExe { get; set; }
