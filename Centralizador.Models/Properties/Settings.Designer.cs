@@ -109,5 +109,17 @@ namespace Centralizador.Models.Properties {
                 return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("03/30/2020 13:07:00")]
+        public global::System.DateTime DateTimeEmail {
+            get {
+                return ((global::System.DateTime)(this["DateTimeEmail"]));
+            }
+            set {
+                this["DateTimeEmail"] = value;
+            }
+        }
     }
 }

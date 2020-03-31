@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 using Centralizador.Models.DataBase;
-
+using Centralizador.Models.Outlook;
 using TenTec.Windows.iGridLib;
 
 namespace Centralizador.WinApp.GUI
@@ -58,10 +58,11 @@ namespace Centralizador.WinApp.GUI
             {
                 participants.Add(Participant.GetParticipantById(item.ParticipantId));
             }
+            participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
             CboParticipants.DisplayMember = "Name";
             CboParticipants.DataSource = participants;
-            CboParticipants.SelectedIndex = -1;
-
+            CboParticipants.SelectedIndex = 0;
+            //CboParticipants.Items.Insert(-1, "Please, select Company");
 
             //Load ComboBox months
             CboMonths.DataSource = DateTimeFormatInfo.InvariantInfo.MonthNames.Take(12).ToList();
@@ -73,36 +74,71 @@ namespace Centralizador.WinApp.GUI
             //Biling types
             BillingTypes = BilingType.GetBilinTypes();
 
+            // User email
+            TssLblUserEmail.Text = "|  " + agent.Email;
+
+            // Time
+            TssLblFechaHora.Text = string.Format(CultureInfo, "{0:D}", DateTime.Today);
+
         }
 
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
-            DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
-            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-            Periodo1 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}";
-            Periodo2 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 2)}";
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
+            else
+            {
+                DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
+                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+                Periodo1 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}";
+                Periodo2 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 2)}";
 
-            //Models.Outlook.ServiceOutlook.Test();
-
-            //return;
 
 
-            BtnCreditor.Enabled = false;
 
-            BackgroundW.RunWorkerAsync("Creditor");
+                BtnCreditor.Enabled = false;
+
+                BackgroundW.RunWorkerAsync("Creditor");
+            }
+
 
         }
 
         private void BtnDebitor_Click(object sender, EventArgs e)
         {
-            DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
-            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
 
-            // Get libro compra
-            //Debo llegar desde outlook a matrices por el natural_key
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
+            else
+            {
+                DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
+                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
 
-            // Get list of payments matrix            
-            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
+                // Get libro compra
+                IList<Detalle> detalles = new List<Detalle>();
+                Periodo1 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}";
+                detalles = ServiceLibro.GetLibro("Debitor", UserParticipant, "33", Periodo1);
+
+                // Debo llegar desde outlook a matrices por el natural_key
+                if (detalles != null)
+                {
+                    foreach (Detalle item in detalles)
+                    {
+
+                    }
+                }
+
+
+                // Get list of payments matrix            
+                // IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
+
+            }
 
 
         }
@@ -294,7 +330,7 @@ namespace Centralizador.WinApp.GUI
                                     softland.GetSoftlandData(instruction);
                                     instruction.Softland = softland;
 
-
+                                    //guardar libro de venta (folio y status) en instruction, no enlazarlo completo FIN!
 
 
 
@@ -327,7 +363,6 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-
         private void BackgroundW_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
@@ -342,8 +377,74 @@ namespace Centralizador.WinApp.GUI
             BtnCreditor.Enabled = true;
         }
 
+        private void BtnFacturar_Click(object sender, EventArgs e)
+        {
+            // Update Dte from Sii
 
 
+            //**************obligar al suario a descargar el archivo desde sii y dejarlo en el escritorio.
+
+
+
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
+            else
+            {
+                DialogResult resp = MessageBox.Show("Are you sure?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (resp == DialogResult.OK)
+                {
+                    UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+                    ServiceEmail.GetFile(UserParticipant);
+
+
+                }
+
+
+                // Check aux (comuna, giro, dte, )
+
+
+
+                // Insert NV
+                // Check if exists?
+
+
+
+
+
+
+                // Insert Ref
+
+            }
+        }
+
+        private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            ComboBox senderComboBox = (ComboBox)sender;
+            if (senderComboBox.SelectedIndex != 0)
+            {
+                TssLblMensaje.Text = "";
+            }
+        }
+
+        private void BtnOutlook_Click(object sender, EventArgs e)
+        {
+            // Read email
+            // TxtDateTimeEmail.Text= string.Format("{0:g}", ServiceOutlook.GetXmlFromEmail());
+            ServiceOutlook.ReadXML();
+
+            BtnCreditor.Enabled = true;
+            BtnDebitor.Enabled = true;
+
+            //Save xml in folder
+
+
+
+
+
+        }
     }
 }
 

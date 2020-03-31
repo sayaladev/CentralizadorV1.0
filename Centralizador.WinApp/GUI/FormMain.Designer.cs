@@ -32,12 +32,17 @@
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblProgBar = new System.Windows.Forms.ToolStripProgressBar();
             this.TssLblMensaje = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
+            this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.BtnOutlook = new System.Windows.Forms.Button();
+            this.BtnFacturar = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
@@ -46,11 +51,7 @@
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
-            this.BtnInsertNV = new System.Windows.Forms.Button();
-            this.BtnInsertRef = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.BtnPdfConvert = new System.Windows.Forms.Button();
-            this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -89,8 +90,16 @@
             // TssLblMensaje
             // 
             this.TssLblMensaje.AutoSize = false;
+            this.TssLblMensaje.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.TssLblMensaje.Name = "TssLblMensaje";
             this.TssLblMensaje.Size = new System.Drawing.Size(400, 17);
+            this.TssLblMensaje.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // TssLblUserEmail
+            // 
+            this.TssLblUserEmail.AutoSize = false;
+            this.TssLblUserEmail.Name = "TssLblUserEmail";
+            this.TssLblUserEmail.Size = new System.Drawing.Size(200, 17);
             // 
             // SplitContainer
             // 
@@ -125,6 +134,15 @@
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
             // 
+            // BtnPdfConvert
+            // 
+            this.BtnPdfConvert.Location = new System.Drawing.Point(31, 649);
+            this.BtnPdfConvert.Name = "BtnPdfConvert";
+            this.BtnPdfConvert.Size = new System.Drawing.Size(75, 39);
+            this.BtnPdfConvert.TabIndex = 4;
+            this.BtnPdfConvert.Text = "Pdf";
+            this.BtnPdfConvert.UseVisualStyleBackColor = true;
+            // 
             // groupBox3
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -138,18 +156,46 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "groupBox3";
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(6, 29);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(222, 20);
+            this.textBox1.TabIndex = 0;
+            // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.BtnInsertRef);
-            this.groupBox2.Controls.Add(this.BtnInsertNV);
+            this.groupBox2.Controls.Add(this.TxtDateTimeEmail);
+            this.groupBox2.Controls.Add(this.BtnOutlook);
+            this.groupBox2.Controls.Add(this.BtnFacturar);
             this.groupBox2.Location = new System.Drawing.Point(13, 243);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(234, 204);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "groupBox2";
+            // 
+            // BtnOutlook
+            // 
+            this.BtnOutlook.Location = new System.Drawing.Point(140, 150);
+            this.BtnOutlook.Name = "BtnOutlook";
+            this.BtnOutlook.Size = new System.Drawing.Size(75, 23);
+            this.BtnOutlook.TabIndex = 1;
+            this.BtnOutlook.Text = "Outlook";
+            this.BtnOutlook.UseVisualStyleBackColor = true;
+            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
+            // 
+            // BtnFacturar
+            // 
+            this.BtnFacturar.Location = new System.Drawing.Point(18, 150);
+            this.BtnFacturar.Name = "BtnFacturar";
+            this.BtnFacturar.Size = new System.Drawing.Size(75, 23);
+            this.BtnFacturar.TabIndex = 0;
+            this.BtnFacturar.Text = "Facturar";
+            this.BtnFacturar.UseVisualStyleBackColor = true;
+            this.BtnFacturar.Click += new System.EventHandler(this.BtnFacturar_Click);
             // 
             // label1
             // 
@@ -184,6 +230,7 @@
             this.CboParticipants.Name = "CboParticipants";
             this.CboParticipants.Size = new System.Drawing.Size(220, 21);
             this.CboParticipants.TabIndex = 0;
+            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
             // 
             // BtnDebitor
             // 
@@ -230,45 +277,12 @@
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
             // 
-            // BtnInsertNV
+            // TxtDateTimeEmail
             // 
-            this.BtnInsertNV.Location = new System.Drawing.Point(18, 150);
-            this.BtnInsertNV.Name = "BtnInsertNV";
-            this.BtnInsertNV.Size = new System.Drawing.Size(75, 23);
-            this.BtnInsertNV.TabIndex = 0;
-            this.BtnInsertNV.Text = "Insert NV";
-            this.BtnInsertNV.UseVisualStyleBackColor = true;
-            // 
-            // BtnInsertRef
-            // 
-            this.BtnInsertRef.Location = new System.Drawing.Point(140, 150);
-            this.BtnInsertRef.Name = "BtnInsertRef";
-            this.BtnInsertRef.Size = new System.Drawing.Size(75, 23);
-            this.BtnInsertRef.TabIndex = 1;
-            this.BtnInsertRef.Text = "Insert RF";
-            this.BtnInsertRef.UseVisualStyleBackColor = true;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(6, 29);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(222, 20);
-            this.textBox1.TabIndex = 0;
-            // 
-            // BtnPdfConvert
-            // 
-            this.BtnPdfConvert.Location = new System.Drawing.Point(31, 649);
-            this.BtnPdfConvert.Name = "BtnPdfConvert";
-            this.BtnPdfConvert.Size = new System.Drawing.Size(75, 39);
-            this.BtnPdfConvert.TabIndex = 4;
-            this.BtnPdfConvert.Text = "Pdf";
-            this.BtnPdfConvert.UseVisualStyleBackColor = true;
-            // 
-            // TssLblUserEmail
-            // 
-            this.TssLblUserEmail.AutoSize = false;
-            this.TssLblUserEmail.Name = "TssLblUserEmail";
-            this.TssLblUserEmail.Size = new System.Drawing.Size(200, 17);
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(115, 114);
+            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(100, 20);
+            this.TxtDateTimeEmail.TabIndex = 2;
             // 
             // FormMain
             // 
@@ -291,6 +305,7 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.GroupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -320,7 +335,8 @@
         private System.Windows.Forms.ToolStripStatusLabel TssLblUserEmail;
         private System.Windows.Forms.Button BtnPdfConvert;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button BtnInsertRef;
-        private System.Windows.Forms.Button BtnInsertNV;
+        private System.Windows.Forms.Button BtnFacturar;
+        private System.Windows.Forms.Button BtnOutlook;
+        private System.Windows.Forms.TextBox TxtDateTimeEmail;
     }
 }

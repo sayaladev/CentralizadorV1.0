@@ -37,5 +37,8 @@
   &lt;Empresa id="470"&gt;PILPILEN&lt;/Empresa&gt;
 &lt;/DatosEmpresas&gt;</Value>
     </Setting>
+    <Setting Name="DateTimeEmail" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">03/30/2020 13:07:00</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
