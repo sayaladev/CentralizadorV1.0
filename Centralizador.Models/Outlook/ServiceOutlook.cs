@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
@@ -87,24 +88,29 @@ namespace Centralizador.Models.Outlook
 
             DateTime today = DateTime.Today.Date;
             string localInbox = $"{ Directory.GetCurrentDirectory()}\\inbox\\{today.Year}\\{today.Month}";
-            IList<EnvioDTESetDTEDTE> attachments = new List<EnvioDTESetDTEDTE>();
+            IList<DTEDefType> attachments = new List<DTEDefType>();
             string[] xmlFiles = Directory.GetFiles(localInbox, "*.xml", SearchOption.TopDirectoryOnly);
             foreach (string item in xmlFiles)
             {
                 XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
-             
-                XDocument docSearchingRoot = XDocument.Load(item);
-                if (docSearchingRoot.Root.Name.LocalName == "EnvioDTE")
+
+                FileStream docSearchingRoot = File.OpenRead(item);
+                XDocument xmlDocumnet = XDocument.Load(item);
+                if (xmlDocumnet.Root.Name.LocalName == "EnvioDTE")
                 {
-                   
-                    EnvioDTE xmlObjeto = (EnvioDTE)deserializer.Deserialize(docSearchingRoot.CreateReader());
-                    foreach (EnvioDTESetDTEDTE element in xmlObjeto.SetDTE.DTE)
+
+                    EnvioDTE xmlObjeto = (EnvioDTE)deserializer.Deserialize(docSearchingRoot);
+                    foreach (DTEDefType element in xmlObjeto.SetDTE.DTE)
                     {
                         // Search Participant
 
                         //AttachmentXml attachmentXml = new AttachmentXml();
                         attachments.Add(element);
                     }
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show(xmlDocumnet.Root.Name.LocalName);
                 }
                 
                 try
