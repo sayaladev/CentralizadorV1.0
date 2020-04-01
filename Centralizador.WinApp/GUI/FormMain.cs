@@ -34,6 +34,8 @@ namespace Centralizador.WinApp.GUI
         private IList<ResultPaymentMatrix> MatricesDebitor { get; set; }
         private ServiceLibro LibroCompraDebtor { get; set; }
 
+        public int MyProperty { get; set; }
+
         //General
         private ResultParticipant UserParticipant { get; set; }
         private DateTime DateTimeCbo { get; set; }
@@ -86,6 +88,8 @@ namespace Centralizador.WinApp.GUI
             // Controls
             BtnCreditor.Enabled = false;
             BtnDebitor.Enabled = false;
+            BtnPdfConvert.Enabled = false;
+            BtnFacturar.Enabled = false;
 
         }
 
@@ -140,6 +144,7 @@ namespace Centralizador.WinApp.GUI
 
                     }
                 }
+                MessageBox.Show(outlook.Attachments.Count.ToString());
 
 
                 // Get list of payments matrix            
@@ -498,12 +503,17 @@ namespace Centralizador.WinApp.GUI
             TxtDateTimeEmail.Text = string.Format("{0:g}", outlook.LastTime);
             TssLblProgBar.Value = 0;
             TssLblMensaje.Text = "";
-            DTEDefType defType;
-            //defType = outlook.Attachments[0];
+   
         }
 
 
+
         #endregion
+
+        private void BtnPdfConvert_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 

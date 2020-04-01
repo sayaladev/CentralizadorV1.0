@@ -37,6 +37,9 @@ namespace Centralizador.Models.Outlook
             Client = new MailClient("TryIt");
             try
             {
+               
+                DateTime time = Properties.Settings.Default.DateTimeEmail;
+                LastTime = time;
                 MailServer oServer = new MailServer("outlook.office365.com", "facturacionchile@capvertenergie.com", "Che@2019!", ServerProtocol.Imap4)
                 //MailServer oServer = new MailServer("outlook.office365.com", "sergiokml@outlook.com", "edkdbigryqfudzlv", ServerProtocol.Imap4)
                 {
@@ -96,6 +99,7 @@ namespace Centralizador.Models.Outlook
                     }
                     else
                     {
+                        LastTime = oMail.ReceivedDate;
                         break;
                     }
                 }
