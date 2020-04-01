@@ -112,7 +112,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("03/30/2020 13:07:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("02/12/2020 13:07:00")]
         public global::System.DateTime DateTimeEmail {
             get {
                 return ((global::System.DateTime)(this["DateTimeEmail"]));

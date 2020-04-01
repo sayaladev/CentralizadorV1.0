@@ -37,13 +37,13 @@
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
-            this.BtnPdfConvert = new System.Windows.Forms.Button();
+            this.BtnPdfDebtor = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.BtnOutlook = new System.Windows.Forms.Button();
             this.BtnFacturar = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.BtnDebitor = new System.Windows.Forms.Button();
@@ -51,7 +51,8 @@
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
-            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
+            this.BtnPdfCreditor = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -113,10 +114,8 @@
             // 
             // SplitContainer.Panel2
             // 
-            this.SplitContainer.Panel2.Controls.Add(this.BtnPdfConvert);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox3);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox2);
-            this.SplitContainer.Panel2.Controls.Add(this.label1);
             this.SplitContainer.Panel2.Controls.Add(this.GroupBox1);
             this.SplitContainer.Size = new System.Drawing.Size(1350, 707);
             this.SplitContainer.SplitterDistance = 1087;
@@ -134,27 +133,32 @@
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
             // 
-            // BtnPdfConvert
+            // BtnPdfDebtor
             // 
-            this.BtnPdfConvert.Location = new System.Drawing.Point(31, 649);
-            this.BtnPdfConvert.Name = "BtnPdfConvert";
-            this.BtnPdfConvert.Size = new System.Drawing.Size(75, 39);
-            this.BtnPdfConvert.TabIndex = 4;
-            this.BtnPdfConvert.Text = "Pdf";
-            this.BtnPdfConvert.UseVisualStyleBackColor = true;
+            this.BtnPdfDebtor.Location = new System.Drawing.Point(115, 80);
+            this.BtnPdfDebtor.Name = "BtnPdfDebtor";
+            this.BtnPdfDebtor.Size = new System.Drawing.Size(75, 39);
+            this.BtnPdfDebtor.TabIndex = 4;
+            this.BtnPdfDebtor.Text = "Pdf";
+            this.BtnPdfDebtor.UseVisualStyleBackColor = true;
             // 
             // groupBox3
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this.button1);
+            this.groupBox3.Controls.Add(this.BtnPdfDebtor);
+            this.groupBox3.Controls.Add(this.TxtDateTimeEmail);
             this.groupBox3.Controls.Add(this.textBox1);
-            this.groupBox3.Location = new System.Drawing.Point(13, 453);
+            this.groupBox3.Controls.Add(this.BtnOutlook);
+            this.groupBox3.Controls.Add(this.BtnDebitor);
+            this.groupBox3.Location = new System.Drawing.Point(13, 351);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(234, 190);
+            this.groupBox3.Size = new System.Drawing.Size(234, 269);
             this.groupBox3.TabIndex = 3;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "groupBox3";
+            this.groupBox3.Text = "Debtor";
             // 
             // textBox1
             // 
@@ -167,19 +171,26 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.TxtDateTimeEmail);
-            this.groupBox2.Controls.Add(this.BtnOutlook);
+            this.groupBox2.Controls.Add(this.BtnPdfCreditor);
+            this.groupBox2.Controls.Add(this.BtnCreditor);
             this.groupBox2.Controls.Add(this.BtnFacturar);
-            this.groupBox2.Location = new System.Drawing.Point(13, 243);
+            this.groupBox2.Location = new System.Drawing.Point(13, 120);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(234, 204);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "groupBox2";
+            this.groupBox2.Text = "Creditor";
+            // 
+            // TxtDateTimeEmail
+            // 
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(18, 139);
+            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(100, 20);
+            this.TxtDateTimeEmail.TabIndex = 2;
             // 
             // BtnOutlook
             // 
-            this.BtnOutlook.Location = new System.Drawing.Point(140, 150);
+            this.BtnOutlook.Location = new System.Drawing.Point(140, 137);
             this.BtnOutlook.Name = "BtnOutlook";
             this.BtnOutlook.Size = new System.Drawing.Size(75, 23);
             this.BtnOutlook.TabIndex = 1;
@@ -197,30 +208,19 @@
             this.BtnFacturar.UseVisualStyleBackColor = true;
             this.BtnFacturar.Click += new System.EventHandler(this.BtnFacturar_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(94, 393);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "label1";
-            // 
             // GroupBox1
             // 
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GroupBox1.Controls.Add(this.CboParticipants);
-            this.GroupBox1.Controls.Add(this.BtnDebitor);
-            this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
             this.GroupBox1.Location = new System.Drawing.Point(13, 12);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(234, 225);
+            this.GroupBox1.Size = new System.Drawing.Size(234, 93);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
-            this.GroupBox1.Text = "groupBox1";
+            this.GroupBox1.Text = "Inicio";
             // 
             // CboParticipants
             // 
@@ -234,7 +234,7 @@
             // 
             // BtnDebitor
             // 
-            this.BtnDebitor.Location = new System.Drawing.Point(140, 159);
+            this.BtnDebitor.Location = new System.Drawing.Point(18, 73);
             this.BtnDebitor.Name = "BtnDebitor";
             this.BtnDebitor.Size = new System.Drawing.Size(75, 46);
             this.BtnDebitor.TabIndex = 5;
@@ -244,7 +244,7 @@
             // 
             // BtnCreditor
             // 
-            this.BtnCreditor.Location = new System.Drawing.Point(18, 159);
+            this.BtnCreditor.Location = new System.Drawing.Point(18, 42);
             this.BtnCreditor.Name = "BtnCreditor";
             this.BtnCreditor.Size = new System.Drawing.Size(75, 46);
             this.BtnCreditor.TabIndex = 4;
@@ -277,12 +277,23 @@
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
             // 
-            // TxtDateTimeEmail
+            // BtnPdfCreditor
             // 
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(115, 114);
-            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
-            this.TxtDateTimeEmail.Size = new System.Drawing.Size(100, 20);
-            this.TxtDateTimeEmail.TabIndex = 2;
+            this.BtnPdfCreditor.Location = new System.Drawing.Point(129, 49);
+            this.BtnPdfCreditor.Name = "BtnPdfCreditor";
+            this.BtnPdfCreditor.Size = new System.Drawing.Size(75, 39);
+            this.BtnPdfCreditor.TabIndex = 5;
+            this.BtnPdfCreditor.Text = "Pdf";
+            this.BtnPdfCreditor.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(27, 190);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -298,14 +309,12 @@
             this.StatusStrip.PerformLayout();
             this.SplitContainer.Panel1.ResumeLayout(false);
             this.SplitContainer.Panel2.ResumeLayout(false);
-            this.SplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).EndInit();
             this.SplitContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
             this.GroupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -326,17 +335,18 @@
         private System.Windows.Forms.Button BtnDebitor;
         private System.Windows.Forms.Button BtnCreditor;
         private System.Windows.Forms.ToolStripProgressBar TssLblProgBar;
-        private System.Windows.Forms.Label label1;
         private System.ComponentModel.BackgroundWorker BackgroundW;
         private System.Windows.Forms.ToolStripStatusLabel TssLblMensaje;
         private System.Windows.Forms.ToolStripStatusLabel TssLblFechaHora;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStripStatusLabel TssLblUserEmail;
-        private System.Windows.Forms.Button BtnPdfConvert;
+        private System.Windows.Forms.Button BtnPdfDebtor;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button BtnFacturar;
         private System.Windows.Forms.Button BtnOutlook;
         private System.Windows.Forms.TextBox TxtDateTimeEmail;
+        private System.Windows.Forms.Button BtnPdfCreditor;
+        private System.Windows.Forms.Button button1;
     }
 }

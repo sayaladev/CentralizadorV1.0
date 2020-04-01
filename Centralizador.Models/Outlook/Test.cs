@@ -1,5 +1,6 @@
 ﻿using System.CodeDom.Compiler;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace Centralizador.Models.Outlook
 {
@@ -369,7 +370,7 @@ namespace Centralizador.Models.Outlook
         private DTEDefTypeDocumentoEncabezadoIdDocIndNoRebaja indNoRebajaField;
 
         private bool indNoRebajaFieldSpecified;
-
+                
         private DTEDefTypeDocumentoEncabezadoIdDocTipoDespacho tipoDespachoField;
 
         private bool tipoDespachoFieldSpecified;
@@ -517,6 +518,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocTipoDespacho TipoDespacho
         {
             get
@@ -544,6 +546,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocIndTraslado IndTraslado
         {
             get
@@ -571,6 +574,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocTpoImpresion TpoImpresion
         {
             get
@@ -598,6 +602,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocIndServicio IndServicio
         {
             get

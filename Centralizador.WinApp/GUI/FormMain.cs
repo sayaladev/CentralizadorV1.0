@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
+
 using TenTec.Windows.iGridLib;
 
 namespace Centralizador.WinApp.GUI
@@ -61,8 +65,7 @@ namespace Centralizador.WinApp.GUI
             participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
             CboParticipants.DisplayMember = "Name";
             CboParticipants.DataSource = participants;
-            CboParticipants.SelectedIndex = 0;
-            //CboParticipants.Items.Insert(-1, "Please, select Company");
+            CboParticipants.SelectedIndex = 0;          
 
             //Load ComboBox months
             CboMonths.DataSource = DateTimeFormatInfo.InvariantInfo.MonthNames.Take(12).ToList();
@@ -79,6 +82,10 @@ namespace Centralizador.WinApp.GUI
 
             // Time
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:D}", DateTime.Today);
+
+            // Controls
+            BtnCreditor.Enabled = false;
+            BtnDebitor.Enabled = false;
 
         }
 
@@ -340,6 +347,7 @@ namespace Centralizador.WinApp.GUI
                                     //Add
                                     InstructionsCreditor.Add(instruction);
                                     i++;
+                                    Thread.Sleep(1000);
                                     BackgroundW.ReportProgress(100 * i / instructions.Count, $"Working...in: {matrix.NaturalKey} ({m} de {MatricesCreditor.Count})");
                                 }
                             }
@@ -422,29 +430,80 @@ namespace Centralizador.WinApp.GUI
 
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            ComboBox senderComboBox = (ComboBox)sender;
+            ComboBox senderComboBox = sender as ComboBox;
+            //BackgroundWorker worker = sender as BackgroundWorker;
             if (senderComboBox.SelectedIndex != 0)
             {
                 TssLblMensaje.Text = "";
             }
         }
 
+        #region Outlook
+
+
+        private ServiceOutlook outlook;
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
-            // Read email
-            // TxtDateTimeEmail.Text= string.Format("{0:g}", ServiceOutlook.GetXmlFromEmail());
-            ServiceOutlook.ReadXML();
+            // Date & folder
+            outlook = new ServiceOutlook
+            {
+                Year = CboYears.SelectedItem,
+                Month = CboMonths.SelectedIndex + 1
+            };
+
+            // Read & save email
+            BackgroundWorker bgwReadEmail = new BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
+            bgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
+            bgwReadEmail.RunWorkerCompleted += BgwReadEmailRunWorkerCompleted;
+            //outlook.GetXmlFromEmail(bgwReadEmail);
+
+            // Read Xml
+            BackgroundWorker bgwReadXml = new BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
+            bgwReadXml.ProgressChanged += BgwReadXmlProgressChanged;
+            bgwReadXml.RunWorkerCompleted += BgwReadXmlRunWorkerCompleted;
+            outlook.ReadXML(bgwReadXml);
 
             BtnCreditor.Enabled = true;
             BtnDebitor.Enabled = true;
 
-            //Save xml in folder
-
-
-
 
 
         }
+
+
+        private void BgwReadEmail_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+        private void BgwReadEmailRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            TxtDateTimeEmail.Text = string.Format("{0:g}", outlook.LastTime);
+            TssLblProgBar.Value = 0;
+            TssLblMensaje.Text = "";
+        }
+        private void BgwReadXmlProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+        private void BgwReadXmlRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            TxtDateTimeEmail.Text = string.Format("{0:g}", outlook.LastTime);
+            TssLblProgBar.Value = 0;
+            TssLblMensaje.Text = "";
+            DTEDefType defType;
+            //defType = outlook.Attachments[0];
+        }
+
+
+        #endregion
     }
 }
 
