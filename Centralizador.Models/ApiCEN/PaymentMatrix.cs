@@ -128,5 +128,46 @@ namespace Centralizador.Models.ApiCEN
             return null;
 
         }
+
+        /// <summary>
+        /// Method return list of Matrix with the Billing Window binding.
+        /// </summary>
+        /// <param name="window"></param>
+        /// <returns></returns>
+        public static IList<ResultPaymentMatrix> GetPaymentMatrixByBillingWindowId(ResultBillingWindow window)
+        {            
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                string res = wc.DownloadString($"payment-matrices/?billing_window={window.Id}");
+                if (res != null)
+                {
+                    PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (p.Results.Count > 0)
+                    {
+                        foreach (ResultPaymentMatrix item in p.Results)
+                        {
+                            item.BillingWindow = window;
+                        }                     
+                        return p.Results;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+
+        }
     }
 }

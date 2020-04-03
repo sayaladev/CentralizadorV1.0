@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -59,9 +58,10 @@ namespace Centralizador.Models.ApiCEN
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (b.Results.Count ==1)
+                    if (b.Results.Count == 1)
                     {
                         return b.Results[0];
+
                     }
 
                 }
@@ -76,9 +76,42 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
 
-           
+        }
+
+        /// <summary>
+        /// Method return 1 Billing Window.
+        /// </summary>
+        /// <param name="nnaturalKey"></param>
+        /// <returns></returns>
+        public static ResultBillingWindow GetBillingWindowByNaturalKey(string nnaturalKey)
+        {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                string res = wc.DownloadString($"billing-windows/?natural_key={nnaturalKey}");
+                if (res != null)
+                {
+                    BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (b.Results.Count == 1)
+                    {
+                        return b.Results[0];
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
         }
     }
-
-
 }

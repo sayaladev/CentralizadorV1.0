@@ -52,7 +52,7 @@ namespace Centralizador.Models.DataBase
             con.Query += "from softland.dte_doccab d ";
             con.Query += "left join softland.dte_logrecenv l ";
             con.Query += "on d.IDSetDTESII = l.IDSetDTE ";
-            con.Query += $"where d.Tipo = 'F' and d.TipoDTE = 33 and d.RUTRecep = '{instruction.Participant.Rut}-{instruction.Participant.VerificationCode}' and d.Folio = {folio} ";
+            con.Query += $"where d.Tipo = 'F' and d.TipoDTE = 33 and d.RUTRecep = '{instruction.ParticipantDebtor.Rut}-{instruction.ParticipantDebtor.VerificationCode}' and d.Folio = {folio} ";
 
             DataTable dataTable = new DataTable();
             dataTable = Conexion.ConexionBdQuery(con);

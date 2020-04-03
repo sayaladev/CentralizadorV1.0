@@ -153,6 +153,37 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
         }
+
+        public static ResultParticipant GetParticipantByRut(string rut)
+        {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                string res = wc.DownloadString($"participants/?rut={rut}");
+                if (res != null)
+                {
+                    Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (p.Results.Count == 1)
+                    {
+                        return p.Results[0];
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
     }
 
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
+using Centralizador.Models.Outlook;
 
 using Newtonsoft.Json;
 
@@ -25,13 +26,11 @@ namespace Centralizador.Models.ApiSII
             Data = data;
         }
 
-        
-        public static IList<Detalle> GetLibro(string tipoLibro, ResultParticipant participante, string tipoDoc, string periodo)
+
+        public static IList<Detalle> GetLibro(string tipoLibro, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
         {
             string ns = "", url = "";
-            string token = TokenSeed.GETTokenFromSii();
             byte op = 0;
-       
             switch (tipoLibro)
             {
                 case "Debitor":
@@ -57,8 +56,8 @@ namespace Centralizador.Models.ApiSII
             Data data = new Data
             {
                 TipoDoc = tipoDoc,
-                Rut = participante.Rut.ToString(),
-                Dv = participante.VerificationCode,
+                Rut = userParticipant.Rut.ToString(),
+                Dv = userParticipant.VerificationCode,
                 Periodo = periodo,
                 Operacion = op,
                 DerrCodigo = tipoDoc,
@@ -73,34 +72,34 @@ namespace Centralizador.Models.ApiSII
                 WebClient wc = new WebClient();
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={participante.Rut}; DV_NS={participante.VerificationCode};TOKEN={token}";
+                wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={userParticipant.Rut}; DV_NS={userParticipant.VerificationCode};TOKEN={token}";
                 string result = wc.UploadString(url, "POST", jSon);
                 if (result != null)
                 {
                     DetalleLibro detalleLibro = JsonConvert.DeserializeObject<DetalleLibro>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (detalleLibro.MetaData.Errors != null)
+                    switch (detalleLibro.RespEstado.CodRespuesta)
                     {
-                        MessageBox.Show($"Message from Sii:{Environment.NewLine}{detalleLibro.MetaData.Errors[0].Descripcion}");
-                        return null;
+                        case 2:
+                            MessageBox.Show($"There are no documents registered for the period {periodo}.", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            return null;
+                        case 0:
+                            return detalleLibro.DataResp.Detalles;
+                        case 99:
+                            MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        case 1:
+                            MessageBox.Show("This option only maintains the detail of the last six months", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                            break;
                     }
-
-                    if (detalleLibro.RespEstado.CodRespuesta != 0)
-                    {
-                        MessageBox.Show($"Message from Sii:{Environment.NewLine}{detalleLibro.RespEstado.MsgeRespuesta}");
-                        return null;
-                    }
-                    return detalleLibro.DataResp.Detalles;
                 }
             }
             catch (WebException e)
             {
-                //throw;//token fuera de tiempo: error 401 no autorizado.
                 HttpWebResponse http = (HttpWebResponse)e.Response;
-                HttpStatusCode code = http.StatusCode;
-                if (code.ToString() == "Unauthorized")
+                if (http.StatusCode.ToString() == "Unauthorized")
                 {
-                                     
 
+                    MessageBox.Show($"Error in the server/paswword.", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
@@ -110,7 +109,6 @@ namespace Centralizador.Models.ApiSII
             }
             return null;
         }
-
     }
 
     public class Detalle
@@ -150,7 +148,7 @@ namespace Centralizador.Models.ApiSII
         public float TasaImptoIVA { get; set; }
 
         [JsonProperty("dehOrdenEvento")]
-        public string DehOrdenEvento { get; set; }
+        public byte DehOrdenEvento { get; set; }
 
         [JsonProperty("dehDescripcion")]
         public string DehDescripcion { get; set; }
@@ -160,6 +158,11 @@ namespace Centralizador.Models.ApiSII
 
         [JsonProperty("dhdrCodigo")]
         public object DhdrCodigo { get; set; }
+
+        // New properties
+        public ResultInstruction Instruction { get; set; }
+
+        public DTEDefTypeDocumento DocumentFile { get; set; }
 
     }
 

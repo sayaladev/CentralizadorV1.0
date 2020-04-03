@@ -59,14 +59,13 @@
     <Compile Include="ApiCEN\Instruction.cs" />
     <Compile Include="ApiCEN\Participant.cs" />
     <Compile Include="ApiCEN\PaymentMatrix.cs" />
-    <Compile Include="ApiSII\ServiceEmail.cs" />
     <Compile Include="ApiSII\ServiceLibro.cs" />
     <Compile Include="ApiSII\TokenSeed.cs" />
+    <Compile Include="DataBase\Auxiliar.cs" />
     <Compile Include="DataBase\Conexion.cs" />
     <Compile Include="DataBase\Reference.cs" />
     <Compile Include="DataBase\InfoSii.cs" />
     <Compile Include="DataBase\Softland.cs" />
-    <Compile Include="Outlook\Test.cs" />
     <Compile Include="Outlook\DeserializerXml.cs" />
     <Compile Include="Outlook\ServiceOutlook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

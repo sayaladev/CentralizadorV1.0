@@ -121,5 +121,17 @@ namespace Centralizador.Models.Properties {
                 this["DateTimeEmail"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TokenSii {
+            get {
+                return ((string)(this["TokenSii"]));
+            }
+            set {
+                this["TokenSii"] = value;
+            }
+        }
     }
 }

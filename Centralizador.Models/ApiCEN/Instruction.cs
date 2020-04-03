@@ -66,7 +66,9 @@ namespace Centralizador.Models.ApiCEN
 
         //Mapping (new properties)    
 
-        public ResultParticipant Participant { get; set; }
+        public ResultParticipant ParticipantDebtor { get; set; }
+
+        public ResultParticipant ParticipantCreditor { get; set; }
 
         public ResultPaymentMatrix PaymentMatrix { get; set; }
 
@@ -93,7 +95,7 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultInstruction> Results { get; set; }
 
-        public static IList<ResultInstruction> GetInstructions(ResultPaymentMatrix matrix, ResultParticipant participant, string userType)
+        public static IList<ResultInstruction> GetInstructions(ResultPaymentMatrix matrix, int id, string userType)
         {
             IList<ResultInstruction> instructions = new List<ResultInstruction>();
             string res = "";
@@ -107,11 +109,11 @@ namespace Centralizador.Models.ApiCEN
                 wc.Encoding = Encoding.UTF8;
                 if (userType == "Creditor")
                 {
-                     res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}");
+                    res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={id}");
                 }
                 else
                 {
-                     res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&debitor={participant.Id}");
+                    res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&debitor={id}");
                 }
                 if (res != null)
                 {
@@ -120,23 +122,23 @@ namespace Centralizador.Models.ApiCEN
                     {
                         foreach (ResultInstruction item in instruction.Results)
                         {
-                            if (item.Id == 1434430)
-                            {
-                                System.Windows.Forms.MessageBox.Show("Test");
-                            }
-                            if (item.Status == "Publicado")
+                            //if (item.Id == 1434430)
+                            //{
+                            //    System.Windows.Forms.MessageBox.Show("Test");
+                            //}
+                            if (item.Status == "Publicado") //********SACAR Y PONER COMO FILTRO EN EL GET
                             {
                                 if (userType == "Creditor")
                                 {
-                                    item.Participant = Participant.GetParticipantById(item.Debtor);
+                                    //item.Participant = Participant.GetParticipantById(item.Debtor);
                                 }
                                 else
                                 {
-                                    item.Participant = Participant.GetParticipantById(item.Creditor);
+                                   // item.Participant = Participant.GetParticipantById(item.Creditor);
                                 }
                                 if (item.StatusBilled == 2)
                                 {
-                                    item.Dte = Dte.GetDte(item);  
+                                    item.Dte = Dte.GetDte(item);
                                 }
                                 instructions.Add(item);
 
@@ -145,6 +147,48 @@ namespace Centralizador.Models.ApiCEN
                         return instructions;
                     }
 
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Method return 1 instruction with the matrix + participants binding.
+        /// </summary>
+        /// <param name="idMatrix"></param>
+        /// <param name="idCReditor"></param>
+        /// <param name="idDebtor"></param>
+        /// <returns></returns>
+        public static ResultInstruction GetInstructionDebtor(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userParticipant)
+        {
+            string res = "";
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userParticipant.Id}&status=Publicado");
+                if (res != null)
+                {
+                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (instruction.Results.Count == 1)
+                    {
+                        instruction.Results[0].PaymentMatrix = matrix;
+                        instruction.Results[0].ParticipantCreditor = participant;
+                        instruction.Results[0].ParticipantDebtor = userParticipant;
+                        return instruction.Results[0];
+                    }
                 }
             }
             catch (Exception)

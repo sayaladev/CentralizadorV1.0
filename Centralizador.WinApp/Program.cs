@@ -26,7 +26,15 @@ namespace Centralizador.WinApp
             }
             else
             {
-                Application.Run(new FormMain());
+                string tokenSii = Models.ApiSII.TokenSeed.GETTokenFromSii();
+                if (tokenSii != null)
+                {
+                    Application.Run(new FormMain(tokenSii));
+                }
+                else
+                {
+                    MessageBox.Show("Missing Sii Token. Please check the digital cert...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                } 
             }
         }
     }
