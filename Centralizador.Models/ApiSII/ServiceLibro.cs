@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
+using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
 
 using Newtonsoft.Json;
@@ -160,9 +161,13 @@ namespace Centralizador.Models.ApiSII
         public object DhdrCodigo { get; set; }
 
         // New properties
+
+        public uint NroInt { get; set; }
         public ResultInstruction Instruction { get; set; }
 
-        public DTEDefTypeDocumento DocumentFile { get; set; }
+        public DTEDefTypeDocumento FileRecibido { get; set; }
+
+        public IList<Reference> References { get; set; }
 
     }
 

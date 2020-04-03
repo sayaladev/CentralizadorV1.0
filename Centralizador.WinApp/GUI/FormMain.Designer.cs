@@ -48,21 +48,21 @@
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.BtnPagar = new System.Windows.Forms.Button();
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.BtnOutlook = new System.Windows.Forms.Button();
-            this.BtnDebitor = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.BtnCreditor = new System.Windows.Forms.Button();
             this.BtnFacturar = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
+            this.BtnCreditor = new System.Windows.Forms.Button();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
+            this.BtnDebitor = new System.Windows.Forms.Button();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -255,6 +255,15 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "CEN";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(142, 31);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(15, 14);
+            this.checkBox1.TabIndex = 9;
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(19, 19);
@@ -301,16 +310,6 @@
             this.BtnOutlook.UseVisualStyleBackColor = true;
             this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
             // 
-            // BtnDebitor
-            // 
-            this.BtnDebitor.Location = new System.Drawing.Point(25, 86);
-            this.BtnDebitor.Name = "BtnDebitor";
-            this.BtnDebitor.Size = new System.Drawing.Size(75, 46);
-            this.BtnDebitor.TabIndex = 5;
-            this.BtnDebitor.Text = "Debtor";
-            this.BtnDebitor.UseVisualStyleBackColor = true;
-            this.BtnDebitor.Click += new System.EventHandler(this.BtnDebitor_Click);
-            // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -322,16 +321,6 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Creditor";
-            // 
-            // BtnCreditor
-            // 
-            this.BtnCreditor.Location = new System.Drawing.Point(135, 86);
-            this.BtnCreditor.Name = "BtnCreditor";
-            this.BtnCreditor.Size = new System.Drawing.Size(75, 46);
-            this.BtnCreditor.TabIndex = 4;
-            this.BtnCreditor.Text = "Creditor";
-            this.BtnCreditor.UseVisualStyleBackColor = true;
-            this.BtnCreditor.Click += new System.EventHandler(this.BtnCreditor_Click);
             // 
             // BtnFacturar
             // 
@@ -358,6 +347,16 @@
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Start";
+            // 
+            // BtnCreditor
+            // 
+            this.BtnCreditor.Location = new System.Drawing.Point(28, 85);
+            this.BtnCreditor.Name = "BtnCreditor";
+            this.BtnCreditor.Size = new System.Drawing.Size(75, 46);
+            this.BtnCreditor.TabIndex = 4;
+            this.BtnCreditor.Text = "Creditor";
+            this.BtnCreditor.UseVisualStyleBackColor = true;
+            this.BtnCreditor.Click += new System.EventHandler(this.BtnCreditor_Click);
             // 
             // CboParticipants
             // 
@@ -390,19 +389,22 @@
             this.CboMonths.Size = new System.Drawing.Size(136, 21);
             this.CboMonths.TabIndex = 2;
             // 
+            // BtnDebitor
+            // 
+            this.BtnDebitor.Location = new System.Drawing.Point(131, 85);
+            this.BtnDebitor.Name = "BtnDebitor";
+            this.BtnDebitor.Size = new System.Drawing.Size(75, 46);
+            this.BtnDebitor.TabIndex = 5;
+            this.BtnDebitor.Text = "Debtor";
+            this.BtnDebitor.UseVisualStyleBackColor = true;
+            this.BtnDebitor.Click += new System.EventHandler(this.BtnDebitor_Click);
+            // 
             // BackgroundW
             // 
             this.BackgroundW.WorkerReportsProgress = true;
-         
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(142, 31);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(15, 14);
-            this.checkBox1.TabIndex = 9;
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.BackgroundW.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundW_DoWork);
+            this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
+            this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
             // 
             // FormMain
             // 

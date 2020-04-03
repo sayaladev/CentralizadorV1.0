@@ -16,7 +16,7 @@ namespace Centralizador.Models.Outlook
     public class ServiceOutlook
     {
 
-        private DateTime LastTime { get; set; }
+        public DateTime LastTime { get; set; }
 
         private string TokenSii { get; set; }
 

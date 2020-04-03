@@ -26,10 +26,10 @@ namespace Centralizador.Models.ApiCEN
         public int Debtor { get; set; }
 
         [JsonProperty("amount")]
-        public int Amount { get; set; }
+        public uint Amount { get; set; }
 
         [JsonProperty("amount_gross")]
-        public int AmountGross { get; set; }
+        public uint AmountGross { get; set; }
 
         [JsonProperty("closed")]
         public bool Closed { get; set; }
@@ -74,7 +74,7 @@ namespace Centralizador.Models.ApiCEN
 
         public ResultDte Dte { get; set; }
 
-        public Softland Softland { get; set; }
+        public IList<Reference> References { get; set; }
 
 
 
@@ -96,13 +96,13 @@ namespace Centralizador.Models.ApiCEN
         public IList<ResultInstruction> Results { get; set; }
 
         /// <summary>
-        /// Method return list of instructions with + user participant binding.
+        /// Method return list of instructions with the matrix + user participant binding.
         /// </summary>
         /// <param name="matrix"></param>
-        /// <param name="participant"></param>
+        /// <param name="Userparticipant"></param>
         /// <returns></returns>
-        public static IList<ResultInstruction> GetInstructionCreditor(ResultPaymentMatrix matrix, ResultParticipant participant)
-        {          
+        public static IList<ResultInstruction> GetInstructionCreditor(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
+        {
             string res = "";
             WebClient wc = new WebClient
             {
@@ -112,14 +112,19 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&status=Publicado");
+                res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
                 if (res != null)
                 {
-                    Instruction i = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (i.Results.Count > 0)
+                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (instruction.Results.Count > 0)
                     {
-                        return i.Results;
-                    }                  
+                        foreach (ResultInstruction item in instruction.Results)
+                        {
+                            item.ParticipantCreditor = Userparticipant;
+                            item.PaymentMatrix = matrix;
+                        }
+                        return instruction.Results;
+                    }
                 }
             }
             catch (Exception)

@@ -65,7 +65,7 @@ namespace Centralizador.Models.ApiCEN
         public string Name { get; set; }
 
         [JsonProperty("rut")]
-        public int Rut { get; set; }
+        public uint Rut { get; set; }
 
         [JsonProperty("verification_code")]
         public string VerificationCode { get; set; }
@@ -122,7 +122,11 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultParticipant> Results { get; set; }
 
-
+        /// <summary>
+        /// Method return 1 participant.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public static ResultParticipant GetParticipantById(int id)
         {
             WebClient wc = new WebClient
@@ -154,6 +158,11 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
+        /// <summary>
+        /// Method return 1 participant.
+        /// </summary>
+        /// <param name="rut"></param>
+        /// <returns></returns>
         public static ResultParticipant GetParticipantByRut(string rut)
         {
             WebClient wc = new WebClient
