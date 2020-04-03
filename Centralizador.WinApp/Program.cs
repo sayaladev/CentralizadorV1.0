@@ -22,7 +22,7 @@ namespace Centralizador.WinApp
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\" + file;
             if (!File.Exists(path))
             {
-                MessageBox.Show("Missing Sii DTE file. Please download for continue...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Missing Sii file '{file}', Please download for continue...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {

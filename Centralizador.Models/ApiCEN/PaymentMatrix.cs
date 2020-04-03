@@ -108,11 +108,11 @@ namespace Centralizador.Models.ApiCEN
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     if (p.Results.Count > 0)
                     {
-                        //Billing windows
-                        foreach (ResultPaymentMatrix matrix in p.Results)
-                        {
-                            matrix.BillingWindow = BillingWindow.GetBillingWindowById(matrix);
-                        }
+                        ////Billing windows
+                        //foreach (ResultPaymentMatrix matrix in p.Results)
+                        //{
+                        //    matrix.BillingWindow = BillingWindow.GetBillingWindowById(matrix);
+                        //}
                         return p.Results;
                     }
                 }

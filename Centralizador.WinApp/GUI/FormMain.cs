@@ -6,15 +6,13 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
-using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
-
+using Centralizador.Models.registroreclamodteservice;
 using TenTec.Windows.iGridLib;
 
 namespace Centralizador.WinApp.GUI
@@ -113,20 +111,54 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
             }
+
+            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+            // Get matrix
+            IList<Detalle> detalles = new List<Detalle>();
+            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
+            if (matrices != null)
+            {
+                foreach (ResultPaymentMatrix m in matrices)
+                {
+                    IList<ResultInstruction> instructions = Instruction.GetInstructionCreditor(m, UserParticipant);
+                    if (instructions != null)
+                    {
+                        foreach (ResultInstruction i in instructions)
+                        {
+                            Detalle detalle = new Detalle
+                            {
+                                Instruction = i
+                            };
+                            using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
+                            {
+
+
+                            }
+                                detalle.FechaRecepcion = "";
+
+
+                            detalles.Add(detalle);
+                        }
+                    }
+
+                }
+            }
             else
             {
-                DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
-                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-                //Periodo1 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}";
-                Periodo2 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 2)}";
-
-
-
-
-                BtnCreditor.Enabled = false;
-
-                BackgroundW.RunWorkerAsync("Creditor");
+                MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
+
+
+            //Periodo1 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}";
+            // Periodo2 = $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 2)}";
+
+
+
+
+            //BtnCreditor.Enabled = false;
+
+            //BackgroundW.RunWorkerAsync("Creditor");
+
 
 
         }
@@ -140,7 +172,6 @@ namespace Centralizador.WinApp.GUI
             }
             string nameFile = "";
             XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
-            DateTimeCbo = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
             UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
             // Get libro compra from Sii
             IList<Detalle> detalles = new List<Detalle>();
@@ -359,110 +390,109 @@ namespace Centralizador.WinApp.GUI
         }
 
 
-
         #endregion
 
-        private void BackgroundW_DoWork(object sender, DoWorkEventArgs e)
-        {
-            string UserType = e.Argument.ToString();
+        //private void BackgroundW_DoWork(object sender, DoWorkEventArgs e)
+        //{
+        //    string UserType = e.Argument.ToString();
 
-            switch (UserType)
-            {
-                case "Creditor":
-                    // Get list of payments matrix  
-                    // Crear un libro detalle y enlazarlos con instrucciones
-
-
+        //    switch (UserType)
+        //    {
+        //        case "Creditor":
+        //            // Get list of payments matrix  
+        //            // Crear un libro detalle y enlazarlos con instrucciones
 
 
 
 
 
 
-                    MatricesCreditor = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
-                    if (MatricesCreditor != null)
-                    {
-                        //Get libro
-                        IList<Detalle> detalles1 = new List<Detalle>();
-                        IList<Detalle> detalles2 = new List<Detalle>();
-                        // que el método traiga 2 meses
-                        detalles1 = ServiceLibro.GetLibro("Creditor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
-                        detalles2 = ServiceLibro.GetLibro("Creditor", UserParticipant, "33", Periodo2, TokenSii);
-
-                        detalles1 = detalles1.Concat(detalles2).ToList();
-
-                        if (detalles1 == null)
-                        {
-                            break;
-                        }
-
-                        InstructionsCreditor = new List<ResultInstruction>();
-                        int m = 1;
-                        foreach (ResultPaymentMatrix matrix in MatricesCreditor)
-                        {
-                            // if (matrix.Id == 680)
-                            //{
-                            IList<ResultInstruction> instructions = Instruction.GetInstructions(matrix, UserParticipant.Id, "Creditor"); //Reconsiderar crear un get para debtor y otro creditor
-                            if (instructions != null)
-                            {
-                                BackgroundW.ReportProgress(0, "");
-                                int i = 0;
-                                foreach (ResultInstruction instruction in instructions)
-                                {
-                                    instruction.PaymentMatrix = matrix;
-                                    Softland softland = new Softland(detalles1);
-                                    softland.GetSoftlandData(instruction);
-                                    instruction.Softland = softland;
-
-                                    //guardar libro de venta (folio y status) en instruction, no enlazarlo completo FIN!
-
-                                    // ***** Traer datos de auxiliar e ir actualizando el faltante
-
-                                    // También actualziar dte aquí!
 
 
+        //            MatricesCreditor = PaymentMatrix.GetPaymentMatrix(DateTimeCbo);
+        //            if (MatricesCreditor != null)
+        //            {
+        //                //Get libro
+        //                IList<Detalle> detalles1 = new List<Detalle>();
+        //                IList<Detalle> detalles2 = new List<Detalle>();
+        //                // que el método traiga 2 meses
+        //                detalles1 = ServiceLibro.GetLibro("Creditor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+        //                detalles2 = ServiceLibro.GetLibro("Creditor", UserParticipant, "33", Periodo2, TokenSii);
 
+        //                detalles1 = detalles1.Concat(detalles2).ToList();
 
-                                    //Add
-                                    InstructionsCreditor.Add(instruction);
-                                    i++;
-                                    Thread.Sleep(1000);
-                                    BackgroundW.ReportProgress(100 * i / instructions.Count, $"Working...in: {matrix.NaturalKey} ({m} de {MatricesCreditor.Count})");
-                                }
-                            }
-                            m++;
-                            //}
-                        }
-                    }
-                    BackgroundW.ReportProgress(100, "Complete!...");
-                    break;
+        //                if (detalles1 == null)
+        //                {
+        //                    break;
+        //                }
+
+        //                InstructionsCreditor = new List<ResultInstruction>();
+        //                int m = 1;
+        //                foreach (ResultPaymentMatrix matrix in MatricesCreditor)
+        //                {
+        //                    // if (matrix.Id == 680)
+        //                    //{
+        //                    IList<ResultInstruction> instructions = Instruction.GetInstructions(matrix, UserParticipant.Id, "Creditor"); //Reconsiderar crear un get para debtor y otro creditor
+        //                    if (instructions != null)
+        //                    {
+        //                        BackgroundW.ReportProgress(0, "");
+        //                        int i = 0;
+        //                        foreach (ResultInstruction instruction in instructions)
+        //                        {
+        //                            instruction.PaymentMatrix = matrix;
+        //                            Softland softland = new Softland(detalles1);
+        //                            softland.GetSoftlandData(instruction);
+        //                            instruction.Softland = softland;
+
+        //                            //guardar libro de venta (folio y status) en instruction, no enlazarlo completo FIN!
+
+        //                            // ***** Traer datos de auxiliar e ir actualizando el faltante
+
+        //                            // También actualziar dte aquí!
 
 
 
 
+        //                            //Add
+        //                            InstructionsCreditor.Add(instruction);
+        //                            i++;
+        //                            Thread.Sleep(1000);
+        //                            BackgroundW.ReportProgress(100 * i / instructions.Count, $"Working...in: {matrix.NaturalKey} ({m} de {MatricesCreditor.Count})");
+        //                        }
+        //                    }
+        //                    m++;
+        //                    //}
+        //                }
+        //            }
+        //            BackgroundW.ReportProgress(100, "Complete!...");
+        //            break;
 
-                case "Debtor":
-
-                    break;
-            }
 
 
 
-        }
 
-        private void BackgroundW_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
+        //        case "Debtor":
 
-        private void BackgroundW_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
-        {
+        //            break;
+        //    }
 
-            //IGridDesign();
-            TssLblProgBar.Value = 0;
-            BtnCreditor.Enabled = true;
-        }
+
+
+        //}
+
+        //private void BackgroundW_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        //{
+        //    TssLblProgBar.Value = e.ProgressPercentage;
+        //    TssLblMensaje.Text = e.UserState.ToString();
+        //}
+
+        //private void BackgroundW_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        //{
+
+        //    //IGridDesign();
+        //    TssLblProgBar.Value = 0;
+        //    BtnCreditor.Enabled = true;
+        //}
 
         private void BtnFacturar_Click(object sender, EventArgs e)
         {
@@ -510,7 +540,6 @@ namespace Centralizador.WinApp.GUI
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             ComboBox senderComboBox = sender as ComboBox;
-            //BackgroundWorker worker = sender as BackgroundWorker;
             if (senderComboBox.SelectedIndex != 0)
             {
                 TssLblMensaje.Text = "";
@@ -524,11 +553,7 @@ namespace Centralizador.WinApp.GUI
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
             // Date & folder
-            outlook = new ServiceOutlook
-            {
-                TokenSii = TokenSii,
-                LastTime = Models.Properties.Settings.Default.DateTimeEmail
-            };
+            outlook = new ServiceOutlook(Models.Properties.Settings.Default.DateTimeEmail, TokenSii);          
 
             // Read & save email
             BackgroundWorker bgwReadEmail = new BackgroundWorker
@@ -538,10 +563,10 @@ namespace Centralizador.WinApp.GUI
             bgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
             bgwReadEmail.RunWorkerCompleted += BgwReadEmailRunWorkerCompleted;
             outlook.GetXmlFromEmail(bgwReadEmail);
-            //            TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", outlook.LastTime);
 
-            BtnCreditor.Enabled = true;
-            BtnDebitor.Enabled = true;
+
+            //BtnCreditor.Enabled = true;
+            //BtnDebitor.Enabled = true;
 
 
 

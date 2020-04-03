@@ -95,9 +95,14 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultInstruction> Results { get; set; }
 
-        public static IList<ResultInstruction> GetInstructions(ResultPaymentMatrix matrix, int id, string userType)
-        {
-            IList<ResultInstruction> instructions = new List<ResultInstruction>();
+        /// <summary>
+        /// Method return list of instructions with + user participant binding.
+        /// </summary>
+        /// <param name="matrix"></param>
+        /// <param name="participant"></param>
+        /// <returns></returns>
+        public static IList<ResultInstruction> GetInstructionCreditor(ResultPaymentMatrix matrix, ResultParticipant participant)
+        {          
             string res = "";
             WebClient wc = new WebClient
             {
@@ -107,46 +112,14 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                if (userType == "Creditor")
-                {
-                    res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={id}");
-                }
-                else
-                {
-                    res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&debitor={id}");
-                }
+                res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&status=Publicado");
                 if (res != null)
                 {
-                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (instruction.Results.Count > 0)
+                    Instruction i = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (i.Results.Count > 0)
                     {
-                        foreach (ResultInstruction item in instruction.Results)
-                        {
-                            //if (item.Id == 1434430)
-                            //{
-                            //    System.Windows.Forms.MessageBox.Show("Test");
-                            //}
-                            if (item.Status == "Publicado") //********SACAR Y PONER COMO FILTRO EN EL GET
-                            {
-                                if (userType == "Creditor")
-                                {
-                                    //item.Participant = Participant.GetParticipantById(item.Debtor);
-                                }
-                                else
-                                {
-                                   // item.Participant = Participant.GetParticipantById(item.Creditor);
-                                }
-                                if (item.StatusBilled == 2)
-                                {
-                                    item.Dte = Dte.GetDte(item);
-                                }
-                                instructions.Add(item);
-
-                            }
-                        }
-                        return instructions;
-                    }
-
+                        return i.Results;
+                    }                  
                 }
             }
             catch (Exception)

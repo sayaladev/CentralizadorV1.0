@@ -16,9 +16,9 @@ namespace Centralizador.Models.Outlook
     public class ServiceOutlook
     {
 
-        public DateTime LastTime { get; set; }
+        private DateTime LastTime { get; set; }
 
-        public string TokenSii { get; set; }
+        private string TokenSii { get; set; }
 
         private MailInfo[] Infos { get; set; }
 
@@ -27,6 +27,12 @@ namespace Centralizador.Models.Outlook
         private IList<Mail> ListMail { get; set; }
 
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
+
+        public ServiceOutlook(DateTime lastTime, string tokenSii)
+        {
+            LastTime = lastTime;
+            TokenSii = tokenSii;
+        }
 
 
 
