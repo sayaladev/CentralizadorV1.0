@@ -61,7 +61,7 @@
             this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
-            this.BtnDebitor = new System.Windows.Forms.Button();
+            this.BtnDebtor = new System.Windows.Forms.Button();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
@@ -340,7 +340,7 @@
             this.GroupBox1.Controls.Add(this.CboParticipants);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
-            this.GroupBox1.Controls.Add(this.BtnDebitor);
+            this.GroupBox1.Controls.Add(this.BtnDebtor);
             this.GroupBox1.Location = new System.Drawing.Point(13, 12);
             this.GroupBox1.Name = "GroupBox1";
             this.GroupBox1.Size = new System.Drawing.Size(234, 148);
@@ -389,15 +389,15 @@
             this.CboMonths.Size = new System.Drawing.Size(136, 21);
             this.CboMonths.TabIndex = 2;
             // 
-            // BtnDebitor
+            // BtnDebtor
             // 
-            this.BtnDebitor.Location = new System.Drawing.Point(131, 85);
-            this.BtnDebitor.Name = "BtnDebitor";
-            this.BtnDebitor.Size = new System.Drawing.Size(75, 46);
-            this.BtnDebitor.TabIndex = 5;
-            this.BtnDebitor.Text = "Debtor";
-            this.BtnDebitor.UseVisualStyleBackColor = true;
-            this.BtnDebitor.Click += new System.EventHandler(this.BtnDebitor_Click);
+            this.BtnDebtor.Location = new System.Drawing.Point(131, 85);
+            this.BtnDebtor.Name = "BtnDebtor";
+            this.BtnDebtor.Size = new System.Drawing.Size(75, 46);
+            this.BtnDebtor.TabIndex = 5;
+            this.BtnDebtor.Text = "Debtor";
+            this.BtnDebtor.UseVisualStyleBackColor = true;
+            this.BtnDebtor.Click += new System.EventHandler(this.BtnDebtor_Click);
             // 
             // BackgroundW
             // 
@@ -447,7 +447,7 @@
         private System.Windows.Forms.ComboBox CboParticipants;
         private System.Windows.Forms.ComboBox CboYears;
         private System.Windows.Forms.ComboBox CboMonths;
-        private System.Windows.Forms.Button BtnDebitor;
+        private System.Windows.Forms.Button BtnDebtor;
         private System.Windows.Forms.Button BtnCreditor;
         private System.Windows.Forms.ToolStripProgressBar TssLblProgBar;
         private System.ComponentModel.BackgroundWorker BackgroundW;

@@ -34,6 +34,9 @@
     <Reference Include="EAGetMail, Version=5.1.0.5, Culture=neutral, PublicKeyToken=e10a0812eb29cf94, processorArchitecture=MSIL">
       <HintPath>..\packages\EAGetMail.5.1.0.5\lib\net461\EAGetMail.dll</HintPath>
     </Reference>
+    <Reference Include="Mail, Version=3.0.20073.1408, Culture=neutral, PublicKeyToken=6dc438ab78a525b3, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mail.dll.3.0.20073.1408\lib\net45\Mail.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -61,10 +64,12 @@
     <Compile Include="ApiCEN\PaymentMatrix.cs" />
     <Compile Include="ApiSII\ServiceLibro.cs" />
     <Compile Include="ApiSII\TokenSeed.cs" />
+    <Compile Include="AppFunctions\ServicePdf.cs" />
     <Compile Include="DataBase\Auxiliar.cs" />
     <Compile Include="DataBase\Conexion.cs" />
     <Compile Include="DataBase\Reference.cs" />
     <Compile Include="Outlook\DeserializerXml.cs" />
+    <Compile Include="Outlook\ServiceEmail.cs" />
     <Compile Include="Outlook\ServiceOutlook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

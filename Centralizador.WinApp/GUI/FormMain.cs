@@ -7,10 +7,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
+using Centralizador.Models.AppFunctions;
 using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
 
@@ -112,12 +112,21 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
             }
-            BackgroundW.RunWorkerAsync();
+            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
+            if (matrices != null)
+            {
+                BackgroundW.RunWorkerAsync(matrices);
+            }
+            else
+            {
+                MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
 
 
         }
 
-        private void BtnDebitor_Click(object sender, EventArgs e)
+        private void BtnDebtor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0)
             {
@@ -125,9 +134,8 @@ namespace Centralizador.WinApp.GUI
                 return;
             }
             string nameFile = "";
-            XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
             UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-            // Get libro compra from Sii
+            // Get info from Sii / Debtor.
             IList<Detalle> detalles = new List<Detalle>();
             detalles = ServiceLibro.GetLibro("Debitor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
             if (detalles != null)
@@ -137,51 +145,55 @@ namespace Centralizador.WinApp.GUI
                     nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
                     nameFile += $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
                     if (File.Exists(nameFile))
-                    {
-                        using (StreamReader reader = new StreamReader(nameFile))
+                    {   // Deserialize                     
+                        DTEDefType defType = ServicePdf.TransformXmlToObject(nameFile);
+                        DTEDefTypeDocumento doc = (DTEDefTypeDocumento)defType.Item;
+                        if (doc.Referencia != null)
                         {
-                            EnvioDTE document = (EnvioDTE)deserializer.Deserialize(reader);
-                            foreach (DTEDefType type in document.SetDTE.DTE)
+                            foreach (DTEDefTypeDocumentoReferencia r in doc.Referencia)
                             {
-                                DTEDefTypeDocumento doc = (DTEDefTypeDocumento)type.Item;
-                                if (doc.Referencia != null)
+                                if (r.TpoDocRef == "SEN")
                                 {
-                                    foreach (DTEDefTypeDocumentoReferencia r in doc.Referencia)
+                                    string rznRef = "";
+                                    ResultBillingWindow window = null;
+                                    if (r.RazonRef != null)
                                     {
-                                        if (r.TpoDocRef == "SEN")
-                                        {
-                                            string rznRef = "";
-                                            ResultBillingWindow window = null;
-                                            if (r.RazonRef != null)
-                                            {
-                                                rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
-                                                window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
-                                            }
-                                            if (window != null)
-                                            {
-                                                // Get the asociated matrix  
-                                                IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                                                foreach (ResultPaymentMatrix m in matrices)
-                                                {
-                                                    if (m.NaturalKey == r.RazonRef)
-                                                    {
-                                                        // Get the instruction                                        
-                                                        ResultParticipant participant = Participant.GetParticipantByRut(doc.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
-                                                        ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
-                                                        // Asignament
-                                                        item.Instruction = instruction;
-
-                                                    }
-                                                }
-
-                                            }
-
-                                        }
+                                        rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
+                                        window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
                                     }
-                                }
+                                    if (window != null)
+                                    {
+                                        // Get the asociated matrix  
+                                        IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                        foreach (ResultPaymentMatrix m in matrices)
+                                        {
+                                            if (m.NaturalKey == r.RazonRef)
+                                            {
+                                                // Get the instruction                                        
+                                                ResultParticipant participant = Participant.GetParticipantByRut(doc.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
+                                                ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
 
+                                                // tengo que ir a softkand por PAGOS y referencia
+                                                Reference reference = new Reference
+                                                {
+                                                    FileEnviado = ServicePdf.TransformObjectToXml(doc)
+                                                };
+
+                                                // Asignament to detalle
+                                                item.Instruction = instruction;
+                                                //item.References = 
+
+                                            }
+                                        }
+
+                                    }
+
+                                }
                             }
                         }
+
+
+
                     }
                 }
                 IGridDesign(detalles);
@@ -347,9 +359,6 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
 
-
-    
-
         private void BtnFacturar_Click(object sender, EventArgs e)
         {
             // Update Dte from Sii
@@ -366,12 +375,12 @@ namespace Centralizador.WinApp.GUI
             }
             else
             {
-                DialogResult resp = MessageBox.Show("Are you sure?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                DialogResult resp = MessageBox.Show($"Se van a insertar las siguientes NV:{Environment.NewLine} Folio 5478  a 5498 {Environment.NewLine} ¿Quiere continuar?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (resp == DialogResult.OK)
                 {
-                    UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+                    //UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
 
-
+                    DialogResult b = MessageBox.Show("Are you sure?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
 
                 }
 
@@ -408,6 +417,10 @@ namespace Centralizador.WinApp.GUI
         private ServiceOutlook outlook;
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
+
+            // Test
+            //ServiceEmail.Get();
+
             // Date & folder
             outlook = new ServiceOutlook(Models.Properties.Settings.Default.DateTimeEmail, TokenSii);
 
@@ -462,73 +475,58 @@ namespace Centralizador.WinApp.GUI
 
         private void BackgroundW_DoWork(object sender, DoWorkEventArgs e)
         {
-            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+            IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
             IList<Detalle> detalles = new List<Detalle>();
-
             int c = 0;
             float porcent = 0;
-            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-            if (matrices != null)
+            foreach (ResultPaymentMatrix m in matrices)
             {
-
-                foreach (ResultPaymentMatrix m in matrices)
+                // Get instructions with matrix binding.
+                IList<ResultInstruction> instructions = Instruction.GetInstructionCreditor(m, UserParticipant);
+                if (instructions != null)
                 {
-
-                    // Get instructions with matrix binding.
-                    IList<ResultInstruction> instructions = Instruction.GetInstructionCreditor(m, UserParticipant);
-                    if (instructions != null)
+                    c = 0;
+                    foreach (ResultInstruction instruction in instructions)
                     {
-
-                        foreach (ResultInstruction instruction in instructions)
+                        ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
+                        m.BillingWindow = window;
+                        instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
+                        // Get reference from Softland.
+                        instruction.References = Reference.GetInfoFactura(instruction);
+                        // Root classs Detalle
+                        Detalle detalle = new Detalle
                         {
-                            ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
-                            m.BillingWindow = window;
-
-                            instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
-                            instruction.References = Reference.GetInfoFactura(instruction);
-
-                            // BillingWindow.GetBillingWindowByNaturalKey(rznRef);
-                            Detalle detalle = new Detalle
+                            Instruction = instruction
+                        };
+                        detalle.MntNeto = instruction.Amount;
+                        detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
+                        detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
+                        detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
+                        if (instruction.References != null)
+                        {
+                            if (instruction.References[0].Folio != 0)
                             {
-                                Instruction = instruction
-                            };
-                            detalle.MntNeto = instruction.Amount;
-                            detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
-                            detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
-                            detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
-                            if (instruction.References != null)
-                            {
-
-
-                                if (instruction.References[0].Folio != 0)
-                                {
-                                    detalle.Folio = instruction.References[0].Folio;
-                                }
-                                if (instruction.References[0].FechaEmision != null)
-                                {
-                                    detalle.FechaEmision = string.Format(CultureInfo, "{0:d}", instruction.References[0].FechaEmision);
-                                }
-                                if (instruction.References[0].FileEnviado != null)
-                                {
-                                    detalle.FechaRecepcion = instruction.References[0].FileEnviado;
-                                }
+                                detalle.Folio = instruction.References[0].Folio;
                             }
-                            detalles.Add(detalle);
-                            c++;
-                            porcent = (float)(100 * c) / matrices.Count;
-                            BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{matrices.Count})");
-                            //Thread.Sleep(500);
+                            if (instruction.References[0].FechaEmision != null)
+                            {
+                                detalle.FechaEmision = string.Format(CultureInfo, "{0:d}", instruction.References[0].FechaEmision);
+                            }
+                            if (instruction.References[0].FileEnviado != null)
+                            {
+                                detalle.Instruction.References[0].FileEnviado = instruction.References[0].FileEnviado;
+                            }
+
                         }
+                        c++;
+                        porcent = (float)(100 * c) / instructions.Count;
+                        BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{instructions.Count})");
+                        detalles.Add(detalle);
                     }
-
                 }
-                IGridDesign(detalles);
+                BackgroundW.ReportProgress(0, $"xxxxxxxxxxxxxxxxxxxx");
             }
-            else
-            {
-                MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            }
-
+            e.Result = detalles;
         }
 
         private void BackgroundW_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -539,8 +537,9 @@ namespace Centralizador.WinApp.GUI
 
         private void BackgroundW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //IGridDesign();
-            TssLblProgBar.Value = 0;
+            IList<Detalle> detalles = (IList<Detalle>)e.Result;
+            IGridDesign(detalles);
+            //TssLblProgBar.Value = 0;
             BtnCreditor.Enabled = true;
         }
     }

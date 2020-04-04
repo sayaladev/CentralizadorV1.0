@@ -7,12 +7,23 @@ using System.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using Centralizador.Models.AppFunctions;
 using Centralizador.Models.registroreclamodteservice;
 
 using EAGetMail;
 
+using Limilabs.Client.IMAP;
+using Limilabs.Mail;
+using Limilabs.Mail.MIME;
+
 namespace Centralizador.Models.Outlook
 {
+
+    internal class LastRun
+    {
+        public long LargestUID { get; set; }
+    }
+
     public class ServiceOutlook
     {
 
@@ -34,43 +45,10 @@ namespace Centralizador.Models.Outlook
             TokenSii = tokenSii;
         }
 
-
-
         public void GetXmlFromEmail(BackgroundWorker bgw)
-        {   // The mail must be delete from 'inbox' folder, because this loop is for all folder.
-            // In folder there are all types of mails. (EvioDTE / EnvioRecibo / etc.)
+        {
             bgw.DoWork += Bgw_DoWork;
-            Client = new MailClient("TryIt");
-            try
-            {
-                MailServer oServer = new MailServer("outlook.office365.com", "facturacionchile@capvertenergie.com", "Che@2019!", ServerProtocol.Imap4)
-                //MailServer oServer = new MailServer("outlook.office365.com", "sergiokml@outlook.com", "edkdbigryqfudzlv", ServerProtocol.Imap4)
-                {
-                    AuthType = ServerAuthType.AuthLogin,
-                    SSLConnection = true,
-                    Port = 993
-                };
-                bgw.ReportProgress(0, $"Working in connect to Outlook remote...");
-                Client.Connect(oServer);
-                bgw.ReportProgress(0, $"Working in connect to Outlook remote... Success!");
-                Infos = Client.GetMailInfos();
-                if (Infos.Length != 0)
-                {
-                    bgw.RunWorkerAsync();
-                }
-                else
-                {
-                    bgw.ReportProgress(0, $"No new messages!");
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-
-            }
+            bgw.RunWorkerAsync();
         }
 
         private void Bgw_DoWork(object sender, DoWorkEventArgs e)
@@ -78,159 +56,229 @@ namespace Centralizador.Models.Outlook
             BackgroundWorker worker = sender as BackgroundWorker;
             float porcent = 0;
             int c = 0;
-            ListMail = new List<Mail>();
-            try
+
+            using (Imap imap = new Imap())
             {
-                DateTime time = DateTime.Parse(string.Format("{0:g}", Properties.Settings.Default.DateTimeEmail, CultureInfo));
-                for (int i = Infos.Length - 1; i >= 0; i--)
-                {
-                    MailInfo mail = Infos[i];
-                    Mail oMail = Client.GetMail(mail);
-                    int res = DateTime.Compare(time, DateTime.Parse(string.Format("{0:g}", oMail.ReceivedDate), CultureInfo)); // -1 ok
-                    if (res == 0)
-                    {
-                        LastTime = DateTime.Parse(string.Format("{0:g}", oMail.ReceivedDate), CultureInfo);
-                        break;
-                    }
-                    if (res == -1)
-                    {
-                        ListMail.Add(oMail);
-                        if (mail.Index == Infos.Length)
-                        {
-                            LastTime = oMail.ReceivedDate;
-                            Properties.Settings.Default.DateTimeEmail = DateTime.Parse(string.Format("{0:g}", LastTime), CultureInfo);
-                        }
-                        c++;
-                        worker.ReportProgress(0, $"Download email from the server...    ({c}-{oMail.ReceivedDate})");
-                    }
-                    if (res == 0 || res == 1)
-                    {
-                        //LastTime = DateTime.Parse(string.Format("{0:g}", oMail.ReceivedDate), CultureInfo);
-                        break;
-                    }
-                }
+                string userName = Properties.Settings.Default.UserEmail;
+                string password = Properties.Settings.Default.UserPassword;
+                string pathTemp = Directory.GetCurrentDirectory() + @"\temp";
 
-                if (ListMail.Count == 0)
+                imap.Connect("outlook.office365.com"); // or ConnectSSL for SSL
+                imap.UseBestLogin(userName, password);
+
+                long Uid = Properties.Settings.Default.UIdEmail;
+                imap.SelectInbox(); // Default inbox
+                List<long> uids = imap.Search().Where(Expression.UID(Range.From(Uid)));
+
+                if (!Directory.Exists(pathTemp))
                 {
-                    worker.ReportProgress(0, "There are no new messages...");
-                    Thread.Sleep(500);
-                    return;
+                    Directory.CreateDirectory(pathTemp);
                 }
-                else
+                foreach (long uid in uids)
                 {
-                    c = 0;
-                    if (!Directory.Exists($"{ Directory.GetCurrentDirectory()}\\temp"))
+                    byte[] eml = imap.GetMessageByUID(uid);
+                    IMail email = new MailBuilder().CreateFromEml(eml);
+                    foreach (MimeData attachment in email.Attachments)
                     {
-                        Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\temp");
-                    }
-                    using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
-                    {
-                        foreach (Mail item in ListMail)
+                        if (attachment.ContentType.MimeSubtype.Name == "text/xml")
                         {
-                            item.DecodeTNEF();
-                            Attachment[] atts = item.Attachments;
-                            foreach (Attachment attachment in atts)
+                            attachment.Save(pathTemp + @"\" + attachment.SafeFileName);
+                            XDocument xmlDocumnet = XDocument.Load(pathTemp + @"\" + attachment.SafeFileName);
+                            if (xmlDocumnet.Root.Name.LocalName == "EnvioDTE")
                             {
-                                if (attachment.Name.Contains(".xml"))
+                                XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
+                                EnvioDTE xmlObjeto;
+                                using (StreamReader reader = new StreamReader(pathTemp + @"\" + attachment.SafeFileName))
                                 {
-                                    attachment.SaveAs($"{ Directory.GetCurrentDirectory()}\\temp\\{attachment.Name}", true);
-                                    using (StreamReader reader = new StreamReader($"{ Directory.GetCurrentDirectory()}\\temp\\{attachment.Name}"))
+                                    xmlObjeto = (EnvioDTE)deserializer.Deserialize(reader);
+                                }
+                                foreach (DTEDefType type in xmlObjeto.SetDTE.DTE)
+                                {
+                                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)type.Item;
+                                    string tipoDte = null;
+                                    switch (document.Encabezado.IdDoc.TipoDTE)
                                     {
-                                        XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
-                                        XDocument xmlDocumnet = XDocument.Load($"{ Directory.GetCurrentDirectory()}\\temp\\{attachment.Name}");
-                                        if (xmlDocumnet.Root.Name.LocalName == "EnvioDTE")
+                                        case DTEType.Item33:
+                                            tipoDte = "33";
+                                            break;
+                                        case DTEType.Item34:
+                                            tipoDte = "34";
+                                            break;
+                                        case DTEType.Item46:
+                                            tipoDte = "46";
+                                            break;
+                                        case DTEType.Item52:
+                                            tipoDte = "52";
+                                            break;
+                                        case DTEType.Item56:
+                                            tipoDte = "56";
+                                            break;
+                                        case DTEType.Item61:
+                                            tipoDte = "61";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
+                                    string response;
+                                    using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
+                                    {
+                                        response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
+                                        emisor.GetValue(1).ToString(),
+                                        tipoDte,
+                                        document.Encabezado.IdDoc.Folio);
+                                    }
+                                    if (response.Length != 0)
+                                    {
+                                        DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
+                                        string nameFolder = $"{timeResponse.Year}\\{timeResponse.Month}\\{document.Encabezado.Receptor.RUTRecep}";
+                                        string nameFile = $"{document.Encabezado.Emisor.RUTEmisor}__{document.Encabezado.IdDoc.Folio}";
+                                        if (!Directory.Exists($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}"))
                                         {
-                                            EnvioDTE xmlObjeto = (EnvioDTE)deserializer.Deserialize(reader);
-                                            foreach (DTEDefType type in xmlObjeto.SetDTE.DTE)
+                                            Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}");
+                                        }
+                                        //
+
+                                        attachment.SaveAs($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\{nameFile}.xml", true);
+
+                                    }
+                                    else
+                                    {
+
+
+                                    }
+                                }
+
+
+
+
+                            }
+
+                            //
+                        }
+
+                        LastTime = (DateTime)email.Date;
+                    }
+                    imap.Close();
+                }
+
+
+
+
+
+
+                ListMail = new List<Mail>();
+                try
+                {
+
+
+
+                    {
+                        c = 0;
+
+                        using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
+                        {
+                            foreach (Mail item in ListMail)
+                            {
+                                item.DecodeTNEF();
+                                Attachment[] atts = item.Attachments;
+                                foreach (Attachment attachment in atts)
+                                {
+                                    if (attachment.Name.Contains(".xml"))
+                                    {
+                                        attachment.SaveAs($"{ Directory.GetCurrentDirectory()}\\temp\\{attachment.Name}", true);
+                                        using (StreamReader reader = new StreamReader($"{ Directory.GetCurrentDirectory()}\\temp\\{attachment.Name}"))
+                                        {
+                                            XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
+                                            XDocument xmlDocumnet = XDocument.Load($"{ Directory.GetCurrentDirectory()}\\temp\\{attachment.Name}");
+                                            if (xmlDocumnet.Root.Name.LocalName == "EnvioDTE")
                                             {
-                                                DTEDefTypeDocumento document = (DTEDefTypeDocumento)type.Item;
-                                                string tipoDte = null;
-                                                switch (document.Encabezado.IdDoc.TipoDTE)
+                                                EnvioDTE xmlObjeto = (EnvioDTE)deserializer.Deserialize(reader);
+                                                foreach (DTEDefType type in xmlObjeto.SetDTE.DTE)
                                                 {
-                                                    case DTEType.Item33:
-                                                         tipoDte = "33";
-                                                        break;
-                                                    case DTEType.Item34:
-                                                        tipoDte = "34";
-                                                        break;
-                                                    case DTEType.Item46:
-                                                        tipoDte = "46";
-                                                        break;
-                                                    case DTEType.Item52:
-                                                        tipoDte = "52";
-                                                        break;
-                                                    case DTEType.Item56:
-                                                        tipoDte = "56";
-                                                        break;
-                                                    case DTEType.Item61:
-                                                        tipoDte = "61";
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
-                                                string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
-                                                string response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
-                                                    emisor.GetValue(1).ToString(),
-                                                    tipoDte, // Hay un Enum
-                                                    document.Encabezado.IdDoc.Folio);
-                                                if (response.Length !=0)
-                                                {
-                                                    DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
-                                                    // Save in month folder
-                                                    // Name of folder
-                                                    string nameFolder = $"{timeResponse.Year}\\{timeResponse.Month}\\{document.Encabezado.Receptor.RUTRecep}";
-                                                    string nameFile = $"{document.Encabezado.Emisor.RUTEmisor}__{document.Encabezado.IdDoc.Folio}";
-                                                    if (!Directory.Exists($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}"))
+                                                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)type.Item;
+                                                    string tipoDte = null;
+                                                    switch (document.Encabezado.IdDoc.TipoDTE)
                                                     {
-                                                        Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}");
+                                                        case DTEType.Item33:
+                                                            tipoDte = "33";
+                                                            break;
+                                                        case DTEType.Item34:
+                                                            tipoDte = "34";
+                                                            break;
+                                                        case DTEType.Item46:
+                                                            tipoDte = "46";
+                                                            break;
+                                                        case DTEType.Item52:
+                                                            tipoDte = "52";
+                                                            break;
+                                                        case DTEType.Item56:
+                                                            tipoDte = "56";
+                                                            break;
+                                                        case DTEType.Item61:
+                                                            tipoDte = "61";
+                                                            break;
+                                                        default:
+                                                            break;
                                                     }
-                                                    attachment.SaveAs($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\{nameFile}.xml", true);
-                                                }
-                                                else
-                                                {
-                                                    string nameFolder = $"{document.Encabezado.IdDoc.FchEmis.Year}\\{document.Encabezado.IdDoc.FchEmis.Month}\\{document.Encabezado.Receptor.RUTRecep}";
-                                                    string nameFile = $"{document.Encabezado.Emisor.RUTEmisor}__{document.Encabezado.IdDoc.Folio}";
-                                                    if (!Directory.Exists($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\no_date"))
+                                                    string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
+                                                    string response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
+                                                        emisor.GetValue(1).ToString(),
+                                                        tipoDte,
+                                                        document.Encabezado.IdDoc.Folio);
+                                                    // Serialize 1 dte
+                                                    string dte = ServicePdf.TransformObjectToXml(document);
+                                                    if (response.Length != 0)
                                                     {
-                                                        Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\no_date");
+                                                        DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
+                                                        // Save in month folder                                                   
+                                                        string nameFolder = $"{timeResponse.Year}\\{timeResponse.Month}\\{document.Encabezado.Receptor.RUTRecep}";
+                                                        string nameFile = $"{document.Encabezado.Emisor.RUTEmisor}__{document.Encabezado.IdDoc.Folio}";
+                                                        if (!Directory.Exists($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}"))
+                                                        {
+                                                            Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}");
+                                                        }
+                                                        //
+
+                                                        attachment.SaveAs($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\{nameFile}.xml", true);
                                                     }
-                                                    attachment.SaveAs($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\no_date\\{nameFile}.xml", true);
+                                                    else
+                                                    {
+                                                        // Save errors
+                                                        string nameFolder = $"{document.Encabezado.IdDoc.FchEmis.Year}\\{document.Encabezado.IdDoc.FchEmis.Month}\\{document.Encabezado.Receptor.RUTRecep}";
+                                                        string nameFile = $"{document.Encabezado.Emisor.RUTEmisor}__{document.Encabezado.IdDoc.Folio}";
+                                                        if (!Directory.Exists($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\no_date"))
+                                                        {
+                                                            Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\no_date");
+                                                        }
+                                                        // Save only 1 doc, no attachment
+                                                        attachment.SaveAs($"{ Directory.GetCurrentDirectory()}\\inbox\\{nameFolder}\\no_date\\{nameFile}.xml", true);
+                                                    }
                                                 }
-
-                                              
-
-                                               
-
                                             }
                                         }
                                     }
                                 }
+                                c++;
+                                porcent = (float)(100 * c) / ListMail.Count;
+                                worker.ReportProgress((int)porcent, $"Saving the Xml files...   ({c}/{ListMail.Count})");
+                                Thread.Sleep(500);
                             }
-                            c++;
-                            porcent = (float)(100 * c) / ListMail.Count;
-                            worker.ReportProgress((int)porcent, $"Saving the Xml files...   ({c}/{ListMail.Count})");
-                            Thread.Sleep(500);
                         }
                     }
                 }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    Client.Close();
+                    Properties.Settings.Default.Save();
+                }
             }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                Client.Close();
-                Properties.Settings.Default.Save();
-            }
-        }
 
-        enum TipoDte
-        {
-            item33=33,
-            item34=34
-            
+
         }
     }
-}
 

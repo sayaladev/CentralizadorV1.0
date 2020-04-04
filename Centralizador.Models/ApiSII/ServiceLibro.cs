@@ -6,7 +6,6 @@ using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.DataBase;
-using Centralizador.Models.Outlook;
 
 using Newtonsoft.Json;
 
@@ -162,10 +161,7 @@ namespace Centralizador.Models.ApiSII
 
         // New properties
 
-        public uint NroInt { get; set; }
         public ResultInstruction Instruction { get; set; }
-
-        public DTEDefTypeDocumento FileRecibido { get; set; }
 
         public IList<Reference> References { get; set; }
 

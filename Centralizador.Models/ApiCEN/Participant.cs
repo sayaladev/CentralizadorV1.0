@@ -47,11 +47,7 @@ namespace Centralizador.Models.ApiCEN
 
     public class ResultParticipant
     {
-        //public ResultParticipant(int participantId)
-        //{
-        //    ParticipantId = participantId;
-        //}
-
+        
         [JsonProperty("is_coordinator")]
         public bool IsCoordinator { get; set; } //Agent
 

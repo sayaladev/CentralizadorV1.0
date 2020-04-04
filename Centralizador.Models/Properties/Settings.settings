@@ -40,8 +40,14 @@
     <Setting Name="DateTimeEmail" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)">02/12/2020 13:07:00</Value>
     </Setting>
-    <Setting Name="TokenSii" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="UserEmail" Type="System.String" Scope="User">
+      <Value Profile="(Default)">facturacionchile@capvertenergie.com</Value>
+    </Setting>
+    <Setting Name="UserPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Che@2019!</Value>
+    </Setting>
+    <Setting Name="UIdEmail" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">65001</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -124,13 +124,37 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TokenSii {
+        [global::System.Configuration.DefaultSettingValueAttribute("facturacionchile@capvertenergie.com")]
+        public string UserEmail {
             get {
-                return ((string)(this["TokenSii"]));
+                return ((string)(this["UserEmail"]));
             }
             set {
-                this["TokenSii"] = value;
+                this["UserEmail"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Che@2019!")]
+        public string UserPassword {
+            get {
+                return ((string)(this["UserPassword"]));
+            }
+            set {
+                this["UserPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65001")]
+        public long UIdEmail {
+            get {
+                return ((long)(this["UIdEmail"]));
+            }
+            set {
+                this["UIdEmail"] = value;
             }
         }
     }
