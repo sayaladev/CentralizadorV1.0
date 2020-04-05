@@ -435,8 +435,8 @@ namespace Centralizador.WinApp.GUI
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
             BtnOutlook.Enabled = false;
-            
 
+         
             // Date & folder
             outlook = new ServiceOutlook(Models.Properties.Settings.Default.DateTimeEmail, TokenSii);
 
