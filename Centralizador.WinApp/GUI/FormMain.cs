@@ -145,52 +145,69 @@ namespace Centralizador.WinApp.GUI
                     nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
                     nameFile += $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
                     if (File.Exists(nameFile))
-                    {   // Deserialize                     
-                        DTEDefType defType = ServicePdf.TransformXmlToObject(nameFile);
-                        DTEDefTypeDocumento doc = (DTEDefTypeDocumento)defType.Item;
-                        if (doc.Referencia != null)
+                    {   // Deserialize  
+                
+                  
+                        //foreach (DTEDefType type in xmlObjeto.SetDTE.DTE)
+                        //{
+                        //    DTEDefTypeDocumento document = (DTEDefTypeDocumento)type.Item;
+
+
+
+                            EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(nameFile);
+
+                        EnvioDTESetDTE doc = (EnvioDTESetDTE)xmlObjeto.SetDTE.DTE[0].Item;
+                     
+                        
+                        foreach (DTEDefType z in doc.DTE)
                         {
-                            foreach (DTEDefTypeDocumentoReferencia r in doc.Referencia)
-                            {
-                                if (r.TpoDocRef == "SEN")
-                                {
-                                    string rznRef = "";
-                                    ResultBillingWindow window = null;
-                                    if (r.RazonRef != null)
-                                    {
-                                        rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
-                                        window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
-                                    }
-                                    if (window != null)
-                                    {
-                                        // Get the asociated matrix  
-                                        IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                                        foreach (ResultPaymentMatrix m in matrices)
-                                        {
-                                            if (m.NaturalKey == r.RazonRef)
-                                            {
-                                                // Get the instruction                                        
-                                                ResultParticipant participant = Participant.GetParticipantByRut(doc.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
-                                                ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
 
-                                                // tengo que ir a softkand por PAGOS y referencia
-                                                Reference reference = new Reference
-                                                {
-                                                    FileEnviado = ServicePdf.TransformObjectToXml(doc)
-                                                };
 
-                                                // Asignament to detalle
-                                                item.Instruction = instruction;
-                                                //item.References = 
-
-                                            }
-                                        }
-
-                                    }
-
-                                }
-                            }
                         }
+
+                        //if (doc.re != null)
+                        //{
+                        //    foreach (DTEDefTypeDocumentoReferencia r in doc.Referencia)
+                        //    {
+                        //        if (r.TpoDocRef == "SEN")
+                        //        {
+                        //            string rznRef = "";
+                        //            ResultBillingWindow window = null;
+                        //            if (r.RazonRef != null)
+                        //            {
+                        //                rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
+                        //                window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
+                        //            }
+                        //            if (window != null)
+                        //            {
+                        //                // Get the asociated matrix  
+                        //                IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                        //                foreach (ResultPaymentMatrix m in matrices)
+                        //                {
+                        //                    if (m.NaturalKey == r.RazonRef)
+                        //                    {
+                        //                        // Get the instruction                                        
+                        //                        ResultParticipant participant = Participant.GetParticipantByRut(doc.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
+                        //                        ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
+
+                        //                        // tengo que ir a softkand por PAGOS y referencia
+                        //                        Reference reference = new Reference
+                        //                        {
+                        //                            FileEnviado = ServicePdf.TransformObjectToXml(doc) //Es necesario? si ya tengo el file .xml 
+                        //                        };
+
+                        //                        // Asignament to detalle
+                        //                        item.Instruction = instruction;
+                        //                        //item.References = 
+
+                        //                    }
+                        //                }
+
+                        //            }
+
+                        //        }
+                        //    }
+                        //}
 
 
 
@@ -417,9 +434,8 @@ namespace Centralizador.WinApp.GUI
         private ServiceOutlook outlook;
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
-
-            // Test
-            //ServiceEmail.Get();
+            BtnOutlook.Enabled = false;
+            
 
             // Date & folder
             outlook = new ServiceOutlook(Models.Properties.Settings.Default.DateTimeEmail, TokenSii);
@@ -433,6 +449,7 @@ namespace Centralizador.WinApp.GUI
             bgwReadEmail.RunWorkerCompleted += BgwReadEmailRunWorkerCompleted;
             outlook.GetXmlFromEmail(bgwReadEmail);
 
+            
 
             //BtnCreditor.Enabled = true;
             //BtnDebitor.Enabled = true;
@@ -449,10 +466,11 @@ namespace Centralizador.WinApp.GUI
         }
         private void BgwReadEmailRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            TssLblMensaje.Text = "Finished...";
-            TssLblProgBar.Value = 0;
-            TssLblMensaje.Text = "";
+            //TssLblMensaje.Text = "Finished...";
+           TssLblProgBar.Value = 0;
+            //TssLblMensaje.Text = "";
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", outlook.LastTime);
+            BtnOutlook.Enabled = true;
 
         }
 
