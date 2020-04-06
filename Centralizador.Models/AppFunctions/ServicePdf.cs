@@ -16,47 +16,50 @@ namespace Centralizador.Models.AppFunctions
         /// <returns></returns>
         public static EnvioDTE TransformXmlToObject(string pathFile)
         {
-            XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
-            using (StreamReader reader = new StreamReader(pathFile))
+            try
             {
-                EnvioDTE document = (EnvioDTE)deserializer.Deserialize(reader);
-                return document;
-            }            
-        }
-
-        public static string TransformObjectToXml(DTEDefTypeDocumento doc) {
-            XmlSerializer serializer = new XmlSerializer(typeof(DTEDefTypeDocumento), new XmlRootAttribute("DTE"));
-       
-            using (UTF8StringWriter stringWriter = new UTF8StringWriter())
-            {
-                using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true}))
+                XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
+                using (StreamReader reader = new StreamReader(pathFile, Encoding.Default))
                 {
-                    serializer.Serialize(xmlWriter, doc);
+                    EnvioDTE document = (EnvioDTE)deserializer.Deserialize(reader);
+                    return document;
                 }
+            }
+            catch (System.Exception)
+            {
 
-                return stringWriter.ToString();
+                return null;
             }
 
-
-            //using (StringWriter reader = new StringWriter())
-            //{
-                
-
-            //    serializer.Serialize(reader, doc);               
-            //    return reader.ToString();
-            //}         
-
         }
 
-        public class UTF8StringWriter : StringWriter
+        /// <summary>
+        /// Method return a string (Object to Xml).
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string TransformObjectToXml(DTEDefType obj)
         {
-            public override Encoding Encoding
+            try
             {
-                get
+                XmlSerializer serializer = new XmlSerializer(typeof(DTEDefType));
+                using (Utf8StringWriter stringWriter = new Utf8StringWriter( ))
                 {
-                    return Encoding.UTF8;
+                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true }))
+                    {
+                        serializer.Serialize(xmlWriter, obj);
+                    }
+                    return stringWriter.ToString();
                 }
             }
+            catch (System.Exception)
+            {
+                return null;
+            } 
+        }
+        public sealed class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }

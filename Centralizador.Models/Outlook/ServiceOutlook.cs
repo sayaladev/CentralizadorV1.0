@@ -134,9 +134,9 @@ namespace Centralizador.Models.Outlook
             {
                 // Deserialize
                 EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(path);
-                foreach (DTEDefType type in xmlObjeto.SetDTE.DTE)
+                foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
                 {
-                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)type.Item;
+                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
                     string tipoDte = null;
                     switch (document.Encabezado.IdDoc.TipoDTE)
                     {
@@ -180,7 +180,7 @@ namespace Centralizador.Models.Outlook
                             Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder);
                         }
                         ;
-                        File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(document));
+                        File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
                     }
                     else
                     {
@@ -190,7 +190,7 @@ namespace Centralizador.Models.Outlook
                         {
                             Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\no_date");
                         }
-                        File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\no_date\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(document));
+                        File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\no_date\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
                     }
                 }
             }

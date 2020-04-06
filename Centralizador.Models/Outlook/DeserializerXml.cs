@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
 
+
 namespace Centralizador.Models.Outlook
 {
     //------------------------------------------------------------------------------
@@ -43,9 +44,9 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Documento", typeof(DTEDefTypeDocumento))]
-        [System.Xml.Serialization.XmlElementAttribute("Exportaciones", typeof(DTEDefTypeExportaciones))]
-        [System.Xml.Serialization.XmlElementAttribute("Liquidacion", typeof(DTEDefTypeLiquidacion))]
+        [XmlElementAttribute("Documento", typeof(DTEDefTypeDocumento))]
+        [XmlElementAttribute("Exportaciones", typeof(DTEDefTypeExportaciones))]
+        [XmlElementAttribute("Liquidacion", typeof(DTEDefTypeLiquidacion))]
         public object Item
         {
             get
@@ -59,7 +60,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public decimal version
         {
             get
@@ -74,11 +75,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumento
     {
 
@@ -96,7 +97,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeDocumentoTED tEDField;
 
-        private System.DateTime tmstFirmaField;
+        private DateTime tmstFirmaField;
 
         private string idField;
 
@@ -114,7 +115,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Detalle")]
+        [XmlElementAttribute("Detalle")]
         public DTEDefTypeDocumentoDetalle[] Detalle
         {
             get
@@ -128,7 +129,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubTotInfo")]
+        [XmlElementAttribute("SubTotInfo")]
         public DTEDefTypeDocumentoSubTotInfo[] SubTotInfo
         {
             get
@@ -142,7 +143,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("DscRcgGlobal")]
+        [XmlElementAttribute("DscRcgGlobal")]
         public DTEDefTypeDocumentoDscRcgGlobal[] DscRcgGlobal
         {
             get
@@ -156,7 +157,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Referencia")]
+        [XmlElementAttribute("Referencia")]
         public DTEDefTypeDocumentoReferencia[] Referencia
         {
             get
@@ -170,7 +171,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Comisiones")]
+        [XmlElementAttribute("Comisiones")]
         public DTEDefTypeDocumentoComisiones[] Comisiones
         {
             get
@@ -197,7 +198,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        public System.DateTime TmstFirma
+        public DateTime TmstFirma
         {
             get
             {
@@ -210,7 +211,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        [XmlAttributeAttribute(DataType = "ID")]
         public string ID
         {
             get
@@ -225,11 +226,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezado
     {
 
@@ -355,11 +356,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoIdDoc
     {
 
@@ -367,7 +368,7 @@ namespace Centralizador.Models.Outlook
 
         private string folioField;
 
-        private System.DateTime fchEmisField;
+        private DateTime fchEmisField;
 
         private DTEDefTypeDocumentoEncabezadoIdDocIndNoRebaja indNoRebajaField;
 
@@ -407,7 +408,7 @@ namespace Centralizador.Models.Outlook
 
         private string fmaPagExpField;
 
-        private System.DateTime fchCancelField;
+        private DateTime fchCancelField;
 
         private bool fchCancelFieldSpecified;
 
@@ -417,11 +418,11 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeDocumentoEncabezadoIdDocMntPagos[] mntPagosField;
 
-        private System.DateTime periodoDesdeField;
+        private DateTime periodoDesdeField;
 
         private bool periodoDesdeFieldSpecified;
 
-        private System.DateTime periodoHastaField;
+        private DateTime periodoHastaField;
 
         private bool periodoHastaFieldSpecified;
 
@@ -443,7 +444,7 @@ namespace Centralizador.Models.Outlook
 
         private string termPagoDiasField;
 
-        private System.DateTime fchVencField;
+        private DateTime fchVencField;
 
         private bool fchVencFieldSpecified;
 
@@ -465,7 +466,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string Folio
         {
             get
@@ -479,8 +480,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchEmis
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchEmis
         {
             get
             {
@@ -506,7 +507,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndNoRebajaSpecified
         {
             get
@@ -520,7 +521,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocTipoDespacho TipoDespacho
         {
             get
@@ -534,7 +535,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TipoDespachoSpecified
         {
             get
@@ -548,7 +549,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocIndTraslado IndTraslado
         {
             get
@@ -562,7 +563,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndTrasladoSpecified
         {
             get
@@ -576,7 +577,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocTpoImpresion TpoImpresion
         {
             get
@@ -590,7 +591,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoImpresionSpecified
         {
             get
@@ -604,7 +605,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public DTEDefTypeDocumentoEncabezadoIdDocIndServicio IndServicio
         {
             get
@@ -618,7 +619,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndServicioSpecified
         {
             get
@@ -645,7 +646,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntBrutoSpecified
         {
             get
@@ -672,7 +673,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoTranCompraSpecified
         {
             get
@@ -699,7 +700,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoTranVentaSpecified
         {
             get
@@ -726,7 +727,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FmaPagoSpecified
         {
             get
@@ -740,7 +741,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string FmaPagExp
         {
             get
@@ -754,8 +755,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchCancel
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchCancel
         {
             get
             {
@@ -768,7 +769,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchCancelSpecified
         {
             get
@@ -782,7 +783,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntCancel
         {
             get
@@ -796,7 +797,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string SaldoInsol
         {
             get
@@ -810,7 +811,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("MntPagos")]
+        [XmlElementAttribute("MntPagos")]
         public DTEDefTypeDocumentoEncabezadoIdDocMntPagos[] MntPagos
         {
             get
@@ -824,8 +825,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime PeriodoDesde
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime PeriodoDesde
         {
             get
             {
@@ -838,7 +839,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PeriodoDesdeSpecified
         {
             get
@@ -852,8 +853,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime PeriodoHasta
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime PeriodoHasta
         {
             get
             {
@@ -866,7 +867,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PeriodoHastaSpecified
         {
             get
@@ -893,7 +894,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MedioPagoSpecified
         {
             get
@@ -920,7 +921,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoCtaPagoSpecified
         {
             get
@@ -986,7 +987,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string TermPagoDias
         {
             get
@@ -1000,8 +1001,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchVenc
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchVenc
         {
             get
             {
@@ -1014,7 +1015,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchVencSpecified
         {
             get
@@ -1041,7 +1042,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TipoFactEspSpecified
         {
             get
@@ -1056,117 +1057,117 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEType
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("33")]
+        [XmlEnumAttribute("33")]
         Item33,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("34")]
+        [XmlEnumAttribute("34")]
         Item34,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("46")]
+        [XmlEnumAttribute("46")]
         Item46,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("52")]
+        [XmlEnumAttribute("52")]
         Item52,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("56")]
+        [XmlEnumAttribute("56")]
         Item56,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("61")]
+        [XmlEnumAttribute("61")]
         Item61,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocIndNoRebaja
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocTipoDespacho
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocIndTraslado
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("5")]
+        [XmlEnumAttribute("5")]
         Item5,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("6")]
+        [XmlEnumAttribute("6")]
         Item6,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("7")]
+        [XmlEnumAttribute("7")]
         Item7,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("8")]
+        [XmlEnumAttribute("8")]
         Item8,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("9")]
+        [XmlEnumAttribute("9")]
         Item9,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocTpoImpresion
     {
 
@@ -1178,135 +1179,135 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocIndServicio
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocMntBruto
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum TipoTransCOMPRA
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("5")]
+        [XmlEnumAttribute("5")]
         Item5,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("6")]
+        [XmlEnumAttribute("6")]
         Item6,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("7")]
+        [XmlEnumAttribute("7")]
         Item7,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum TipoTransVENTA
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocFmaPago
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoIdDocMntPagos
     {
 
-        private System.DateTime fchPagoField;
+        private DateTime fchPagoField;
 
         private string mntPagoField;
 
         private string glosaPagosField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchPago
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchPago
         {
             get
             {
@@ -1319,7 +1320,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntPago
         {
             get
@@ -1347,9 +1348,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum MedioPagoType
     {
 
@@ -1376,9 +1377,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocTpoCtaPago
     {
 
@@ -1393,23 +1394,23 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoIdDocTipoFactEsp
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoEmisor
     {
 
@@ -1481,7 +1482,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Telefono")]
+        [XmlElementAttribute("Telefono")]
         public string[] Telefono
         {
             get
@@ -1508,7 +1509,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Acteco", DataType = "positiveInteger")]
+        [XmlElementAttribute("Acteco", DataType = "positiveInteger")]
         public string[] Acteco
         {
             get
@@ -1548,7 +1549,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CdgSIISucur
         {
             get
@@ -1628,11 +1629,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoEmisorGuiaExport
     {
 
@@ -1642,7 +1643,7 @@ namespace Centralizador.Models.Outlook
 
         private string folioAutField;
 
-        private System.DateTime fchAutField;
+        private DateTime fchAutField;
 
         private bool fchAutFieldSpecified;
 
@@ -1660,7 +1661,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool CdgTrasladoSpecified
         {
             get
@@ -1674,7 +1675,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string FolioAut
         {
             get
@@ -1688,8 +1689,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchAut
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchAut
         {
             get
             {
@@ -1702,7 +1703,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchAutSpecified
         {
             get
@@ -1717,35 +1718,35 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoEmisorGuiaExportCdgTraslado
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoReceptor
     {
 
@@ -1946,11 +1947,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoReceptorExtranjero
     {
 
@@ -2002,7 +2003,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TipoDocIDSpecified
         {
             get
@@ -2017,27 +2018,27 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoEncabezadoReceptorExtranjeroTipoDocID
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoTransporte
     {
 
@@ -2148,11 +2149,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoTransporteChofer
     {
 
@@ -2188,11 +2189,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoTransporteAduana
     {
 
@@ -2261,7 +2262,7 @@ namespace Centralizador.Models.Outlook
         private string codPaisDestinField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodModVenta
         {
             get
@@ -2275,7 +2276,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodClauVenta
         {
             get
@@ -2302,7 +2303,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TotClauVentaSpecified
         {
             get
@@ -2316,7 +2317,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodViaTransp
         {
             get
@@ -2408,7 +2409,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPtoEmbarque
         {
             get
@@ -2435,7 +2436,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPtoDesemb
         {
             get
@@ -2462,7 +2463,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string Tara
         {
             get
@@ -2476,7 +2477,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodUnidMedTara
         {
             get
@@ -2503,7 +2504,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PesoBrutoSpecified
         {
             get
@@ -2517,7 +2518,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodUnidPesoBruto
         {
             get
@@ -2544,7 +2545,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PesoNetoSpecified
         {
             get
@@ -2558,7 +2559,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodUnidPesoNeto
         {
             get
@@ -2572,7 +2573,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string TotItems
         {
             get
@@ -2586,7 +2587,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string TotBultos
         {
             get
@@ -2600,7 +2601,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TipoBultos")]
+        [XmlElementAttribute("TipoBultos")]
         public DTEDefTypeDocumentoEncabezadoTransporteAduanaTipoBultos[] TipoBultos
         {
             get
@@ -2627,7 +2628,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntFleteSpecified
         {
             get
@@ -2654,7 +2655,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntSeguroSpecified
         {
             get
@@ -2668,7 +2669,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPaisRecep
         {
             get
@@ -2682,7 +2683,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPaisDestin
         {
             get
@@ -2697,11 +2698,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoTransporteAduanaTipoBultos
     {
 
@@ -2718,7 +2719,7 @@ namespace Centralizador.Models.Outlook
         private string emisorSelloField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodTpoBultos
         {
             get
@@ -2732,7 +2733,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CantBultos
         {
             get
@@ -2799,11 +2800,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoTotales
     {
 
@@ -2846,7 +2847,7 @@ namespace Centralizador.Models.Outlook
         private string vlrPagarField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntNeto
         {
             get
@@ -2860,7 +2861,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntExe
         {
             get
@@ -2874,7 +2875,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntBase
         {
             get
@@ -2888,7 +2889,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntMargenCom
         {
             get
@@ -2915,7 +2916,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TasaIVASpecified
         {
             get
@@ -2929,7 +2930,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string IVA
         {
             get
@@ -2943,7 +2944,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string IVAProp
         {
             get
@@ -2957,7 +2958,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string IVATerc
         {
             get
@@ -2971,7 +2972,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ImptoReten")]
+        [XmlElementAttribute("ImptoReten")]
         public DTEDefTypeDocumentoEncabezadoTotalesImptoReten[] ImptoReten
         {
             get
@@ -2985,7 +2986,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string IVANoRet
         {
             get
@@ -2999,7 +3000,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string CredEC
         {
             get
@@ -3013,7 +3014,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string GrntDep
         {
             get
@@ -3040,7 +3041,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntTotal
         {
             get
@@ -3054,7 +3055,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MontoNF
         {
             get
@@ -3068,7 +3069,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MontoPeriodo
         {
             get
@@ -3082,7 +3083,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string SaldoAnterior
         {
             get
@@ -3096,7 +3097,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string VlrPagar
         {
             get
@@ -3111,11 +3112,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoTotalesImptoReten
     {
 
@@ -3154,7 +3155,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TasaImpSpecified
         {
             get
@@ -3168,7 +3169,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string MontoImp
         {
             get
@@ -3183,195 +3184,195 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum ImpAdicDTEType
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("14")]
+        [XmlEnumAttribute("14")]
         Item14,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("15")]
+        [XmlEnumAttribute("15")]
         Item15,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("16")]
+        [XmlEnumAttribute("16")]
         Item16,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("17")]
+        [XmlEnumAttribute("17")]
         Item17,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("18")]
+        [XmlEnumAttribute("18")]
         Item18,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("19")]
+        [XmlEnumAttribute("19")]
         Item19,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("23")]
+        [XmlEnumAttribute("23")]
         Item23,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("24")]
+        [XmlEnumAttribute("24")]
         Item24,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("25")]
+        [XmlEnumAttribute("25")]
         Item25,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("26")]
+        [XmlEnumAttribute("26")]
         Item26,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("27")]
+        [XmlEnumAttribute("27")]
         Item27,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("28")]
+        [XmlEnumAttribute("28")]
         Item28,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("30")]
+        [XmlEnumAttribute("30")]
         Item30,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("31")]
+        [XmlEnumAttribute("31")]
         Item31,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("32")]
+        [XmlEnumAttribute("32")]
         Item32,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("33")]
+        [XmlEnumAttribute("33")]
         Item33,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("34")]
+        [XmlEnumAttribute("34")]
         Item34,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("35")]
+        [XmlEnumAttribute("35")]
         Item35,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("36")]
+        [XmlEnumAttribute("36")]
         Item36,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("37")]
+        [XmlEnumAttribute("37")]
         Item37,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("38")]
+        [XmlEnumAttribute("38")]
         Item38,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("39")]
+        [XmlEnumAttribute("39")]
         Item39,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("40")]
+        [XmlEnumAttribute("40")]
         Item40,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("41")]
+        [XmlEnumAttribute("41")]
         Item41,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("44")]
+        [XmlEnumAttribute("44")]
         Item44,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("45")]
+        [XmlEnumAttribute("45")]
         Item45,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("46")]
+        [XmlEnumAttribute("46")]
         Item46,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("47")]
+        [XmlEnumAttribute("47")]
         Item47,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("48")]
+        [XmlEnumAttribute("48")]
         Item48,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("49")]
+        [XmlEnumAttribute("49")]
         Item49,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("50")]
+        [XmlEnumAttribute("50")]
         Item50,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("51")]
+        [XmlEnumAttribute("51")]
         Item51,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("52")]
+        [XmlEnumAttribute("52")]
         Item52,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("53")]
+        [XmlEnumAttribute("53")]
         Item53,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("54")]
+        [XmlEnumAttribute("54")]
         Item54,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("55")]
+        [XmlEnumAttribute("55")]
         Item55,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("271")]
+        [XmlEnumAttribute("271")]
         Item271,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("301")]
+        [XmlEnumAttribute("301")]
         Item301,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("321")]
+        [XmlEnumAttribute("321")]
         Item321,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("331")]
+        [XmlEnumAttribute("331")]
         Item331,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("341")]
+        [XmlEnumAttribute("341")]
         Item341,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("361")]
+        [XmlEnumAttribute("361")]
         Item361,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("371")]
+        [XmlEnumAttribute("371")]
         Item371,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("481")]
+        [XmlEnumAttribute("481")]
         Item481,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoTotalesComisiones
     {
 
@@ -3382,7 +3383,7 @@ namespace Centralizador.Models.Outlook
         private string valComIVAField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string ValComNeto
         {
             get
@@ -3396,7 +3397,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string ValComExe
         {
             get
@@ -3410,7 +3411,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string ValComIVA
         {
             get
@@ -3425,11 +3426,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoOtraMoneda
     {
 
@@ -3494,7 +3495,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoCambioSpecified
         {
             get
@@ -3521,7 +3522,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntNetoOtrMndaSpecified
         {
             get
@@ -3548,7 +3549,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntExeOtrMndaSpecified
         {
             get
@@ -3575,7 +3576,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntFaeCarneOtrMndaSpecified
         {
             get
@@ -3602,7 +3603,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntMargComOtrMndaSpecified
         {
             get
@@ -3629,7 +3630,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IVAOtrMndaSpecified
         {
             get
@@ -3643,7 +3644,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ImpRetOtrMnda")]
+        [XmlElementAttribute("ImpRetOtrMnda")]
         public DTEDefTypeDocumentoEncabezadoOtraMonedaImpRetOtrMnda[] ImpRetOtrMnda
         {
             get
@@ -3670,7 +3671,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IVANoRetOtrMndaSpecified
         {
             get
@@ -3698,9 +3699,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum TipMonType
     {
 
@@ -3714,50 +3715,50 @@ namespace Centralizador.Models.Outlook
         CHELIN,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("CORONA DIN")]
+        [XmlEnumAttribute("CORONA DIN")]
         CORONADIN,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("CORONA NOR")]
+        [XmlEnumAttribute("CORONA NOR")]
         CORONANOR,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("CORONA SC")]
+        [XmlEnumAttribute("CORONA SC")]
         CORONASC,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("CRUZEIRO REAL")]
+        [XmlEnumAttribute("CRUZEIRO REAL")]
         CRUZEIROREAL,
 
         /// <remarks/>
         DIRHAM,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("DOLAR AUST")]
+        [XmlEnumAttribute("DOLAR AUST")]
         DOLARAUST,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("DOLAR CAN")]
+        [XmlEnumAttribute("DOLAR CAN")]
         DOLARCAN,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("DOLAR HK")]
+        [XmlEnumAttribute("DOLAR HK")]
         DOLARHK,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("DOLAR NZ")]
+        [XmlEnumAttribute("DOLAR NZ")]
         DOLARNZ,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("DOLAR SIN")]
+        [XmlEnumAttribute("DOLAR SIN")]
         DOLARSIN,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("DOLAR TAI")]
+        [XmlEnumAttribute("DOLAR TAI")]
         DOLARTAI,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("DOLAR USA")]
+        [XmlEnumAttribute("DOLAR USA")]
         DOLARUSA,
 
         /// <remarks/>
@@ -3773,41 +3774,41 @@ namespace Centralizador.Models.Outlook
         FLORIN,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("FRANCO BEL")]
+        [XmlEnumAttribute("FRANCO BEL")]
         FRANCOBEL,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("FRANCO FR")]
+        [XmlEnumAttribute("FRANCO FR")]
         FRANCOFR,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("FRANCO SZ")]
+        [XmlEnumAttribute("FRANCO SZ")]
         FRANCOSZ,
 
         /// <remarks/>
         GUARANI,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("LIBRA EST")]
+        [XmlEnumAttribute("LIBRA EST")]
         LIBRAEST,
 
         /// <remarks/>
         LIRA,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("MARCO AL")]
+        [XmlEnumAttribute("MARCO AL")]
         MARCOAL,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("MARCO FIN")]
+        [XmlEnumAttribute("MARCO FIN")]
         MARCOFIN,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("NUEVO SOL")]
+        [XmlEnumAttribute("NUEVO SOL")]
         NUEVOSOL,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("OTRAS MONEDAS")]
+        [XmlEnumAttribute("OTRAS MONEDAS")]
         OTRASMONEDAS,
 
         /// <remarks/>
@@ -3817,19 +3818,19 @@ namespace Centralizador.Models.Outlook
         PESO,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("PESO CL")]
+        [XmlEnumAttribute("PESO CL")]
         PESOCL,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("PESO COL")]
+        [XmlEnumAttribute("PESO COL")]
         PESOCOL,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("PESO MEX")]
+        [XmlEnumAttribute("PESO MEX")]
         PESOMEX,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("PESO URUG")]
+        [XmlEnumAttribute("PESO URUG")]
         PESOURUG,
 
         /// <remarks/>
@@ -3849,11 +3850,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoEncabezadoOtraMonedaImpRetOtrMnda
     {
 
@@ -3892,7 +3893,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TasaImpOtrMndaSpecified
         {
             get
@@ -3920,11 +3921,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDetalle
     {
 
@@ -3958,11 +3959,11 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeDocumentoDetalleSubcantidad[] subcantidadField;
 
-        private System.DateTime fchElaborField;
+        private DateTime fchElaborField;
 
         private bool fchElaborFieldSpecified;
 
-        private System.DateTime fchVencimField;
+        private DateTime fchVencimField;
 
         private bool fchVencimFieldSpecified;
 
@@ -3995,7 +3996,7 @@ namespace Centralizador.Models.Outlook
         private string montoItemField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinDet
         {
             get
@@ -4009,7 +4010,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CdgItem")]
+        [XmlElementAttribute("CdgItem")]
         public DTEDefTypeDocumentoDetalleCdgItem[] CdgItem
         {
             get
@@ -4036,7 +4037,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndExeSpecified
         {
             get
@@ -4102,7 +4103,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool QtyRefSpecified
         {
             get
@@ -4142,7 +4143,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PrcRefSpecified
         {
             get
@@ -4169,7 +4170,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool QtyItemSpecified
         {
             get
@@ -4183,7 +4184,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Subcantidad")]
+        [XmlElementAttribute("Subcantidad")]
         public DTEDefTypeDocumentoDetalleSubcantidad[] Subcantidad
         {
             get
@@ -4197,8 +4198,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchElabor
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchElabor
         {
             get
             {
@@ -4211,7 +4212,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchElaborSpecified
         {
             get
@@ -4225,8 +4226,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchVencim
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchVencim
         {
             get
             {
@@ -4239,7 +4240,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchVencimSpecified
         {
             get
@@ -4279,7 +4280,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PrcItemSpecified
         {
             get
@@ -4319,7 +4320,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool DescuentoPctSpecified
         {
             get
@@ -4333,7 +4334,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string DescuentoMonto
         {
             get
@@ -4347,7 +4348,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubDscto")]
+        [XmlElementAttribute("SubDscto")]
         public DTEDefTypeDocumentoDetalleSubDscto[] SubDscto
         {
             get
@@ -4374,7 +4375,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool RecargoPctSpecified
         {
             get
@@ -4388,7 +4389,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string RecargoMonto
         {
             get
@@ -4402,7 +4403,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubRecargo")]
+        [XmlElementAttribute("SubRecargo")]
         public DTEDefTypeDocumentoDetalleSubRecargo[] SubRecargo
         {
             get
@@ -4416,7 +4417,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CodImpAdic")]
+        [XmlElementAttribute("CodImpAdic")]
         public ImpAdicDTEType[] CodImpAdic
         {
             get
@@ -4430,7 +4431,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MontoItem
         {
             get
@@ -4445,11 +4446,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDetalleCdgItem
     {
 
@@ -4485,43 +4486,43 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoDetalleIndExe
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("5")]
+        [XmlEnumAttribute("5")]
         Item5,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("6")]
+        [XmlEnumAttribute("6")]
         Item6,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDetalleRetenedor
     {
 
@@ -4547,7 +4548,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntBaseFaena
         {
             get
@@ -4561,7 +4562,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntMargComer
         {
             get
@@ -4575,7 +4576,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string PrcConsFinal
         {
             get
@@ -4590,9 +4591,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoDetalleRetenedorIndAgente
     {
 
@@ -4601,11 +4602,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDetalleSubcantidad
     {
 
@@ -4641,11 +4642,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDetalleOtrMnda
     {
 
@@ -4709,7 +4710,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FctConvSpecified
         {
             get
@@ -4736,7 +4737,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool DctoOtrMndaSpecified
         {
             get
@@ -4763,7 +4764,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool RecargoOtrMndaSpecified
         {
             get
@@ -4790,7 +4791,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MontoItemOtrMndaSpecified
         {
             get
@@ -4805,11 +4806,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDetalleSubDscto
     {
 
@@ -4845,27 +4846,27 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum DineroPorcentajeType
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("%")]
+        [XmlEnumAttribute("%")]
         Item,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("$")]
+        [XmlEnumAttribute("$")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDetalleSubRecargo
     {
 
@@ -4901,11 +4902,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoSubTotInfo
     {
 
@@ -4938,7 +4939,7 @@ namespace Centralizador.Models.Outlook
         private string[] lineasDetaField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroSTI
         {
             get
@@ -4965,7 +4966,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string OrdenSTI
         {
             get
@@ -4992,7 +4993,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotNetoSTISpecified
         {
             get
@@ -5019,7 +5020,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotIVASTISpecified
         {
             get
@@ -5046,7 +5047,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotAdicSTISpecified
         {
             get
@@ -5073,7 +5074,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotExeSTISpecified
         {
             get
@@ -5100,7 +5101,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool ValSubtotSTISpecified
         {
             get
@@ -5114,7 +5115,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("LineasDeta", DataType = "positiveInteger")]
+        [XmlElementAttribute("LineasDeta", DataType = "positiveInteger")]
         public string[] LineasDeta
         {
             get
@@ -5129,11 +5130,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoDscRcgGlobal
     {
 
@@ -5156,7 +5157,7 @@ namespace Centralizador.Models.Outlook
         private bool indExeDRFieldSpecified;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinDR
         {
             get
@@ -5235,7 +5236,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool ValorDROtrMndaSpecified
         {
             get
@@ -5262,7 +5263,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndExeDRSpecified
         {
             get
@@ -5277,9 +5278,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoDscRcgGlobalTpoMov
     {
 
@@ -5291,27 +5292,27 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoDscRcgGlobalIndExeDR
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoReferencia
     {
 
@@ -5327,7 +5328,7 @@ namespace Centralizador.Models.Outlook
 
         private string rUTOtrField;
 
-        private System.DateTime fchRefField;
+        private DateTime fchRefField;
 
         private DTEDefTypeDocumentoReferenciaCodRef codRefField;
 
@@ -5336,7 +5337,7 @@ namespace Centralizador.Models.Outlook
         private string razonRefField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinRef
         {
             get
@@ -5376,7 +5377,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndGlobalSpecified
         {
             get
@@ -5416,8 +5417,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchRef
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchRef
         {
             get
             {
@@ -5443,7 +5444,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool CodRefSpecified
         {
             get
@@ -5471,43 +5472,43 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoReferenciaIndGlobal
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoReferenciaCodRef
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoComisiones
     {
 
@@ -5528,7 +5529,7 @@ namespace Centralizador.Models.Outlook
         private string valComIVAField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinCom
         {
             get
@@ -5581,7 +5582,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TasaComisionSpecified
         {
             get
@@ -5595,7 +5596,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string ValComNeto
         {
             get
@@ -5609,7 +5610,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string ValComExe
         {
             get
@@ -5623,7 +5624,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string ValComIVA
         {
             get
@@ -5638,9 +5639,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoComisionesTipoMovim
     {
 
@@ -5652,11 +5653,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTED
     {
 
@@ -5698,7 +5699,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string version
         {
             get
@@ -5713,11 +5714,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDDD
     {
 
@@ -5727,7 +5728,7 @@ namespace Centralizador.Models.Outlook
 
         private string fField;
 
-        private System.DateTime feField;
+        private DateTime feField;
 
         private string rrField;
 
@@ -5739,7 +5740,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeDocumentoTEDDDCAF cAFField;
 
-        private System.DateTime tSTEDField;
+        private DateTime tSTEDField;
 
         /// <remarks/>
         public string RE
@@ -5768,7 +5769,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string F
         {
             get
@@ -5782,8 +5783,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FE
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FE
         {
             get
             {
@@ -5861,7 +5862,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        public System.DateTime TSTED
+        public DateTime TSTED
         {
             get
             {
@@ -5875,11 +5876,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDDDCAF
     {
 
@@ -5921,7 +5922,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string version
         {
             get
@@ -5936,11 +5937,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDDDCAFDA
     {
 
@@ -5952,7 +5953,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeDocumentoTEDDDCAFDARNG rNGField;
 
-        private System.DateTime faField;
+        private DateTime faField;
 
         private object itemField;
 
@@ -6011,8 +6012,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FA
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FA
         {
             get
             {
@@ -6025,8 +6026,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("DSAPK", typeof(DTEDefTypeDocumentoTEDDDCAFDADSAPK))]
-        [System.Xml.Serialization.XmlElementAttribute("RSAPK", typeof(DTEDefTypeDocumentoTEDDDCAFDARSAPK))]
+        [XmlElementAttribute("DSAPK", typeof(DTEDefTypeDocumentoTEDDDCAFDADSAPK))]
+        [XmlElementAttribute("RSAPK", typeof(DTEDefTypeDocumentoTEDDDCAFDARSAPK))]
         public object Item
         {
             get
@@ -6054,11 +6055,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDDDCAFDARNG
     {
 
@@ -6067,7 +6068,7 @@ namespace Centralizador.Models.Outlook
         private string hField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string D
         {
             get
@@ -6081,7 +6082,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string H
         {
             get
@@ -6096,11 +6097,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDDDCAFDADSAPK
     {
 
@@ -6113,7 +6114,7 @@ namespace Centralizador.Models.Outlook
         private byte[] yField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] P
         {
             get
@@ -6127,7 +6128,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] Q
         {
             get
@@ -6141,7 +6142,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] G
         {
             get
@@ -6155,7 +6156,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] Y
         {
             get
@@ -6170,11 +6171,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDDDCAFDARSAPK
     {
 
@@ -6183,7 +6184,7 @@ namespace Centralizador.Models.Outlook
         private byte[] eField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] M
         {
             get
@@ -6197,7 +6198,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] E
         {
             get
@@ -6212,11 +6213,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDDDCAFFRMA
     {
 
@@ -6230,7 +6231,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string algoritmo
         {
             get
@@ -6244,7 +6245,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute(DataType = "base64Binary")]
+        [XmlTextAttribute(DataType = "base64Binary")]
         public byte[] Value
         {
             get
@@ -6259,11 +6260,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeDocumentoTEDFRMT
     {
 
@@ -6272,7 +6273,7 @@ namespace Centralizador.Models.Outlook
         private byte[] valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public DTEDefTypeDocumentoTEDFRMTAlgoritmo algoritmo
         {
             get
@@ -6286,7 +6287,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute(DataType = "base64Binary")]
+        [XmlTextAttribute(DataType = "base64Binary")]
         public byte[] Value
         {
             get
@@ -6301,9 +6302,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeDocumentoTEDFRMTAlgoritmo
     {
 
@@ -6315,11 +6316,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportaciones
     {
 
@@ -6335,7 +6336,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeExportacionesTED tEDField;
 
-        private System.DateTime tmstFirmaField;
+        private DateTime tmstFirmaField;
 
         private string idField;
 
@@ -6353,7 +6354,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Detalle")]
+        [XmlElementAttribute("Detalle")]
         public DTEDefTypeExportacionesDetalle[] Detalle
         {
             get
@@ -6367,7 +6368,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubTotInfo")]
+        [XmlElementAttribute("SubTotInfo")]
         public DTEDefTypeExportacionesSubTotInfo[] SubTotInfo
         {
             get
@@ -6381,7 +6382,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("DscRcgGlobal")]
+        [XmlElementAttribute("DscRcgGlobal")]
         public DTEDefTypeExportacionesDscRcgGlobal[] DscRcgGlobal
         {
             get
@@ -6395,7 +6396,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Referencia")]
+        [XmlElementAttribute("Referencia")]
         public DTEDefTypeExportacionesReferencia[] Referencia
         {
             get
@@ -6422,7 +6423,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        public System.DateTime TmstFirma
+        public DateTime TmstFirma
         {
             get
             {
@@ -6435,7 +6436,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        [XmlAttributeAttribute(DataType = "ID")]
         public string ID
         {
             get
@@ -6450,11 +6451,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezado
     {
 
@@ -6550,11 +6551,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoIdDoc
     {
 
@@ -6562,7 +6563,7 @@ namespace Centralizador.Models.Outlook
 
         private string folioField;
 
-        private System.DateTime fchEmisField;
+        private DateTime fchEmisField;
 
         private DTEDefTypeExportacionesEncabezadoIdDocTipoDespacho tipoDespachoField;
 
@@ -6578,7 +6579,7 @@ namespace Centralizador.Models.Outlook
 
         private string fmaPagExpField;
 
-        private System.DateTime fchCancelField;
+        private DateTime fchCancelField;
 
         private bool fchCancelFieldSpecified;
 
@@ -6588,11 +6589,11 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeExportacionesEncabezadoIdDocMntPagos[] mntPagosField;
 
-        private System.DateTime periodoDesdeField;
+        private DateTime periodoDesdeField;
 
         private bool periodoDesdeFieldSpecified;
 
-        private System.DateTime periodoHastaField;
+        private DateTime periodoHastaField;
 
         private bool periodoHastaFieldSpecified;
 
@@ -6614,7 +6615,7 @@ namespace Centralizador.Models.Outlook
 
         private string termPagoDiasField;
 
-        private System.DateTime fchVencField;
+        private DateTime fchVencField;
 
         private bool fchVencFieldSpecified;
 
@@ -6632,7 +6633,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string Folio
         {
             get
@@ -6646,8 +6647,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchEmis
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchEmis
         {
             get
             {
@@ -6673,7 +6674,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TipoDespachoSpecified
         {
             get
@@ -6700,7 +6701,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndServicioSpecified
         {
             get
@@ -6727,7 +6728,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FmaPagoSpecified
         {
             get
@@ -6741,7 +6742,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string FmaPagExp
         {
             get
@@ -6755,8 +6756,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchCancel
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchCancel
         {
             get
             {
@@ -6769,7 +6770,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchCancelSpecified
         {
             get
@@ -6783,7 +6784,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntCancel
         {
             get
@@ -6797,7 +6798,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string SaldoInsol
         {
             get
@@ -6811,7 +6812,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("MntPagos")]
+        [XmlElementAttribute("MntPagos")]
         public DTEDefTypeExportacionesEncabezadoIdDocMntPagos[] MntPagos
         {
             get
@@ -6825,8 +6826,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime PeriodoDesde
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime PeriodoDesde
         {
             get
             {
@@ -6839,7 +6840,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PeriodoDesdeSpecified
         {
             get
@@ -6853,8 +6854,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime PeriodoHasta
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime PeriodoHasta
         {
             get
             {
@@ -6867,7 +6868,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PeriodoHastaSpecified
         {
             get
@@ -6894,7 +6895,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MedioPagoSpecified
         {
             get
@@ -6921,7 +6922,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoCtaPagoSpecified
         {
             get
@@ -6987,7 +6988,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string TermPagoDias
         {
             get
@@ -7001,8 +7002,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchVenc
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchVenc
         {
             get
             {
@@ -7015,7 +7016,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchVencSpecified
         {
             get
@@ -7030,103 +7031,103 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum EXPType
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("110")]
+        [XmlEnumAttribute("110")]
         Item110,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("111")]
+        [XmlEnumAttribute("111")]
         Item111,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("112")]
+        [XmlEnumAttribute("112")]
         Item112,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesEncabezadoIdDocTipoDespacho
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesEncabezadoIdDocIndServicio
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("5")]
+        [XmlEnumAttribute("5")]
         Item5,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesEncabezadoIdDocFmaPago
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoIdDocMntPagos
     {
 
-        private System.DateTime fchPagoField;
+        private DateTime fchPagoField;
 
         private string mntPagoField;
 
         private string glosaPagosField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchPago
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchPago
         {
             get
             {
@@ -7139,7 +7140,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntPago
         {
             get
@@ -7167,9 +7168,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesEncabezadoIdDocTpoCtaPago
     {
 
@@ -7184,11 +7185,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoEmisor
     {
 
@@ -7260,7 +7261,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Telefono")]
+        [XmlElementAttribute("Telefono")]
         public string[] Telefono
         {
             get
@@ -7287,7 +7288,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Acteco", DataType = "positiveInteger")]
+        [XmlElementAttribute("Acteco", DataType = "positiveInteger")]
         public string[] Acteco
         {
             get
@@ -7314,7 +7315,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CdgSIISucur
         {
             get
@@ -7407,11 +7408,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoReceptor
     {
 
@@ -7612,11 +7613,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoReceptorExtranjero
     {
 
@@ -7667,11 +7668,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoTransporte
     {
 
@@ -7782,11 +7783,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoTransporteChofer
     {
 
@@ -7822,11 +7823,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoTransporteAduana
     {
 
@@ -7895,7 +7896,7 @@ namespace Centralizador.Models.Outlook
         private string codPaisDestinField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodModVenta
         {
             get
@@ -7909,7 +7910,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodClauVenta
         {
             get
@@ -7936,7 +7937,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TotClauVentaSpecified
         {
             get
@@ -7950,7 +7951,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodViaTransp
         {
             get
@@ -8042,7 +8043,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPtoEmbarque
         {
             get
@@ -8069,7 +8070,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPtoDesemb
         {
             get
@@ -8096,7 +8097,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string Tara
         {
             get
@@ -8110,7 +8111,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodUnidMedTara
         {
             get
@@ -8137,7 +8138,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PesoBrutoSpecified
         {
             get
@@ -8151,7 +8152,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodUnidPesoBruto
         {
             get
@@ -8178,7 +8179,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PesoNetoSpecified
         {
             get
@@ -8192,7 +8193,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodUnidPesoNeto
         {
             get
@@ -8206,7 +8207,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string TotItems
         {
             get
@@ -8220,7 +8221,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string TotBultos
         {
             get
@@ -8234,7 +8235,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TipoBultos")]
+        [XmlElementAttribute("TipoBultos")]
         public DTEDefTypeExportacionesEncabezadoTransporteAduanaTipoBultos[] TipoBultos
         {
             get
@@ -8261,7 +8262,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntFleteSpecified
         {
             get
@@ -8288,7 +8289,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntSeguroSpecified
         {
             get
@@ -8302,7 +8303,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPaisRecep
         {
             get
@@ -8316,7 +8317,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodPaisDestin
         {
             get
@@ -8331,11 +8332,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoTransporteAduanaTipoBultos
     {
 
@@ -8352,7 +8353,7 @@ namespace Centralizador.Models.Outlook
         private string emisorSelloField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CodTpoBultos
         {
             get
@@ -8366,7 +8367,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CantBultos
         {
             get
@@ -8433,11 +8434,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoTotales
     {
 
@@ -8488,11 +8489,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesEncabezadoOtraMoneda
     {
 
@@ -8535,7 +8536,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoCambioSpecified
         {
             get
@@ -8562,7 +8563,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntExeOtrMndaSpecified
         {
             get
@@ -8590,11 +8591,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesDetalle
     {
 
@@ -8626,11 +8627,11 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeExportacionesDetalleSubcantidad[] subcantidadField;
 
-        private System.DateTime fchElaborField;
+        private DateTime fchElaborField;
 
         private bool fchElaborFieldSpecified;
 
-        private System.DateTime fchVencimField;
+        private DateTime fchVencimField;
 
         private bool fchVencimFieldSpecified;
 
@@ -8661,7 +8662,7 @@ namespace Centralizador.Models.Outlook
         private decimal montoItemField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinDet
         {
             get
@@ -8675,7 +8676,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CdgItem")]
+        [XmlElementAttribute("CdgItem")]
         public DTEDefTypeExportacionesDetalleCdgItem[] CdgItem
         {
             get
@@ -8702,7 +8703,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndExeSpecified
         {
             get
@@ -8755,7 +8756,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool QtyRefSpecified
         {
             get
@@ -8795,7 +8796,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PrcRefSpecified
         {
             get
@@ -8822,7 +8823,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool QtyItemSpecified
         {
             get
@@ -8836,7 +8837,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Subcantidad")]
+        [XmlElementAttribute("Subcantidad")]
         public DTEDefTypeExportacionesDetalleSubcantidad[] Subcantidad
         {
             get
@@ -8850,8 +8851,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchElabor
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchElabor
         {
             get
             {
@@ -8864,7 +8865,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchElaborSpecified
         {
             get
@@ -8878,8 +8879,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchVencim
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchVencim
         {
             get
             {
@@ -8892,7 +8893,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchVencimSpecified
         {
             get
@@ -8932,7 +8933,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PrcItemSpecified
         {
             get
@@ -8972,7 +8973,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool DescuentoPctSpecified
         {
             get
@@ -8986,7 +8987,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string DescuentoMonto
         {
             get
@@ -9000,7 +9001,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubDscto")]
+        [XmlElementAttribute("SubDscto")]
         public DTEDefTypeExportacionesDetalleSubDscto[] SubDscto
         {
             get
@@ -9027,7 +9028,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool RecargoPctSpecified
         {
             get
@@ -9041,7 +9042,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string RecargoMonto
         {
             get
@@ -9055,7 +9056,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubRecargo")]
+        [XmlElementAttribute("SubRecargo")]
         public DTEDefTypeExportacionesDetalleSubRecargo[] SubRecargo
         {
             get
@@ -9083,11 +9084,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesDetalleCdgItem
     {
 
@@ -9123,43 +9124,43 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesDetalleIndExe
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("5")]
+        [XmlEnumAttribute("5")]
         Item5,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("6")]
+        [XmlEnumAttribute("6")]
         Item6,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesDetalleSubcantidad
     {
 
@@ -9210,11 +9211,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesDetalleOtrMnda
     {
 
@@ -9276,7 +9277,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FctConvSpecified
         {
             get
@@ -9303,7 +9304,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool DctoOtrMndaSpecified
         {
             get
@@ -9330,7 +9331,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool RecargoOtrMndaSpecified
         {
             get
@@ -9358,11 +9359,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesDetalleSubDscto
     {
 
@@ -9398,27 +9399,27 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesDetalleSubDsctoTipoDscto
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("$")]
+        [XmlEnumAttribute("$")]
         Item,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("%")]
+        [XmlEnumAttribute("%")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesDetalleSubRecargo
     {
 
@@ -9454,27 +9455,27 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesDetalleSubRecargoTipoRecargo
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("$")]
+        [XmlEnumAttribute("$")]
         Item,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("%")]
+        [XmlEnumAttribute("%")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesSubTotInfo
     {
 
@@ -9507,7 +9508,7 @@ namespace Centralizador.Models.Outlook
         private string[] lineasDetaField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroSTI
         {
             get
@@ -9534,7 +9535,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string OrdenSTI
         {
             get
@@ -9561,7 +9562,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotNetoSTISpecified
         {
             get
@@ -9588,7 +9589,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotIVASTISpecified
         {
             get
@@ -9615,7 +9616,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotAdicSTISpecified
         {
             get
@@ -9642,7 +9643,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotExeSTISpecified
         {
             get
@@ -9669,7 +9670,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool ValSubtotSTISpecified
         {
             get
@@ -9683,7 +9684,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("LineasDeta", DataType = "positiveInteger")]
+        [XmlElementAttribute("LineasDeta", DataType = "positiveInteger")]
         public string[] LineasDeta
         {
             get
@@ -9698,11 +9699,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesDscRcgGlobal
     {
 
@@ -9725,7 +9726,7 @@ namespace Centralizador.Models.Outlook
         private bool indExeDRFieldSpecified;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinDR
         {
             get
@@ -9804,7 +9805,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool ValorDROtrMndaSpecified
         {
             get
@@ -9831,7 +9832,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndExeDRSpecified
         {
             get
@@ -9846,9 +9847,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesDscRcgGlobalTpoMov
     {
 
@@ -9860,43 +9861,43 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesDscRcgGlobalTpoValor
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("%")]
+        [XmlEnumAttribute("%")]
         Item,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("$")]
+        [XmlEnumAttribute("$")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesDscRcgGlobalIndExeDR
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesReferencia
     {
 
@@ -9914,7 +9915,7 @@ namespace Centralizador.Models.Outlook
 
         private string idAdicOtrField;
 
-        private System.DateTime fchRefField;
+        private DateTime fchRefField;
 
         private DTEDefTypeExportacionesReferenciaCodRef codRefField;
 
@@ -9923,7 +9924,7 @@ namespace Centralizador.Models.Outlook
         private string razonRefField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinRef
         {
             get
@@ -9963,7 +9964,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndGlobalSpecified
         {
             get
@@ -10016,8 +10017,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchRef
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchRef
         {
             get
             {
@@ -10043,7 +10044,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool CodRefSpecified
         {
             get
@@ -10071,43 +10072,43 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesReferenciaIndGlobal
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesReferenciaCodRef
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTED
     {
 
@@ -10149,7 +10150,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string version
         {
             get
@@ -10164,11 +10165,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDDD
     {
 
@@ -10178,7 +10179,7 @@ namespace Centralizador.Models.Outlook
 
         private string fField;
 
-        private System.DateTime feField;
+        private DateTime feField;
 
         private string rrField;
 
@@ -10190,7 +10191,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeExportacionesTEDDDCAF cAFField;
 
-        private System.DateTime tSTEDField;
+        private DateTime tSTEDField;
 
         /// <remarks/>
         public string RE
@@ -10219,7 +10220,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string F
         {
             get
@@ -10233,8 +10234,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FE
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FE
         {
             get
             {
@@ -10312,7 +10313,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        public System.DateTime TSTED
+        public DateTime TSTED
         {
             get
             {
@@ -10326,11 +10327,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDDDCAF
     {
 
@@ -10372,7 +10373,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string version
         {
             get
@@ -10387,11 +10388,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDDDCAFDA
     {
 
@@ -10403,7 +10404,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeExportacionesTEDDDCAFDARNG rNGField;
 
-        private System.DateTime faField;
+        private DateTime faField;
 
         private object itemField;
 
@@ -10462,8 +10463,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FA
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FA
         {
             get
             {
@@ -10476,8 +10477,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("DSAPK", typeof(DTEDefTypeExportacionesTEDDDCAFDADSAPK))]
-        [System.Xml.Serialization.XmlElementAttribute("RSAPK", typeof(DTEDefTypeExportacionesTEDDDCAFDARSAPK))]
+        [XmlElementAttribute("DSAPK", typeof(DTEDefTypeExportacionesTEDDDCAFDADSAPK))]
+        [XmlElementAttribute("RSAPK", typeof(DTEDefTypeExportacionesTEDDDCAFDARSAPK))]
         public object Item
         {
             get
@@ -10505,11 +10506,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDDDCAFDARNG
     {
 
@@ -10518,7 +10519,7 @@ namespace Centralizador.Models.Outlook
         private string hField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string D
         {
             get
@@ -10532,7 +10533,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string H
         {
             get
@@ -10547,11 +10548,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDDDCAFDADSAPK
     {
 
@@ -10564,7 +10565,7 @@ namespace Centralizador.Models.Outlook
         private byte[] yField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] P
         {
             get
@@ -10578,7 +10579,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] Q
         {
             get
@@ -10592,7 +10593,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] G
         {
             get
@@ -10606,7 +10607,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] Y
         {
             get
@@ -10621,11 +10622,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDDDCAFDARSAPK
     {
 
@@ -10634,7 +10635,7 @@ namespace Centralizador.Models.Outlook
         private byte[] eField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] M
         {
             get
@@ -10648,7 +10649,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] E
         {
             get
@@ -10663,11 +10664,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDDDCAFFRMA
     {
 
@@ -10681,7 +10682,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string algoritmo
         {
             get
@@ -10695,7 +10696,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute(DataType = "base64Binary")]
+        [XmlTextAttribute(DataType = "base64Binary")]
         public byte[] Value
         {
             get
@@ -10710,11 +10711,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeExportacionesTEDFRMT
     {
 
@@ -10723,7 +10724,7 @@ namespace Centralizador.Models.Outlook
         private byte[] valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public DTEDefTypeExportacionesTEDFRMTAlgoritmo algoritmo
         {
             get
@@ -10737,7 +10738,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute(DataType = "base64Binary")]
+        [XmlTextAttribute(DataType = "base64Binary")]
         public byte[] Value
         {
             get
@@ -10752,9 +10753,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeExportacionesTEDFRMTAlgoritmo
     {
 
@@ -10766,11 +10767,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacion
     {
 
@@ -10786,7 +10787,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeLiquidacionTED tEDField;
 
-        private System.DateTime tmstFirmaField;
+        private DateTime tmstFirmaField;
 
         private string idField;
 
@@ -10804,7 +10805,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Detalle")]
+        [XmlElementAttribute("Detalle")]
         public DTEDefTypeLiquidacionDetalle[] Detalle
         {
             get
@@ -10818,7 +10819,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubTotInfo")]
+        [XmlElementAttribute("SubTotInfo")]
         public DTEDefTypeLiquidacionSubTotInfo[] SubTotInfo
         {
             get
@@ -10832,7 +10833,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Referencia")]
+        [XmlElementAttribute("Referencia")]
         public DTEDefTypeLiquidacionReferencia[] Referencia
         {
             get
@@ -10846,7 +10847,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Comisiones")]
+        [XmlElementAttribute("Comisiones")]
         public DTEDefTypeLiquidacionComisiones[] Comisiones
         {
             get
@@ -10873,7 +10874,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        public System.DateTime TmstFirma
+        public DateTime TmstFirma
         {
             get
             {
@@ -10886,7 +10887,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        [XmlAttributeAttribute(DataType = "ID")]
         public string ID
         {
             get
@@ -10901,11 +10902,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezado
     {
 
@@ -10971,11 +10972,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezadoIdDoc
     {
 
@@ -10983,7 +10984,7 @@ namespace Centralizador.Models.Outlook
 
         private string folioField;
 
-        private System.DateTime fchEmisField;
+        private DateTime fchEmisField;
 
         private DTEDefTypeLiquidacionEncabezadoIdDocIndServicio indServicioField;
 
@@ -11005,7 +11006,7 @@ namespace Centralizador.Models.Outlook
 
         private bool fmaPagoFieldSpecified;
 
-        private System.DateTime fchCancelField;
+        private DateTime fchCancelField;
 
         private bool fchCancelFieldSpecified;
 
@@ -11015,11 +11016,11 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeLiquidacionEncabezadoIdDocMntPagos[] mntPagosField;
 
-        private System.DateTime periodoDesdeField;
+        private DateTime periodoDesdeField;
 
         private bool periodoDesdeFieldSpecified;
 
-        private System.DateTime periodoHastaField;
+        private DateTime periodoHastaField;
 
         private bool periodoHastaFieldSpecified;
 
@@ -11041,7 +11042,7 @@ namespace Centralizador.Models.Outlook
 
         private string termPagoDiasField;
 
-        private System.DateTime fchVencField;
+        private DateTime fchVencField;
 
         private bool fchVencFieldSpecified;
 
@@ -11059,7 +11060,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string Folio
         {
             get
@@ -11073,8 +11074,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchEmis
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchEmis
         {
             get
             {
@@ -11100,7 +11101,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndServicioSpecified
         {
             get
@@ -11127,7 +11128,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MntBrutoSpecified
         {
             get
@@ -11154,7 +11155,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoTranCompraSpecified
         {
             get
@@ -11181,7 +11182,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoTranVentaSpecified
         {
             get
@@ -11208,7 +11209,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FmaPagoSpecified
         {
             get
@@ -11222,8 +11223,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchCancel
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchCancel
         {
             get
             {
@@ -11236,7 +11237,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchCancelSpecified
         {
             get
@@ -11250,7 +11251,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntCancel
         {
             get
@@ -11264,7 +11265,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string SaldoInsol
         {
             get
@@ -11278,7 +11279,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("MntPagos")]
+        [XmlElementAttribute("MntPagos")]
         public DTEDefTypeLiquidacionEncabezadoIdDocMntPagos[] MntPagos
         {
             get
@@ -11292,8 +11293,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime PeriodoDesde
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime PeriodoDesde
         {
             get
             {
@@ -11306,7 +11307,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PeriodoDesdeSpecified
         {
             get
@@ -11320,8 +11321,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime PeriodoHasta
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime PeriodoHasta
         {
             get
             {
@@ -11334,7 +11335,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PeriodoHastaSpecified
         {
             get
@@ -11361,7 +11362,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool MedioPagoSpecified
         {
             get
@@ -11388,7 +11389,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TpoCtaPagoSpecified
         {
             get
@@ -11454,7 +11455,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string TermPagoDias
         {
             get
@@ -11468,8 +11469,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchVenc
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchVenc
         {
             get
             {
@@ -11482,7 +11483,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchVencSpecified
         {
             get
@@ -11497,87 +11498,87 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum LIQType
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("43")]
+        [XmlEnumAttribute("43")]
         Item43,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionEncabezadoIdDocIndServicio
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionEncabezadoIdDocMntBruto
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionEncabezadoIdDocFmaPago
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezadoIdDocMntPagos
     {
 
-        private System.DateTime fchPagoField;
+        private DateTime fchPagoField;
 
         private string mntPagoField;
 
         private string glosaPagosField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchPago
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchPago
         {
             get
             {
@@ -11590,7 +11591,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string MntPago
         {
             get
@@ -11618,9 +11619,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionEncabezadoIdDocTpoCtaPago
     {
 
@@ -11635,11 +11636,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezadoEmisor
     {
 
@@ -11707,7 +11708,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Telefono")]
+        [XmlElementAttribute("Telefono")]
         public string[] Telefono
         {
             get
@@ -11734,7 +11735,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Acteco", DataType = "positiveInteger")]
+        [XmlElementAttribute("Acteco", DataType = "positiveInteger")]
         public string[] Acteco
         {
             get
@@ -11761,7 +11762,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string CdgSIISucur
         {
             get
@@ -11828,11 +11829,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezadoReceptor
     {
 
@@ -12018,11 +12019,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezadoTotales
     {
 
@@ -12053,7 +12054,7 @@ namespace Centralizador.Models.Outlook
         private string vlrPagarField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MntNeto
         {
             get
@@ -12067,7 +12068,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MntExe
         {
             get
@@ -12094,7 +12095,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TasaIVASpecified
         {
             get
@@ -12108,7 +12109,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string IVA
         {
             get
@@ -12122,7 +12123,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string IVAProp
         {
             get
@@ -12136,7 +12137,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string IVATerc
         {
             get
@@ -12150,7 +12151,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("ImptoReten")]
+        [XmlElementAttribute("ImptoReten")]
         public DTEDefTypeLiquidacionEncabezadoTotalesImptoReten[] ImptoReten
         {
             get
@@ -12177,7 +12178,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MntTotal
         {
             get
@@ -12191,7 +12192,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MontoPeriodo
         {
             get
@@ -12205,7 +12206,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string SaldoAnterior
         {
             get
@@ -12219,7 +12220,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string VlrPagar
         {
             get
@@ -12234,11 +12235,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezadoTotalesImptoReten
     {
 
@@ -12277,7 +12278,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TasaImpSpecified
         {
             get
@@ -12291,7 +12292,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MontoImp
         {
             get
@@ -12306,11 +12307,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionEncabezadoTotalesComisiones
     {
 
@@ -12321,7 +12322,7 @@ namespace Centralizador.Models.Outlook
         private string valComIVAField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string ValComNeto
         {
             get
@@ -12335,7 +12336,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string ValComExe
         {
             get
@@ -12349,7 +12350,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string ValComIVA
         {
             get
@@ -12364,11 +12365,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionDetalle
     {
 
@@ -12402,11 +12403,11 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeLiquidacionDetalleSubcantidad[] subcantidadField;
 
-        private System.DateTime fchElaborField;
+        private DateTime fchElaborField;
 
         private bool fchElaborFieldSpecified;
 
-        private System.DateTime fchVencimField;
+        private DateTime fchVencimField;
 
         private bool fchVencimFieldSpecified;
 
@@ -12421,7 +12422,7 @@ namespace Centralizador.Models.Outlook
         private string montoItemField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinDet
         {
             get
@@ -12435,7 +12436,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CdgItem")]
+        [XmlElementAttribute("CdgItem")]
         public DTEDefTypeLiquidacionDetalleCdgItem[] CdgItem
         {
             get
@@ -12475,7 +12476,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndExeSpecified
         {
             get
@@ -12528,7 +12529,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool QtyRefSpecified
         {
             get
@@ -12568,7 +12569,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PrcRefSpecified
         {
             get
@@ -12595,7 +12596,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool QtyItemSpecified
         {
             get
@@ -12609,7 +12610,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Subcantidad")]
+        [XmlElementAttribute("Subcantidad")]
         public DTEDefTypeLiquidacionDetalleSubcantidad[] Subcantidad
         {
             get
@@ -12623,8 +12624,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchElabor
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchElabor
         {
             get
             {
@@ -12637,7 +12638,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchElaborSpecified
         {
             get
@@ -12651,8 +12652,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchVencim
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchVencim
         {
             get
             {
@@ -12665,7 +12666,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool FchVencimSpecified
         {
             get
@@ -12705,7 +12706,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool PrcItemSpecified
         {
             get
@@ -12719,7 +12720,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CodImpAdic")]
+        [XmlElementAttribute("CodImpAdic")]
         public ImpAdicDTEType[] CodImpAdic
         {
             get
@@ -12733,7 +12734,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MontoItem
         {
             get
@@ -12748,11 +12749,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionDetalleCdgItem
     {
 
@@ -12788,43 +12789,43 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionDetalleIndExe
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("4")]
+        [XmlEnumAttribute("4")]
         Item4,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("5")]
+        [XmlEnumAttribute("5")]
         Item5,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("6")]
+        [XmlEnumAttribute("6")]
         Item6,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionDetalleSubcantidad
     {
 
@@ -12860,11 +12861,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionSubTotInfo
     {
 
@@ -12897,7 +12898,7 @@ namespace Centralizador.Models.Outlook
         private string[] lineasDetaField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroSTI
         {
             get
@@ -12924,7 +12925,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string OrdenSTI
         {
             get
@@ -12951,7 +12952,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotNetoSTISpecified
         {
             get
@@ -12978,7 +12979,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotIVASTISpecified
         {
             get
@@ -13005,7 +13006,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotAdicSTISpecified
         {
             get
@@ -13032,7 +13033,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool SubTotExeSTISpecified
         {
             get
@@ -13059,7 +13060,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool ValSubtotSTISpecified
         {
             get
@@ -13073,7 +13074,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("LineasDeta", DataType = "positiveInteger")]
+        [XmlElementAttribute("LineasDeta", DataType = "positiveInteger")]
         public string[] LineasDeta
         {
             get
@@ -13088,11 +13089,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionReferencia
     {
 
@@ -13106,7 +13107,7 @@ namespace Centralizador.Models.Outlook
 
         private string folioRefField;
 
-        private System.DateTime fchRefField;
+        private DateTime fchRefField;
 
         private DTEDefTypeLiquidacionReferenciaCodRef codRefField;
 
@@ -13115,7 +13116,7 @@ namespace Centralizador.Models.Outlook
         private string razonRefField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinRef
         {
             get
@@ -13155,7 +13156,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool IndGlobalSpecified
         {
             get
@@ -13182,8 +13183,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchRef
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchRef
         {
             get
             {
@@ -13209,7 +13210,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool CodRefSpecified
         {
             get
@@ -13237,43 +13238,43 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionReferenciaIndGlobal
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionReferenciaCodRef
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("1")]
+        [XmlEnumAttribute("1")]
         Item1,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("2")]
+        [XmlEnumAttribute("2")]
         Item2,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("3")]
+        [XmlEnumAttribute("3")]
         Item3,
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionComisiones
     {
 
@@ -13294,7 +13295,7 @@ namespace Centralizador.Models.Outlook
         private string valComIVAField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroLinCom
         {
             get
@@ -13347,7 +13348,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [XmlIgnoreAttribute()]
         public bool TasaComisionSpecified
         {
             get
@@ -13361,7 +13362,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string ValComNeto
         {
             get
@@ -13375,7 +13376,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string ValComExe
         {
             get
@@ -13389,7 +13390,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string ValComIVA
         {
             get
@@ -13404,9 +13405,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionComisionesTipoMovim
     {
 
@@ -13418,11 +13419,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTED
     {
 
@@ -13464,7 +13465,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string version
         {
             get
@@ -13479,11 +13480,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDDD
     {
 
@@ -13493,7 +13494,7 @@ namespace Centralizador.Models.Outlook
 
         private string fField;
 
-        private System.DateTime feField;
+        private DateTime feField;
 
         private string rrField;
 
@@ -13505,7 +13506,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeLiquidacionTEDDDCAF cAFField;
 
-        private System.DateTime tSTEDField;
+        private DateTime tSTEDField;
 
         /// <remarks/>
         public string RE
@@ -13534,7 +13535,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string F
         {
             get
@@ -13548,8 +13549,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FE
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FE
         {
             get
             {
@@ -13588,7 +13589,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "integer")]
+        [XmlElementAttribute(DataType = "integer")]
         public string MNT
         {
             get
@@ -13628,7 +13629,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        public System.DateTime TSTED
+        public DateTime TSTED
         {
             get
             {
@@ -13642,11 +13643,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDDDCAF
     {
 
@@ -13688,7 +13689,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string version
         {
             get
@@ -13703,11 +13704,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDDDCAFDA
     {
 
@@ -13719,7 +13720,7 @@ namespace Centralizador.Models.Outlook
 
         private DTEDefTypeLiquidacionTEDDDCAFDARNG rNGField;
 
-        private System.DateTime faField;
+        private DateTime faField;
 
         private object itemField;
 
@@ -13778,8 +13779,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FA
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FA
         {
             get
             {
@@ -13792,8 +13793,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("DSAPK", typeof(DTEDefTypeLiquidacionTEDDDCAFDADSAPK))]
-        [System.Xml.Serialization.XmlElementAttribute("RSAPK", typeof(DTEDefTypeLiquidacionTEDDDCAFDARSAPK))]
+        [XmlElementAttribute("DSAPK", typeof(DTEDefTypeLiquidacionTEDDDCAFDADSAPK))]
+        [XmlElementAttribute("RSAPK", typeof(DTEDefTypeLiquidacionTEDDDCAFDARSAPK))]
         public object Item
         {
             get
@@ -13821,11 +13822,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDDDCAFDARNG
     {
 
@@ -13834,7 +13835,7 @@ namespace Centralizador.Models.Outlook
         private string hField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string D
         {
             get
@@ -13848,7 +13849,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string H
         {
             get
@@ -13863,11 +13864,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDDDCAFDADSAPK
     {
 
@@ -13880,7 +13881,7 @@ namespace Centralizador.Models.Outlook
         private byte[] yField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] P
         {
             get
@@ -13894,7 +13895,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] Q
         {
             get
@@ -13908,7 +13909,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] G
         {
             get
@@ -13922,7 +13923,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] Y
         {
             get
@@ -13937,11 +13938,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDDDCAFDARSAPK
     {
 
@@ -13950,7 +13951,7 @@ namespace Centralizador.Models.Outlook
         private byte[] eField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] M
         {
             get
@@ -13964,7 +13965,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElementAttribute(DataType = "base64Binary")]
         public byte[] E
         {
             get
@@ -13979,11 +13980,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDDDCAFFRMA
     {
 
@@ -13997,7 +13998,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public string algoritmo
         {
             get
@@ -14011,7 +14012,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute(DataType = "base64Binary")]
+        [XmlTextAttribute(DataType = "base64Binary")]
         public byte[] Value
         {
             get
@@ -14026,11 +14027,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class DTEDefTypeLiquidacionTEDFRMT
     {
 
@@ -14039,7 +14040,7 @@ namespace Centralizador.Models.Outlook
         private byte[] valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public DTEDefTypeLiquidacionTEDFRMTAlgoritmo algoritmo
         {
             get
@@ -14053,7 +14054,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlTextAttribute(DataType = "base64Binary")]
+        [XmlTextAttribute(DataType = "base64Binary")]
         public byte[] Value
         {
             get
@@ -14068,9 +14069,9 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public enum DTEDefTypeLiquidacionTEDFRMTAlgoritmo
     {
 
@@ -14082,12 +14083,12 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.sii.cl/SiiDte", IsNullable = false)]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [XmlRootAttribute(Namespace = "http://www.sii.cl/SiiDte", IsNullable = false)]
     public partial class EnvioDTE
     {
 
@@ -14114,7 +14115,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public decimal version
         {
             get
@@ -14134,11 +14135,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class EnvioDTESetDTE
     {
 
@@ -14162,7 +14163,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("DTE")]
+        [XmlElementAttribute("DTE")]
         public DTEDefType[] DTE
         {
             get
@@ -14176,7 +14177,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        [XmlAttributeAttribute(DataType = "ID")]
         public string ID
         {
             get
@@ -14191,11 +14192,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class EnvioDTESetDTECaratula
     {
 
@@ -14205,11 +14206,11 @@ namespace Centralizador.Models.Outlook
 
         private string rutReceptorField;
 
-        private System.DateTime fchResolField;
+        private DateTime fchResolField;
 
         private string nroResolField;
 
-        private System.DateTime tmstFirmaEnvField;
+        private DateTime tmstFirmaEnvField;
 
         private EnvioDTESetDTECaratulaSubTotDTE[] subTotDTEField;
 
@@ -14260,8 +14261,8 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-        public System.DateTime FchResol
+        [XmlElementAttribute(DataType = "date")]
+        public DateTime FchResol
         {
             get
             {
@@ -14274,7 +14275,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "nonNegativeInteger")]
+        [XmlElementAttribute(DataType = "nonNegativeInteger")]
         public string NroResol
         {
             get
@@ -14288,7 +14289,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        public System.DateTime TmstFirmaEnv
+        public DateTime TmstFirmaEnv
         {
             get
             {
@@ -14301,7 +14302,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SubTotDTE")]
+        [XmlElementAttribute("SubTotDTE")]
         public EnvioDTESetDTECaratulaSubTotDTE[] SubTotDTE
         {
             get
@@ -14315,7 +14316,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttributeAttribute()]
         public decimal version
         {
             get
@@ -14330,11 +14331,11 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [DebuggerStepThroughAttribute()]
+    [DesignerCategoryAttribute("code")]
+    [XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sii.cl/SiiDte")]
     public partial class EnvioDTESetDTECaratulaSubTotDTE
     {
 
@@ -14356,7 +14357,7 @@ namespace Centralizador.Models.Outlook
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+        [XmlElementAttribute(DataType = "positiveInteger")]
         public string NroDTE
         {
             get
@@ -14371,50 +14372,50 @@ namespace Centralizador.Models.Outlook
     }
 
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
+    [GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [SerializableAttribute()]
+    [XmlTypeAttribute(Namespace = "http://www.sii.cl/SiiDte")]
     public enum DOCType
     {
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("33")]
+        [XmlEnumAttribute("33")]
         Item33,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("34")]
+        [XmlEnumAttribute("34")]
         Item34,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("43")]
+        [XmlEnumAttribute("43")]
         Item43,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("46")]
+        [XmlEnumAttribute("46")]
         Item46,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("52")]
+        [XmlEnumAttribute("52")]
         Item52,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("56")]
+        [XmlEnumAttribute("56")]
         Item56,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("61")]
+        [XmlEnumAttribute("61")]
         Item61,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("110")]
+        [XmlEnumAttribute("110")]
         Item110,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("111")]
+        [XmlEnumAttribute("111")]
         Item111,
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlEnumAttribute("112")]
+        [XmlEnumAttribute("112")]
         Item112,
     }
 

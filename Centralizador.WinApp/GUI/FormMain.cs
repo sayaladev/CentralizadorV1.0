@@ -107,21 +107,46 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
-            if (CboParticipants.SelectedIndex == 0)
+
+
+            // Tester
+            var resultado = ServicePdf.TransformXmlToObject(@"C:\Users\Developer\Desktop\SS76451022-4SS033F0000000721.xml");
+
+            foreach (DTEDefType item in resultado.SetDTE.DTE)
             {
-                TssLblMensaje.Text = "Plesase select a Company!";
-                return;
+                var re = ServicePdf.TransformObjectToXml(item);
             }
-            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-            if (matrices != null)
-            {
-                BackgroundW.RunWorkerAsync(matrices);
-            }
-            else
-            {
-                MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            }
+
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //if (CboParticipants.SelectedIndex == 0)
+            //{
+            //    TssLblMensaje.Text = "Plesase select a Company!";
+            //    return;
+            //}
+            //UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+            //IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
+            //if (matrices != null)
+            //{
+            //    BackgroundW.RunWorkerAsync(matrices);
+            //}
+            //else
+            //{
+            //    MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            //}
 
 
         }
@@ -154,16 +179,16 @@ namespace Centralizador.WinApp.GUI
 
 
 
-                            EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(nameFile);
+                            //EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(nameFile);
 
-                        EnvioDTESetDTE doc = (EnvioDTESetDTE)xmlObjeto.SetDTE.DTE[0].Item;
+                       // EnvioDTESetDTE doc = (EnvioDTESetDTE)xmlObjeto.SetDTE.DTE[0].Item;
                      
                         
-                        foreach (DTEDefType z in doc.DTE)
-                        {
+                        //foreach (DTEDefType z in doc.DTE)
+                        //{
 
 
-                        }
+                        //}
 
                         //if (doc.re != null)
                         //{
