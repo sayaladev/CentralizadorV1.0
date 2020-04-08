@@ -115,10 +115,11 @@ namespace Centralizador.WinApp.GUI
             if (matrices != null)
             {
                 BackgroundW.RunWorkerAsync(matrices);
+                BtnCreditor.Enabled = false;
             }
             else
             {
-                MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                TssLblMensaje.Text = "There are no published instructions.";
             }
         }
 
@@ -354,7 +355,8 @@ namespace Centralizador.WinApp.GUI
 
                 throw;
             }
-            IGridMain.EndUpdate();           
+            IGridMain.EndUpdate();
+            IGridMain.Focus();
 
         }
         #endregion
@@ -489,17 +491,17 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnPdfConvert_Click(object sender, EventArgs e)
         {
-            if (BtnCreditor.Enabled == true)
-            {
-                foreach (Detalle item in DetallesCreditor)
-                {
-                    DTEDefType a = ServicePdf.TransformXmlStringToObjectDTE(item.References[0].FileBasico);
-                }
-            }
-            else if (BtnDebtor.Enabled == true)
-            {
+            //if (BtnCreditor.Enabled == true)
+            //{
+            //    foreach (Detalle item in DetallesCreditor)
+            //    {
+            //        DTEDefType a = ServicePdf.TransformXmlStringToObjectDTE(item.References[0].FileBasico);
+            //    }
+            //}
+            //else if (BtnDebtor.Enabled == true)
+            //{
 
-            }
+            //}
 
         }
 
@@ -516,20 +518,25 @@ namespace Centralizador.WinApp.GUI
         private void BackgroundW_DoWork(object sender, DoWorkEventArgs e)
         {
             IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
-            IList<Detalle> detalles = new List<Detalle>();
+            DetallesCreditor = new List<Detalle>();
+            List<ResultInstruction> instructions = new List<ResultInstruction>();
             int c = 0;
             float porcent = 0;
             foreach (ResultPaymentMatrix m in matrices)
             {
+                ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
+                m.BillingWindow = window;
                 // Get instructions with matrix binding.
-                IList<ResultInstruction> instructions = Instruction.GetInstructionCreditor(m, UserParticipant);
-                if (instructions != null)
+                IList<ResultInstruction> lista =  Instruction.GetInstructionCreditor(m, UserParticipant);
+                if (lista !=null)
                 {
+                    instructions.AddRange(lista);
+                } 
+            }                  
                     c = 0;
                     foreach (ResultInstruction instruction in instructions)
                     {
-                        ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
-                        m.BillingWindow = window;
+                     
                         instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
                         // Get reference from Softland.
                         instruction.References = Reference.GetInfoFactura(instruction);
@@ -558,13 +565,12 @@ namespace Centralizador.WinApp.GUI
                             }
                             
                         }
-                        detalles.Add(detalle);
+                DetallesCreditor.Add(detalle);
                         c++;
                         porcent = (float)(100 * c) / instructions.Count;
                         BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{instructions.Count})");                        
-                    }
-                }                
-            }          
+                    }                                
+                      
         }
 
         private void BackgroundW_ProgressChanged(object sender, ProgressChangedEventArgs e)
