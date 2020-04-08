@@ -5,6 +5,8 @@ using System.Xml.Serialization;
 
 using Centralizador.Models.Outlook;
 
+using SelectPdf;
+
 namespace Centralizador.Models.AppFunctions
 {
     public class ServicePdf
@@ -27,7 +29,41 @@ namespace Centralizador.Models.AppFunctions
             }
             catch (System.Exception)
             {
+                return null;
+            }
 
+        }
+
+        public static DTEDefType TransformXmlToObjectDTE(string pathFile)
+        {
+            try
+            {
+                XmlSerializer deserializer = new XmlSerializer(typeof(DTEDefType));
+                using (StreamReader reader = new StreamReader(pathFile, Encoding.Default))
+                {
+                    DTEDefType document = (DTEDefType)deserializer.Deserialize(reader);
+                    return document;
+                }
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
+
+        }
+        public static DTEDefType TransformXmlStringToObjectDTE(string file)
+        {
+            try
+            {
+                XmlSerializer deserializer = new XmlSerializer(typeof(DTEDefType));
+                using (StringReader reader = new StringReader(file))
+                {
+                    DTEDefType document = (DTEDefType)deserializer.Deserialize(reader);
+                    return document;
+                }
+            }
+            catch (System.Exception)
+            {
                 return null;
             }
 
@@ -43,7 +79,7 @@ namespace Centralizador.Models.AppFunctions
             try
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(DTEDefType));
-                using (Utf8StringWriter stringWriter = new Utf8StringWriter( ))
+                using (Utf8StringWriter stringWriter = new Utf8StringWriter())
                 {
                     using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true }))
                     {
@@ -55,11 +91,17 @@ namespace Centralizador.Models.AppFunctions
             catch (System.Exception)
             {
                 return null;
-            } 
+            }
         }
         public sealed class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding => Encoding.UTF8;
+        }
+
+        public static PdfDocument GetPdfDocument()
+        {
+
+            return null;
         }
     }
 }

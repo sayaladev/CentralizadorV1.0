@@ -33,7 +33,7 @@ namespace Centralizador.Models.ApiSII
             byte op = 0;
             switch (tipoLibro)
             {
-                case "Debitor":
+                case "Debtor":
                     ns = "cl.sii.sdi.lob.diii.consemitidos.data.api.interfaces.FacadeService/getDetalleRecibidos";
                     op = 2;
                     url = "https://www4.sii.cl/consemitidosinternetui/services/data/facadeService/getDetalleRecibidos";

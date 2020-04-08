@@ -122,27 +122,21 @@ namespace Centralizador.Models.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("facturacionchile@capvertenergie.com")]
         public string UserEmail {
             get {
                 return ((string)(this["UserEmail"]));
             }
-            set {
-                this["UserEmail"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Che@2019!")]
         public string UserPassword {
             get {
                 return ((string)(this["UserPassword"]));
-            }
-            set {
-                this["UserPassword"] = value;
             }
         }
         

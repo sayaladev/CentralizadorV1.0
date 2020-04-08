@@ -25,24 +25,19 @@ namespace Centralizador.WinApp.GUI
 
 
 
-        //Creditor
-        private IList<ResultInstruction> InstructionsCreditor { get; set; }
-        private IList<ResultPaymentMatrix> MatricesCreditor { get; set; }
+        //Creditor     
+        public IList<Detalle> DetallesCreditor { get; set; }
+
 
         //Debitor
-        private IList<ResultInstruction> InstructionsDebitor { get; set; }
-        private IList<ResultPaymentMatrix> MatricesDebitor { get; set; }
-        private ServiceLibro LibroCompraDebtor { get; set; }
+        public IList<Detalle> DetallesDebtor { get; set; }
 
-        public int MyProperty { get; set; }
 
         //General
         private ResultParticipant UserParticipant { get; set; }
-        private DateTime DateTimeCbo { get; set; }
+
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
         private IEnumerable<ResultBilingType> BillingTypes { get; set; }
-        //private string Periodo1 { get; set; }
-        private string Periodo2 { get; set; }
 
         public string TokenSii { get; set; }
 
@@ -103,52 +98,28 @@ namespace Centralizador.WinApp.GUI
             // Date Time Outlook
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
 
+            // IGridMain
+            //IGridDesign();
+
         }
 
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
-
-
-            // Tester
-            var resultado = ServicePdf.TransformXmlToObject(@"C:\Users\Developer\Desktop\SS76451022-4SS033F0000000721.xml");
-
-            foreach (DTEDefType item in resultado.SetDTE.DTE)
+            if (CboParticipants.SelectedIndex == 0)
             {
-                var re = ServicePdf.TransformObjectToXml(item);
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            } 
+            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
+            if (matrices != null)
+            {
+                BackgroundW.RunWorkerAsync(matrices);
             }
-
-         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //if (CboParticipants.SelectedIndex == 0)
-            //{
-            //    TssLblMensaje.Text = "Plesase select a Company!";
-            //    return;
-            //}
-            //UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-            //IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-            //if (matrices != null)
-            //{
-            //    BackgroundW.RunWorkerAsync(matrices);
-            //}
-            //else
-            //{
-            //    MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            //}
-
-
+            else
+            {
+                MessageBox.Show($"There are no published instructions for {UserParticipant.Name.ToUpper()} company", "Cenralizador", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         private void BtnDebtor_Click(object sender, EventArgs e)
@@ -161,152 +132,77 @@ namespace Centralizador.WinApp.GUI
             string nameFile = "";
             UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
             // Get info from Sii / Debtor.
-            IList<Detalle> detalles = new List<Detalle>();
-            detalles = ServiceLibro.GetLibro("Debitor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
-            if (detalles != null)
+            DetallesDebtor = new List<Detalle>();
+            DetallesDebtor = ServiceLibro.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+            if (DetallesDebtor != null)
             {
-                foreach (Detalle item in detalles)
+                foreach (Detalle item in DetallesDebtor)
                 {
+                    nameFile = "";
                     nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
                     nameFile += $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
                     if (File.Exists(nameFile))
                     {   // Deserialize  
-                
-                  
-                        //foreach (DTEDefType type in xmlObjeto.SetDTE.DTE)
-                        //{
-                        //    DTEDefTypeDocumento document = (DTEDefTypeDocumento)type.Item;
+                        DTEDefType xmlObjeto = ServicePdf.TransformXmlToObjectDTE(nameFile);
+                        DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
+                        DTEDefTypeDocumentoReferencia[] referencias = dte.Referencia;
+                        if (referencias != null)
+                        {
+                            foreach (DTEDefTypeDocumentoReferencia r in referencias)
+                            {
+                                if (r.TpoDocRef == "SEN")
+                                {
+                                    string rznRef = "";
+                                    ResultBillingWindow window = null;
+                                    if (r.RazonRef != null)
+                                    {
+                                        rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
+                                        window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
+                                    }
+                                    if (window != null)
+                                    {
+                                        // Get the asociated matrix  
+                                        IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                        foreach (ResultPaymentMatrix m in matrices)
+                                        {
+                                            if (m.NaturalKey == r.RazonRef)
+                                            {
+                                                // Get the instruction                                        
+                                                ResultParticipant participant = Participant.GetParticipantByRut(dte.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
+                                                ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
 
+                                                //tengo que ir a softkand por PAGOS y referencia
+                                                Reference reference = new Reference
+                                                {
+                                                    FileEnviado = File.ReadAllText(nameFile)
+                                                };
 
+                                                // Asignament to detalle
+                                                item.Instruction = instruction;
+                                                //item.References = 
 
-                            //EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(nameFile);
+                                            }
+                                        }
 
-                       // EnvioDTESetDTE doc = (EnvioDTESetDTE)xmlObjeto.SetDTE.DTE[0].Item;
-                     
-                        
-                        //foreach (DTEDefType z in doc.DTE)
-                        //{
+                                    }
 
-
-                        //}
-
-                        //if (doc.re != null)
-                        //{
-                        //    foreach (DTEDefTypeDocumentoReferencia r in doc.Referencia)
-                        //    {
-                        //        if (r.TpoDocRef == "SEN")
-                        //        {
-                        //            string rznRef = "";
-                        //            ResultBillingWindow window = null;
-                        //            if (r.RazonRef != null)
-                        //            {
-                        //                rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
-                        //                window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
-                        //            }
-                        //            if (window != null)
-                        //            {
-                        //                // Get the asociated matrix  
-                        //                IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                        //                foreach (ResultPaymentMatrix m in matrices)
-                        //                {
-                        //                    if (m.NaturalKey == r.RazonRef)
-                        //                    {
-                        //                        // Get the instruction                                        
-                        //                        ResultParticipant participant = Participant.GetParticipantByRut(doc.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
-                        //                        ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
-
-                        //                        // tengo que ir a softkand por PAGOS y referencia
-                        //                        Reference reference = new Reference
-                        //                        {
-                        //                            FileEnviado = ServicePdf.TransformObjectToXml(doc) //Es necesario? si ya tengo el file .xml 
-                        //                        };
-
-                        //                        // Asignament to detalle
-                        //                        item.Instruction = instruction;
-                        //                        //item.References = 
-
-                        //                    }
-                        //                }
-
-                        //            }
-
-                        //        }
-                        //    }
-                        //}
-
-
-
+                                }
+                            }
+                        }
                     }
                 }
-                IGridDesign(detalles);
+                IGridFill(DetallesDebtor);
             }
 
         }
-        private void IGridDesign(IList<Detalle> detalles)
-        {
+
+        private void IGridFill(IList<Detalle> detalles) {
             try
             {
                 IGridMain.BeginUpdate();
-                // Delete previous
-                IGridMain.Cols.Clear();
-                IGridMain.Rows.Clear();
-                // Set up the frozen area parameters.
-                // First frozen column will display row numbers.
-                IGridMain.FrozenArea.ColCount = 2;
-                IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
-                //IGridMain.DefaultCol.IncludeInSelect = false;
-                IGridMain.DefaultCol.AllowSizing = false;
-
-                // Set up the width of the first frozen column (hot and current row indicator).
-                IGridMain.DefaultCol.Width = 10;
-                // Add the first frozen column.
-                IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-                // Set up the width of the second frozen column (row numbers).
-                IGridMain.DefaultCol.Width = 30;
-                // Add the second frozen column.
-                IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-
-                // Set up the default parameters of the data columns.                
-                IGridMain.DefaultCol.AllowSizing = true;
-
-                // Add data columns.                
-                IGridMain.Cols.Add("Instruction");
-                IGridMain.Cols.Add("Cod Prod");
-                IGridMain.Cols.Add("Paso1");
-                IGridMain.Cols.Add("Paso2");
-                IGridMain.Cols.Add("Paso3");
-                IGridMain.Cols.Add("Paso4");
-                IGridMain.Cols.Add("Rut");
-                IGridMain.Cols.Add("Dv");
-                IGridMain.Cols.Add("Amount");
-                IGridMain.Cols.Add("Exent amount");
-                IGridMain.Cols.Add("Iva");
-                IGridMain.Cols.Add("Total");
-                IGridMain.Cols.Add("Folio");
-                IGridMain.Cols.Add("F. emisión");
-                IGridMain.Cols.Add("Cbte.");
-                IGridMain.Cols.Add("F. de pago");
-                IGridMain.Cols.Add("pic");
-                IGridMain.Cols.Add("F. de envío");
-                IGridMain.Cols.Add("flag");
-                IGridMain.Cols.Add("status");
-                IGridMain.Cols.Add("F. de envío");
-                IGridMain.Cols.Add("M");
-                IGridMain.Cols.Add("Aceptado cliente");
-
-                // General config Grid
-                IGridMain.SelectionMode = iGSelectionMode.MultiExtended;
-                IGridMain.RowMode = true;
-                IGridMain.SelRowsBackColor = Color.Empty;
-                IGridMain.SelRowsForeColor = Color.Empty;
-
-                // Rows selected
-                Color myHighlightColor = SystemColors.Highlight;
-                IGridMain.SelCellsBackColor = Color.FromArgb(100, myHighlightColor.R, myHighlightColor.G, myHighlightColor.B);
-
+                IGridDesign();
                 // Fill up the cells with data.                
                 iGRow myRow;
-
                 foreach (Detalle item in detalles)
                 {
                     myRow = IGridMain.Rows.Add();
@@ -367,8 +263,98 @@ namespace Centralizador.WinApp.GUI
 
                 throw;
             }
-            IGridMain.EndUpdate();
-            IGridMain.Focus();
+            finally {
+                IGridMain.EndUpdate();
+                IGridMain.Focus();
+            }
+        }
+        private void IGridDesign()
+        {
+            try
+            {
+                IGridMain.BeginUpdate();
+                // Delete previous
+                IGridMain.Cols.Clear();
+                IGridMain.Rows.Clear();
+                // Set up the frozen area parameters.
+                // First frozen column will display row numbers.
+                IGridMain.FrozenArea.ColCount = 2;
+                IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
+                //IGridMain.DefaultCol.IncludeInSelect = false;
+                IGridMain.DefaultCol.AllowSizing = false;
+
+                // Set up the width of the first frozen column (hot and current row indicator).
+                IGridMain.DefaultCol.Width = 10;
+                // Add the first frozen column.
+                IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+                // Set up the width of the second frozen column (row numbers).
+                IGridMain.DefaultCol.Width = 30;
+                // Add the second frozen column.
+                IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+
+                // Set up the default parameters of the data columns.                
+                IGridMain.DefaultCol.AllowSizing = true;
+
+                // Add data columns.                
+                IGridMain.Cols.Add("Instruction");
+                IGridMain.Cols.Add("Cod Prod");
+                IGridMain.Cols.Add("Paso1");
+                IGridMain.Cols.Add("Paso2");
+                IGridMain.Cols.Add("Paso3");
+                IGridMain.Cols.Add("Paso4");
+                IGridMain.Cols.Add("Rut");
+                IGridMain.Cols.Add("Dv");
+                IGridMain.Cols.Add("Amount");
+                IGridMain.Cols.Add("Exent amount");
+                IGridMain.Cols.Add("Iva");
+                IGridMain.Cols.Add("Total");
+                IGridMain.Cols.Add("Folio");
+                IGridMain.Cols.Add("F. emisión");
+                IGridMain.Cols.Add("Cbte.");
+                IGridMain.Cols.Add("F. de pago");
+                IGridMain.Cols.Add("pic");
+                IGridMain.Cols.Add("F. de envío");
+                IGridMain.Cols.Add("flag");
+                IGridMain.Cols.Add("status");
+                IGridMain.Cols.Add("F. de envío");
+                IGridMain.Cols.Add("M");
+                IGridMain.Cols.Add("Aceptado cliente");
+
+                // General config Grid
+                IGridMain.SelectionMode = iGSelectionMode.MultiExtended;
+                IGridMain.RowMode = true;
+                IGridMain.SelRowsBackColor = Color.Empty;
+                IGridMain.SelRowsForeColor = Color.Empty;
+
+                // Header
+                IGridMain.GroupBox.Visible = true;
+                IGridMain.Header.SeparatingLine = new iGPenStyle { DashStyle = DashStyle.Solid };
+                IGridMain.Header.Rows.Count = 3;
+                IGridMain.Header.Cells[1, 2].Value = "Coordinador Eléctrico Nacional";
+                IGridMain.Header.Cells[1, 2].SpanCols = 7;
+                IGridMain.Header.Cells[1, 2].TextAlign = iGContentAlignment.MiddleCenter;
+
+
+
+                // Scroll
+                IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.Always;
+                IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.CollapseAll, "Collapse all tasks");
+                IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.ExpandAll, "Expand all tasks");
+
+                // Rows selected
+                Color myHighlightColor = SystemColors.Highlight;
+                IGridMain.SelCellsBackColor = Color.FromArgb(100, myHighlightColor.R, myHighlightColor.G, myHighlightColor.B);
+
+               
+
+               
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            IGridMain.EndUpdate();           
 
         }
         #endregion
@@ -461,7 +447,7 @@ namespace Centralizador.WinApp.GUI
         {
             BtnOutlook.Enabled = false;
 
-         
+
             // Date & folder
             outlook = new ServiceOutlook(Models.Properties.Settings.Default.DateTimeEmail, TokenSii);
 
@@ -474,7 +460,7 @@ namespace Centralizador.WinApp.GUI
             bgwReadEmail.RunWorkerCompleted += BgwReadEmailRunWorkerCompleted;
             outlook.GetXmlFromEmail(bgwReadEmail);
 
-            
+
 
             //BtnCreditor.Enabled = true;
             //BtnDebitor.Enabled = true;
@@ -492,7 +478,7 @@ namespace Centralizador.WinApp.GUI
         private void BgwReadEmailRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //TssLblMensaje.Text = "Finished...";
-           TssLblProgBar.Value = 0;
+            TssLblProgBar.Value = 0;
             //TssLblMensaje.Text = "";
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", outlook.LastTime);
             BtnOutlook.Enabled = true;
@@ -503,6 +489,17 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnPdfConvert_Click(object sender, EventArgs e)
         {
+            if (BtnCreditor.Enabled == true)
+            {
+                foreach (Detalle item in DetallesCreditor)
+                {
+                    DTEDefType a = ServicePdf.TransformXmlStringToObjectDTE(item.References[0].FileBasico);
+                }
+            }
+            else if (BtnDebtor.Enabled == true)
+            {
+
+            }
 
         }
 
@@ -559,17 +556,15 @@ namespace Centralizador.WinApp.GUI
                             {
                                 detalle.Instruction.References[0].FileEnviado = instruction.References[0].FileEnviado;
                             }
-
+                            
                         }
+                        detalles.Add(detalle);
                         c++;
                         porcent = (float)(100 * c) / instructions.Count;
-                        BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{instructions.Count})");
-                        detalles.Add(detalle);
+                        BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{instructions.Count})");                        
                     }
-                }
-                BackgroundW.ReportProgress(0, $"xxxxxxxxxxxxxxxxxxxx");
-            }
-            e.Result = detalles;
+                }                
+            }          
         }
 
         private void BackgroundW_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -580,11 +575,13 @@ namespace Centralizador.WinApp.GUI
 
         private void BackgroundW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            IList<Detalle> detalles = (IList<Detalle>)e.Result;
-            IGridDesign(detalles);
+            
+            IGridFill(DetallesCreditor);
             //TssLblProgBar.Value = 0;
             BtnCreditor.Enabled = true;
         }
+
+      
     }
 }
 

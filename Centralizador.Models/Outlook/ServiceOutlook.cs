@@ -37,11 +37,11 @@ namespace Centralizador.Models.Outlook
         private void Bgw_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            
+
             IList<Mail> mails = new List<Mail>();
             int c = 0;
             float porcent = 0;
-           
+
 
             string userName = Properties.Settings.Default.UserEmail;
             string password = Properties.Settings.Default.UserPassword;
@@ -75,7 +75,8 @@ namespace Centralizador.Models.Outlook
                             Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
                             Properties.Settings.Default.UIdEmail = Convert.ToInt64(info.UIDL);
                         }
-                        worker.ReportProgress(0, $"Dowloading email from server... [{i}][{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}]");
+                        c++;
+                        worker.ReportProgress(0, $"Dowloading email from server... [{c}][{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}]");
                     }
                     else
                     {
@@ -90,12 +91,13 @@ namespace Centralizador.Models.Outlook
                     Thread.Sleep(500);
                     return;
                 }
+                c = 0;
                 string pathTemp = Directory.GetCurrentDirectory() + @"\temp";
                 if (!Directory.Exists(pathTemp))
                 {
                     Directory.CreateDirectory(pathTemp);
                 }
-               
+
                 foreach (Mail item in mails)
                 {
                     Attachment[] atts = item.Attachments;
@@ -104,32 +106,42 @@ namespace Centralizador.Models.Outlook
                         if (att.Name.Contains(".xml"))
                         {
                             att.SaveAs(pathTemp + @"\" + att.Name, true);
-                            XDocument xmlDocumnet = XDocument.Load(pathTemp + @"\" + att.Name);
-                            // Save file
-                            SaveFiles(xmlDocumnet, pathTemp + @"\" + att.Name);
+                            try
+                            {
+                                XDocument xmlDocumnet = XDocument.Load(pathTemp + @"\" + att.Name);
+                                // Save file                          
+                                SaveFiles(xmlDocumnet, pathTemp + @"\" + att.Name);
+                            }
+                            catch (Exception)
+                            {
+
+                                continue;
+                            }
                         }
-                        c++;
-                        porcent = (float)(100 * c) / mails.Count;
-                        worker.ReportProgress((int)porcent, $"Processing Xml files... [{item.ReceivedDate}] ({c}/{mails.Count})");
+                        
                     }
+                    c++;
+                    porcent = (float)(100 * c) / mails.Count;
+                    worker.ReportProgress((int)porcent, $"Processing Xml files... [{item.ReceivedDate}] ({c}/{mails.Count})");
                 }
-                worker.ReportProgress((int)porcent, $"Processing Xml files... [finished]");
                 Thread.Sleep(500);
+                worker.ReportProgress((int)porcent, $"Processing Xml files... [finished]");
             }
             catch (Exception)
             {
 
                 throw;
             }
-            finally {
+            finally
+            {
 
                 Properties.Settings.Default.Save();
             }
 
         }
 
-        private void SaveFiles(XDocument xmlDocumnet, string path) {
-
+        private void SaveFiles(XDocument xmlDocumnet, string path)
+        {
             if (xmlDocumnet.Root.Name.LocalName == "EnvioDTE")
             {
                 // Deserialize
@@ -200,7 +212,7 @@ namespace Centralizador.Models.Outlook
 
     }
 
-    
+
 }
 
 

@@ -71,7 +71,7 @@ namespace Centralizador.Models.ApiSII
             }
             catch (System.Exception)
             {
-                MessageBox.Show($"This certificate is not valid:{Environment.NewLine} {cert.FriendlyName} ");
+                //MessageBox.Show($"This certificate is not valid:{Environment.NewLine} {cert.FriendlyName} ");
                 return null;
             }
         }
