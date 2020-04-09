@@ -28,10 +28,8 @@ namespace Centralizador.WinApp.GUI
         //Creditor     
         public IList<Detalle> DetallesCreditor { get; set; }
 
-
         //Debitor
         public IList<Detalle> DetallesDebtor { get; set; }
-
 
         //General
         private ResultParticipant UserParticipant { get; set; }
@@ -40,6 +38,8 @@ namespace Centralizador.WinApp.GUI
         private IEnumerable<ResultBilingType> BillingTypes { get; set; }
 
         public string TokenSii { get; set; }
+
+        public bool IsCreditor { get; set; }
 
 
         #endregion
@@ -109,8 +109,7 @@ namespace Centralizador.WinApp.GUI
             {
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
-            } 
-            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+            }
             IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
             if (matrices != null)
             {
@@ -131,7 +130,6 @@ namespace Centralizador.WinApp.GUI
                 return;
             }
             string nameFile = "";
-            UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
             // Get info from Sii / Debtor.
             DetallesDebtor = new List<Detalle>();
             DetallesDebtor = ServiceLibro.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
@@ -197,7 +195,8 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-        private void IGridFill(IList<Detalle> detalles) {
+        private void IGridFill(IList<Detalle> detalles)
+        {
             try
             {
                 IGridMain.BeginUpdate();
@@ -264,7 +263,8 @@ namespace Centralizador.WinApp.GUI
 
                 throw;
             }
-            finally {
+            finally
+            {
                 IGridMain.EndUpdate();
                 IGridMain.Focus();
             }
@@ -346,9 +346,9 @@ namespace Centralizador.WinApp.GUI
                 Color myHighlightColor = SystemColors.Highlight;
                 IGridMain.SelCellsBackColor = Color.FromArgb(100, myHighlightColor.R, myHighlightColor.G, myHighlightColor.B);
 
-               
 
-               
+
+
             }
             catch (Exception)
             {
@@ -434,11 +434,18 @@ namespace Centralizador.WinApp.GUI
 
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            ComboBox senderComboBox = sender as ComboBox;
-            if (senderComboBox.SelectedIndex != 0)
+            if (CboParticipants.SelectedIndex != 0)
             {
-                TssLblMensaje.Text = "";
+                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+                TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
+                TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode; ;
             }
+            else
+            {
+                TxtCtaCteParticipant.Text = "";
+                TxtRutParticipant.Text = "";
+            }
+            TssLblMensaje.Text = "";
         }
 
         #region Outlook
@@ -527,50 +534,50 @@ namespace Centralizador.WinApp.GUI
                 ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
                 m.BillingWindow = window;
                 // Get instructions with matrix binding.
-                IList<ResultInstruction> lista =  Instruction.GetInstructionCreditor(m, UserParticipant);
-                if (lista !=null)
+                IList<ResultInstruction> lista = Instruction.GetInstructionCreditor(m, UserParticipant);
+                if (lista != null)
                 {
                     instructions.AddRange(lista);
-                } 
-            }                  
-                    c = 0;
-                    foreach (ResultInstruction instruction in instructions)
+                }
+            }
+            c = 0;
+            foreach (ResultInstruction instruction in instructions)
+            {
+
+                instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
+                // Get reference from Softland.
+                instruction.References = Reference.GetInfoFactura(instruction);
+                // Root classs Detalle
+                Detalle detalle = new Detalle
+                {
+                    Instruction = instruction
+                };
+                detalle.MntNeto = instruction.Amount;
+                detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
+                detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
+                detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
+                if (instruction.References != null)
+                {
+                    if (instruction.References[0].Folio != 0)
                     {
-                     
-                        instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
-                        // Get reference from Softland.
-                        instruction.References = Reference.GetInfoFactura(instruction);
-                        // Root classs Detalle
-                        Detalle detalle = new Detalle
-                        {
-                            Instruction = instruction
-                        };
-                        detalle.MntNeto = instruction.Amount;
-                        detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
-                        detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
-                        detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
-                        if (instruction.References != null)
-                        {
-                            if (instruction.References[0].Folio != 0)
-                            {
-                                detalle.Folio = instruction.References[0].Folio;
-                            }
-                            if (instruction.References[0].FechaEmision != null)
-                            {
-                                detalle.FechaEmision = string.Format(CultureInfo, "{0:d}", instruction.References[0].FechaEmision);
-                            }
-                            if (instruction.References[0].FileEnviado != null)
-                            {
-                                detalle.Instruction.References[0].FileEnviado = instruction.References[0].FileEnviado;
-                            }
-                            
-                        }
+                        detalle.Folio = instruction.References[0].Folio;
+                    }
+                    if (instruction.References[0].FechaEmision != null)
+                    {
+                        detalle.FechaEmision = string.Format(CultureInfo, "{0:d}", instruction.References[0].FechaEmision);
+                    }
+                    if (instruction.References[0].FileEnviado != null)
+                    {
+                        detalle.Instruction.References[0].FileEnviado = instruction.References[0].FileEnviado;
+                    }
+
+                }
                 DetallesCreditor.Add(detalle);
-                        c++;
-                        porcent = (float)(100 * c) / instructions.Count;
-                        BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{instructions.Count})");                        
-                    }                                
-                      
+                c++;
+                porcent = (float)(100 * c) / instructions.Count;
+                BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{instructions.Count})");
+            }
+
         }
 
         private void BackgroundW_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -581,13 +588,13 @@ namespace Centralizador.WinApp.GUI
 
         private void BackgroundW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            
+
             IGridFill(DetallesCreditor);
             //TssLblProgBar.Value = 0;
             BtnCreditor.Enabled = true;
         }
 
-      
+
     }
 }
 

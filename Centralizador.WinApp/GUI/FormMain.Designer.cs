@@ -42,13 +42,10 @@
             this.TxtDteEmail = new System.Windows.Forms.TextBox();
             this.TxtRznRef = new System.Windows.Forms.TextBox();
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
-            this.TxtRut = new System.Windows.Forms.TextBox();
-            this.TxtDigit = new System.Windows.Forms.TextBox();
             this.TxtRznSocial = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.BtnPagar = new System.Windows.Forms.Button();
@@ -63,6 +60,10 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
+            this.TxtRutParticipant = new System.Windows.Forms.TextBox();
+            this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -157,66 +158,48 @@
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
-          
-         
             // 
             // groupBox4
             // 
-            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.TxtDteEmail);
-            this.groupBox4.Controls.Add(this.TxtRznRef);
-            this.groupBox4.Controls.Add(this.TxtFolioRef);
-            this.groupBox4.Controls.Add(this.TxtRut);
-            this.groupBox4.Controls.Add(this.TxtDigit);
             this.groupBox4.Controls.Add(this.TxtRznSocial);
-            this.groupBox4.Location = new System.Drawing.Point(13, 166);
+            this.groupBox4.Location = new System.Drawing.Point(13, 237);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(234, 174);
+            this.groupBox4.Size = new System.Drawing.Size(234, 103);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Document info:";
             // 
             // TxtDteEmail
             // 
-            this.TxtDteEmail.Location = new System.Drawing.Point(61, 125);
+            this.TxtDteEmail.Location = new System.Drawing.Point(59, 45);
             this.TxtDteEmail.Name = "TxtDteEmail";
+            this.TxtDteEmail.ReadOnly = true;
             this.TxtDteEmail.Size = new System.Drawing.Size(167, 20);
             this.TxtDteEmail.TabIndex = 9;
             // 
             // TxtRznRef
             // 
-            this.TxtRznRef.Location = new System.Drawing.Point(61, 98);
+            this.TxtRznRef.Location = new System.Drawing.Point(63, 193);
             this.TxtRznRef.Name = "TxtRznRef";
-            this.TxtRznRef.Size = new System.Drawing.Size(167, 20);
+            this.TxtRznRef.ReadOnly = true;
+            this.TxtRznRef.Size = new System.Drawing.Size(165, 20);
             this.TxtRznRef.TabIndex = 8;
             // 
             // TxtFolioRef
             // 
-            this.TxtFolioRef.Location = new System.Drawing.Point(51, 71);
+            this.TxtFolioRef.Location = new System.Drawing.Point(63, 166);
             this.TxtFolioRef.Name = "TxtFolioRef";
-            this.TxtFolioRef.Size = new System.Drawing.Size(177, 20);
+            this.TxtFolioRef.ReadOnly = true;
+            this.TxtFolioRef.Size = new System.Drawing.Size(165, 20);
             this.TxtFolioRef.TabIndex = 7;
-            // 
-            // TxtRut
-            // 
-            this.TxtRut.Location = new System.Drawing.Point(8, 45);
-            this.TxtRut.Name = "TxtRut";
-            this.TxtRut.Size = new System.Drawing.Size(100, 20);
-            this.TxtRut.TabIndex = 5;
-            // 
-            // TxtDigit
-            // 
-            this.TxtDigit.Location = new System.Drawing.Point(118, 45);
-            this.TxtDigit.Name = "TxtDigit";
-            this.TxtDigit.Size = new System.Drawing.Size(26, 20);
-            this.TxtDigit.TabIndex = 6;
             // 
             // TxtRznSocial
             // 
             this.TxtRznSocial.Location = new System.Drawing.Point(8, 19);
             this.TxtRznSocial.Name = "TxtRznSocial";
-            this.TxtRznSocial.Size = new System.Drawing.Size(220, 20);
+            this.TxtRznSocial.ReadOnly = true;
+            this.TxtRznSocial.Size = new System.Drawing.Size(218, 20);
             this.TxtRznSocial.TabIndex = 0;
             // 
             // BtnPdfConvert
@@ -231,9 +214,6 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.groupBox5);
             this.groupBox3.Controls.Add(this.BtnPagar);
             this.groupBox3.Controls.Add(this.TxtDateTimeEmail);
@@ -247,7 +227,6 @@
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.checkBox1);
             this.groupBox5.Controls.Add(this.button2);
             this.groupBox5.Controls.Add(this.button1);
             this.groupBox5.Location = new System.Drawing.Point(8, 58);
@@ -256,15 +235,6 @@
             this.groupBox5.TabIndex = 9;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "CEN";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(142, 31);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(15, 14);
-            this.checkBox1.TabIndex = 9;
-            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
@@ -314,8 +284,6 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.BtnFacturar);
             this.groupBox2.Location = new System.Drawing.Point(13, 346);
             this.groupBox2.Name = "groupBox2";
@@ -326,7 +294,8 @@
             // 
             // BtnFacturar
             // 
-            this.BtnFacturar.Location = new System.Drawing.Point(80, 14);
+            this.BtnFacturar.Enabled = false;
+            this.BtnFacturar.Location = new System.Drawing.Point(27, 19);
             this.BtnFacturar.Name = "BtnFacturar";
             this.BtnFacturar.Size = new System.Drawing.Size(75, 46);
             this.BtnFacturar.TabIndex = 0;
@@ -336,25 +305,29 @@
             // 
             // GroupBox1
             // 
-            this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBox1.Controls.Add(this.label2);
+            this.GroupBox1.Controls.Add(this.label1);
+            this.GroupBox1.Controls.Add(this.TxtCtaCteParticipant);
+            this.GroupBox1.Controls.Add(this.TxtRutParticipant);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
+            this.GroupBox1.Controls.Add(this.TxtRznRef);
             this.GroupBox1.Controls.Add(this.CboParticipants);
+            this.GroupBox1.Controls.Add(this.TxtFolioRef);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
             this.GroupBox1.Controls.Add(this.BtnDebtor);
             this.GroupBox1.Location = new System.Drawing.Point(13, 12);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(234, 148);
+            this.GroupBox1.Size = new System.Drawing.Size(234, 219);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Start";
             // 
             // BtnCreditor
             // 
-            this.BtnCreditor.Location = new System.Drawing.Point(28, 85);
+            this.BtnCreditor.Location = new System.Drawing.Point(9, 99);
             this.BtnCreditor.Name = "BtnCreditor";
-            this.BtnCreditor.Size = new System.Drawing.Size(75, 46);
+            this.BtnCreditor.Size = new System.Drawing.Size(97, 51);
             this.BtnCreditor.TabIndex = 4;
             this.BtnCreditor.Text = "Creditor";
             this.BtnCreditor.UseVisualStyleBackColor = true;
@@ -365,7 +338,7 @@
             this.CboParticipants.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboParticipants.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboParticipants.FormattingEnabled = true;
-            this.CboParticipants.Location = new System.Drawing.Point(8, 46);
+            this.CboParticipants.Location = new System.Drawing.Point(7, 46);
             this.CboParticipants.Name = "CboParticipants";
             this.CboParticipants.Size = new System.Drawing.Size(220, 21);
             this.CboParticipants.TabIndex = 0;
@@ -393,9 +366,9 @@
             // 
             // BtnDebtor
             // 
-            this.BtnDebtor.Location = new System.Drawing.Point(131, 85);
+            this.BtnDebtor.Location = new System.Drawing.Point(128, 99);
             this.BtnDebtor.Name = "BtnDebtor";
-            this.BtnDebtor.Size = new System.Drawing.Size(75, 46);
+            this.BtnDebtor.Size = new System.Drawing.Size(97, 51);
             this.BtnDebtor.TabIndex = 5;
             this.BtnDebtor.Text = "Debtor";
             this.BtnDebtor.UseVisualStyleBackColor = true;
@@ -407,6 +380,48 @@
             this.BackgroundW.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundW_DoWork);
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
+            // 
+            // TxtRutParticipant
+            // 
+            this.TxtRutParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtRutParticipant.Location = new System.Drawing.Point(7, 73);
+            this.TxtRutParticipant.Name = "TxtRutParticipant";
+            this.TxtRutParticipant.ReadOnly = true;
+            this.TxtRutParticipant.Size = new System.Drawing.Size(104, 20);
+            this.TxtRutParticipant.TabIndex = 9;
+            this.TxtRutParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // TxtCtaCteParticipant
+            // 
+            this.TxtCtaCteParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtCtaCteParticipant.Location = new System.Drawing.Point(121, 73);
+            this.TxtCtaCteParticipant.Name = "TxtCtaCteParticipant";
+            this.TxtCtaCteParticipant.ReadOnly = true;
+            this.TxtCtaCteParticipant.Size = new System.Drawing.Size(106, 20);
+            this.TxtCtaCteParticipant.TabIndex = 10;
+            this.TxtCtaCteParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(4, 173);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "FolioRef:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(6, 199);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 13);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "RznRef:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // FormMain
             // 
@@ -430,9 +445,9 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
+            this.GroupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -468,12 +483,13 @@
         private System.Windows.Forms.TextBox TxtDteEmail;
         private System.Windows.Forms.TextBox TxtRznRef;
         private System.Windows.Forms.TextBox TxtFolioRef;
-        private System.Windows.Forms.TextBox TxtRut;
-        private System.Windows.Forms.TextBox TxtDigit;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button BtnPagar;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TextBox TxtCtaCteParticipant;
+        private System.Windows.Forms.TextBox TxtRutParticipant;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
