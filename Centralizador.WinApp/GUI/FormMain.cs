@@ -196,20 +196,16 @@ namespace Centralizador.WinApp.GUI
         {
             try
             {
-                IGridMain.BeginUpdate();               
+                IGridMain.BeginUpdate();
                 // Fill up the cells with data.
                 IGridMain.Rows.Clear();
                 // Set up the height of the first row (frozen).
-                IGridMain.Rows.Add();
-                IGridMain.Rows[0].Height = 11;                
+          
                 iGRow myRow;
 
                 foreach (Detalle item in detalles)
                 {
-                    myRow = IGridMain.Rows.Add();
-                    // Set up the first frozen row (hot column indicator) parameters.
-                    myRow.Cells[0].CustomDrawFlags = iGCustomDrawFlags.Foreground;
-                    myRow.Cells[0].Selectable = iGBool.False;
+                    myRow = IGridMain.Rows.Add();                 
 
                     if (item.Instruction != null)
                     {
@@ -365,81 +361,62 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
         #region IGridMain methods
-        // Stores the current cell.
-        iGCell fCurCell;
-        // Stores the index of the hot column.
-        private int fHotCol = -1;
-        // Stores the index of the hot row.
-        private int fHotRow = -1;
+     
+        
+       
         private void IGridMain_CustomDrawCellForeground(object sender, iGCustomDrawCellEventArgs e)
         {
-            if (e.RowIndex == 0)
+            iGCell fCurCell = IGridMain.CurCell;
+
+            if (e.ColIndex == 1 )
             {
-                // Draw the hot and current column indicators.
+                //Draw the row numbers.
                 e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
-                if (e.ColIndex > 1)
-                {
-                    int myY = e.Bounds.Y + (e.Bounds.Height - 4) / 2;
-                    int myX = e.Bounds.X + (e.Bounds.Width - 7) / 2;
-                    Brush myBrush = null;
-                    if (fCurCell != null && e.ColIndex == fCurCell.ColIndex)
-                        myBrush = SystemBrushes.ControlText;
-                    else if (e.ColIndex == fHotCol)
-                        myBrush = Brushes.Blue;
-
-                    if (myBrush != null)
-                    {
-                        e.Graphics.FillRectangle(myBrush, myX, myY, 7, 1);
-                        e.Graphics.FillRectangle(myBrush, myX + 1, myY + 1, 5, 1);
-                        e.Graphics.FillRectangle(myBrush, myX + 2, myY + 2, 3, 1);
-                        e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
-                    }
-                }
+                e.Graphics.DrawString(
+                    e.RowIndex.ToString(),
+                    Font,
+                    SystemBrushes.ControlText,
+                    new Rectangle(e.Bounds.X + 2, e.Bounds.Y, e.Bounds.Width - 4, e.Bounds.Height));
             }
-            else
+            else if (e.ColIndex == 0)
             {
-                if (e.ColIndex == 1)
+                // Draw the hot and current row indicators.
+                e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
+                int myY = e.Bounds.Y + ((e.Bounds.Height - 7) / 2);
+                int myX = e.Bounds.X + ((e.Bounds.Width - 4) / 2);
+                Brush myBrush = null;
+                if (fCurCell != null && e.RowIndex == fCurCell.RowIndex)
                 {
-                    //Draw the row numbers.
-                    e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
-                    e.Graphics.DrawString(
-                        e.RowIndex.ToString(),
-                        Font,
-                        SystemBrushes.ControlText,
-                        new Rectangle(e.Bounds.X + 2, e.Bounds.Y, e.Bounds.Width - 4, e.Bounds.Height));
+                    myBrush = Brushes.Green;
                 }
-                else if (e.ColIndex == 0)
-                {
-                    // Draw the hot and current row indicators.
-                    e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
-                    int myY = e.Bounds.Y + (e.Bounds.Height - 7) / 2;
-                    int myX = e.Bounds.X + (e.Bounds.Width - 4) / 2;
-                    Brush myBrush = null;
-                    if (fCurCell != null && e.RowIndex == fCurCell.RowIndex)
-                        myBrush = SystemBrushes.ControlText;
-                    else if (e.RowIndex == fHotRow)
-                        myBrush = Brushes.Blue;
+                //else if (e.RowIndex == -1)
+                //{
+                //    myBrush = Brushes.Red;
+                //}
 
-                    if (myBrush != null)
-                    {
-                        e.Graphics.FillRectangle(myBrush, myX, myY, 1, 7);
-                        e.Graphics.FillRectangle(myBrush, myX + 1, myY + 1, 1, 5);
-                        e.Graphics.FillRectangle(myBrush, myX + 2, myY + 2, 1, 3);
-                        e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
-                    }
+                if (myBrush != null)
+                {
+                    e.Graphics.FillRectangle(myBrush, myX, myY, 1, 7);
+                    e.Graphics.FillRectangle(myBrush, myX + 1, myY + 1, 1, 5);
+                    e.Graphics.FillRectangle(myBrush, myX + 2, myY + 2, 1, 3);
+                    e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
                 }
             }
-        }
 
+        }
         private void IGridMain_ColHdrMouseDown(object sender, iGColHdrMouseDownEventArgs e)
         {
             // Prohibit sorting by the hot and current row indicator columns and by the row number column.
             if (e.ColIndex == 0 || e.ColIndex == 1)
             {
                 e.DoDefault = false;
-            }            
+            }
         }
+        private void IGridMain_CurRowChanged(object sender, EventArgs e)
+        {
+            iGRow gRow = IGridMain.CurRow;
 
+        }
 
         #endregion
 
@@ -659,8 +636,8 @@ namespace Centralizador.WinApp.GUI
         private void FormMain_Shown(object sender, EventArgs e)
         {
             // frozen column will display row numbers.
-            IGridMain.FrozenArea.ColCount = 2;
-            IGridMain.FrozenArea.RowCount = 1;
+            IGridMain.FrozenArea.ColCount = 3;
+            IGridMain.FrozenArea.RowCount = 0;
             IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
             IGridMain.FrozenArea.RowsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
 
@@ -677,75 +654,50 @@ namespace Centralizador.WinApp.GUI
             IGridMain.DefaultCol.Width = 30;
             // Add the second frozen column.
             IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-            // Set up the default parameters of the data columns.
-            IGridMain.DefaultCol.AllowMoving = true;
-            //fGrid.DefaultCol.IncludeInSelect = true;
-            IGridMain.DefaultCol.AllowSizing = true;
+           
 
             // Add data columns.
             iGColPattern pattern = new iGColPattern();
             pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
-            pattern.ColHdrStyle.Font = new Font("Verdana",6.5f, FontStyle.Bold);
-            IGridMain.Cols.Add("Instruction",55, pattern);
-            IGridMain.Cols.Add("Code",40,pattern);
-            IGridMain.Cols.Add("P1",25,pattern);
+            pattern.ColHdrStyle.Font = new Font("Verdana", 6.5f, FontStyle.Bold);
+            IGridMain.Cols.Add("Instruction", 55, pattern);
+            IGridMain.Cols.Add("Code", 40, pattern);
+            IGridMain.Cols.Add("P1", 25, pattern);
             IGridMain.Cols.Add("P2", 25, pattern);
             IGridMain.Cols.Add("P3", 25, pattern);
-            IGridMain.Cols.Add("P4",25, pattern);
-            IGridMain.Cols.Add("Rut",60, pattern);
-            IGridMain.Cols.Add("Dv",15, pattern);
-            IGridMain.Cols.Add("Amount",65, pattern);
-            IGridMain.Cols.Add("Exent",65, pattern);
-            IGridMain.Cols.Add("Iva",65, pattern);
-            IGridMain.Cols.Add("Total",65, pattern);
-            IGridMain.Cols.Add("Folio",70, pattern);
-            IGridMain.Cols.Add("Emission",65, pattern);
-            IGridMain.Cols.Add("Cbte.",70, pattern);
-            IGridMain.Cols.Add("F. de pago",65, pattern);
-            IGridMain.Cols.Add("pic",25, pattern);
-            IGridMain.Cols.Add("F. de envío",65, pattern);
-            IGridMain.Cols.Add("flag",25, pattern);
-            IGridMain.Cols.Add("status",70, pattern);
-            IGridMain.Cols.Add("F. de envío",65, pattern);
-            IGridMain.Cols.Add("M",25, pattern);
-            IGridMain.Cols.Add("Aceptado cliente",70, pattern);
+            IGridMain.Cols.Add("P4", 25, pattern);
+            IGridMain.Cols.Add("Rut", 60, pattern);
+            IGridMain.Cols.Add("Dv", 15, pattern);
+            IGridMain.Cols.Add("Amount", 65, pattern);
+            IGridMain.Cols.Add("Exent", 65, pattern);
+            IGridMain.Cols.Add("Iva", 65, pattern);
+            IGridMain.Cols.Add("Total", 65, pattern);
+            IGridMain.Cols.Add("Folio", 70, pattern);
+            IGridMain.Cols.Add("Emission", 65, pattern);
+            IGridMain.Cols.Add("Cbte.", 70, pattern);
+            IGridMain.Cols.Add("F. de pago", 65, pattern);
+            IGridMain.Cols.Add("pic", 25, pattern);
+            IGridMain.Cols.Add("F. de envío", 65, pattern);
+            IGridMain.Cols.Add("flag", 25, pattern);
+            IGridMain.Cols.Add("status", 70, pattern);
+            IGridMain.Cols.Add("F. de envío", 65, pattern);
+            IGridMain.Cols.Add("M", 25, pattern);
+            IGridMain.Cols.Add("Aceptado cliente", 70, pattern);
 
             // General options
             IGridMain.GroupBox.Visible = true;
             IGridMain.RowMode = true;
             IGridMain.ReadOnly = true;
-
+            // Set up the default parameters of the data columns.
+            IGridMain.DefaultCol.AllowMoving = true;
+            //fGrid.DefaultCol.IncludeInSelect = true;
+            IGridMain.DefaultCol.AllowSizing = true;
 
         }
 
-        private void IGridMain_CurCellChanged(object sender, EventArgs e)
-        {
-            if (fCurCell != null && fCurCell.RowIndex < IGridMain.Rows.Count)
-            {
-                // Redraw the cells indicated the current row and column.
-                IGridMain.Invalidate(IGridMain.Cells[fCurCell.RowIndex, 0].Bounds);
-                IGridMain.Invalidate(IGridMain.Cells[0, fCurCell.ColIndex].Bounds);
-            }
-            fCurCell = IGridMain.CurCell;
-            if (fCurCell != null)
-            {
-                // Redraw the cells indicating the current row and column.
-                IGridMain.Invalidate(IGridMain.Cells[fCurCell.RowIndex, 0].Bounds);
-                IGridMain.Invalidate(IGridMain.Cells[0, fCurCell.ColIndex].Bounds);
+       
 
-                // Set up the text of the label indicating the current cell.
-                if (fCurCell.Value != null)
-                    TssLblMensaje.Text = fCurCell.Value.ToString();
-                else
-                    TssLblMensaje.Text = null;
-            }
-            else
-            {
-                // iGrid does not have the current cell. Set text of the 
-                // label indicating the current cell to nothing.
-               TssLblMensaje.Text = null;
-            }
-        }
+       
     }
 }
 

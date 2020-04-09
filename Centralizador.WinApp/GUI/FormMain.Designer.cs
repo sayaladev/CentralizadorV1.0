@@ -40,8 +40,6 @@
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.TxtDteEmail = new System.Windows.Forms.TextBox();
-            this.TxtRznRef = new System.Windows.Forms.TextBox();
-            this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtRznSocial = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -54,16 +52,18 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.BtnFacturar = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
+            this.TxtRutParticipant = new System.Windows.Forms.TextBox();
             this.BtnCreditor = new System.Windows.Forms.Button();
+            this.TxtRznRef = new System.Windows.Forms.TextBox();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
+            this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
-            this.TxtRutParticipant = new System.Windows.Forms.TextBox();
-            this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -158,7 +158,7 @@
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
-            this.IGridMain.CurCellChanged += new System.EventHandler(this.IGridMain_CurCellChanged);
+            this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             // 
             // groupBox4
             // 
@@ -178,22 +178,6 @@
             this.TxtDteEmail.ReadOnly = true;
             this.TxtDteEmail.Size = new System.Drawing.Size(167, 20);
             this.TxtDteEmail.TabIndex = 9;
-            // 
-            // TxtRznRef
-            // 
-            this.TxtRznRef.Location = new System.Drawing.Point(63, 193);
-            this.TxtRznRef.Name = "TxtRznRef";
-            this.TxtRznRef.ReadOnly = true;
-            this.TxtRznRef.Size = new System.Drawing.Size(165, 20);
-            this.TxtRznRef.TabIndex = 8;
-            // 
-            // TxtFolioRef
-            // 
-            this.TxtFolioRef.Location = new System.Drawing.Point(63, 166);
-            this.TxtFolioRef.Name = "TxtFolioRef";
-            this.TxtFolioRef.ReadOnly = true;
-            this.TxtFolioRef.Size = new System.Drawing.Size(165, 20);
-            this.TxtFolioRef.TabIndex = 7;
             // 
             // TxtRznSocial
             // 
@@ -324,6 +308,48 @@
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Start";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(6, 199);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 13);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "RznRef:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(4, 173);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "FolioRef:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // TxtCtaCteParticipant
+            // 
+            this.TxtCtaCteParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtCtaCteParticipant.Location = new System.Drawing.Point(121, 73);
+            this.TxtCtaCteParticipant.Name = "TxtCtaCteParticipant";
+            this.TxtCtaCteParticipant.ReadOnly = true;
+            this.TxtCtaCteParticipant.Size = new System.Drawing.Size(106, 20);
+            this.TxtCtaCteParticipant.TabIndex = 10;
+            this.TxtCtaCteParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // TxtRutParticipant
+            // 
+            this.TxtRutParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtRutParticipant.Location = new System.Drawing.Point(7, 73);
+            this.TxtRutParticipant.Name = "TxtRutParticipant";
+            this.TxtRutParticipant.ReadOnly = true;
+            this.TxtRutParticipant.Size = new System.Drawing.Size(104, 20);
+            this.TxtRutParticipant.TabIndex = 9;
+            this.TxtRutParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // BtnCreditor
             // 
             this.BtnCreditor.Location = new System.Drawing.Point(9, 99);
@@ -333,6 +359,14 @@
             this.BtnCreditor.Text = "Creditor";
             this.BtnCreditor.UseVisualStyleBackColor = true;
             this.BtnCreditor.Click += new System.EventHandler(this.BtnCreditor_Click);
+            // 
+            // TxtRznRef
+            // 
+            this.TxtRznRef.Location = new System.Drawing.Point(63, 193);
+            this.TxtRznRef.Name = "TxtRznRef";
+            this.TxtRznRef.ReadOnly = true;
+            this.TxtRznRef.Size = new System.Drawing.Size(165, 20);
+            this.TxtRznRef.TabIndex = 8;
             // 
             // CboParticipants
             // 
@@ -344,6 +378,14 @@
             this.CboParticipants.Size = new System.Drawing.Size(220, 21);
             this.CboParticipants.TabIndex = 0;
             this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
+            // 
+            // TxtFolioRef
+            // 
+            this.TxtFolioRef.Location = new System.Drawing.Point(63, 166);
+            this.TxtFolioRef.Name = "TxtFolioRef";
+            this.TxtFolioRef.ReadOnly = true;
+            this.TxtFolioRef.Size = new System.Drawing.Size(165, 20);
+            this.TxtFolioRef.TabIndex = 7;
             // 
             // CboYears
             // 
@@ -381,48 +423,6 @@
             this.BackgroundW.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundW_DoWork);
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
-            // 
-            // TxtRutParticipant
-            // 
-            this.TxtRutParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRutParticipant.Location = new System.Drawing.Point(7, 73);
-            this.TxtRutParticipant.Name = "TxtRutParticipant";
-            this.TxtRutParticipant.ReadOnly = true;
-            this.TxtRutParticipant.Size = new System.Drawing.Size(104, 20);
-            this.TxtRutParticipant.TabIndex = 9;
-            this.TxtRutParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // TxtCtaCteParticipant
-            // 
-            this.TxtCtaCteParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtCtaCteParticipant.Location = new System.Drawing.Point(121, 73);
-            this.TxtCtaCteParticipant.Name = "TxtCtaCteParticipant";
-            this.TxtCtaCteParticipant.ReadOnly = true;
-            this.TxtCtaCteParticipant.Size = new System.Drawing.Size(106, 20);
-            this.TxtCtaCteParticipant.TabIndex = 10;
-            this.TxtCtaCteParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(4, 173);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 13);
-            this.label1.TabIndex = 11;
-            this.label1.Text = "FolioRef:";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(6, 199);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 13);
-            this.label2.TabIndex = 12;
-            this.label2.Text = "RznRef:";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // FormMain
             // 
