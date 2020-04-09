@@ -87,10 +87,7 @@ namespace Centralizador.WinApp.GUI
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:D}", DateTime.Today);
 
             // Controls
-            //BtnCreditor.Enabled = false;
-            //BtnDebitor.Enabled = false;
-            //BtnPdfConvert.Enabled = false;
-            //BtnFacturar.Enabled = false;
+            BtnDebtor.Enabled = false;
 
             // Token
             TssLblTokenSii.Text = TokenSii;
@@ -199,13 +196,21 @@ namespace Centralizador.WinApp.GUI
         {
             try
             {
-                IGridMain.BeginUpdate();
-                IGridDesign();
-                // Fill up the cells with data.                
+                IGridMain.BeginUpdate();               
+                // Fill up the cells with data.
+                IGridMain.Rows.Clear();
+                // Set up the height of the first row (frozen).
+                IGridMain.Rows.Add();
+                IGridMain.Rows[0].Height = 11;                
                 iGRow myRow;
+
                 foreach (Detalle item in detalles)
                 {
                     myRow = IGridMain.Rows.Add();
+                    // Set up the first frozen row (hot column indicator) parameters.
+                    myRow.Cells[0].CustomDrawFlags = iGCustomDrawFlags.Foreground;
+                    myRow.Cells[0].Selectable = iGBool.False;
+
                     if (item.Instruction != null)
                     {
                         myRow.Cells[2].Value = item.Instruction.Id;
@@ -254,8 +259,6 @@ namespace Centralizador.WinApp.GUI
                     }
 
                 }
-                // Fit the columns' width.
-                IGridMain.Cols.AutoWidth();
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
             }
             catch (Exception)
@@ -362,17 +365,69 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
         #region IGridMain methods
+        // Stores the current cell.
+        iGCell fCurCell;
+        // Stores the index of the hot column.
+        private int fHotCol = -1;
+        // Stores the index of the hot row.
+        private int fHotRow = -1;
         private void IGridMain_CustomDrawCellForeground(object sender, iGCustomDrawCellEventArgs e)
         {
-            if (e.ColIndex == 1)
+            if (e.RowIndex == 0)
             {
-                // Draw the row numbers.
+                // Draw the hot and current column indicators.
                 e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
-                e.Graphics.DrawString(
-                    (e.RowIndex + 1).ToString(),
-                    Font,
-                    SystemBrushes.ControlText,
-                    new Rectangle(e.Bounds.X + 2, e.Bounds.Y, e.Bounds.Width - 4, e.Bounds.Height));
+                if (e.ColIndex > 1)
+                {
+                    int myY = e.Bounds.Y + (e.Bounds.Height - 4) / 2;
+                    int myX = e.Bounds.X + (e.Bounds.Width - 7) / 2;
+                    Brush myBrush = null;
+                    if (fCurCell != null && e.ColIndex == fCurCell.ColIndex)
+                        myBrush = SystemBrushes.ControlText;
+                    else if (e.ColIndex == fHotCol)
+                        myBrush = Brushes.Blue;
+
+                    if (myBrush != null)
+                    {
+                        e.Graphics.FillRectangle(myBrush, myX, myY, 7, 1);
+                        e.Graphics.FillRectangle(myBrush, myX + 1, myY + 1, 5, 1);
+                        e.Graphics.FillRectangle(myBrush, myX + 2, myY + 2, 3, 1);
+                        e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
+                    }
+                }
+            }
+            else
+            {
+                if (e.ColIndex == 1)
+                {
+                    //Draw the row numbers.
+                    e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
+                    e.Graphics.DrawString(
+                        e.RowIndex.ToString(),
+                        Font,
+                        SystemBrushes.ControlText,
+                        new Rectangle(e.Bounds.X + 2, e.Bounds.Y, e.Bounds.Width - 4, e.Bounds.Height));
+                }
+                else if (e.ColIndex == 0)
+                {
+                    // Draw the hot and current row indicators.
+                    e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
+                    int myY = e.Bounds.Y + (e.Bounds.Height - 7) / 2;
+                    int myX = e.Bounds.X + (e.Bounds.Width - 4) / 2;
+                    Brush myBrush = null;
+                    if (fCurCell != null && e.RowIndex == fCurCell.RowIndex)
+                        myBrush = SystemBrushes.ControlText;
+                    else if (e.RowIndex == fHotRow)
+                        myBrush = Brushes.Blue;
+
+                    if (myBrush != null)
+                    {
+                        e.Graphics.FillRectangle(myBrush, myX, myY, 1, 7);
+                        e.Graphics.FillRectangle(myBrush, myX + 1, myY + 1, 1, 5);
+                        e.Graphics.FillRectangle(myBrush, myX + 2, myY + 2, 1, 3);
+                        e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
+                    }
+                }
             }
         }
 
@@ -382,7 +437,7 @@ namespace Centralizador.WinApp.GUI
             if (e.ColIndex == 0 || e.ColIndex == 1)
             {
                 e.DoDefault = false;
-            }
+            }            
         }
 
 
@@ -471,8 +526,6 @@ namespace Centralizador.WinApp.GUI
 
 
 
-            //BtnCreditor.Enabled = true;
-            //BtnDebitor.Enabled = true;
 
 
 
@@ -490,6 +543,7 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = 0;
             //TssLblMensaje.Text = "";
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", outlook.LastTime);
+            BtnDebtor.Enabled = true;
             BtnOutlook.Enabled = true;
 
         }
@@ -531,6 +585,11 @@ namespace Centralizador.WinApp.GUI
             float porcent = 0;
             foreach (ResultPaymentMatrix m in matrices)
             {
+                // Tester 
+                if (m.Id != 680)
+                {
+                    continue;
+                }
                 ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
                 m.BillingWindow = window;
                 // Get instructions with matrix binding.
@@ -539,6 +598,10 @@ namespace Centralizador.WinApp.GUI
                 {
                     instructions.AddRange(lista);
                 }
+                c++;
+                porcent = (float)(100 * c) / matrices.Count;
+                BackgroundW.ReportProgress((int)porcent, $"Getting info from CEN... ({c}/{matrices.Count})");
+
             }
             c = 0;
             foreach (ResultInstruction instruction in instructions)
@@ -575,9 +638,8 @@ namespace Centralizador.WinApp.GUI
                 DetallesCreditor.Add(detalle);
                 c++;
                 porcent = (float)(100 * c) / instructions.Count;
-                BackgroundW.ReportProgress((int)porcent, $"Getting info from data base...   ({c}/{instructions.Count})");
+                BackgroundW.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{instructions.Count})");
             }
-
         }
 
         private void BackgroundW_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -590,11 +652,100 @@ namespace Centralizador.WinApp.GUI
         {
 
             IGridFill(DetallesCreditor);
-            //TssLblProgBar.Value = 0;
             BtnCreditor.Enabled = true;
+            TssLblProgBar.Value = 0;
         }
 
+        private void FormMain_Shown(object sender, EventArgs e)
+        {
+            // frozen column will display row numbers.
+            IGridMain.FrozenArea.ColCount = 2;
+            IGridMain.FrozenArea.RowCount = 1;
+            IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
+            IGridMain.FrozenArea.RowsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
 
+            // Set up the deafult parameters of the frozen columns.
+            IGridMain.DefaultCol.AllowMoving = false;
+            IGridMain.DefaultCol.IncludeInSelect = false;
+            IGridMain.DefaultCol.AllowSizing = false;
+
+            // Set up the width of the first frozen column (hot and current row indicator).
+            IGridMain.DefaultCol.Width = 10;
+            // Add the first frozen column.
+            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+            // Set up the width of the second frozen column (row numbers).
+            IGridMain.DefaultCol.Width = 30;
+            // Add the second frozen column.
+            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+            // Set up the default parameters of the data columns.
+            IGridMain.DefaultCol.AllowMoving = true;
+            //fGrid.DefaultCol.IncludeInSelect = true;
+            IGridMain.DefaultCol.AllowSizing = true;
+
+            // Add data columns.
+            iGColPattern pattern = new iGColPattern();
+            pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
+            pattern.ColHdrStyle.Font = new Font("Verdana",6.5f, FontStyle.Bold);
+            IGridMain.Cols.Add("Instruction",55, pattern);
+            IGridMain.Cols.Add("Code",40,pattern);
+            IGridMain.Cols.Add("P1",25,pattern);
+            IGridMain.Cols.Add("P2", 25, pattern);
+            IGridMain.Cols.Add("P3", 25, pattern);
+            IGridMain.Cols.Add("P4",25, pattern);
+            IGridMain.Cols.Add("Rut",60, pattern);
+            IGridMain.Cols.Add("Dv",15, pattern);
+            IGridMain.Cols.Add("Amount",65, pattern);
+            IGridMain.Cols.Add("Exent",65, pattern);
+            IGridMain.Cols.Add("Iva",65, pattern);
+            IGridMain.Cols.Add("Total",65, pattern);
+            IGridMain.Cols.Add("Folio",70, pattern);
+            IGridMain.Cols.Add("Emission",65, pattern);
+            IGridMain.Cols.Add("Cbte.",70, pattern);
+            IGridMain.Cols.Add("F. de pago",65, pattern);
+            IGridMain.Cols.Add("pic",25, pattern);
+            IGridMain.Cols.Add("F. de envío",65, pattern);
+            IGridMain.Cols.Add("flag",25, pattern);
+            IGridMain.Cols.Add("status",70, pattern);
+            IGridMain.Cols.Add("F. de envío",65, pattern);
+            IGridMain.Cols.Add("M",25, pattern);
+            IGridMain.Cols.Add("Aceptado cliente",70, pattern);
+
+            // General options
+            IGridMain.GroupBox.Visible = true;
+            IGridMain.RowMode = true;
+            IGridMain.ReadOnly = true;
+
+
+        }
+
+        private void IGridMain_CurCellChanged(object sender, EventArgs e)
+        {
+            if (fCurCell != null && fCurCell.RowIndex < IGridMain.Rows.Count)
+            {
+                // Redraw the cells indicated the current row and column.
+                IGridMain.Invalidate(IGridMain.Cells[fCurCell.RowIndex, 0].Bounds);
+                IGridMain.Invalidate(IGridMain.Cells[0, fCurCell.ColIndex].Bounds);
+            }
+            fCurCell = IGridMain.CurCell;
+            if (fCurCell != null)
+            {
+                // Redraw the cells indicating the current row and column.
+                IGridMain.Invalidate(IGridMain.Cells[fCurCell.RowIndex, 0].Bounds);
+                IGridMain.Invalidate(IGridMain.Cells[0, fCurCell.ColIndex].Bounds);
+
+                // Set up the text of the label indicating the current cell.
+                if (fCurCell.Value != null)
+                    TssLblMensaje.Text = fCurCell.Value.ToString();
+                else
+                    TssLblMensaje.Text = null;
+            }
+            else
+            {
+                // iGrid does not have the current cell. Set text of the 
+                // label indicating the current cell to nothing.
+               TssLblMensaje.Text = null;
+            }
+        }
     }
 }
 

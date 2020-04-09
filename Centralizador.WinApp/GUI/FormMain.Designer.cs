@@ -158,6 +158,7 @@
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
+            this.IGridMain.CurCellChanged += new System.EventHandler(this.IGridMain_CurCellChanged);
             // 
             // groupBox4
             // 
@@ -433,6 +434,7 @@
             this.Name = "FormMain";
             this.Text = "FormMain";
             this.Load += new System.EventHandler(this.FormMain_Load);
+            this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.StatusStrip.ResumeLayout(false);
             this.StatusStrip.PerformLayout();
             this.SplitContainer.Panel1.ResumeLayout(false);
