@@ -17,9 +17,9 @@ namespace Centralizador.Models.DataBase
 
         public string FileBasico { get; set; }
 
-        public DateTime FechaEmision { get; set; }
+        public DateTime? FechaEmision { get; set; }
 
-        public DateTime FechaRecepcionSii { get; set; }
+        public DateTime? FechaRecepcionSii { get; set; }
 
         public static IList<Reference> GetInfoFactura(ResultInstruction instruction)
         {
@@ -65,12 +65,35 @@ namespace Centralizador.Models.DataBase
 
                         Reference r = new Reference();
 
-                        if (!item.IsNull("Folio")) r.Folio = Convert.ToUInt32(item["Folio"]);                      
-                        if (!item.IsNull("NroInt")) r.NroInt = Convert.ToUInt32(item["NroInt"]);         
-                        if (!item.IsNull("RecepcionSii"))  r.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
-                        if (!item.IsNull("Fecha"))  r.FechaEmision = Convert.ToDateTime(item["Fecha"]);
-                        if (!item.IsNull("FileEnviado"))  r.FileEnviado = item["FileEnviado"].ToString();
-                        if (!item.IsNull("FileBasico"))  r.FileBasico = item["FileBasico"].ToString();
+               
+
+
+                        if (item["Folio"] != DBNull.Value)
+                        {
+                            r.Folio = Convert.ToUInt32(item["Folio"]);
+                        }
+                        if (item["NroInt"] != DBNull.Value)
+                        {
+                            r.NroInt = Convert.ToUInt32(item["NroInt"]);
+                        }
+
+                        if (item["RecepcionSii"] != DBNull.Value)
+                        {
+                             r.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
+                        }
+                        if (item["Fecha"] != DBNull.Value)
+                        {
+                            r.FechaEmision = Convert.ToDateTime(item["Fecha"]);
+                        }
+                        if (item["FileEnviado"] != DBNull.Value)
+                        {
+                            r.FileEnviado = item["FileEnviado"].ToString();
+                        }
+                        if (item["FileBasico"] != DBNull.Value)
+                        {
+                            r.FileBasico = item["FileBasico"].ToString();
+                        }
+                                               
 
 
                         

@@ -214,13 +214,23 @@ namespace Centralizador.WinApp.GUI
                     }
                     myRow.Cells[8].Value = item.RutReceptor;
                     myRow.Cells[9].Value = item.DvReceptor;
-                    myRow.Cells[10].Value = item.MntNeto;
+                    myRow.Cells[10].Value = item.MntNeto.ToString("C", CultureInfo);
                     myRow.Cells[11].Value = item.MntExento;
                     myRow.Cells[12].Value = item.MntIva;
                     myRow.Cells[13].Value = item.MntTotal;
                     myRow.Cells[14].Value = item.Folio;
-                    myRow.Cells[15].Value = item.FechaEmision;
-                    myRow.Cells[19].Value = item.FechaRecepcion;
+                    DateTime FechaEmision = Convert.ToDateTime(item.FechaEmision,CultureInfo);
+                    myRow.Cells[15].Value = string.Format(CultureInfo, "{0:d}", FechaEmision);
+
+
+  
+
+                    if (item.FechaRecepcion != "")
+                    {
+                        DateTime? FechaRecepcion = Convert.ToDateTime(item.FechaRecepcion, CultureInfo);
+                        myRow.Cells[19].Value = string.Format(CultureInfo, "{0:d}", FechaRecepcion);
+                    }
+              
                     switch (item.DehOrdenEvento)
                     {
                         case 1:
@@ -236,15 +246,15 @@ namespace Centralizador.WinApp.GUI
                             //myRow.Cells[21].Value = TypeEvent.AcuseRecibo;
                             break;
                         case 5:
-                            TimeSpan len = DateTime.Today.Subtract(DateTime.Parse(item.FechaRecepcion));
-                            if (len.Days > 8)
-                            {
-                                myRow.Cells[21].Value = TypeEvent.Aceptado;
-                            }
-                            else
-                            {
-                                myRow.Cells[21].Value = $"{8 - len.Days} d.";
-                            }
+                            //TimeSpan len = DateTime.Today.Subtract(item.FechaRecepcion);
+                            //if (len.Days > 8)
+                            //{
+                            //    myRow.Cells[21].Value = TypeEvent.Aceptado;
+                            //}
+                            //else
+                            //{
+                            //    myRow.Cells[21].Value = $"{8 - len.Days} d.";
+                            //}
 
                             break;
                         case 6:
@@ -412,35 +422,49 @@ namespace Centralizador.WinApp.GUI
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
             iGRow gRow = IGridMain.CurRow;
-            //var rut = gRow.Cells[].Value;
-            try
+            uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
+            uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
+            //var fechaEnvio = gRow.Cells[19].Value;
+            TssLblMensaje.Text = "";
+            TxtNmbItem.Text = "";
+            Detalle detalle;
+            if (folio > 0)
             {
                 if (IsCreditor)
                 {
 
-                    TxtFolioRef.Text = DetallesCreditor.First(x => x.Instruction.Id == Convert.ToInt32(gRow.Cells[2].Value)).Instruction.PaymentMatrix.NaturalKey;
-                    TxtRznRef.Text = DetallesCreditor.First(x => x.Instruction.Id == Convert.ToInt32(gRow.Cells[2].Value)).Instruction.PaymentMatrix.ReferenceCode;
-                    TxtRznSocial.Text = DetallesCreditor.First(x => x.Instruction.Id == Convert.ToInt32(gRow.Cells[2].Value)).RznSocRecep;
+                    detalle = DetallesCreditor.First(x => x.Folio == folio && x.RutReceptor == rut);
+
                 }
                 else
                 {
-                    TxtFolioRef.Text = DetallesDebtor.First(x => x.Instruction.Id == Convert.ToInt32(gRow.Cells[2].Value)).Instruction.PaymentMatrix.NaturalKey;
-                    TxtRznRef.Text = DetallesDebtor.First(x => x.Instruction.Id == Convert.ToInt32(gRow.Cells[2].Value)).Instruction.PaymentMatrix.ReferenceCode;
-                    TxtRznSocial.Text = DetallesDebtor.First(x => x.Instruction.Id == Convert.ToInt32(gRow.Cells[2].Value)).RznSocRecep;
+                    detalle = DetallesDebtor.First(x => x.Folio == folio);
                 }
-            }
-            catch (Exception)
-            {
-                TxtFolioRef.Text = "";
-                TxtRznRef.Text = "";
+                try
+                {
+                    TxtRznSocial.Text = detalle.RznSocRecep;
+                    if (detalle.DTEDef != null)
+                    {
+                        DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                        DTEDefTypeDocumentoDetalle[] referencias = dte.Detalle;
+                        TxtNmbItem.Text = referencias[0].NmbItem;
+                    }
+                    else
+                    {
+                        TssLblMensaje.Text = $"This invoice {folio} has not been sent to Sii.";
+                    }
+                  
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+
+              
+
 
             }
-
-
-
-
-
-
 
         }
 
@@ -618,8 +642,18 @@ namespace Centralizador.WinApp.GUI
                 detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
                 detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
                 detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
+                // Mapping references Softland
+                IList<Reference> references = Reference.GetInfoFactura(instruction);
 
-                detalle.References = Reference.GetInfoFactura(instruction);
+                detalle.References = references;
+                if (references != null)
+                {
+                    detalle.DTEDef = ServicePdf.TransformXmlStringToObjectDTE(references[0].FileBasico);
+                    detalle.Folio = references[0].Folio;
+                    detalle.FechaEmision = references[0].FechaEmision.ToString();
+                    detalle.FechaRecepcion = references[0].FechaRecepcionSii.ToString();
+                }
+       
                 DetallesCreditor.Add(detalle);
                 c++;
                 porcent = (float)(100 * c) / instructions.Count;

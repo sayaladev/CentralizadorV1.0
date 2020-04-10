@@ -12,7 +12,7 @@ namespace Centralizador.Models.AppFunctions
     public class ServicePdf
     {
         /// <summary>
-        /// Method return a object (Xml to object).
+        /// Method return a object (Xml 'ENvioDTE' to object).
         /// </summary>
         /// <param name="pathFile"></param>
         /// <returns></returns>
@@ -34,12 +34,17 @@ namespace Centralizador.Models.AppFunctions
 
         }
 
-        public static DTEDefType TransformXmlToObjectDTE(string pathFile)
+        /// <summary>
+        /// Methos return a object (Xml 'DTE' to object).
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static DTEDefType TransformXmlToObjectDTE(string filePath)
         {
             try
             {
                 XmlSerializer deserializer = new XmlSerializer(typeof(DTEDefType));
-                using (StreamReader reader = new StreamReader(pathFile, Encoding.Default))
+                using (StreamReader reader = new StreamReader(filePath, Encoding.Default))
                 {
                     DTEDefType document = (DTEDefType)deserializer.Deserialize(reader);
                     return document;
@@ -55,8 +60,12 @@ namespace Centralizador.Models.AppFunctions
         {
             try
             {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(file);
+                xmlDoc.DocumentElement.SetAttribute("xmlns", "http://www.sii.cl/SiiDte");
+
                 XmlSerializer deserializer = new XmlSerializer(typeof(DTEDefType));
-                using (StringReader reader = new StringReader(file))
+                using (StringReader reader = new StringReader(xmlDoc.InnerXml))
                 {
                     DTEDefType document = (DTEDefType)deserializer.Deserialize(reader);
                     return document;
