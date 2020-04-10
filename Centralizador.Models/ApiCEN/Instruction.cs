@@ -72,9 +72,9 @@ namespace Centralizador.Models.ApiCEN
 
         public ResultPaymentMatrix PaymentMatrix { get; set; }
 
-        public ResultDte Dte { get; set; }
+        
 
-        public IList<Reference> References { get; set; }
+        //public IList<Reference> References { get; set; }
 
 
 

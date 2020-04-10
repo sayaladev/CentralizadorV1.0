@@ -39,7 +39,6 @@
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.TxtDteEmail = new System.Windows.Forms.TextBox();
             this.TxtRznSocial = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -64,6 +63,7 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.BackgroundW = new System.ComponentModel.BackgroundWorker();
+            this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -162,7 +162,7 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.TxtDteEmail);
+            this.groupBox4.Controls.Add(this.TxtNmbItem);
             this.groupBox4.Controls.Add(this.TxtRznSocial);
             this.groupBox4.Location = new System.Drawing.Point(13, 237);
             this.groupBox4.Name = "groupBox4";
@@ -170,14 +170,6 @@
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Document info:";
-            // 
-            // TxtDteEmail
-            // 
-            this.TxtDteEmail.Location = new System.Drawing.Point(59, 45);
-            this.TxtDteEmail.Name = "TxtDteEmail";
-            this.TxtDteEmail.ReadOnly = true;
-            this.TxtDteEmail.Size = new System.Drawing.Size(167, 20);
-            this.TxtDteEmail.TabIndex = 9;
             // 
             // TxtRznSocial
             // 
@@ -424,6 +416,15 @@
             this.BackgroundW.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundW_ProgressChanged);
             this.BackgroundW.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundW_RunWorkerCompleted);
             // 
+            // TxtNmbItem
+            // 
+            this.TxtNmbItem.Location = new System.Drawing.Point(9, 46);
+            this.TxtNmbItem.Multiline = true;
+            this.TxtNmbItem.Name = "TxtNmbItem";
+            this.TxtNmbItem.ReadOnly = true;
+            this.TxtNmbItem.Size = new System.Drawing.Size(216, 51);
+            this.TxtNmbItem.TabIndex = 1;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -482,7 +483,6 @@
         private System.Windows.Forms.TextBox TxtDateTimeEmail;
         private System.Windows.Forms.ToolStripStatusLabel TssLblTokenSii;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.TextBox TxtDteEmail;
         private System.Windows.Forms.TextBox TxtRznRef;
         private System.Windows.Forms.TextBox TxtFolioRef;
         private System.Windows.Forms.GroupBox groupBox5;
@@ -493,5 +493,6 @@
         private System.Windows.Forms.TextBox TxtRutParticipant;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox TxtNmbItem;
     }
 }
