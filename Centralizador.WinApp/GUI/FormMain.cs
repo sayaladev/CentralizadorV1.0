@@ -219,18 +219,22 @@ namespace Centralizador.WinApp.GUI
                     myRow.Cells[12].Value = item.MntIva;
                     myRow.Cells[13].Value = item.MntTotal;
                     myRow.Cells[14].Value = item.Folio;
-                    DateTime FechaEmision = Convert.ToDateTime(item.FechaEmision,CultureInfo);
-                    myRow.Cells[15].Value = string.Format(CultureInfo, "{0:d}", FechaEmision);
+
+                    if (item.FechaEmision != null)
+                    {
+                        DateTime FechaEmision = Convert.ToDateTime(item.FechaEmision, CultureInfo);
+                        myRow.Cells[15].Value = string.Format(CultureInfo, "{0:d}", FechaEmision);
+                    }
 
 
-  
 
-                    if (item.FechaRecepcion != "")
+
+                    if (item.FechaRecepcion != null)
                     {
                         DateTime? FechaRecepcion = Convert.ToDateTime(item.FechaRecepcion, CultureInfo);
                         myRow.Cells[19].Value = string.Format(CultureInfo, "{0:d}", FechaRecepcion);
                     }
-              
+
                     switch (item.DehOrdenEvento)
                     {
                         case 1:
@@ -424,6 +428,7 @@ namespace Centralizador.WinApp.GUI
             iGRow gRow = IGridMain.CurRow;
             uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
             uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
+            uint instruction = Convert.ToUInt32(gRow.Cells[2].Value);
             //var fechaEnvio = gRow.Cells[19].Value;
             TssLblMensaje.Text = "";
             TxtNmbItem.Text = "";
@@ -451,9 +456,9 @@ namespace Centralizador.WinApp.GUI
                     }
                     else
                     {
-                        TssLblMensaje.Text = $"This invoice {folio} has not been sent to Sii.";
+                        TssLblMensaje.Text = $"This invoice ({folio}) has not been sent to Sii.";
                     }
-                  
+
                 }
                 catch (Exception)
                 {
@@ -461,8 +466,13 @@ namespace Centralizador.WinApp.GUI
                     throw;
                 }
 
-              
 
+
+
+            }
+            else
+            {
+                TssLblMensaje.Text = $"  This instruction ({instruction}) has not been billed yet.";
 
             }
 
@@ -650,10 +660,18 @@ namespace Centralizador.WinApp.GUI
                 {
                     detalle.DTEDef = ServicePdf.TransformXmlStringToObjectDTE(references[0].FileBasico);
                     detalle.Folio = references[0].Folio;
-                    detalle.FechaEmision = references[0].FechaEmision.ToString();
-                    detalle.FechaRecepcion = references[0].FechaRecepcionSii.ToString();
+
+                    if (references[0].FechaRecepcionSii != null)
+                    {
+                        detalle.FechaRecepcion = references[0].FechaRecepcionSii.ToString();
+                    }
+                    if (references[0].FechaEmision != null)
+                    {
+                        detalle.FechaEmision = references[0].FechaEmision.ToString();
+                    }
+
                 }
-       
+
                 DetallesCreditor.Add(detalle);
                 c++;
                 porcent = (float)(100 * c) / instructions.Count;
