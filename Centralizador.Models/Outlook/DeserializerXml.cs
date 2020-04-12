@@ -1065,27 +1065,27 @@ namespace Centralizador.Models.Outlook
 
         /// <remarks/>
         [XmlEnumAttribute("33")]
-        Item33,
+        Item33 = 33,
 
         /// <remarks/>
         [XmlEnumAttribute("34")]
-        Item34,
+        Item34 = 34,
 
         /// <remarks/>
         [XmlEnumAttribute("46")]
-        Item46,
+        Item46 = 46,
 
         /// <remarks/>
         [XmlEnumAttribute("52")]
-        Item52,
+        Item52 = 52,
 
         /// <remarks/>
         [XmlEnumAttribute("56")]
-        Item56,
+        Item56 = 56,
 
         /// <remarks/>
         [XmlEnumAttribute("61")]
-        Item61,
+        Item61 = 61,
     }
 
     /// <remarks/>
@@ -1279,7 +1279,7 @@ namespace Centralizador.Models.Outlook
 
         /// <remarks/>
         [XmlEnumAttribute("1")]
-        Item1,
+        Contado,
 
         /// <remarks/>
         [XmlEnumAttribute("2")]
@@ -1287,7 +1287,7 @@ namespace Centralizador.Models.Outlook
 
         /// <remarks/>
         [XmlEnumAttribute("3")]
-        Item3,
+        Gratis,
     }
 
     /// <remarks/>

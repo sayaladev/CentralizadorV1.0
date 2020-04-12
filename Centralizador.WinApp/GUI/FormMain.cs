@@ -534,6 +534,7 @@ namespace Centralizador.WinApp.GUI
             TxtFolioRef.Text = "";
             TxtRznRef.Text = "";
             TxtRznSocial.Text = "";
+            TxtFmaPago.Text = "";
         }
 
         #region IGridMain methods

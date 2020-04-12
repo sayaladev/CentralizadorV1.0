@@ -119,7 +119,7 @@ namespace Centralizador.Models.Outlook
                                 continue;
                             }
                         }
-                        
+
                     }
                     c++;
                     porcent = (float)(100 * c) / mails.Count;
@@ -137,7 +137,7 @@ namespace Centralizador.Models.Outlook
             {
 
                 Properties.Settings.Default.Save();
-              
+
             }
 
         }
@@ -150,38 +150,14 @@ namespace Centralizador.Models.Outlook
                 EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(path);
                 foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
                 {
-                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
-                    string tipoDte = null;
-                    switch (document.Encabezado.IdDoc.TipoDTE)
-                    {
-                        case DTEType.Item33:
-                            tipoDte = "33";
-                            break;
-                        case DTEType.Item34:
-                            tipoDte = "34";
-                            break;
-                        case DTEType.Item46:
-                            tipoDte = "46";
-                            break;
-                        case DTEType.Item52:
-                            tipoDte = "52";
-                            break;
-                        case DTEType.Item56:
-                            tipoDte = "56";
-                            break;
-                        case DTEType.Item61:
-                            tipoDte = "61";
-                            break;
-                        default:
-                            break;
-                    }
+                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;                   
                     string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
                     string response;
                     using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
                     {
                         response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
                         emisor.GetValue(1).ToString(),
-                        tipoDte,
+                        Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
                         document.Encabezado.IdDoc.Folio);
                     }
                     if (response.Length != 0)

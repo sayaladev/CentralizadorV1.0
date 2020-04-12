@@ -38,7 +38,12 @@
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
+            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.TxtFmaPago = new System.Windows.Forms.TextBox();
+            this.TxtFolioRef = new System.Windows.Forms.TextBox();
+            this.TxtRznRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.TxtRznSocial = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
@@ -50,18 +55,13 @@
             this.button2 = new System.Windows.Forms.Button();
             this.BtnFacturar = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
-            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
             this.TxtRutParticipant = new System.Windows.Forms.TextBox();
             this.BtnCreditor = new System.Windows.Forms.Button();
-            this.TxtRznRef = new System.Windows.Forms.TextBox();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
-            this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.TxtFmaPago = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -69,10 +69,10 @@
             this.SplitContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).BeginInit();
             this.groupBox4.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox1.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // StatusStrip
@@ -160,6 +160,15 @@
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             // 
+            // TxtDateTimeEmail
+            // 
+            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(137, 661);
+            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
+            this.TxtDateTimeEmail.ReadOnly = true;
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(104, 20);
+            this.TxtDateTimeEmail.TabIndex = 2;
+            // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.groupBox5);
@@ -170,7 +179,46 @@
             this.groupBox4.Size = new System.Drawing.Size(234, 222);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Document info:";
+            this.groupBox4.Text = "Invoice Info:";
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.TxtFmaPago);
+            this.groupBox5.Controls.Add(this.TxtFolioRef);
+            this.groupBox5.Controls.Add(this.TxtRznRef);
+            this.groupBox5.Location = new System.Drawing.Point(44, 103);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(181, 113);
+            this.groupBox5.TabIndex = 9;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Cen References:";
+            // 
+            // TxtFmaPago
+            // 
+            this.TxtFmaPago.Location = new System.Drawing.Point(40, 69);
+            this.TxtFmaPago.Name = "TxtFmaPago";
+            this.TxtFmaPago.ReadOnly = true;
+            this.TxtFmaPago.Size = new System.Drawing.Size(100, 20);
+            this.TxtFmaPago.TabIndex = 9;
+            this.TxtFmaPago.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // TxtFolioRef
+            // 
+            this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtFolioRef.Location = new System.Drawing.Point(8, 19);
+            this.TxtFolioRef.Name = "TxtFolioRef";
+            this.TxtFolioRef.ReadOnly = true;
+            this.TxtFolioRef.Size = new System.Drawing.Size(165, 18);
+            this.TxtFolioRef.TabIndex = 7;
+            // 
+            // TxtRznRef
+            // 
+            this.TxtRznRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtRznRef.Location = new System.Drawing.Point(8, 45);
+            this.TxtRznRef.Name = "TxtRznRef";
+            this.TxtRznRef.ReadOnly = true;
+            this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
+            this.TxtRznRef.TabIndex = 8;
             // 
             // TxtNmbItem
             // 
@@ -180,7 +228,7 @@
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
             this.TxtNmbItem.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TxtNmbItem.Size = new System.Drawing.Size(216, 51);
+            this.TxtNmbItem.Size = new System.Drawing.Size(218, 51);
             this.TxtNmbItem.TabIndex = 1;
             // 
             // TxtRznSocial
@@ -225,9 +273,9 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(9, 73);
+            this.button1.Location = new System.Drawing.Point(139, 29);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(104, 23);
+            this.button1.Size = new System.Drawing.Size(69, 38);
             this.button1.TabIndex = 7;
             this.button1.Text = "Cen";
             this.button1.UseVisualStyleBackColor = true;
@@ -236,7 +284,7 @@
             // 
             this.BtnPagar.Location = new System.Drawing.Point(8, 29);
             this.BtnPagar.Name = "BtnPagar";
-            this.BtnPagar.Size = new System.Drawing.Size(114, 23);
+            this.BtnPagar.Size = new System.Drawing.Size(69, 38);
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = true;
@@ -245,9 +293,9 @@
             // 
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.BtnFacturar);
-            this.groupBox2.Location = new System.Drawing.Point(13, 439);
+            this.groupBox2.Location = new System.Drawing.Point(13, 425);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(234, 65);
+            this.groupBox2.Size = new System.Drawing.Size(234, 79);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Creditor";
@@ -256,7 +304,7 @@
             // 
             this.button2.Location = new System.Drawing.Point(121, 19);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(104, 23);
+            this.button2.Size = new System.Drawing.Size(69, 38);
             this.button2.TabIndex = 8;
             this.button2.Text = "Cen";
             this.button2.UseVisualStyleBackColor = true;
@@ -266,7 +314,7 @@
             this.BtnFacturar.Enabled = false;
             this.BtnFacturar.Location = new System.Drawing.Point(18, 19);
             this.BtnFacturar.Name = "BtnFacturar";
-            this.BtnFacturar.Size = new System.Drawing.Size(75, 46);
+            this.BtnFacturar.Size = new System.Drawing.Size(69, 38);
             this.BtnFacturar.TabIndex = 0;
             this.BtnFacturar.Text = "Facturar";
             this.BtnFacturar.UseVisualStyleBackColor = true;
@@ -288,15 +336,6 @@
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Start";
             // 
-            // TxtDateTimeEmail
-            // 
-            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(137, 661);
-            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
-            this.TxtDateTimeEmail.ReadOnly = true;
-            this.TxtDateTimeEmail.Size = new System.Drawing.Size(104, 20);
-            this.TxtDateTimeEmail.TabIndex = 2;
-            // 
             // TxtCtaCteParticipant
             // 
             this.TxtCtaCteParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -310,7 +349,7 @@
             // TxtRutParticipant
             // 
             this.TxtRutParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRutParticipant.Location = new System.Drawing.Point(7, 73);
+            this.TxtRutParticipant.Location = new System.Drawing.Point(8, 73);
             this.TxtRutParticipant.Name = "TxtRutParticipant";
             this.TxtRutParticipant.ReadOnly = true;
             this.TxtRutParticipant.Size = new System.Drawing.Size(104, 21);
@@ -327,34 +366,16 @@
             this.BtnCreditor.UseVisualStyleBackColor = true;
             this.BtnCreditor.Click += new System.EventHandler(this.BtnCreditor_Click);
             // 
-            // TxtRznRef
-            // 
-            this.TxtRznRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRznRef.Location = new System.Drawing.Point(23, 45);
-            this.TxtRznRef.Name = "TxtRznRef";
-            this.TxtRznRef.ReadOnly = true;
-            this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
-            this.TxtRznRef.TabIndex = 8;
-            // 
             // CboParticipants
             // 
             this.CboParticipants.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboParticipants.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboParticipants.FormattingEnabled = true;
-            this.CboParticipants.Location = new System.Drawing.Point(7, 46);
+            this.CboParticipants.Location = new System.Drawing.Point(8, 46);
             this.CboParticipants.Name = "CboParticipants";
             this.CboParticipants.Size = new System.Drawing.Size(220, 23);
             this.CboParticipants.TabIndex = 0;
             this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
-            // 
-            // TxtFolioRef
-            // 
-            this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFolioRef.Location = new System.Drawing.Point(23, 19);
-            this.TxtFolioRef.Name = "TxtFolioRef";
-            this.TxtFolioRef.ReadOnly = true;
-            this.TxtFolioRef.Size = new System.Drawing.Size(165, 18);
-            this.TxtFolioRef.TabIndex = 7;
             // 
             // CboYears
             // 
@@ -386,26 +407,6 @@
             this.BtnDebtor.UseVisualStyleBackColor = true;
             this.BtnDebtor.Click += new System.EventHandler(this.BtnDebtor_Click);
             // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.TxtFmaPago);
-            this.groupBox5.Controls.Add(this.TxtFolioRef);
-            this.groupBox5.Controls.Add(this.TxtRznRef);
-            this.groupBox5.Location = new System.Drawing.Point(31, 103);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(194, 113);
-            this.groupBox5.TabIndex = 9;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "References CEN:";
-            // 
-            // TxtFmaPago
-            // 
-            this.TxtFmaPago.Location = new System.Drawing.Point(88, 69);
-            this.TxtFmaPago.Name = "TxtFmaPago";
-            this.TxtFmaPago.ReadOnly = true;
-            this.TxtFmaPago.Size = new System.Drawing.Size(100, 20);
-            this.TxtFmaPago.TabIndex = 9;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -427,12 +428,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.GroupBox1.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
