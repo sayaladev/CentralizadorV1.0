@@ -163,7 +163,7 @@ namespace Centralizador.Models.ApiSII
 
         public ResultInstruction Instruction { get; set; }
 
-        public IList<Reference> References { get; set; }
+        public Reference References { get; set; }
 
         public DTEDefType DTEDef { get; set; }
 

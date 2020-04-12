@@ -42,16 +42,14 @@
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.TxtRznSocial = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
+            this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.button1 = new System.Windows.Forms.Button();
             this.BtnPagar = new System.Windows.Forms.Button();
-            this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button2 = new System.Windows.Forms.Button();
             this.BtnFacturar = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
             this.TxtRutParticipant = new System.Windows.Forms.TextBox();
@@ -62,6 +60,8 @@
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.TxtFmaPago = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -72,6 +72,7 @@
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox1.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // StatusStrip
@@ -135,6 +136,7 @@
             // 
             // SplitContainer.Panel2
             // 
+            this.SplitContainer.Panel2.Controls.Add(this.TxtDateTimeEmail);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox4);
             this.SplitContainer.Panel2.Controls.Add(this.BtnPdfConvert);
             this.SplitContainer.Panel2.Controls.Add(this.BtnOutlook);
@@ -160,27 +162,31 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.groupBox5);
             this.groupBox4.Controls.Add(this.TxtNmbItem);
             this.groupBox4.Controls.Add(this.TxtRznSocial);
-            this.groupBox4.Location = new System.Drawing.Point(13, 293);
+            this.groupBox4.Location = new System.Drawing.Point(13, 197);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(234, 103);
+            this.groupBox4.Size = new System.Drawing.Size(234, 222);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Document info:";
             // 
             // TxtNmbItem
             // 
+            this.TxtNmbItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtNmbItem.Location = new System.Drawing.Point(9, 46);
             this.TxtNmbItem.Multiline = true;
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
+            this.TxtNmbItem.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.TxtNmbItem.Size = new System.Drawing.Size(216, 51);
             this.TxtNmbItem.TabIndex = 1;
             // 
             // TxtRznSocial
             // 
-            this.TxtRznSocial.Location = new System.Drawing.Point(8, 19);
+            this.TxtRznSocial.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtRznSocial.Location = new System.Drawing.Point(10, 19);
             this.TxtRznSocial.Name = "TxtRznSocial";
             this.TxtRznSocial.ReadOnly = true;
             this.TxtRznSocial.Size = new System.Drawing.Size(218, 20);
@@ -188,13 +194,23 @@
             // 
             // BtnPdfConvert
             // 
-            this.BtnPdfConvert.Location = new System.Drawing.Point(118, 647);
+            this.BtnPdfConvert.Location = new System.Drawing.Point(13, 647);
             this.BtnPdfConvert.Name = "BtnPdfConvert";
-            this.BtnPdfConvert.Size = new System.Drawing.Size(75, 46);
+            this.BtnPdfConvert.Size = new System.Drawing.Size(56, 46);
             this.BtnPdfConvert.TabIndex = 4;
             this.BtnPdfConvert.Text = "Pdf";
             this.BtnPdfConvert.UseVisualStyleBackColor = true;
             this.BtnPdfConvert.Click += new System.EventHandler(this.BtnPdfConvert_Click);
+            // 
+            // BtnOutlook
+            // 
+            this.BtnOutlook.Location = new System.Drawing.Point(75, 647);
+            this.BtnOutlook.Name = "BtnOutlook";
+            this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
+            this.BtnOutlook.TabIndex = 1;
+            this.BtnOutlook.Text = "Outlook";
+            this.BtnOutlook.UseVisualStyleBackColor = true;
+            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
             // 
             // groupBox3
             // 
@@ -225,30 +241,20 @@
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = true;
             // 
-            // BtnOutlook
-            // 
-            this.BtnOutlook.Location = new System.Drawing.Point(19, 647);
-            this.BtnOutlook.Name = "BtnOutlook";
-            this.BtnOutlook.Size = new System.Drawing.Size(75, 46);
-            this.BtnOutlook.TabIndex = 1;
-            this.BtnOutlook.Text = "Outlook";
-            this.BtnOutlook.UseVisualStyleBackColor = true;
-            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.BtnFacturar);
-            this.groupBox2.Location = new System.Drawing.Point(13, 402);
+            this.groupBox2.Location = new System.Drawing.Point(13, 439);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(234, 102);
+            this.groupBox2.Size = new System.Drawing.Size(234, 65);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Creditor";
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(123, 31);
+            this.button2.Location = new System.Drawing.Point(121, 19);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(104, 23);
             this.button2.TabIndex = 8;
@@ -258,7 +264,7 @@
             // BtnFacturar
             // 
             this.BtnFacturar.Enabled = false;
-            this.BtnFacturar.Location = new System.Drawing.Point(27, 19);
+            this.BtnFacturar.Location = new System.Drawing.Point(18, 19);
             this.BtnFacturar.Name = "BtnFacturar";
             this.BtnFacturar.Size = new System.Drawing.Size(75, 46);
             this.BtnFacturar.TabIndex = 0;
@@ -268,54 +274,27 @@
             // 
             // GroupBox1
             // 
-            this.GroupBox1.Controls.Add(this.label2);
-            this.GroupBox1.Controls.Add(this.label1);
-            this.GroupBox1.Controls.Add(this.TxtDateTimeEmail);
             this.GroupBox1.Controls.Add(this.TxtCtaCteParticipant);
             this.GroupBox1.Controls.Add(this.TxtRutParticipant);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
-            this.GroupBox1.Controls.Add(this.TxtRznRef);
             this.GroupBox1.Controls.Add(this.CboParticipants);
-            this.GroupBox1.Controls.Add(this.TxtFolioRef);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
             this.GroupBox1.Controls.Add(this.BtnDebtor);
             this.GroupBox1.Location = new System.Drawing.Point(13, 12);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(234, 275);
+            this.GroupBox1.Size = new System.Drawing.Size(234, 166);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Start";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(6, 244);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 13);
-            this.label2.TabIndex = 12;
-            this.label2.Text = "RznRef:";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(4, 218);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 13);
-            this.label1.TabIndex = 11;
-            this.label1.Text = "FolioRef:";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // TxtDateTimeEmail
             // 
             this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(96, 170);
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(137, 661);
             this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
             this.TxtDateTimeEmail.ReadOnly = true;
-            this.TxtDateTimeEmail.Size = new System.Drawing.Size(129, 20);
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(104, 20);
             this.TxtDateTimeEmail.TabIndex = 2;
             // 
             // TxtCtaCteParticipant
@@ -350,10 +329,11 @@
             // 
             // TxtRznRef
             // 
-            this.TxtRznRef.Location = new System.Drawing.Point(63, 238);
+            this.TxtRznRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtRznRef.Location = new System.Drawing.Point(23, 45);
             this.TxtRznRef.Name = "TxtRznRef";
             this.TxtRznRef.ReadOnly = true;
-            this.TxtRznRef.Size = new System.Drawing.Size(165, 20);
+            this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
             this.TxtRznRef.TabIndex = 8;
             // 
             // CboParticipants
@@ -369,10 +349,11 @@
             // 
             // TxtFolioRef
             // 
-            this.TxtFolioRef.Location = new System.Drawing.Point(63, 211);
+            this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtFolioRef.Location = new System.Drawing.Point(23, 19);
             this.TxtFolioRef.Name = "TxtFolioRef";
             this.TxtFolioRef.ReadOnly = true;
-            this.TxtFolioRef.Size = new System.Drawing.Size(165, 20);
+            this.TxtFolioRef.Size = new System.Drawing.Size(165, 18);
             this.TxtFolioRef.TabIndex = 7;
             // 
             // CboYears
@@ -405,6 +386,26 @@
             this.BtnDebtor.UseVisualStyleBackColor = true;
             this.BtnDebtor.Click += new System.EventHandler(this.BtnDebtor_Click);
             // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.TxtFmaPago);
+            this.groupBox5.Controls.Add(this.TxtFolioRef);
+            this.groupBox5.Controls.Add(this.TxtRznRef);
+            this.groupBox5.Location = new System.Drawing.Point(31, 103);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(194, 113);
+            this.groupBox5.TabIndex = 9;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "References CEN:";
+            // 
+            // TxtFmaPago
+            // 
+            this.TxtFmaPago.Location = new System.Drawing.Point(88, 69);
+            this.TxtFmaPago.Name = "TxtFmaPago";
+            this.TxtFmaPago.ReadOnly = true;
+            this.TxtFmaPago.Size = new System.Drawing.Size(100, 20);
+            this.TxtFmaPago.TabIndex = 9;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -420,6 +421,7 @@
             this.StatusStrip.PerformLayout();
             this.SplitContainer.Panel1.ResumeLayout(false);
             this.SplitContainer.Panel2.ResumeLayout(false);
+            this.SplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).EndInit();
             this.SplitContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).EndInit();
@@ -429,6 +431,8 @@
             this.groupBox2.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.GroupBox1.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -467,8 +471,8 @@
         private System.Windows.Forms.Button BtnPagar;
         private System.Windows.Forms.TextBox TxtCtaCteParticipant;
         private System.Windows.Forms.TextBox TxtRutParticipant;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox TxtNmbItem;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.TextBox TxtFmaPago;
     }
 }

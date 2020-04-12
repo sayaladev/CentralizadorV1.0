@@ -1283,7 +1283,7 @@ namespace Centralizador.Models.Outlook
 
         /// <remarks/>
         [XmlEnumAttribute("2")]
-        Item2,
+        Crédito,
 
         /// <remarks/>
         [XmlEnumAttribute("3")]

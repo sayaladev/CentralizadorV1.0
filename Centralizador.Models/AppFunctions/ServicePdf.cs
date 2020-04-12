@@ -44,7 +44,7 @@ namespace Centralizador.Models.AppFunctions
             try
             {
                 XmlSerializer deserializer = new XmlSerializer(typeof(DTEDefType));
-                using (StreamReader reader = new StreamReader(filePath, Encoding.Default))
+                using (StreamReader reader = new StreamReader(filePath, Encoding.UTF8))
                 {
                     DTEDefType document = (DTEDefType)deserializer.Deserialize(reader);
                     return document;
