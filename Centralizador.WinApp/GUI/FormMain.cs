@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
@@ -26,10 +27,13 @@ namespace Centralizador.WinApp.GUI
 
 
         //Creditor     
-        public IList<Detalle> DetallesCreditor { get; set; }
+        private IList<Detalle> DetallesCreditor { get; set; }
+        private BackgroundWorker BgwCreditor { get; set; }
 
         //Debitor
-        public IList<Detalle> DetallesDebtor { get; set; }
+        private IList<Detalle> DetallesDebtor { get; set; }
+
+        private BackgroundWorker BgwDebtor { get; set; }
 
         //General
         private ResultParticipant UserParticipant { get; set; }
@@ -39,7 +43,7 @@ namespace Centralizador.WinApp.GUI
 
         public string TokenSii { get; set; }
 
-        public bool IsCreditor { get; set; }
+        private bool IsCreditor { get; set; }
 
 
         #endregion
@@ -86,7 +90,10 @@ namespace Centralizador.WinApp.GUI
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:D}", DateTime.Today);
 
             // Controls
-            BtnDebtor.Enabled = false;
+            BgwDebtor = new BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
 
             // Token
             TssLblTokenSii.Text = TokenSii;
@@ -98,6 +105,86 @@ namespace Centralizador.WinApp.GUI
 
         }
 
+        private void FormMain_Shown(object sender, EventArgs e)
+        {
+            // frozen column will display row numbers.
+            IGridMain.FrozenArea.ColCount = 3;
+            IGridMain.FrozenArea.RowCount = 0;
+            IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
+            IGridMain.FrozenArea.RowsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
+
+            // Set up the deafult parameters of the frozen columns.
+            IGridMain.DefaultCol.AllowMoving = false;
+            IGridMain.DefaultCol.IncludeInSelect = false;
+            //IGridMain.DefaultCol.AllowSizing = false;
+
+            // Set up the width of the first frozen column (hot and current row indicator).
+            IGridMain.DefaultCol.Width = 10;
+            // Add the first frozen column.
+            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+            // Set up the width of the second frozen column (row numbers).
+            IGridMain.DefaultCol.Width = 30;
+            // Add the second frozen column.
+            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+
+            // Add data columns.
+            iGColPattern pattern = new iGColPattern();
+            pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
+            pattern.ColHdrStyle.Font = new Font("Verdana", 6.5f, FontStyle.Bold);
+            IGridMain.Cols.Add("Instruction", 55, pattern);
+            IGridMain.Cols.Add("Code", 40, pattern);
+            IGridMain.Cols.Add("P1", 25, pattern);
+            IGridMain.Cols.Add("P2", 25, pattern);
+            IGridMain.Cols.Add("P3", 25, pattern);
+            IGridMain.Cols.Add("P4", 25, pattern);
+            IGridMain.Cols.Add("Rut", 60, pattern);
+            IGridMain.Cols.Add("Dv", 15, pattern);
+            IGridMain.Cols.Add("Amount", 65, pattern);
+            IGridMain.Cols.Add("Exent", 65, pattern);
+            IGridMain.Cols.Add("Iva", 65, pattern);
+            IGridMain.Cols.Add("Total", 65, pattern);
+            IGridMain.Cols.Add("Folio", 70, pattern);
+            IGridMain.Cols.Add("Emission", 65, pattern);
+            IGridMain.Cols.Add("Cbte.", 70, pattern);
+            IGridMain.Cols.Add("F. de pago", 65, pattern);
+            IGridMain.Cols.Add("pic", 25, pattern);
+            IGridMain.Cols.Add("F. de envío", 65, pattern);
+            IGridMain.Cols.Add("flag", 25, pattern);
+            IGridMain.Cols.Add("status", 70, pattern);
+            IGridMain.Cols.Add("F. de envío", 65, pattern);
+            IGridMain.Cols.Add("M", 25, pattern);
+            IGridMain.Cols.Add("Aceptado cliente", 70, pattern);
+
+            // General options
+            IGridMain.GroupBox.Visible = true;
+            IGridMain.RowMode = true;
+            IGridMain.ReadOnly = true;
+            // Set up the default parameters of the data columns.
+            IGridMain.DefaultCol.AllowMoving = true;
+            //fGrid.DefaultCol.IncludeInSelect = true;
+            IGridMain.DefaultCol.AllowSizing = true;
+
+            // Footer
+            IGridMain.Footer.Visible = true;
+            IGridMain.Footer.Rows.Count = 2;
+            IGridMain.Footer.AutoHeightEvents = iGAutoHeightEvents.None;
+            IGridMain.Footer.Rows[0].Height = 30;
+            IGridMain.Footer.Cells[0, 3].SpanCols = 22;
+            IGridMain.Footer.Cells[0, 3].TextAlign = iGContentAlignment.MiddleCenter;
+
+            // Footer freezer section
+            IGridMain.Footer.Cells[0, 0].SpanCols = 3;
+            IGridMain.Footer.Cells[1, 0].SpanCols = 3;
+
+            // Footer totals
+            IGridMain.Footer.Cells[1, 10].AggregateFunction = iGAggregateFunction.Sum;
+        }
+
+        #endregion
+
+        #region Creditor Transactions
+
+
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0)
@@ -108,14 +195,108 @@ namespace Centralizador.WinApp.GUI
             IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
             if (matrices != null)
             {
-                BackgroundW.RunWorkerAsync(matrices);
-                BtnCreditor.Enabled = false;
+                BgwCreditor = new BackgroundWorker
+                {
+                    WorkerReportsProgress = true
+                };
+                BgwCreditor.ProgressChanged += BgwCreditor_ProgressChanged;
+                BgwCreditor.RunWorkerCompleted += BgwCreditor_RunWorkerCompleted;
+                BgwCreditor.DoWork += BgwCreditor_DoWork;
+                if (BgwCreditor.IsBusy == false)
+                {
+                    BgwCreditor.RunWorkerAsync(matrices);
+                }                              
             }
             else
             {
                 TssLblMensaje.Text = "There are no published instructions.";
             }
         }
+
+        private void BgwCreditor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
+            DetallesCreditor = new List<Detalle>();
+            List<ResultInstruction> instructions = new List<ResultInstruction>();
+            int c = 0;
+            float porcent = 0;
+            foreach (ResultPaymentMatrix m in matrices)
+            {
+                // Tester 
+                if (m.Id != 680)
+                {
+                    continue;
+                }
+                ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
+                m.BillingWindow = window;
+                // Get instructions with matrix binding.
+                IList<ResultInstruction> lista = Instruction.GetInstructionCreditor(m, UserParticipant);
+                if (lista != null)
+                {
+                    instructions.AddRange(lista);
+                }
+                c++;
+                porcent = (float)(100 * c) / matrices.Count;
+                BgwCreditor.ReportProgress((int)porcent, $"Getting info from CEN... ({c}/{matrices.Count})");
+
+            }
+            c = 0;
+            foreach (ResultInstruction instruction in instructions)
+            {
+                Detalle detalle = new Detalle
+                {
+                    Instruction = instruction,
+                    MntNeto = instruction.Amount
+                };
+                detalle.Instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
+                detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
+                detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
+                detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
+                // Mapping references Softland
+                IList<Reference> references = Reference.GetInfoFactura(instruction);
+
+                detalle.References = references;
+                if (references != null)
+                {
+                    detalle.DTEDef = ServicePdf.TransformXmlStringToObjectDTE(references[0].FileBasico);
+                    detalle.Folio = references[0].Folio;
+
+                    if (references[0].FechaRecepcionSii != null)
+                    {
+                        detalle.FechaRecepcion = references[0].FechaRecepcionSii.ToString();
+                    }
+                    if (references[0].FechaEmision != null)
+                    {
+                        detalle.FechaEmision = references[0].FechaEmision.ToString();
+                    }
+
+                }
+
+                DetallesCreditor.Add(detalle);
+                c++;
+                porcent = (float)(100 * c) / instructions.Count;
+                BgwCreditor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{instructions.Count})");
+            }
+        }
+
+        private void BgwCreditor_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+
+        private void BgwCreditor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+            IGridFill(DetallesCreditor);      
+            TssLblProgBar.Value = 0;
+            IsCreditor = true;
+        }
+
+        #endregion
+
+        #region Debtor Transactions
+
 
         private void BtnDebtor_Click(object sender, EventArgs e)
         {
@@ -124,73 +305,103 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
             }
-            string nameFile = "";
-            // Get info from Sii / Debtor.
             DetallesDebtor = new List<Detalle>();
             DetallesDebtor = ServiceLibro.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+            string nameFile = "";
+            nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
             if (DetallesDebtor != null)
             {
-                foreach (Detalle item in DetallesDebtor)
+                
+
+                BgwDebtor.ProgressChanged += BgwDebtor_ProgressChanged;
+                BgwDebtor.RunWorkerCompleted += BgwDebtor_RunWorkerCompleted;
+                BgwDebtor.DoWork += BgwDebtor_DoWork;
+                if (BgwDebtor.IsBusy == false)
                 {
-                    nameFile = "";
-                    nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
-                    nameFile += $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
-                    if (File.Exists(nameFile))
-                    {   // Deserialize  
-                        DTEDefType xmlObjeto = ServicePdf.TransformXmlToObjectDTE(nameFile);
-                        item.DTEDef = xmlObjeto;
-                        DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
-                        DTEDefTypeDocumentoReferencia[] referencias = dte.Referencia;
-                        if (referencias != null)
+                    BgwDebtor.RunWorkerAsync(nameFile);
+                }                       
+
+            }
+        }
+
+        private void BgwDebtor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string nameFile = e.Argument.ToString();
+            int c = 0;
+            float porcent = 0;
+            foreach (Detalle item in DetallesDebtor)
+            {
+                nameFile += $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
+                if (File.Exists(nameFile))
+                {   // Deserialize  
+                    DTEDefType xmlObjeto = ServicePdf.TransformXmlToObjectDTE(nameFile);
+                    item.DTEDef = xmlObjeto;
+                    DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
+                    DTEDefTypeDocumentoReferencia[] referencias = dte.Referencia;
+                    if (referencias != null)
+                    {
+                        foreach (DTEDefTypeDocumentoReferencia r in referencias)
                         {
-                            foreach (DTEDefTypeDocumentoReferencia r in referencias)
+                            if (r.TpoDocRef == "SEN")
                             {
-                                if (r.TpoDocRef == "SEN")
+                                string rznRef = "";
+                                ResultBillingWindow window = null;
+                                if (r.RazonRef != null)
                                 {
-                                    string rznRef = "";
-                                    ResultBillingWindow window = null;
-                                    if (r.RazonRef != null)
+                                    rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
+                                    window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
+                                }
+                                if (window != null)
+                                {
+                                    // Get the asociated matrix  
+                                    IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                    foreach (ResultPaymentMatrix m in matrices)
                                     {
-                                        rznRef = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
-                                        window = BillingWindow.GetBillingWindowByNaturalKey(rznRef);
-                                    }
-                                    if (window != null)
-                                    {
-                                        // Get the asociated matrix  
-                                        IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                                        foreach (ResultPaymentMatrix m in matrices)
+                                        if (m.NaturalKey == r.RazonRef)
                                         {
-                                            if (m.NaturalKey == r.RazonRef)
-                                            {
-                                                // Get the instruction                                        
-                                                ResultParticipant participant = Participant.GetParticipantByRut(dte.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
-                                                ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
+                                            // Get the instruction                                        
+                                            ResultParticipant participant = Participant.GetParticipantByRut(dte.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
+                                            ResultInstruction instruction = Instruction.GetInstructionDebtor(m, participant, UserParticipant);
 
-                                                //tengo que ir a softland por PAGOS y referencia
-                                                //Reference reference = new Reference
-                                                //{
-                                                //    FileEnviado = File.ReadAllText(nameFile)
-                                                //};
+                                            //tengo que ir a softland por PAGOS y referencia
+                                            //Reference reference = new Reference
+                                            //{
+                                            //    FileEnviado = File.ReadAllText(nameFile)
+                                            //};
 
-                                                // Asignament to detalle
-                                                item.Instruction = instruction;
-                                                //item.References = 
+                                            // Asignament to detalle
+                                            item.Instruction = instruction;
+                                            //item.References = 
 
-                                            }
                                         }
-
                                     }
 
                                 }
+
                             }
                         }
                     }
-                    TssLblMensaje.Text = "Get info from data base...";
                 }
-                IGridFill(DetallesDebtor);
+                c++;
+                porcent = (float)(100 * c) / DetallesDebtor.Count;
+                BgwDebtor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{DetallesDebtor.Count})");
+                Thread.Sleep(100);
             }
-
         }
+        private void BgwDebtor_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+
+        private void BgwDebtor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            IGridFill(DetallesDebtor);          
+            TssLblProgBar.Value = 0;
+            IsCreditor = false;
+        }
+
+        #endregion
 
         private void IGridFill(IList<Detalle> detalles)
         {
@@ -373,7 +584,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Focus();
 
         }
-        #endregion
+
 
         #region IGridMain methods
 
@@ -543,29 +754,24 @@ namespace Centralizador.WinApp.GUI
         #region Outlook
 
 
-        private ServiceOutlook outlook;
+        /// <summary>
+        /// Method download & read email from account of CVE company.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnOutlook_Click(object sender, EventArgs e)
-        {
-            BtnOutlook.Enabled = false;
-
-
-            // Date & folder
-            outlook = new ServiceOutlook(Models.Properties.Settings.Default.DateTimeEmail, TokenSii);
-
-            // Read & save email
+        {            
+            ServiceOutlook outlook = new ServiceOutlook(TokenSii);            
             BackgroundWorker bgwReadEmail = new BackgroundWorker
             {
                 WorkerReportsProgress = true
             };
             bgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
-            bgwReadEmail.RunWorkerCompleted += BgwReadEmailRunWorkerCompleted;
-            outlook.GetXmlFromEmail(bgwReadEmail);
-
-
-
-
-
-
+            bgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
+            if (bgwReadEmail.IsBusy == false)
+            {
+                outlook.GetXmlFromEmail(bgwReadEmail);
+            }
         }
 
 
@@ -574,14 +780,12 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
-        private void BgwReadEmailRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BgwReadEmail_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //TssLblMensaje.Text = "Finished...";
             TssLblProgBar.Value = 0;
-            //TssLblMensaje.Text = "";
-            TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", outlook.LastTime);
-            BtnDebtor.Enabled = true;
             BtnOutlook.Enabled = true;
+            TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", e.Result);
+            IGridMain.Focus();
 
         }
 
@@ -613,161 +817,9 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-        private void BackgroundW_DoWork(object sender, DoWorkEventArgs e)
-        {
-            IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
-            DetallesCreditor = new List<Detalle>();
-            List<ResultInstruction> instructions = new List<ResultInstruction>();
-            int c = 0;
-            float porcent = 0;
-            foreach (ResultPaymentMatrix m in matrices)
-            {
-                // Tester 
-                if (m.Id != 680)
-                {
-                    continue;
-                }
-                ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
-                m.BillingWindow = window;
-                // Get instructions with matrix binding.
-                IList<ResultInstruction> lista = Instruction.GetInstructionCreditor(m, UserParticipant);
-                if (lista != null)
-                {
-                    instructions.AddRange(lista);
-                }
-                c++;
-                porcent = (float)(100 * c) / matrices.Count;
-                BackgroundW.ReportProgress((int)porcent, $"Getting info from CEN... ({c}/{matrices.Count})");
 
-            }
-            c = 0;
-            foreach (ResultInstruction instruction in instructions)
-            {
-                Detalle detalle = new Detalle
-                {
-                    Instruction = instruction,
-                    MntNeto = instruction.Amount
-                };
-                detalle.Instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
-                detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
-                detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
-                detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
-                // Mapping references Softland
-                IList<Reference> references = Reference.GetInfoFactura(instruction);
 
-                detalle.References = references;
-                if (references != null)
-                {
-                    detalle.DTEDef = ServicePdf.TransformXmlStringToObjectDTE(references[0].FileBasico);
-                    detalle.Folio = references[0].Folio;
 
-                    if (references[0].FechaRecepcionSii != null)
-                    {
-                        detalle.FechaRecepcion = references[0].FechaRecepcionSii.ToString();
-                    }
-                    if (references[0].FechaEmision != null)
-                    {
-                        detalle.FechaEmision = references[0].FechaEmision.ToString();
-                    }
-
-                }
-
-                DetallesCreditor.Add(detalle);
-                c++;
-                porcent = (float)(100 * c) / instructions.Count;
-                BackgroundW.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{instructions.Count})");
-            }
-        }
-
-        private void BackgroundW_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
-
-        private void BackgroundW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-
-            IGridFill(DetallesCreditor);
-            BtnCreditor.Enabled = true;
-            TssLblProgBar.Value = 0;
-            IsCreditor = true;
-        }
-
-        private void FormMain_Shown(object sender, EventArgs e)
-        {
-            // frozen column will display row numbers.
-            IGridMain.FrozenArea.ColCount = 3;
-            IGridMain.FrozenArea.RowCount = 0;
-            IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
-            IGridMain.FrozenArea.RowsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
-
-            // Set up the deafult parameters of the frozen columns.
-            IGridMain.DefaultCol.AllowMoving = false;
-            IGridMain.DefaultCol.IncludeInSelect = false;
-            //IGridMain.DefaultCol.AllowSizing = false;
-
-            // Set up the width of the first frozen column (hot and current row indicator).
-            IGridMain.DefaultCol.Width = 10;
-            // Add the first frozen column.
-            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-            // Set up the width of the second frozen column (row numbers).
-            IGridMain.DefaultCol.Width = 30;
-            // Add the second frozen column.
-            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-
-            // Add data columns.
-            iGColPattern pattern = new iGColPattern();
-            pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
-            pattern.ColHdrStyle.Font = new Font("Verdana", 6.5f, FontStyle.Bold);
-            IGridMain.Cols.Add("Instruction", 55, pattern);
-            IGridMain.Cols.Add("Code", 40, pattern);
-            IGridMain.Cols.Add("P1", 25, pattern);
-            IGridMain.Cols.Add("P2", 25, pattern);
-            IGridMain.Cols.Add("P3", 25, pattern);
-            IGridMain.Cols.Add("P4", 25, pattern);
-            IGridMain.Cols.Add("Rut", 60, pattern);
-            IGridMain.Cols.Add("Dv", 15, pattern);
-            IGridMain.Cols.Add("Amount", 65, pattern);
-            IGridMain.Cols.Add("Exent", 65, pattern);
-            IGridMain.Cols.Add("Iva", 65, pattern);
-            IGridMain.Cols.Add("Total", 65, pattern);
-            IGridMain.Cols.Add("Folio", 70, pattern);
-            IGridMain.Cols.Add("Emission", 65, pattern);
-            IGridMain.Cols.Add("Cbte.", 70, pattern);
-            IGridMain.Cols.Add("F. de pago", 65, pattern);
-            IGridMain.Cols.Add("pic", 25, pattern);
-            IGridMain.Cols.Add("F. de envío", 65, pattern);
-            IGridMain.Cols.Add("flag", 25, pattern);
-            IGridMain.Cols.Add("status", 70, pattern);
-            IGridMain.Cols.Add("F. de envío", 65, pattern);
-            IGridMain.Cols.Add("M", 25, pattern);
-            IGridMain.Cols.Add("Aceptado cliente", 70, pattern);
-
-            // General options
-            IGridMain.GroupBox.Visible = true;
-            IGridMain.RowMode = true;
-            IGridMain.ReadOnly = true;
-            // Set up the default parameters of the data columns.
-            IGridMain.DefaultCol.AllowMoving = true;
-            //fGrid.DefaultCol.IncludeInSelect = true;
-            IGridMain.DefaultCol.AllowSizing = true;
-
-            // Footer
-            IGridMain.Footer.Visible = true;
-            IGridMain.Footer.Rows.Count = 2;
-            IGridMain.Footer.AutoHeightEvents = iGAutoHeightEvents.None;
-            IGridMain.Footer.Rows[0].Height = 30;
-            IGridMain.Footer.Cells[0, 3].SpanCols = 22;
-            IGridMain.Footer.Cells[0, 3].TextAlign = iGContentAlignment.MiddleCenter;
-
-            // Footer freezer section
-            IGridMain.Footer.Cells[0, 0].SpanCols = 3;
-            IGridMain.Footer.Cells[1, 0].SpanCols = 3;
-
-            // Footer totals
-            IGridMain.Footer.Cells[1, 10].AggregateFunction = iGAggregateFunction.Sum;
-        }
 
 
 

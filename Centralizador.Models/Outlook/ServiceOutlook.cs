@@ -15,15 +15,15 @@ namespace Centralizador.Models.Outlook
 {
     public class ServiceOutlook
     {
-        public DateTime LastTime { get; set; }
+        //public DateTime LastTime { get; set; }
 
         private string TokenSii { get; set; }
 
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
 
-        public ServiceOutlook(DateTime lastTime, string tokenSii)
+        public ServiceOutlook(string tokenSii)
         {
-            LastTime = lastTime;
+            //LastTime = lastTime;
             TokenSii = tokenSii;
         }
 
@@ -71,7 +71,7 @@ namespace Centralizador.Models.Outlook
                         mails.Add(oMail);
                         if (i == len - 1)
                         {
-                            LastTime = oMail.ReceivedDate;
+                            e.Result = oMail.ReceivedDate;
                             Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
                             Properties.Settings.Default.UIdEmail = Convert.ToInt64(info.UIDL);
                         }
@@ -80,6 +80,7 @@ namespace Centralizador.Models.Outlook
                     }
                     else
                     {
+                        e.Result = Properties.Settings.Default.DateTimeEmail;
                         break;
                     }
 
@@ -136,6 +137,7 @@ namespace Centralizador.Models.Outlook
             {
 
                 Properties.Settings.Default.Save();
+              
             }
 
         }
