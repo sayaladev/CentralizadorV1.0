@@ -2,17 +2,23 @@
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Xml.Xsl;
 
+using Centralizador.Models.ApiSII;
 using Centralizador.Models.Outlook;
 
+using Pdf417EncoderLibrary;
+
 using SelectPdf;
+
+
 
 namespace Centralizador.Models.AppFunctions
 {
     public class ServicePdf
     {
         /// <summary>
-        /// Method return a object (Xml 'ENvioDTE' to object).
+        /// Method return a object (Xml 'EnvioDTE' to object).
         /// </summary>
         /// <param name="pathFile"></param>
         /// <returns></returns>
@@ -56,14 +62,18 @@ namespace Centralizador.Models.AppFunctions
             }
 
         }
+        /// <summary>
+        /// Method return a object (Xml 'DTE' to object).
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static DTEDefType TransformXmlStringToObjectDTE(string file)
         {
             try
             {
-                var xmlDoc = new XmlDocument();
+                XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(file);
                 xmlDoc.DocumentElement.SetAttribute("xmlns", "http://www.sii.cl/SiiDte");
-
                 XmlSerializer deserializer = new XmlSerializer(typeof(DTEDefType));
                 using (StringReader reader = new StringReader(xmlDoc.InnerXml))
                 {
@@ -106,11 +116,81 @@ namespace Centralizador.Models.AppFunctions
         {
             public override Encoding Encoding => Encoding.UTF8;
         }
-
-        public static PdfDocument GetPdfDocument()
+        public static string TransformObjectToXml(DTEDefTypeDocumentoTED obj)
         {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(DTEDefTypeDocumentoTED), new XmlRootAttribute("TED"));
+                using (Utf8StringWriter stringWriter = new Utf8StringWriter())
+                {
+                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
+                    {
+                        serializer.Serialize(xmlWriter, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
+                    }
+                    return stringWriter.ToString();
+                }
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
+        }
 
-            return null;
+        public static void GetPdfDocument(Detalle obj)
+        {
+            // Timbre Pdf417            
+            DTEDefTypeDocumento documento = (DTEDefTypeDocumento)obj.DTEDef.Item;
+            try
+            {
+                Pdf417Encoder encoder = new Pdf417Encoder
+                {
+                    //EncodingControl = EncodingControl.ByteOnly,
+                    //ErrorCorrection = ErrorCorrectionLevel.Level_5,
+                    GlobalLabelIDCharacterSet = "ISO-8859-1",
+                    //QuietZone = 14,
+                    DefaultDataColumns = 14,
+                    RowHeight = 6,
+                    NarrowBarWidth = 2
+                };
+                encoder.WidthToHeightRatio(1.9);
+                encoder.Encode(TransformObjectToXml(documento.TED).ToString());
+                encoder.SaveBarcodeToPngFile(Path.GetTempPath() + "\\timbre.png");
+
+                XsltArgumentList argumentList = new XsltArgumentList();
+                argumentList.AddParam("timbre", "", Path.GetTempPath() + "\\timbre.png");
+
+                // Xml to Html
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(TransformObjectToXml(obj.DTEDef));
+                XslCompiledTransform transform = new XslCompiledTransform();
+                using (XmlReader xmlReader = XmlReader.Create(new StringReader(Properties.Resources.EncoderXmlToHtml)))
+                {
+                    using (XmlWriter xmlWriter = XmlWriter.Create(Path.GetTempPath() + "\\invoice.html"))
+                    {
+                        transform.Load(xmlReader);
+                        transform.Transform(xmlDocument, argumentList, xmlWriter);
+                    }
+                }
+
+                // Html to Pdf
+                PdfDocument pdfDocument = new PdfDocument();
+                HtmlToPdf htmlToPdf = new HtmlToPdf();
+                htmlToPdf.Options.PdfPageSize = PdfPageSize.Letter;
+                pdfDocument = htmlToPdf.ConvertUrl(Path.GetTempPath() + "\\invoice.html");
+                pdfDocument.Save(Path.GetTempPath() + "\\invoice.pdf");
+
+
+              
+
+                //return obj;
+            }
+
+
+            catch (System.Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

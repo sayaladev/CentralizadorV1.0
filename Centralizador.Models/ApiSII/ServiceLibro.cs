@@ -8,6 +8,7 @@ using Centralizador.Models.ApiCEN;
 using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
 using Newtonsoft.Json;
+using SelectPdf;
 
 namespace Centralizador.Models.ApiSII
 {
@@ -166,6 +167,7 @@ namespace Centralizador.Models.ApiSII
         public Reference References { get; set; }
 
         public DTEDefType DTEDef { get; set; }
+      
 
     }
 

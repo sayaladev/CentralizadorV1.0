@@ -158,6 +158,7 @@
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
+            this.IGridMain.CellDoubleClick += new TenTec.Windows.iGridLib.iGCellDoubleClickEventHandler(this.IGridMain_CellDoubleClick);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             // 
             // TxtDateTimeEmail

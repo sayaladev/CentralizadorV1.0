@@ -444,7 +444,7 @@ namespace Centralizador.WinApp.GUI
                 // Set up the height of the first row (frozen).
 
                 iGRow myRow;
-
+                DateTime? fechaRecepcion = null;
                 foreach (Detalle item in detalles)
                 {
                     myRow = IGridMain.Rows.Add();
@@ -473,8 +473,8 @@ namespace Centralizador.WinApp.GUI
 
                     if (item.FechaRecepcion != null)
                     {
-                        DateTime? FechaRecepcion = Convert.ToDateTime(item.FechaRecepcion, CultureInfo);
-                        myRow.Cells[19].Value = string.Format(CultureInfo, "{0:d}", FechaRecepcion);
+                        fechaRecepcion = Convert.ToDateTime(item.FechaRecepcion, CultureInfo);
+                        myRow.Cells[19].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
                     }
 
                     switch (item.DehOrdenEvento)
@@ -489,18 +489,18 @@ namespace Centralizador.WinApp.GUI
                             myRow.Cells[21].Value = TypeEvent.Contado;
                             break;
                         case 4:
-                            //myRow.Cells[21].Value = TypeEvent.AcuseRecibo;
+                            myRow.Cells[21].Value = TypeEvent.AcuseRecibo;
                             break;
                         case 5:
-                            //TimeSpan len = DateTime.Today.Subtract(item.FechaRecepcion);
-                            //if (len.Days > 8)
-                            //{
-                            //    myRow.Cells[21].Value = TypeEvent.Aceptado;
-                            //}
-                            //else
-                            //{
-                            //    myRow.Cells[21].Value = $"{8 - len.Days} d.";
-                            //}
+                            TimeSpan len = DateTime.Today.Subtract((DateTime)fechaRecepcion);
+                            if (len.Days > 8)
+                            {
+                                myRow.Cells[21].Value = TypeEvent.Aceptado;
+                            }
+                            else
+                            {
+                                myRow.Cells[21].Value = $"{8 - len.Days} d.";
+                            }
 
                             break;
                         case 6:
@@ -595,7 +595,6 @@ namespace Centralizador.WinApp.GUI
             uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
             uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
             uint instruction = Convert.ToUInt32(gRow.Cells[2].Value);
-            //var fechaEnvio = gRow.Cells[19].Value;
             CleanControls();
             Detalle detalle;
             if (folio > 0)
@@ -770,17 +769,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnPdfConvert_Click(object sender, EventArgs e)
         {
-            //if (BtnCreditor.Enabled == true)
-            //{
-            //    foreach (Detalle item in DetallesCreditor)
-            //    {
-            //        DTEDefType a = ServicePdf.TransformXmlStringToObjectDTE(item.References[0].FileBasico);
-            //    }
-            //}
-            //else if (BtnDebtor.Enabled == true)
-            //{
 
-            //}
 
         }
 
@@ -794,13 +783,32 @@ namespace Centralizador.WinApp.GUI
 
         }
 
+        private void IGridMain_CellDoubleClick(object sender, iGCellDoubleClickEventArgs e)
+        {
+            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
+            {
+                return;
+            }
+            iGRow gRow = IGridMain.CurRow;
+            uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
+            uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
+            Detalle detalle;
+
+            if (IsCreditor)
+            {
+                detalle = DetallesCreditor.First(x => x.Folio == folio && x.RutReceptor == rut);
+            }
+            else
+            {
+                detalle = DetallesDebtor.First(x => x.Folio == folio && x.RutReceptor == rut);
+            }
+
+            detalle = ServicePdf.GetPdfDocument(detalle);
 
 
+            //System.Diagnostics.Process.Start(detalle.PdfDocument);
 
-
-
-
-
+        }
     }
 }
 
