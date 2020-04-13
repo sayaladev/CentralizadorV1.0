@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:sii="http://www.sii.cl/SiiDte" xmlns:str="http://exslt.org/strings" version="1.0" >
   <xsl:output method="xml" indent="yes"/>
   <!--<xsl:template match="@* | node()"> : Atributo + comentarios + Texto nodo y elemento. LO MISMO: attribute::* | child::node()
       <xsl:template match="@* | *">      : Atributo y elemento.
@@ -146,20 +146,20 @@
                     <td width="38%">
                       <p>
                         <span class="tit1">
-                          <xsl:value-of select="Documento/Encabezado/Emisor/RznSoc"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Emisor/sii:RznSoc"/>
                         </span>
                         <br></br>
                         <span class="tit2">
-                          <xsl:value-of select="Documento/Encabezado/Emisor/GiroEmis"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Emisor/sii:GiroEmis"/>
                         </span>
                       </p>
                       <p>
                         <span class="txt2">
-                          <xsl:value-of select="Documento/Encabezado/Emisor/DirOrigen"/>-<xsl:value-of select="Documento/Encabezado/Emisor/CmnaOrigen"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Emisor/sii:DirOrigen"/>-<xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Emisor/sii:CmnaOrigen"/>
                         </span>
                         <br></br>
                         <span class="txt2">
-                          <xsl:value-of select="Documento/Encabezado/Emisor/CiudadOrigen"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Emisor/sii:CiudadOrigen"/>
                         </span>
                       </p>
                     </td>
@@ -172,14 +172,14 @@
                           <span class="tit3">
                             R.U.T. :
                             <xsl:call-template name="formatearRut">
-                              <xsl:with-param name="input" select="Documento/Encabezado/Emisor/RUTEmisor"/>
+                              <xsl:with-param name="input" select="sii:DTE/sii:Documento/sii:Encabezado/sii:Emisor/sii:RUTEmisor"/>
                             </xsl:call-template>
                           </span>
                         </p>
                         <p>
                           <span class="tit3">
                             <xsl:call-template name="DTEName">
-                              <xsl:with-param name="codDTE" select="Documento/Encabezado/IdDoc/TipoDTE"/>
+                              <xsl:with-param name="codDTE" select="sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:TipoDTE"/>
                             </xsl:call-template>
 
 
@@ -188,7 +188,7 @@
                         <p>
                           <span class="tit3">
                             N°
-                            <xsl:value-of select="Documento/Encabezado/IdDoc/Folio"/>
+                            <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:Folio"/>
                           </span>
                         </p>
                       </div>
@@ -215,7 +215,7 @@
                       <td width="45%">
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:value-of select="Documento/Encabezado/Receptor/RznSocRecep"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:RznSocRecep"/>
                         </span>
                       </td>
                       <td width="15%">
@@ -225,7 +225,7 @@
                         <span class="txt2 mayuscula1">
                           :
                           <xsl:call-template name="format-fecha-all">
-                            <xsl:with-param name="input" select="Documento/Encabezado/IdDoc/FchEmis"/>
+                            <xsl:with-param name="input" select="sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:FchEmis"/>
                             <xsl:with-param name="nombre" select="'mayuscorto'"/>
                             <xsl:with-param name="separador" select="'-'"/>
                           </xsl:call-template>
@@ -239,7 +239,7 @@
                       <td>
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:value-of select="Documento/Encabezado/Receptor/GiroRecep"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:GiroRecep"/>
                         </span>
                       </td>
                       <td width="15%">
@@ -248,9 +248,9 @@
                       <td width="30%">
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:if test="Documento/Encabezado/IdDoc/FchVenc[.!= '']">
+                          <xsl:if test="sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:FchVenc[.!= '']">
                             <xsl:call-template name="format-fecha-all">
-                              <xsl:with-param name="input" select="Documento/Encabezado/IdDoc/FchVenc"/>
+                              <xsl:with-param name="input" select="sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:FchVenc"/>
                               <xsl:with-param name="nombre" select="'mayuscorto'"/>
                               <xsl:with-param name="separador" select="'-'"/>
                             </xsl:call-template>
@@ -266,7 +266,7 @@
                         <span class="txt2 mayuscula1">
                           :
                           <xsl:call-template name="formatearRut">
-                            <xsl:with-param name="input" select="Documento/Encabezado/Receptor/RUTRecep"/>
+                            <xsl:with-param name="input" select="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:RUTRecep"/>
                           </xsl:call-template>
                         </span>
                       </td>
@@ -277,9 +277,9 @@
                         <span class="txt2 mayuscula1">
                           :
                           <xsl:choose>
-                            <xsl:when test="number(Documento/Encabezado/IdDoc/FmaPago)=1"> Contado</xsl:when>
-                            <xsl:when test="number(Documento/Encabezado/IdDoc/FmaPago)=2"> Crédito</xsl:when>
-                            <xsl:when test="number(Documento/Encabezado/IdDoc/FmaPago)=3"> Sin Costo(entrega gratuita)</xsl:when>
+                            <xsl:when test="number(sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:FmaPago)=1"> Contado</xsl:when>
+                            <xsl:when test="number(sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:FmaPago)=2"> Crédito</xsl:when>
+                            <xsl:when test="number(sii:DTE/sii:Documento/sii:Encabezado/sii:IdDoc/sii:FmaPago)=3"> Sin Costo(entrega gratuita)</xsl:when>
                           </xsl:choose>
                         </span>
                       </td>
@@ -291,7 +291,7 @@
                       <td>
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:value-of select="Documento/Encabezado/Receptor/DirRecep"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:DirRecep"/>
                         </span>
                       </td>
                       <td width="15%">
@@ -300,8 +300,8 @@
                       <td width="30%">
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:if test="Documento/Encabezado/Receptor/CdgVendedor!='0'">
-                            <xsl:value-of select="Documento/Encabezado/Emisor/CdgVendedor"/>
+                          <xsl:if test="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:CdgVendedor!='0'">
+                            <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Emisor/sii:CdgVendedor"/>
                           </xsl:if>
                         </span>
                       </td>
@@ -313,7 +313,7 @@
                       <td>
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:value-of select="Documento/Encabezado/Receptor/CmnaRecep"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:CmnaRecep"/>
                         </span>
                       </td>
                       <td width="15%">
@@ -322,8 +322,8 @@
                       <td width="30%">
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:if test="Documento/Encabezado/Receptor/CdgIntRecep!='0'">
-                            <xsl:value-of select="Documento/Encabezado/Receptor/CdgIntRecep"/>
+                          <xsl:if test="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:CdgIntRecep!='0'">
+                            <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:CdgIntRecep"/>
                           </xsl:if>
                         </span>
                       </td>
@@ -335,7 +335,7 @@
                       <td>
                         <span class="txt2 mayuscula1">
                           :
-                          <xsl:value-of select="Documento/Encabezado/Receptor/CiudadRecep"/>
+                          <xsl:value-of select="sii:DTE/sii:Documento/sii:Encabezado/sii:Receptor/sii:CiudadRecep"/>
                         </span>
                       </td>
                       <td width="15%">
@@ -345,7 +345,7 @@
                         <span class="txt2 mayuscula1">
                           :
                           <xsl:call-template name="format-fecha-all">
-                            <xsl:with-param name="input" select="Documento/TmstFirma"/>
+                            <xsl:with-param name="input" select="sii:DTE/sii:Documento/sii:TmstFirma"/>
                             <xsl:with-param name="nombre" select="'mayuscorto'"/>
                             <xsl:with-param name="separador" select="'-'"/>
                           </xsl:call-template>
@@ -361,26 +361,26 @@
                 <!--REFERENCIAS-->
                 <div class="bordecurvo" id="datos1">
                   <table width="98%" border="0" cellpadding="0" cellspacing="0">
-                    <xsl:for-each select="Documento/Referencia[.!='']">
+                    <xsl:for-each select="sii:DTE/sii:Documento/sii:Referencia[.!='']">
                       <tr>
                         <td width="15%" style="">
                           <span class="txt2 negrita1"> Tipo Documento :</span>
                           <span class="txt3 mayuscula1">
-                            <xsl:value-of select="TpoDocRef"/>
+                            <xsl:value-of select="sii:TpoDocRef"/>
                           </span>
                         </td>
                         <td width="20%">
                           <span class="txt2 negrita1"> Folio :</span>
                           <span class="txt3 mayuscula1">
-                            <xsl:value-of select="FolioRef"/>
+                            <xsl:value-of select="sii:FolioRef"/>
                           </span>
                         </td>
                         <td width="15%">
                           <span class="txt2 negrita1"> Fecha :</span>
                           <span class="txt3 mayuscula1">
-                            <xsl:if test="FchRef[.!= '']">
+                            <xsl:if test="sii:FchRef[.!= '']">
                               <xsl:call-template name="format-fecha-all">
-                                <xsl:with-param name="input" select="FchRef"/>
+                                <xsl:with-param name="input" select="sii:FchRef"/>
                                 <xsl:with-param name="nombre" select="'corto'"/>
                                 <xsl:with-param name="separador" select="'-'"/>
                               </xsl:call-template>
@@ -390,13 +390,13 @@
                         <td width="20%">
                           <span class="txt2 negrita1"> Tipo Referencia :</span>
                           <span class="txt3 mayuscula1">
-                            <xsl:value-of select="TpoDocRef"/>
+                            <xsl:value-of select="sii:TpoDocRef"/>
                           </span>
                         </td>
                         <td width="30%">
                           <span class="txt2 negrita1"> Razón Referencia :</span>
                           <span class="txt3 mayuscula1">
-                            <xsl:value-of select="RazonRef"/>
+                            <xsl:value-of select="sii:RazonRef"/>
                           </span>
                         </td>
                       </tr>
@@ -432,14 +432,14 @@
                       <span class="negrita1 mayuscula1 txt2">total</span>
                     </td>
                   </tr>
-                  <xsl:for-each select="Documento/Detalle[.!='']">
+                  <xsl:for-each select="sii:DTE/sii:Documento/sii:Detalle[.!='']">
                     <tr>
                       <!--CANTIDAD-->
                       <xsl:choose>
-                        <xsl:when test="QtyItem[.!= '']">
+                        <xsl:when test="sii:QtyItem[.!= '']">
                           <td align="center" class="borde-der txt2">
                             <xsl:call-template name="formatea-number">
-                              <xsl:with-param name="val" select="QtyItem"/>
+                              <xsl:with-param name="val" select="sii:QtyItem"/>
                               <xsl:with-param name="format-string" select="'###.###'"/>
                               <xsl:with-param name="locale" select="'cl'"/>
                             </xsl:call-template>
@@ -451,10 +451,10 @@
                       </xsl:choose>
                       <!--CÓDIGO-->
                       <xsl:choose>
-                        <xsl:when test="VlrCodigo[.!= '']">
+                        <xsl:when test="sii:VlrCodigo[.!= '']">
                           <td align="center" class="borde-der">
                             <xsl:call-template name="formatea-number">
-                              <xsl:with-param name="val" select="VlrCodigo"/>
+                              <xsl:with-param name="val" select="sii:VlrCodigo"/>
                               <xsl:with-param name="format-string" select="'###.###'"/>
                               <xsl:with-param name="locale" select="'cl'"/>
                             </xsl:call-template>
@@ -467,11 +467,11 @@
                       <!--DESCRIPCION-->
                       <xsl:variable name="break">&#10;</xsl:variable>
                       <xsl:choose>
-                        <xsl:when test="NmbItem[.!= '']">
+                        <xsl:when test="sii:NmbItem[.!= '']">
                           <td align="center" class="borde-der">
-                            <xsl:value-of select="NmbItem[.!='']"/>
+                            <xsl:value-of select="sii:NmbItem[.!='']"/>
                             <br></br>
-                            <xsl:value-of select="DscItem[.!='']"/>
+                            <xsl:value-of select="sii:DscItem[.!='']"/>
                           </td>
                         </xsl:when>
                         <xsl:otherwise>
@@ -481,17 +481,17 @@
 
                       <!--P. UNITARIO-->
                       <xsl:choose>
-                        <xsl:when test="PrcItem[.!= '']">
+                        <xsl:when test="sii:PrcItem[.!= '']">
                           <td align="right" class="borde-der">
                             <xsl:call-template name="formatea-number">
-                              <xsl:with-param name="val" select="PrcItem"/>
+                              <xsl:with-param name="val" select="sii:PrcItem"/>
                               <xsl:with-param name="format-string" select="'###.###'"/>
                               <xsl:with-param name="locale" select="'cl'"/>
                             </xsl:call-template>
                           </td>
                         </xsl:when>
                         <xsl:otherwise>
-                          <td align="center" class="borde-der"></td>
+                          <td align="right" class="borde-der">0</td>
                         </xsl:otherwise>
                       </xsl:choose>
 
@@ -502,17 +502,17 @@
 
                       <!--TOTAL-->
                       <xsl:choose>
-                        <xsl:when test="MontoItem[.!= '']">
+                        <xsl:when test="sii:MontoItem[.!= '']">
                           <td align="right" class="borde-der">
                             <xsl:call-template name="formatea-number">
-                              <xsl:with-param name="val" select="MontoItem"/>
+                              <xsl:with-param name="val" select="sii:MontoItem"/>
                               <xsl:with-param name="format-string" select="'###.###'"/>
                               <xsl:with-param name="locale" select="'cl'"/>
                             </xsl:call-template>
                           </td>
                         </xsl:when>
                         <xsl:otherwise>
-                          <td align="center" class="borde-der"></td>
+                          <td align="right" class="borde-der">0</td>
                         </xsl:otherwise>
                       </xsl:choose>
                     </tr>
@@ -610,9 +610,9 @@
                             <span class="negrita1 txt1 mayuscula1 margender">
                               <!--MONTO NETO-->
                               <xsl:choose>
-                                <xsl:when test="Documento/Encabezado/Totales/MntNeto[.!='']">
+                                <xsl:when test="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:MntNeto[.!='']">
                                   <xsl:call-template name="formatea-number">
-                                    <xsl:with-param name="val" select="Documento/Encabezado/Totales/MntNeto"/>
+                                    <xsl:with-param name="val" select="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:MntNeto"/>
                                     <xsl:with-param name="format-string" select="'###.###'"/>
                                     <xsl:with-param name="locale" select="'cl'"/>
                                   </xsl:call-template>
@@ -632,9 +632,9 @@
                             <span class="negrita1 txt1 mayuscula1 margender">
                               <!--MONTO EXENTO-->
                               <xsl:choose>
-                                <xsl:when test="Documento/Encabezado/Totales/MntExe[.!='0']">
+                                <xsl:when test="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:MntExe[.!='0']">
                                   <xsl:call-template name="formatea-number">
-                                    <xsl:with-param name="val" select="Documento/Encabezado/Totales/MntExe"/>
+                                    <xsl:with-param name="val" select="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:MntExe"/>
                                     <xsl:with-param name="format-string" select="'###.###'"/>
                                     <xsl:with-param name="locale" select="'cl'"/>
                                   </xsl:call-template>
@@ -655,9 +655,9 @@
                               <!--MONTO IVA-->
                               <!--DEVUELVE CERO SI NO HAY DATO-->
                               <xsl:choose>
-                                <xsl:when test="Documento/Encabezado/Totales/IVA[.!='']">
+                                <xsl:when test="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:IVA[.!='']">
                                   <xsl:call-template name="formatea-number">
-                                    <xsl:with-param name="val" select="Documento/Encabezado/Totales/IVA"/>
+                                    <xsl:with-param name="val" select="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:IVA"/>
                                     <xsl:with-param name="format-string" select="'###.###'"/>
                                     <xsl:with-param name="locale" select="'cl'"/>
                                   </xsl:call-template>
@@ -685,9 +685,9 @@
                             <span class="negrita1 txt1 mayuscula1 margender">
                               <!--MONTO TOTAL-->
                               <xsl:choose>
-                                <xsl:when test="Documento/Encabezado/Totales/MntTotal[.!='']">
+                                <xsl:when test="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:MntTotal[.!='']">
                                   <xsl:call-template name="formatea-number">
-                                    <xsl:with-param name="val" select="Documento/Encabezado/Totales/MntTotal"/>
+                                    <xsl:with-param name="val" select="sii:DTE/sii:Documento/sii:Encabezado/sii:Totales/sii:MntTotal"/>
                                     <xsl:with-param name="format-string" select="'###.###'"/>
                                     <xsl:with-param name="locale" select="'cl'"/>
                                   </xsl:call-template>

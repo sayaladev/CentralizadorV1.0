@@ -802,11 +802,18 @@ namespace Centralizador.WinApp.GUI
             {
                 detalle = DetallesDebtor.First(x => x.Folio == folio && x.RutReceptor == rut);
             }
+            if (detalle.DTEDef != null)
+            {
+                ServicePdf.GetPdfDocument(detalle);
+            }
+            else
+            {
+                TssLblMensaje.Text = $"This invoice ({ detalle.Folio}) does not have your XMl file received or has not been billed yet.";
+            }
 
-            detalle = ServicePdf.GetPdfDocument(detalle);
 
 
-            //System.Diagnostics.Process.Start(detalle.PdfDocument);
+
 
         }
     }

@@ -7,9 +7,9 @@ using System.Xml.Xsl;
 using Centralizador.Models.ApiSII;
 using Centralizador.Models.Outlook;
 
-using Pdf417EncoderLibrary;
+using OpenHtmlToPdf;
 
-using SelectPdf;
+using Pdf417EncoderLibrary;
 
 
 
@@ -100,7 +100,7 @@ namespace Centralizador.Models.AppFunctions
                 XmlSerializer serializer = new XmlSerializer(typeof(DTEDefType));
                 using (Utf8StringWriter stringWriter = new Utf8StringWriter())
                 {
-                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true }))
+                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
                     {
                         serializer.Serialize(xmlWriter, obj);
                     }
@@ -136,6 +136,7 @@ namespace Centralizador.Models.AppFunctions
             }
         }
 
+
         public static void GetPdfDocument(Detalle obj)
         {
             // Timbre Pdf417            
@@ -161,8 +162,11 @@ namespace Centralizador.Models.AppFunctions
 
                 // Xml to Html
                 XmlDocument xmlDocument = new XmlDocument();
+                // DTEDefTypeDocumento dteee = (DTEDefTypeDocumento)obj.DTEDef.Item;
+
                 xmlDocument.LoadXml(TransformObjectToXml(obj.DTEDef));
                 XslCompiledTransform transform = new XslCompiledTransform();
+                //string RemoveAllNamespaces(string xmlDocument);
                 using (XmlReader xmlReader = XmlReader.Create(new StringReader(Properties.Resources.EncoderXmlToHtml)))
                 {
                     using (XmlWriter xmlWriter = XmlWriter.Create(Path.GetTempPath() + "\\invoice.html"))
@@ -173,14 +177,25 @@ namespace Centralizador.Models.AppFunctions
                 }
 
                 // Html to Pdf
-                PdfDocument pdfDocument = new PdfDocument();
-                HtmlToPdf htmlToPdf = new HtmlToPdf();
-                htmlToPdf.Options.PdfPageSize = PdfPageSize.Letter;
-                pdfDocument = htmlToPdf.ConvertUrl(Path.GetTempPath() + "\\invoice.html");
-                pdfDocument.Save(Path.GetTempPath() + "\\invoice.pdf");
+                //PdfDocument pdfDocument = new PdfDocument();
+                //HtmlToPdf htmlToPdf = new HtmlToPdf();
+                //htmlToPdf.Options.PdfPageSize = PdfPageSize.Letter;
+                //pdfDocument = htmlToPdf.ConvertUrl(Path.GetTempPath() + "\\invoice.html");
+                //pdfDocument.Save(Path.GetTempPath() + "\\invoice.pdf");
+                //pdfDocument.Close();
+                //System.Diagnostics.Process.Start(Path.GetTempPath() + "\\invoice.pdf");
+
+                // OpenHtmlToPdf
 
 
-              
+                IPdfDocument pdfDocument = Pdf.From(File.ReadAllText(Path.GetTempPath() + "\\invoice.html")).OfSize(PaperSize.Letter);
+                pdfDocument.WithGlobalSetting("margin.left", "0.5cm");
+                //pdfDocument.Comressed();
+                //pdfDocument.Content();
+                byte[] content = pdfDocument.Content();
+                File.WriteAllBytes(Path.GetTempPath() + "\\invoice.pdf", content);
+                System.Diagnostics.Process.Start(Path.GetTempPath() + "\\invoice.pdf");
+
 
                 //return obj;
             }
