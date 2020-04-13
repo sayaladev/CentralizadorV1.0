@@ -135,7 +135,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="window"></param>
         /// <returns></returns>
         public static IList<ResultPaymentMatrix> GetPaymentMatrixByBillingWindowId(ResultBillingWindow window)
-        {            
+        {
             WebClient wc = new WebClient
             {
                 BaseAddress = Properties.Settings.Default.BaseAddress
@@ -153,7 +153,7 @@ namespace Centralizador.Models.ApiCEN
                         foreach (ResultPaymentMatrix item in p.Results)
                         {
                             item.BillingWindow = window;
-                        }                     
+                        }
                         return p.Results;
                     }
                 }

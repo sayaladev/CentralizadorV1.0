@@ -66,7 +66,7 @@ namespace Centralizador.Models.DataBase
 
                         Reference r = new Reference();
 
-               
+
 
 
                         if (item["Folio"] != DBNull.Value)
@@ -80,7 +80,7 @@ namespace Centralizador.Models.DataBase
 
                         if (item["RecepcionSii"] != DBNull.Value)
                         {
-                             r.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
+                            r.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
                         }
                         if (item["Fecha"] != DBNull.Value)
                         {
@@ -94,10 +94,10 @@ namespace Centralizador.Models.DataBase
                         {
                             r.FileBasico = item["FileBasico"].ToString();
                         }
-                                               
 
 
-                        
+
+
                         softland.Add(r);
 
                     }

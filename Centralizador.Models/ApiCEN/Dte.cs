@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-using Centralizador.Models.DataBase;
-
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN

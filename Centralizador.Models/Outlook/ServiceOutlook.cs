@@ -150,7 +150,7 @@ namespace Centralizador.Models.Outlook
                 EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(path);
                 foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
                 {
-                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;                   
+                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
                     string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
                     string response;
                     using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))

@@ -93,21 +93,19 @@
             // 
             this.TssLblFechaHora.AutoSize = false;
             this.TssLblFechaHora.Name = "TssLblFechaHora";
-            this.TssLblFechaHora.Size = new System.Drawing.Size(200, 17);
-            this.TssLblFechaHora.Text = "FechaHora";
+            this.TssLblFechaHora.Size = new System.Drawing.Size(180, 17);
             // 
             // TssLblProgBar
             // 
             this.TssLblProgBar.Name = "TssLblProgBar";
-            this.TssLblProgBar.Size = new System.Drawing.Size(430, 16);
+            this.TssLblProgBar.Size = new System.Drawing.Size(350, 16);
             // 
             // TssLblMensaje
             // 
             this.TssLblMensaje.AutoSize = false;
             this.TssLblMensaje.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.TssLblMensaje.Name = "TssLblMensaje";
-            this.TssLblMensaje.Size = new System.Drawing.Size(400, 17);
-            this.TssLblMensaje.Text = "Message";
+            this.TssLblMensaje.Size = new System.Drawing.Size(500, 17);
             this.TssLblMensaje.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // TssLblUserEmail
@@ -115,14 +113,12 @@
             this.TssLblUserEmail.AutoSize = false;
             this.TssLblUserEmail.Name = "TssLblUserEmail";
             this.TssLblUserEmail.Size = new System.Drawing.Size(200, 17);
-            this.TssLblUserEmail.Text = "UserMail";
             // 
             // TssLblTokenSii
             // 
             this.TssLblTokenSii.AutoSize = false;
             this.TssLblTokenSii.Name = "TssLblTokenSii";
             this.TssLblTokenSii.Size = new System.Drawing.Size(100, 17);
-            this.TssLblTokenSii.Text = "TokenSii";
             // 
             // SplitContainer
             // 

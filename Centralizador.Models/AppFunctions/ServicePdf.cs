@@ -15,13 +15,18 @@ using Pdf417EncoderLibrary;
 
 namespace Centralizador.Models.AppFunctions
 {
+
+
     public class ServicePdf
     {
+        public int MyProperty { get; set; }
+
+
         /// <summary>
-        /// Method return a object (Xml 'EnvioDTE' to object).
+        /// 
         /// </summary>
         /// <param name="pathFile"></param>
-        /// <returns></returns>
+        /// <returns>Method return a object (Xml 'EnvioDTE' to object).</returns>
         public static EnvioDTE TransformXmlToObject(string pathFile)
         {
             try
@@ -41,7 +46,7 @@ namespace Centralizador.Models.AppFunctions
         }
 
         /// <summary>
-        /// Methos return a object (Xml 'DTE' to object).
+        /// Method return a object (Xml 'DTE' to object).
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
@@ -89,7 +94,7 @@ namespace Centralizador.Models.AppFunctions
         }
 
         /// <summary>
-        /// Method return a string (Object to Xml).
+        /// Method return a string (Object DTE to Xml).
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
@@ -114,8 +119,20 @@ namespace Centralizador.Models.AppFunctions
         }
         public sealed class Utf8StringWriter : StringWriter
         {
-            public override Encoding Encoding => Encoding.UTF8;
+            public override Encoding Encoding
+            {
+                get
+                {
+                    return Encoding.UTF8;
+                }
+            }
         }
+
+        /// <summary>
+        /// Method return a string (Object TED to Xml).
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static string TransformObjectToXml(DTEDefTypeDocumentoTED obj)
         {
             try
@@ -189,7 +206,6 @@ namespace Centralizador.Models.AppFunctions
 
 
                 IPdfDocument pdfDocument = Pdf.From(File.ReadAllText(Path.GetTempPath() + "\\invoice.html")).OfSize(PaperSize.Letter);
-                pdfDocument.WithGlobalSetting("margin.left", "0.5cm");
                 //pdfDocument.Comressed();
                 //pdfDocument.Content();
                 byte[] content = pdfDocument.Content();

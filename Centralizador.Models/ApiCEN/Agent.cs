@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -31,7 +32,7 @@ namespace Centralizador.Models.ApiCEN
         public int Profile { get; set; }
 
         [JsonProperty("participants")]
-        public IList<ResultParticipant> Participants { get; set; } 
+        public IList<ResultParticipant> Participants { get; set; }
 
         [JsonProperty("created_ts")]
         public DateTime CreatedTs { get; set; }
