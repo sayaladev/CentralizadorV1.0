@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.Xsl;
@@ -15,18 +18,13 @@ using Pdf417EncoderLibrary;
 
 namespace Centralizador.Models.AppFunctions
 {
-
-
     public class ServicePdf
     {
-        public int MyProperty { get; set; }
-
-
         /// <summary>
-        /// 
+        /// Method return a object (Xml 'EnvioDTE' to object).
         /// </summary>
         /// <param name="pathFile"></param>
-        /// <returns>Method return a object (Xml 'EnvioDTE' to object).</returns>
+        /// <returns>Sergio Ayala</returns>        
         public static EnvioDTE TransformXmlToObject(string pathFile)
         {
             try
@@ -46,10 +44,10 @@ namespace Centralizador.Models.AppFunctions
         }
 
         /// <summary>
-        /// Method return a object (Xml 'DTE' to object).
+        /// 
         /// </summary>
         /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <returns>Method return a object (Xml 'DTE' to object).</returns>
         public static DTEDefType TransformXmlToObjectDTE(string filePath)
         {
             try
@@ -153,8 +151,46 @@ namespace Centralizador.Models.AppFunctions
             }
         }
 
+        public static void ConvertToPdf(IList<Detalle> detalle)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            IPdfDocument document;
+            string nomenclatura;
+            if (detalle.Count == 1)
+            {
+                // Open
+                foreach (Detalle item in detalle)
+                {
+                    document = ConvertXmlToPdf(item);
+                    nomenclatura = item.RutReceptor + "_" + item.Folio;
+                    byte[] content = document.Content();
+                    File.WriteAllBytes(Path.GetTempPath() + "\\" + nomenclatura + ".pdf", content);
+                    System.Diagnostics.Process.Start(Path.GetTempPath() + "\\" + nomenclatura + ".pdf");
+                }
+            }
+            else
+            {   // Save in folder
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                dialog.Reset();
+                dialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (Detalle item in detalle)
+                    {
+                        if (item.DTEDef != null)
+                        {
+                            document = ConvertXmlToPdf(item);
+                            byte[] content = document.Content();
+                            nomenclatura = item.RutReceptor + "_" + item.Folio;
+                            File.WriteAllBytes(dialog.SelectedPath + "\\" + nomenclatura + ".pdf", content);
+                        }
+                    }
+                }
+               
+            }
+        }
 
-        public static void GetPdfDocument(Detalle obj)
+        private static IPdfDocument ConvertXmlToPdf(Detalle obj)
         {
             // Timbre Pdf417            
             DTEDefTypeDocumento documento = (DTEDefTypeDocumento)obj.DTEDef.Item;
@@ -179,11 +215,8 @@ namespace Centralizador.Models.AppFunctions
 
                 // Xml to Html
                 XmlDocument xmlDocument = new XmlDocument();
-                // DTEDefTypeDocumento dteee = (DTEDefTypeDocumento)obj.DTEDef.Item;
-
                 xmlDocument.LoadXml(TransformObjectToXml(obj.DTEDef));
                 XslCompiledTransform transform = new XslCompiledTransform();
-                //string RemoveAllNamespaces(string xmlDocument);
                 using (XmlReader xmlReader = XmlReader.Create(new StringReader(Properties.Resources.EncoderXmlToHtml)))
                 {
                     using (XmlWriter xmlWriter = XmlWriter.Create(Path.GetTempPath() + "\\invoice.html"))
@@ -208,12 +241,12 @@ namespace Centralizador.Models.AppFunctions
                 IPdfDocument pdfDocument = Pdf.From(File.ReadAllText(Path.GetTempPath() + "\\invoice.html")).OfSize(PaperSize.Letter);
                 //pdfDocument.Comressed();
                 //pdfDocument.Content();
-                byte[] content = pdfDocument.Content();
-                File.WriteAllBytes(Path.GetTempPath() + "\\invoice.pdf", content);
-                System.Diagnostics.Process.Start(Path.GetTempPath() + "\\invoice.pdf");
+                //byte[] content = pdfDocument.Content();
+                //File.WriteAllBytes(Path.GetTempPath() + "\\invoice.pdf", content);
+                //System.Diagnostics.Process.Start(Path.GetTempPath() + "\\invoice.pdf");
 
 
-                //return obj;
+                return pdfDocument;
             }
 
 

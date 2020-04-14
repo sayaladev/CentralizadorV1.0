@@ -50,13 +50,11 @@ namespace Centralizador.WinApp.GUI
 
         #region FormMain methods
 
-
         public FormMain(string value)
         {
             InitializeComponent();
             TokenSii = value;
         }
-
         private void FormMain_Load(object sender, EventArgs e)
         {
 
@@ -114,7 +112,6 @@ namespace Centralizador.WinApp.GUI
 
 
         }
-
         private void FormMain_Shown(object sender, EventArgs e)
         {
             // frozen column will display row numbers.
@@ -183,6 +180,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.GroupBox.Visible = true;
             IGridMain.RowMode = true;
             IGridMain.ReadOnly = true;
+            IGridMain.SelectionMode = iGSelectionMode.MultiSimple;
             // Set up the default parameters of the data columns.
             IGridMain.DefaultCol.AllowMoving = true;
             //fGrid.DefaultCol.IncludeInSelect = true;
@@ -215,8 +213,94 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Footer.Cells[0, 12].TextAlign = iGContentAlignment.MiddleRight;
             IGridMain.Footer.Cells[0, 13].TextAlign = iGContentAlignment.MiddleRight;
 
+            // Scroll
+
+            IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Near, iGActions.GoFirstRow, "Go to first row");
+            IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.GoLastRow, "Go to last row");
+            IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.SelectAllRows, "Select all rows");
+            IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.DeselectAllRows, "Deselect all rows");
+            IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.Always;
+            IGridMain.HScrollBar.Visibility = iGScrollBarVisibility.Hide;
 
 
+        }
+        private void BtnFacturar_Click(object sender, EventArgs e)
+        {
+            // Update Dte from Sii
+
+
+            //**************obligar al suario a descargar el archivo desde sii y dejarlo en el escritorio.
+
+
+
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
+            else
+            {
+                DialogResult resp = MessageBox.Show($"Se van a insertar las siguientes NV:{Environment.NewLine} Folio 5478  a 5498 {Environment.NewLine} ¿Quiere continuar?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (resp == DialogResult.OK)
+                {
+                    //UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+
+                    DialogResult b = MessageBox.Show("Are you sure?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+
+                }
+
+
+                // Check aux (comuna, giro, dte, )
+
+
+
+                // Insert NV
+                // Check if exists?
+
+
+
+
+
+
+                // Insert Ref
+
+            }
+        }
+        private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            if (CboParticipants.SelectedIndex != 0)
+            {
+                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+                TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
+                TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode; ;
+            }
+            else
+            {
+                TxtCtaCteParticipant.Text = "";
+                TxtRutParticipant.Text = "";
+            }
+            TssLblMensaje.Text = "";
+        }
+        private void BtnPdfConvert_Click(object sender, EventArgs e)
+        {
+            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
+            {
+                return;
+            }
+            DialogResult = MessageBox.Show("Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (DialogResult == DialogResult.Yes)
+            {
+                if (IsCreditor && IGridMain.SelectedRows.Count > 0)
+                {
+                    TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
+                    ServicePdf.ConvertToPdf(DetallesCreditor);
+                }
+                else
+                {
+                    TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
+                    ServicePdf.ConvertToPdf(DetallesDebtor);
+                }
+            }
         }
 
         #endregion
@@ -434,6 +518,8 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
+        #region Common functions
+
         private void IGridFill(IList<Detalle> detalles)
         {
             try
@@ -467,9 +553,6 @@ namespace Centralizador.WinApp.GUI
                         DateTime FechaEmision = Convert.ToDateTime(item.FechaEmision, CultureInfo);
                         myRow.Cells[15].Value = string.Format(CultureInfo, "{0:d}", FechaEmision);
                     }
-
-
-
 
                     if (item.FechaRecepcion != null)
                     {
@@ -525,8 +608,6 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Focus();
             }
         }
-
-
         private void CleanControls()
         {
             TssLblMensaje.Text = "";
@@ -537,10 +618,57 @@ namespace Centralizador.WinApp.GUI
             TxtFmaPago.Text = "";
         }
 
+        #endregion
+
         #region IGridMain methods
 
-
-
+        private void IGridMain_CellDoubleClick(object sender, iGCellDoubleClickEventArgs e)
+        {
+            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
+            {
+                return;
+            }
+            iGRow gRow = IGridMain.CurRow;
+            uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
+            uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
+            Detalle detalle;
+            List<Detalle> detalles = new List<Detalle>();
+            if (IsCreditor)
+            {                
+                    detalle = DetallesCreditor.First(x => x.Folio == folio && x.RutReceptor == rut);
+                    if (detalle.DTEDef != null)
+                    {
+                        TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
+                        detalles.Add(detalle);
+                        ServicePdf.ConvertToPdf(detalles);
+                    }
+                    else
+                    {
+                        TssLblMensaje.Text = $"This invoice ({ detalle.Folio}) does not have your XMl file received or has not been billed yet.";
+                    }                
+            }
+            else
+            {
+                if (IGridMain.SelectedRows.Count > 1)
+                {
+                    ServicePdf.ConvertToPdf(DetallesDebtor);
+                }
+                else
+                {
+                    detalle = DetallesDebtor.First(x => x.Folio == folio && x.RutReceptor == rut);
+                    if (detalle.DTEDef != null)
+                    {
+                        TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
+                        detalles.Add(detalle);
+                        ServicePdf.ConvertToPdf(detalles);
+                    }
+                    else
+                    {
+                        TssLblMensaje.Text = $"This invoice ({ detalle.Folio}) does not have your XMl file received or has not been billed yet.";
+                    }
+                }
+            }
+        }
         private void IGridMain_CustomDrawCellForeground(object sender, iGCustomDrawCellEventArgs e)
         {
             iGCell fCurCell = IGridMain.CurCell;
@@ -664,68 +792,12 @@ namespace Centralizador.WinApp.GUI
 
             }
         }
-
-        #endregion
-
-
-        private void BtnFacturar_Click(object sender, EventArgs e)
+        private void IGridMain_CellMouseDown(object sender, iGCellMouseDownEventArgs e)
         {
-            // Update Dte from Sii
-
-
-            //**************obligar al suario a descargar el archivo desde sii y dejarlo en el escritorio.
-
-
-
-            if (CboParticipants.SelectedIndex == 0)
-            {
-                TssLblMensaje.Text = "Plesase select a Company!";
-                return;
-            }
-            else
-            {
-                DialogResult resp = MessageBox.Show($"Se van a insertar las siguientes NV:{Environment.NewLine} Folio 5478  a 5498 {Environment.NewLine} ¿Quiere continuar?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                if (resp == DialogResult.OK)
-                {
-                    //UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-
-                    DialogResult b = MessageBox.Show("Are you sure?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-
-                }
-
-
-                // Check aux (comuna, giro, dte, )
-
-
-
-                // Insert NV
-                // Check if exists?
-
-
-
-
-
-
-                // Insert Ref
-
-            }
+            IGridMain.PerformAction(iGActions.DeselectAllRows);
         }
 
-        private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            if (CboParticipants.SelectedIndex != 0)
-            {
-                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-                TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
-                TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode; ;
-            }
-            else
-            {
-                TxtCtaCteParticipant.Text = "";
-                TxtRutParticipant.Text = "";
-            }
-            TssLblMensaje.Text = "";
-        }
+        #endregion       
 
         #region Outlook
 
@@ -767,12 +839,6 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-        private void BtnPdfConvert_Click(object sender, EventArgs e)
-        {
-
-
-        }
-
         private enum TypeEvent
         {
             AcuseRecibo = 2,
@@ -783,39 +849,7 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-        private void IGridMain_CellDoubleClick(object sender, iGCellDoubleClickEventArgs e)
-        {
-            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
-            {
-                return;
-            }
-            iGRow gRow = IGridMain.CurRow;
-            uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
-            uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
-            Detalle detalle;
 
-            if (IsCreditor)
-            {
-                detalle = DetallesCreditor.First(x => x.Folio == folio && x.RutReceptor == rut);
-            }
-            else
-            {
-                detalle = DetallesDebtor.First(x => x.Folio == folio && x.RutReceptor == rut);
-            }
-            if (detalle.DTEDef != null)
-            {
-                ServicePdf.GetPdfDocument(detalle);
-            }
-            else
-            {
-                TssLblMensaje.Text = $"This invoice ({ detalle.Folio}) does not have your XMl file received or has not been billed yet.";
-            }
-
-
-
-
-
-        }
     }
 }
 
