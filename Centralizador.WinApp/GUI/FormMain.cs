@@ -116,14 +116,14 @@ namespace Centralizador.WinApp.GUI
         {
             // frozen column will display row numbers.
             IGridMain.FrozenArea.ColCount = 3;
-            IGridMain.FrozenArea.RowCount = 0;
+            //IGridMain.FrozenArea.RowCount = 0;
             IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
-            IGridMain.FrozenArea.RowsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
+            //IGridMain.FrozenArea.RowsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
 
             // Set up the deafult parameters of the frozen columns.
             IGridMain.DefaultCol.AllowMoving = false;
             IGridMain.DefaultCol.IncludeInSelect = false;
-            //IGridMain.DefaultCol.AllowSizing = false;
+            IGridMain.DefaultCol.AllowSizing = false;
 
             // Set up the width of the first frozen column (hot and current row indicator).
             IGridMain.DefaultCol.Width = 10;
@@ -132,59 +132,74 @@ namespace Centralizador.WinApp.GUI
             // Set up the width of the second frozen column (row numbers).
             IGridMain.DefaultCol.Width = 30;
             // Add the second frozen column.
-            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+            IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.None;
 
             // Add data columns.
+            // Pattern headers cols.
             iGColPattern pattern = new iGColPattern();
             pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
             pattern.ColHdrStyle.Font = new Font("Verdana", 6.5f, FontStyle.Bold);
 
+            // Info cols.
+            IGridMain.Cols.Add("folio", "F°", 70, pattern);
+            IGridMain.Cols.Add("fechaEmision", "Emission", 65, pattern);
+            IGridMain.Cols.Add("rut", "RUT", 65, pattern);
+            IGridMain.Cols.Add("rznsocial", "Name", 100, pattern);
+            IGridMain.Cols.Add("flagxml", "", 20, pattern);
+            IGridMain.Cols.Add("inst", "Instruction", 60, pattern);
+            IGridMain.Cols.Add("codProd", "Code", 40, pattern);
+
+            // Info checkboxes
+            iGCellStyle cellStyle = new iGCellStyle
+            {
+                ImageAlign = iGContentAlignment.MiddleCenter
+            };
+            IGridMain.Cols.Add("P1", "", 16, pattern).CellStyle = cellStyle;
+            IGridMain.Cols.Add("P2", "", 16, pattern).CellStyle = cellStyle;
+            IGridMain.Cols.Add("P3", "", 16, pattern).CellStyle = cellStyle;
+            IGridMain.Cols.Add("P4", "", 16, pattern).CellStyle = cellStyle;
+            IGridMain.Cols.Add("flagRef", "", 25, pattern); // steps CEN
+
+            // Money cols
             iGCellStyle colCurrency = new iGCellStyle
             {
                 TextAlign = iGContentAlignment.MiddleRight,
                 FormatString = "{0:#,##}"
             };
+            IGridMain.Cols.Add("neto", "Net $", 65, pattern).CellStyle = colCurrency;
+            IGridMain.Cols.Add("exento", "Exent $", 65, pattern).CellStyle = colCurrency;
+            IGridMain.Cols.Add("iva", "Tax $", 65, pattern).CellStyle = colCurrency;
+            IGridMain.Cols.Add("total", "Total $", 65, pattern).CellStyle = colCurrency;
 
 
-            IGridMain.Cols.Add("Instruction", 55, pattern);
-            IGridMain.Cols.Add("Code", 40, pattern);
-            IGridMain.Cols.Add("P1", 25, pattern);
-            IGridMain.Cols.Add("P2", 25, pattern);
-            IGridMain.Cols.Add("P3", 25, pattern);
-            IGridMain.Cols.Add("P4", 25, pattern);
-            IGridMain.Cols.Add("Rut", 60, pattern);
-            IGridMain.Cols.Add("Dv", 15, pattern);
-            IGridMain.Cols.Add("Amount", 65, pattern);
-            IGridMain.Cols[10].CellStyle = colCurrency;
-            IGridMain.Cols.Add("Exent", 65, pattern);
-            IGridMain.Cols[11].CellStyle = colCurrency;
-            IGridMain.Cols.Add("Iva", 65, pattern);
-            IGridMain.Cols[12].CellStyle = colCurrency;
-            IGridMain.Cols.Add("Total", 65, pattern);
-            IGridMain.Cols[13].CellStyle = colCurrency;
-            IGridMain.Cols.Add("Folio", 70, pattern);
-            IGridMain.Cols[14].CellStyle = new iGCellStyle { TextAlign = iGContentAlignment.MiddleCenter };
-            IGridMain.Cols.Add("Emission", 65, pattern);
+            // Sii info.
+            IGridMain.Cols.Add("fechaEnvio", "", 65, pattern);
+            IGridMain.Cols.Add("status", "", 70, pattern);
+            IGridMain.Cols.Add("flagstatus", "", 70, pattern); // flag
+
+            // IGridMain.Cols[14].CellStyle = new iGCellStyle { TextAlign = iGContentAlignment.MiddleCenter };
+
             //IGridMain.Cols[15].CellStyle = new iGCellStyle { FormatString = "{0:d}" };
-            IGridMain.Cols.Add("Cbte.", 70, pattern);
-            IGridMain.Cols.Add("F. de pago", 65, pattern);
-            IGridMain.Cols.Add("pic", 25, pattern);
-            IGridMain.Cols.Add("F. de envío", 65, pattern);
-            IGridMain.Cols.Add("flag", 25, pattern);
-            IGridMain.Cols.Add("status", 70, pattern);
-            IGridMain.Cols.Add("F. de envío", 65, pattern);
-            IGridMain.Cols.Add("M", 25, pattern);
-            IGridMain.Cols.Add("Aceptado cliente", 70, pattern);
+            //IGridMain.Cols.Add("Cbte.", "", 70, pattern);
+            //IGridMain.Cols.Add("F. de pago", "", 65, pattern);
+            //IGridMain.Cols.Add("pic", "", 25, pattern);
+
+            //IGridMain.Cols.Add("flag", "", 25, pattern);
+
+            //IGridMain.Cols.Add("F.", "", 65, pattern);
+            //IGridMain.Cols.Add("M", "", 25, pattern);
+            //IGridMain.Cols.Add("Aceptado cliente", "", 70, pattern);
 
             // General options
             IGridMain.GroupBox.Visible = true;
             IGridMain.RowMode = true;
-            IGridMain.ReadOnly = true;
-            IGridMain.SelectionMode = iGSelectionMode.MultiSimple;
+            IGridMain.SelectionMode = iGSelectionMode.One;
+            IGridMain.DefaultRow.Height = 20;
+
             // Set up the default parameters of the data columns.
             IGridMain.DefaultCol.AllowMoving = true;
             //fGrid.DefaultCol.IncludeInSelect = true;
-            IGridMain.DefaultCol.AllowSizing = true;
+            IGridMain.DefaultCol.AllowSizing = false;
 
             // Footer
             IGridMain.Footer.Visible = true;
@@ -201,24 +216,24 @@ namespace Centralizador.WinApp.GUI
             // Footer freezer section
             IGridMain.Footer.Cells[0, 0].SpanCols = 3;
             IGridMain.Footer.Cells[0, 3].SpanCols = 7;
-            IGridMain.Footer.Cells[0, 14].SpanCols = 11;
+            // IGridMain.Footer.Cells[0, 14].SpanCols = 11;
 
             // Footer totals
-            IGridMain.Footer.Cells[0, 10].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, 11].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, 12].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, 13].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, 10].TextAlign = iGContentAlignment.MiddleRight;
-            IGridMain.Footer.Cells[0, 11].TextAlign = iGContentAlignment.MiddleRight;
-            IGridMain.Footer.Cells[0, 12].TextAlign = iGContentAlignment.MiddleRight;
-            IGridMain.Footer.Cells[0, 13].TextAlign = iGContentAlignment.MiddleRight;
+            IGridMain.Footer.Cells[0, "neto"].AggregateFunction = iGAggregateFunction.Sum;
+            IGridMain.Footer.Cells[0, "exento"].AggregateFunction = iGAggregateFunction.Sum;
+            IGridMain.Footer.Cells[0, "iva"].AggregateFunction = iGAggregateFunction.Sum;
+            IGridMain.Footer.Cells[0, "total"].AggregateFunction = iGAggregateFunction.Sum;
+            IGridMain.Footer.Cells[0, "neto"].TextAlign = iGContentAlignment.MiddleRight;
+            IGridMain.Footer.Cells[0, "exento"].TextAlign = iGContentAlignment.MiddleRight;
+            IGridMain.Footer.Cells[0, "iva"].TextAlign = iGContentAlignment.MiddleRight;
+            IGridMain.Footer.Cells[0, "total"].TextAlign = iGContentAlignment.MiddleRight;
 
             // Scroll
 
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Near, iGActions.GoFirstRow, "Go to first row");
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.GoLastRow, "Go to last row");
-            IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.SelectAllRows, "Select all rows");
-            IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.DeselectAllRows, "Deselect all rows");
+            //IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.SelectAllRows, "Select all rows");
+            //IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.DeselectAllRows, "Deselect all rows");
             IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.Always;
             IGridMain.HScrollBar.Visibility = iGScrollBarVisibility.Hide;
 
@@ -294,11 +309,13 @@ namespace Centralizador.WinApp.GUI
                 {
                     TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
                     ServicePdf.ConvertToPdf(DetallesCreditor);
+                    TssLblMensaje.Text = "Operation completed.";
                 }
                 else
                 {
                     TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
                     ServicePdf.ConvertToPdf(DetallesDebtor);
+                    TssLblMensaje.Text = "Operation completed.";
                 }
             }
         }
@@ -306,7 +323,6 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
         #region Creditor Transactions
-
 
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
@@ -331,7 +347,6 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "There are no published instructions.";
             }
         }
-
         private void BgwCreditor_DoWork(object sender, DoWorkEventArgs e)
         {
             IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
@@ -407,13 +422,11 @@ namespace Centralizador.WinApp.GUI
                 BgwCreditor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{instructions.Count})");
             }
         }
-
         private void BgwCreditor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
-
         private void BgwCreditor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             CleanControls();
@@ -497,6 +510,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
                 c++;
+                item.Nro = c;
                 porcent = (float)(100 * c) / DetallesDebtor.Count;
                 BgwDebtor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{DetallesDebtor.Count})");
                 Thread.Sleep(100);
@@ -534,67 +548,80 @@ namespace Centralizador.WinApp.GUI
                 foreach (Detalle item in detalles)
                 {
                     myRow = IGridMain.Rows.Add();
+                    myRow.Cells[1].Value = item.Nro;
 
                     if (item.Instruction != null)
                     {
-                        myRow.Cells[2].Value = item.Instruction.Id;
-                        myRow.Cells[3].Value = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                        myRow.Cells["inst"].Value = item.Instruction.Id;
+                        myRow.Cells["codProd"].Value = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     }
-                    myRow.Cells[8].Value = item.RutReceptor;
-                    myRow.Cells[9].Value = item.DvReceptor;
-                    myRow.Cells[10].Value = item.MntNeto;
-                    myRow.Cells[11].Value = item.MntExento;
-                    myRow.Cells[12].Value = item.MntIva;
-                    myRow.Cells[13].Value = item.MntTotal;
-                    myRow.Cells[14].Value = item.Folio;
+                    myRow.Cells["rut"].Value = item.RutReceptor + "-" + item.DvReceptor;
+                    myRow.Cells["rznsocial"].Value = item.RznSocRecep;
+                    myRow.Cells["neto"].Value = item.MntNeto;
+                    myRow.Cells["exento"].Value = item.MntExento;
+                    myRow.Cells["iva"].Value = item.MntIva;
+                    myRow.Cells["total"].Value = item.MntTotal;
+                    myRow.Cells["folio"].Value = item.Folio;
 
                     if (item.FechaEmision != null)
                     {
                         DateTime FechaEmision = Convert.ToDateTime(item.FechaEmision, CultureInfo);
-                        myRow.Cells[15].Value = string.Format(CultureInfo, "{0:d}", FechaEmision);
+                        myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", FechaEmision);
                     }
 
                     if (item.FechaRecepcion != null)
                     {
                         fechaRecepcion = Convert.ToDateTime(item.FechaRecepcion, CultureInfo);
-                        myRow.Cells[19].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
+                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
                     }
 
                     switch (item.DehOrdenEvento)
                     {
                         case 1:
-                            myRow.Cells[21].Value = TypeEvent.Reclamado;
+                            myRow.Cells["status"].Value = TypeEvent.Reclamado;
                             break;
                         case 2:
-                            myRow.Cells[21].Value = TypeEvent.AcuseRecibo;
+                            myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
                             break;
                         case 3:
-                            myRow.Cells[21].Value = TypeEvent.Contado;
+                            myRow.Cells["status"].Value = TypeEvent.Contado;
                             break;
                         case 4:
-                            myRow.Cells[21].Value = TypeEvent.AcuseRecibo;
+                            myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
                             break;
                         case 5:
                             TimeSpan len = DateTime.Today.Subtract((DateTime)fechaRecepcion);
                             if (len.Days > 8)
                             {
-                                myRow.Cells[21].Value = TypeEvent.Aceptado;
+                                myRow.Cells["status"].Value = TypeEvent.Aceptado;
                             }
                             else
                             {
-                                myRow.Cells[21].Value = $"{8 - len.Days} d.";
+                                myRow.Cells["status"].Value = $"{8 - len.Days} d.";
                             }
 
                             break;
                         case 6:
-                            myRow.Cells[21].Value = TypeEvent.Emitido;
+                            myRow.Cells["status"].Value = TypeEvent.Emitido;
                             break;
-
-
+                    }
+                    if (item.DTEDef != null)
+                    {
+                        myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton;
+                    }
+                    if (IsCreditor)
+                    {
+                        myRow.Cells["P1"].Type = iGCellType.Check;
+                        myRow.Cells["P2"].Type = iGCellType.Check;
+                    }
+                    else
+                    {
+                        myRow.Cells["P3"].Type = iGCellType.Check;
+                        myRow.Cells["P4"].Type = iGCellType.Check;
                     }
 
                 }
-
+                IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
             }
             catch (Exception)
@@ -604,6 +631,7 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
+                //IGridMain.ReadOnly = true;               
                 IGridMain.EndUpdate();
                 IGridMain.Focus();
             }
@@ -614,7 +642,6 @@ namespace Centralizador.WinApp.GUI
             TxtNmbItem.Text = "";
             TxtFolioRef.Text = "";
             TxtRznRef.Text = "";
-            TxtRznSocial.Text = "";
             TxtFmaPago.Text = "";
         }
 
@@ -624,62 +651,12 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_CellDoubleClick(object sender, iGCellDoubleClickEventArgs e)
         {
-            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
-            {
-                return;
-            }
-            iGRow gRow = IGridMain.CurRow;
-            uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
-            uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
-            Detalle detalle;
-            List<Detalle> detalles = new List<Detalle>();
-            if (IsCreditor)
-            {                
-                    detalle = DetallesCreditor.First(x => x.Folio == folio && x.RutReceptor == rut);
-                    if (detalle.DTEDef != null)
-                    {
-                        TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
-                        detalles.Add(detalle);
-                        ServicePdf.ConvertToPdf(detalles);
-                    }
-                    else
-                    {
-                        TssLblMensaje.Text = $"This invoice ({ detalle.Folio}) does not have your XMl file received or has not been billed yet.";
-                    }                
-            }
-            else
-            {
-                if (IGridMain.SelectedRows.Count > 1)
-                {
-                    ServicePdf.ConvertToPdf(DetallesDebtor);
-                }
-                else
-                {
-                    detalle = DetallesDebtor.First(x => x.Folio == folio && x.RutReceptor == rut);
-                    if (detalle.DTEDef != null)
-                    {
-                        TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
-                        detalles.Add(detalle);
-                        ServicePdf.ConvertToPdf(detalles);
-                    }
-                    else
-                    {
-                        TssLblMensaje.Text = $"This invoice ({ detalle.Folio}) does not have your XMl file received or has not been billed yet.";
-                    }
-                }
-            }
+
         }
         private void IGridMain_CustomDrawCellForeground(object sender, iGCustomDrawCellEventArgs e)
         {
             iGCell fCurCell = IGridMain.CurCell;
-
-            if (e.ColIndex == 1)
-            {
-                //Draw the row numbers.
-                e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
-                e.Graphics.DrawString((e.RowIndex + 1).ToString(), Font, SystemBrushes.ControlText, new Rectangle(e.Bounds.X + 2, e.Bounds.Y, e.Bounds.Width - 4, e.Bounds.Height));
-            }
-            else if (e.ColIndex == 0)
+            if (e.ColIndex == 0)
             {
                 // Draw the hot and current row indicators.
                 e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
@@ -690,11 +667,6 @@ namespace Centralizador.WinApp.GUI
                 {
                     myBrush = Brushes.Green;
                 }
-                //else if (e.RowIndex == -1)
-                //{
-                //    myBrush = Brushes.Red;
-                //}
-
                 if (myBrush != null)
                 {
                     e.Graphics.FillRectangle(myBrush, myX, myY, 1, 7);
@@ -719,85 +691,38 @@ namespace Centralizador.WinApp.GUI
             {
                 return;
             }
-            iGRow gRow = IGridMain.CurRow;
-            uint rut = Convert.ToUInt32(gRow.Cells[8].Value);
-            uint folio = Convert.ToUInt32(gRow.Cells[14].Value);
-            uint instruction = Convert.ToUInt32(gRow.Cells[2].Value);
             CleanControls();
-            Detalle detalle;
-            if (folio > 0)
+            Detalle detalle = null;
+            if (IsCreditor)
             {
-                if (IsCreditor)
-                {
-                    detalle = DetallesCreditor.First(x => x.Folio == folio && x.RutReceptor == rut);
-                }
-                else
-                {
-                    detalle = DetallesDebtor.First(x => x.Folio == folio && x.RutReceptor == rut);
-                }
-                try
-                {
-                    TxtRznSocial.Text = detalle.RznSocRecep;
-
-                    if (detalle.DTEDef != null)
-                    {
-                        DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-                        DTEDefTypeDocumentoDetalle[] detalles = dte.Detalle;
-                        TxtFmaPago.Text = dte.Encabezado.IdDoc.FmaPago.ToString();
-                        foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
-                        {
-                            TxtNmbItem.Text += "+" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
-                        }
-                        if (dte.Referencia != null)
-                        {
-                            DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                            if (referencia != null)
-                            {
-                                TxtFolioRef.Text = referencia.FolioRef;
-                                TxtRznRef.Text = referencia.RazonRef;
-                            }
-                            else
-                            {
-                                TssLblMensaje.Text = $"This ivoice ({folio}) does not have 'references CEN'.";
-                            }
-
-                        }
-                        else
-                        {
-                            TssLblMensaje.Text = $"This ivoice ({folio}) does not have 'references CEN'.";
-                        }
-                    }
-                    else
-                    {
-                        if (IsCreditor)
-                        {
-                            TssLblMensaje.Text = $"This invoice ({folio}) has not been sent to Sii.";
-                        }
-                        else
-                        {
-                            TssLblMensaje.Text = $"This invoice ({folio}) does not have your XMl file received.";
-                        }
-
-                    }
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
+                detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
             }
             else
             {
-                TssLblMensaje.Text = $"This instruction ({instruction}) has not been billed yet.";
-
+                detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+            }
+            if (detalle.DTEDef != null)
+            {
+                DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                DTEDefTypeDocumentoDetalle[] detalles = dte.Detalle;
+                TxtFmaPago.Text = dte.Encabezado.IdDoc.FmaPago.ToString();
+                foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
+                {
+                    TxtNmbItem.Text += "+" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
+                }
+                if (dte.Referencia != null)
+                {
+                    DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                    if (referencia != null)
+                    {
+                        TxtFolioRef.Text = referencia.FolioRef;
+                        TxtRznRef.Text = referencia.RazonRef;
+                    }
+                }
             }
         }
-        private void IGridMain_CellMouseDown(object sender, iGCellMouseDownEventArgs e)
-        {
-            IGridMain.PerformAction(iGActions.DeselectAllRows);
-        }
 
-        #endregion       
+        #endregion
 
         #region Outlook
 
@@ -849,7 +774,35 @@ namespace Centralizador.WinApp.GUI
 
         }
 
+        private void IGridMain_ColDividerDoubleClick(object sender, iGColDividerDoubleClickEventArgs e)
+        {
+            // TssLblMensaje.Text = IGridMain.Cols[e.ColIndex].Width.ToString();
+        }
 
+        private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
+        {
+            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
+            {
+                return;
+            }
+            Detalle detalle;
+            List<Detalle> detalles = new List<Detalle>();
+            if (IsCreditor)
+            {
+                detalle = DetallesCreditor.First(x => x.Nro == e.RowIndex + 1);
+
+            }
+            else
+            {
+                detalle = DetallesDebtor.First(x => x.Nro == e.RowIndex + 1);
+            }
+            if (detalle.DTEDef != null)
+            {
+                TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
+                detalles.Add(detalle);
+                ServicePdf.ConvertToPdf(detalles);
+            }
+        }
     }
 }
 

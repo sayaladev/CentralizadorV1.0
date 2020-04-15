@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblProgBar = new System.Windows.Forms.ToolStripProgressBar();
@@ -45,7 +47,6 @@
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtRznRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
-            this.TxtRznSocial = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -62,6 +63,8 @@
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
+            this.FListPics = new System.Windows.Forms.ImageList(this.components);
+            this.FpicBoxSearch = new System.Windows.Forms.PictureBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -73,6 +76,7 @@
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).BeginInit();
             this.SuspendLayout();
             // 
             // StatusStrip
@@ -128,6 +132,7 @@
             // 
             // SplitContainer.Panel1
             // 
+            this.SplitContainer.Panel1.Controls.Add(this.FpicBoxSearch);
             this.SplitContainer.Panel1.Controls.Add(this.IGridMain);
             // 
             // SplitContainer.Panel2
@@ -154,8 +159,9 @@
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
-            this.IGridMain.CellMouseDown += new TenTec.Windows.iGridLib.iGCellMouseDownEventHandler(this.IGridMain_CellMouseDown);
+            this.IGridMain.ColDividerDoubleClick += new TenTec.Windows.iGridLib.iGColDividerDoubleClickEventHandler(this.IGridMain_ColDividerDoubleClick);
             this.IGridMain.CellDoubleClick += new TenTec.Windows.iGridLib.iGCellDoubleClickEventHandler(this.IGridMain_CellDoubleClick);
+            this.IGridMain.CellEllipsisButtonClick += new TenTec.Windows.iGridLib.iGEllipsisButtonClickEventHandler(this.IGridMain_CellEllipsisButtonClick);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             // 
             // TxtDateTimeEmail
@@ -171,7 +177,6 @@
             // 
             this.groupBox4.Controls.Add(this.groupBox5);
             this.groupBox4.Controls.Add(this.TxtNmbItem);
-            this.groupBox4.Controls.Add(this.TxtRznSocial);
             this.groupBox4.Location = new System.Drawing.Point(13, 197);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(234, 222);
@@ -221,22 +226,13 @@
             // TxtNmbItem
             // 
             this.TxtNmbItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtNmbItem.Location = new System.Drawing.Point(9, 46);
+            this.TxtNmbItem.Location = new System.Drawing.Point(7, 19);
             this.TxtNmbItem.Multiline = true;
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
             this.TxtNmbItem.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.TxtNmbItem.Size = new System.Drawing.Size(218, 51);
             this.TxtNmbItem.TabIndex = 1;
-            // 
-            // TxtRznSocial
-            // 
-            this.TxtRznSocial.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRznSocial.Location = new System.Drawing.Point(10, 19);
-            this.TxtRznSocial.Name = "TxtRznSocial";
-            this.TxtRznSocial.ReadOnly = true;
-            this.TxtRznSocial.Size = new System.Drawing.Size(218, 20);
-            this.TxtRznSocial.TabIndex = 0;
             // 
             // BtnPdfConvert
             // 
@@ -405,6 +401,38 @@
             this.BtnDebtor.UseVisualStyleBackColor = true;
             this.BtnDebtor.Click += new System.EventHandler(this.BtnDebtor_Click);
             // 
+            // FListPics
+            // 
+            this.FListPics.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("FListPics.ImageStream")));
+            this.FListPics.TransparentColor = System.Drawing.Color.Transparent;
+            this.FListPics.Images.SetKeyName(0, "");
+            this.FListPics.Images.SetKeyName(1, "");
+            this.FListPics.Images.SetKeyName(2, "");
+            this.FListPics.Images.SetKeyName(3, "");
+            this.FListPics.Images.SetKeyName(4, "");
+            this.FListPics.Images.SetKeyName(5, "");
+            this.FListPics.Images.SetKeyName(6, "");
+            this.FListPics.Images.SetKeyName(7, "");
+            this.FListPics.Images.SetKeyName(8, "");
+            this.FListPics.Images.SetKeyName(9, "");
+            this.FListPics.Images.SetKeyName(10, "");
+            this.FListPics.Images.SetKeyName(11, "");
+            this.FListPics.Images.SetKeyName(12, "");
+            this.FListPics.Images.SetKeyName(13, "");
+            this.FListPics.Images.SetKeyName(14, "");
+            this.FListPics.Images.SetKeyName(15, "");
+            this.FListPics.Images.SetKeyName(16, "");
+            // 
+            // FpicBoxSearch
+            // 
+            this.FpicBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("FpicBoxSearch.Image")));
+            this.FpicBoxSearch.Location = new System.Drawing.Point(692, 394);
+            this.FpicBoxSearch.Name = "FpicBoxSearch";
+            this.FpicBoxSearch.Size = new System.Drawing.Size(36, 25);
+            this.FpicBoxSearch.TabIndex = 3;
+            this.FpicBoxSearch.TabStop = false;
+            this.FpicBoxSearch.Visible = false;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -432,6 +460,7 @@
             this.groupBox2.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.GroupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -457,7 +486,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStripStatusLabel TssLblUserEmail;
         private System.Windows.Forms.Button BtnPdfConvert;
-        private System.Windows.Forms.TextBox TxtRznSocial;
         private System.Windows.Forms.Button BtnFacturar;
         private System.Windows.Forms.Button BtnOutlook;
         private System.Windows.Forms.TextBox TxtDateTimeEmail;
@@ -473,5 +501,7 @@
         private System.Windows.Forms.TextBox TxtNmbItem;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox TxtFmaPago;
+        private System.Windows.Forms.PictureBox FpicBoxSearch;
+        private System.Windows.Forms.ImageList FListPics;
     }
 }

@@ -84,7 +84,7 @@ namespace Centralizador.Models.AppFunctions
                     return document;
                 }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -110,7 +110,7 @@ namespace Centralizador.Models.AppFunctions
                     return stringWriter.ToString();
                 }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -145,7 +145,7 @@ namespace Centralizador.Models.AppFunctions
                     return stringWriter.ToString();
                 }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -186,7 +186,7 @@ namespace Centralizador.Models.AppFunctions
                         }
                     }
                 }
-               
+
             }
         }
 
@@ -198,10 +198,10 @@ namespace Centralizador.Models.AppFunctions
             {
                 Pdf417Encoder encoder = new Pdf417Encoder
                 {
-                    //EncodingControl = EncodingControl.ByteOnly,
-                    //ErrorCorrection = ErrorCorrectionLevel.Level_5,
+                    EncodingControl = EncodingControl.ByteOnly,
+                    ErrorCorrection = ErrorCorrectionLevel.Level_5,
                     GlobalLabelIDCharacterSet = "ISO-8859-1",
-                    //QuietZone = 14,
+                    QuietZone = 14,
                     DefaultDataColumns = 14,
                     RowHeight = 6,
                     NarrowBarWidth = 2
@@ -209,10 +209,8 @@ namespace Centralizador.Models.AppFunctions
                 encoder.WidthToHeightRatio(1.9);
                 encoder.Encode(TransformObjectToXml(documento.TED).ToString());
                 encoder.SaveBarcodeToPngFile(Path.GetTempPath() + "\\timbre.png");
-
                 XsltArgumentList argumentList = new XsltArgumentList();
                 argumentList.AddParam("timbre", "", Path.GetTempPath() + "\\timbre.png");
-
                 // Xml to Html
                 XmlDocument xmlDocument = new XmlDocument();
                 xmlDocument.LoadXml(TransformObjectToXml(obj.DTEDef));
@@ -225,34 +223,13 @@ namespace Centralizador.Models.AppFunctions
                         transform.Transform(xmlDocument, argumentList, xmlWriter);
                     }
                 }
-
-                // Html to Pdf
-                //PdfDocument pdfDocument = new PdfDocument();
-                //HtmlToPdf htmlToPdf = new HtmlToPdf();
-                //htmlToPdf.Options.PdfPageSize = PdfPageSize.Letter;
-                //pdfDocument = htmlToPdf.ConvertUrl(Path.GetTempPath() + "\\invoice.html");
-                //pdfDocument.Save(Path.GetTempPath() + "\\invoice.pdf");
-                //pdfDocument.Close();
-                //System.Diagnostics.Process.Start(Path.GetTempPath() + "\\invoice.pdf");
-
-                // OpenHtmlToPdf
-
-
                 IPdfDocument pdfDocument = Pdf.From(File.ReadAllText(Path.GetTempPath() + "\\invoice.html")).OfSize(PaperSize.Letter);
                 //pdfDocument.Comressed();
                 //pdfDocument.Content();
-                //byte[] content = pdfDocument.Content();
-                //File.WriteAllBytes(Path.GetTempPath() + "\\invoice.pdf", content);
-                //System.Diagnostics.Process.Start(Path.GetTempPath() + "\\invoice.pdf");
-
-
                 return pdfDocument;
             }
-
-
-            catch (System.Exception)
+            catch (Exception)
             {
-
                 throw;
             }
         }

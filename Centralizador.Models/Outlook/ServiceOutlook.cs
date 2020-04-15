@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using System.Windows.Forms;
 using System.Xml.Linq;
 
 using Centralizador.Models.AppFunctions;
@@ -113,9 +114,13 @@ namespace Centralizador.Models.Outlook
                                 // Save file                          
                                 SaveFiles(xmlDocumnet, pathTemp + @"\" + att.Name);
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
-
+                                if (ex.Message == "Se excedió el tiempo de espera de la operación")
+                                {
+                                    MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                                    return;
+                                }
                                 continue;
                             }
                         }
@@ -127,6 +132,7 @@ namespace Centralizador.Models.Outlook
                 }
                 Thread.Sleep(500);
                 worker.ReportProgress((int)porcent, $"Processing Xml files... [finished]");
+                Properties.Settings.Default.Save();
             }
             catch (Exception)
             {
@@ -136,7 +142,7 @@ namespace Centralizador.Models.Outlook
             finally
             {
 
-                Properties.Settings.Default.Save();
+              
 
             }
 

@@ -45,15 +45,12 @@ namespace Centralizador.Models.ApiSII
                     url = "https://www4.sii.cl/consemitidosinternetui/services/data/facadeService/getDetalle";
                     break;
             }
-
             MetaData metaData = new MetaData
             {
                 Namespace = ns,
                 ConversationId = token,
                 TransactionId = "0"
             };
-
-
             Data data = new Data
             {
                 TipoDoc = tipoDoc,
@@ -64,9 +61,7 @@ namespace Centralizador.Models.ApiSII
                 DerrCodigo = tipoDoc,
                 RefNCD = "0"
             };
-
             ServiceLibro apiDetalleLibroReq = new ServiceLibro(metaData, data);
-
             try
             {
                 string jSon = JsonConvert.SerializeObject(apiDetalleLibroReq, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -114,7 +109,6 @@ namespace Centralizador.Models.ApiSII
 
     public class Detalle
     {
-
         [JsonProperty("rutReceptor")]
         public uint RutReceptor { get; set; }
 
@@ -162,10 +156,9 @@ namespace Centralizador.Models.ApiSII
 
         // New properties
 
+        public int Nro { get; set; }
         public ResultInstruction Instruction { get; set; }
-
         public Reference References { get; set; }
-
         public DTEDefType DTEDef { get; set; }
 
 
