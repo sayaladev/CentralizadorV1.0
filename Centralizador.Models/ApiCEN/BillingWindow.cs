@@ -81,9 +81,9 @@ namespace Centralizador.Models.ApiCEN
         /// <summary>
         /// Method return 1 Billing Window.
         /// </summary>
-        /// <param name="nnaturalKey"></param>
+        /// <param name="naturalKey"></param>
         /// <returns></returns>
-        public static ResultBillingWindow GetBillingWindowByNaturalKey(string nnaturalKey)
+        public static ResultBillingWindow GetBillingWindowByNaturalKey(string naturalKey)
         {
             WebClient wc = new WebClient
             {
@@ -93,7 +93,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"billing-windows/?natural_key={nnaturalKey}");
+                string res = wc.DownloadString($"billing-windows/?natural_key={naturalKey}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

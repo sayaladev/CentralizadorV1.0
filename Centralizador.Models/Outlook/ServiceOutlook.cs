@@ -118,7 +118,7 @@ namespace Centralizador.Models.Outlook
                             {
                                 if (ex.Message == "Se excedió el tiempo de espera de la operación")
                                 {
-                                    MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                                    MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 continue;
@@ -142,7 +142,7 @@ namespace Centralizador.Models.Outlook
             finally
             {
 
-              
+
 
             }
 

@@ -198,7 +198,7 @@ namespace Centralizador.Models.AppFunctions
             {
                 Pdf417Encoder encoder = new Pdf417Encoder
                 {
-                    EncodingControl = EncodingControl.ByteOnly,
+                    //EncodingControl = EncodingControl.ByteOnly,
                     ErrorCorrection = ErrorCorrectionLevel.Level_5,
                     GlobalLabelIDCharacterSet = "ISO-8859-1",
                     QuietZone = 14,
