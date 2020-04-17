@@ -37,12 +37,12 @@
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblTokenSii = new System.Windows.Forms.ToolStripStatusLabel();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
+            this.FpicBoxSearch = new System.Windows.Forms.PictureBox();
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtRznRef = new System.Windows.Forms.TextBox();
@@ -64,19 +64,18 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
-            this.FpicBoxSearch = new System.Windows.Forms.PictureBox();
+            this.TxtDscItem = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
             this.SplitContainer.Panel2.SuspendLayout();
             this.SplitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).BeginInit();
             this.groupBox4.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).BeginInit();
             this.SuspendLayout();
             // 
             // StatusStrip
@@ -148,6 +147,16 @@
             this.SplitContainer.SplitterDistance = 1087;
             this.SplitContainer.TabIndex = 1;
             // 
+            // FpicBoxSearch
+            // 
+            this.FpicBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("FpicBoxSearch.Image")));
+            this.FpicBoxSearch.Location = new System.Drawing.Point(692, 394);
+            this.FpicBoxSearch.Name = "FpicBoxSearch";
+            this.FpicBoxSearch.Size = new System.Drawing.Size(36, 25);
+            this.FpicBoxSearch.TabIndex = 3;
+            this.FpicBoxSearch.TabStop = false;
+            this.FpicBoxSearch.Visible = false;
+            // 
             // IGridMain
             // 
             this.IGridMain.DefaultCol.CellStyle = this.iGrid1DefaultCellStyle;
@@ -175,7 +184,10 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.groupBox5);
+            this.groupBox4.Controls.Add(this.TxtFmaPago);
+            this.groupBox4.Controls.Add(this.TxtDscItem);
+            this.groupBox4.Controls.Add(this.TxtRznRef);
+            this.groupBox4.Controls.Add(this.TxtFolioRef);
             this.groupBox4.Controls.Add(this.TxtNmbItem);
             this.groupBox4.Location = new System.Drawing.Point(13, 197);
             this.groupBox4.Name = "groupBox4";
@@ -184,31 +196,20 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
             // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.TxtFmaPago);
-            this.groupBox5.Controls.Add(this.TxtFolioRef);
-            this.groupBox5.Controls.Add(this.TxtRznRef);
-            this.groupBox5.Location = new System.Drawing.Point(44, 103);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(181, 113);
-            this.groupBox5.TabIndex = 9;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Cen References:";
-            // 
             // TxtFmaPago
             // 
-            this.TxtFmaPago.Location = new System.Drawing.Point(40, 69);
+            this.TxtFmaPago.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtFmaPago.Location = new System.Drawing.Point(128, 149);
             this.TxtFmaPago.Name = "TxtFmaPago";
             this.TxtFmaPago.ReadOnly = true;
-            this.TxtFmaPago.Size = new System.Drawing.Size(100, 20);
+            this.TxtFmaPago.Size = new System.Drawing.Size(100, 18);
             this.TxtFmaPago.TabIndex = 9;
             this.TxtFmaPago.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // TxtFolioRef
             // 
             this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFolioRef.Location = new System.Drawing.Point(8, 19);
+            this.TxtFolioRef.Location = new System.Drawing.Point(63, 101);
             this.TxtFolioRef.Name = "TxtFolioRef";
             this.TxtFolioRef.ReadOnly = true;
             this.TxtFolioRef.Size = new System.Drawing.Size(165, 18);
@@ -217,7 +218,7 @@
             // TxtRznRef
             // 
             this.TxtRznRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRznRef.Location = new System.Drawing.Point(8, 45);
+            this.TxtRznRef.Location = new System.Drawing.Point(63, 125);
             this.TxtRznRef.Name = "TxtRznRef";
             this.TxtRznRef.ReadOnly = true;
             this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
@@ -231,7 +232,7 @@
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
             this.TxtNmbItem.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TxtNmbItem.Size = new System.Drawing.Size(218, 51);
+            this.TxtNmbItem.Size = new System.Drawing.Size(221, 51);
             this.TxtNmbItem.TabIndex = 1;
             // 
             // BtnPdfConvert
@@ -423,15 +424,14 @@
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
             // 
-            // FpicBoxSearch
+            // TxtDscItem
             // 
-            this.FpicBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("FpicBoxSearch.Image")));
-            this.FpicBoxSearch.Location = new System.Drawing.Point(692, 394);
-            this.FpicBoxSearch.Name = "FpicBoxSearch";
-            this.FpicBoxSearch.Size = new System.Drawing.Size(36, 25);
-            this.FpicBoxSearch.TabIndex = 3;
-            this.FpicBoxSearch.TabStop = false;
-            this.FpicBoxSearch.Visible = false;
+            this.TxtDscItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtDscItem.Location = new System.Drawing.Point(8, 77);
+            this.TxtDscItem.Name = "TxtDscItem";
+            this.TxtDscItem.ReadOnly = true;
+            this.TxtDscItem.Size = new System.Drawing.Size(220, 18);
+            this.TxtDscItem.TabIndex = 10;
             // 
             // FormMain
             // 
@@ -451,16 +451,14 @@
             this.SplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).EndInit();
             this.SplitContainer.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.GroupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -499,9 +497,9 @@
         private System.Windows.Forms.TextBox TxtCtaCteParticipant;
         private System.Windows.Forms.TextBox TxtRutParticipant;
         private System.Windows.Forms.TextBox TxtNmbItem;
-        private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox TxtFmaPago;
         private System.Windows.Forms.PictureBox FpicBoxSearch;
         private System.Windows.Forms.ImageList FListPics;
+        private System.Windows.Forms.TextBox TxtDscItem;
     }
 }

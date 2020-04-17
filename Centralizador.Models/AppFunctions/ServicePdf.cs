@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -20,6 +22,14 @@ namespace Centralizador.Models.AppFunctions
 {
     public class ServicePdf
     {
+        private IList<Detalle> Detalles { get; set; }
+
+        public ServicePdf(IList<Detalle> detalles)
+        {
+            Detalles = detalles;
+        }
+
+
         /// <summary>
         /// Method return a object (Xml 'EnvioDTE' to object).
         /// </summary>
@@ -151,43 +161,60 @@ namespace Centralizador.Models.AppFunctions
             }
         }
 
-        public static void ConvertToPdf(IList<Detalle> detalle)
+        public static void ConvertToPdf(Detalle detalle)
         {
-            Cursor.Current = Cursors.WaitCursor;
             IPdfDocument document;
             string nomenclatura;
-            if (detalle.Count == 1)
+            document = ConvertXmlToPdf(detalle);
+            nomenclatura = detalle.RutReceptor + "_" + detalle.Folio;
+            byte[] content = document.Content();
+            try
             {
-                // Open
-                foreach (Detalle item in detalle)
-                {
-                    document = ConvertXmlToPdf(item);
-                    nomenclatura = item.RutReceptor + "_" + item.Folio;
-                    byte[] content = document.Content();
-                    File.WriteAllBytes(Path.GetTempPath() + "\\" + nomenclatura + ".pdf", content);
-                    System.Diagnostics.Process.Start(Path.GetTempPath() + "\\" + nomenclatura + ".pdf");
-                }
+                File.WriteAllBytes(Path.GetTempPath() + "\\" + nomenclatura + ".pdf", content);
+                Process.Start(Path.GetTempPath() + "\\" + nomenclatura + ".pdf");
             }
-            else
-            {   // Save in folder
+            catch (Exception)
+            {
+                throw;
+            }          
+        }
+        public void ConvertToPdf(BackgroundWorker bgw)
+        {
+            bgw.DoWork += Bgw_DoWork;
+            if (Detalles.Count > 0)
+            {
+                // N doc
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
                 dialog.Reset();
                 dialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    foreach (Detalle item in detalle)
-                    {
-                        if (item.DTEDef != null)
-                        {
-                            document = ConvertXmlToPdf(item);
-                            byte[] content = document.Content();
-                            nomenclatura = item.RutReceptor + "_" + item.Folio;
-                            File.WriteAllBytes(dialog.SelectedPath + "\\" + nomenclatura + ".pdf", content);
-                        }
-                    }
+                {                    
+                    bgw.RunWorkerAsync(dialog);
                 }
-
             }
+           
+        }
+        private void Bgw_DoWork(object sender, DoWorkEventArgs e)
+        {            
+            FolderBrowserDialog dialog = e.Argument as FolderBrowserDialog;
+            BackgroundWorker bgw = sender as BackgroundWorker;
+            IPdfDocument document;
+            int c = 0;
+            string nomenclatura;
+            foreach (Detalle item in Detalles)
+            {
+                if (item.DTEDef != null)
+                {
+                    document = ConvertXmlToPdf(item);
+                    byte[] content = document.Content();
+                    nomenclatura = item.RutReceptor + "_" + item.Folio;
+                    File.WriteAllBytes(dialog.SelectedPath + "\\" + nomenclatura + ".pdf", content);
+                }
+                c++;
+                float porcent = (float)(100 * c) / Detalles.Count;
+                bgw.ReportProgress((int)porcent, $"Converting to Pdf... [{item.Folio}] ({c}/{Detalles.Count})");
+            }
+            Process.Start(dialog.SelectedPath);
         }
 
         private static IPdfDocument ConvertXmlToPdf(Detalle obj)

@@ -24,26 +24,21 @@ namespace Centralizador.WinApp.GUI
     {
         #region Global variables/prop
 
-
-
         //Creditor     
         private IList<Detalle> DetallesCreditor { get; set; }
         private BackgroundWorker BgwCreditor { get; set; }
 
         //Debitor
         private IList<Detalle> DetallesDebtor { get; set; }
-
         private BackgroundWorker BgwDebtor { get; set; }
 
         //General
         private ResultParticipant UserParticipant { get; set; }
-
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
         private IEnumerable<ResultBilingType> BillingTypes { get; set; }
-
         public string TokenSii { get; set; }
-
         private bool IsCreditor { get; set; }
+        public bool IsRunning { get; set; }
 
 
         #endregion
@@ -292,32 +287,66 @@ namespace Centralizador.WinApp.GUI
             }
             TssLblMensaje.Text = "";
         }
-        private void BtnPdfConvert_Click(object sender, EventArgs e)
-        {
-            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
-            {
-                return;
-            }
-            DialogResult = MessageBox.Show("Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (DialogResult == DialogResult.Yes)
-            {
-                if (IsCreditor && IGridMain.SelectedRows.Count > 0)
-                {
-                    TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
-                    ServicePdf.ConvertToPdf(DetallesCreditor);
-                    TssLblMensaje.Text = "Operation completed.";
-                }
-                else
-                {
-                    TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
-                    ServicePdf.ConvertToPdf(DetallesDebtor);
-                    TssLblMensaje.Text = "Operation completed.";
-                }
-            }
-        }
 
         #endregion
 
+        #region Convert Pdf
+
+        private void BtnPdfConvert_Click(object sender, EventArgs e)
+        {
+            if (!IsRunning && IGridMain.Rows.Count > 0)
+            {
+                IList<Detalle> lista = new List<Detalle>();
+                if (IsCreditor)
+                {
+                    foreach (Detalle item in DetallesCreditor)
+                    {
+                        if (item.DTEDef != null)
+                        {
+                            lista.Add(item);
+                        }
+                    }             
+                }
+                else
+                {
+                    foreach (Detalle item in DetallesDebtor)
+                    {
+                        if (item.DTEDef != null)
+                        {
+                            lista.Add(item);
+                        }
+                    }
+                }            
+               
+                DialogResult = MessageBox.Show($"Are you sure you convert {lista.Count} documents?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (DialogResult == DialogResult.Yes)
+                {                    
+                    BackgroundWorker bgwConvertPdf = new BackgroundWorker
+                    {
+                        WorkerReportsProgress = true
+                    };
+                    bgwConvertPdf.ProgressChanged += BgwConvertPdf_ProgressChanged;
+                    bgwConvertPdf.RunWorkerCompleted += BgwConvertPdf_RunWorkerCompleted;
+                    ServicePdf servicePdf = new ServicePdf(lista);
+                    servicePdf.ConvertToPdf(bgwConvertPdf);
+                }
+            }
+        }
+        private void BgwConvertPdf_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+        private void BgwConvertPdf_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            TssLblProgBar.Value = 0;
+            TssLblMensaje.Text = "Operation completed.";
+            IsRunning = false;
+            IGridMain.Focus();
+        }
+
+        #endregion
+        
         #region Creditor Transactions
 
         private void BtnCreditor_Click(object sender, EventArgs e)
@@ -327,15 +356,9 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
             }
-            else if (BgwCreditor.IsBusy == true)
-            {
-                TssLblMensaje.Text = "Is busy!";
-                return;
-            }
             IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-            if (matrices != null)
+            if (matrices != null && !IsRunning)
             {
-
                 BgwCreditor.RunWorkerAsync(matrices);
             }
             else
@@ -345,6 +368,7 @@ namespace Centralizador.WinApp.GUI
         }
         private void BgwCreditor_DoWork(object sender, DoWorkEventArgs e)
         {
+            IsRunning = true;
             IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
             DetallesCreditor = new List<Detalle>();
             List<ResultInstruction> instructions = new List<ResultInstruction>();
@@ -428,6 +452,7 @@ namespace Centralizador.WinApp.GUI
             IGridFill(DetallesCreditor);
             TssLblProgBar.Value = 0;
             IsCreditor = true;
+            IsRunning = false;
         }
 
         #endregion
@@ -442,23 +467,18 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
             }
-            else if (BgwDebtor.IsBusy == true)
-            {
-                TssLblMensaje.Text = "Is busy!";
-                return;
-            }
             DetallesDebtor = new List<Detalle>();
             DetallesDebtor = ServiceLibro.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
             string nameFile = "";
             nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
-            if (DetallesDebtor != null)
+            if (DetallesDebtor != null && !IsRunning)
             {
-
                 BgwDebtor.RunWorkerAsync(nameFile);
             }
         }
         private void BgwDebtor_DoWork(object sender, DoWorkEventArgs e)
         {
+            IsRunning = true;
             string nameFilePath = e.Argument.ToString();
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
@@ -521,6 +541,7 @@ namespace Centralizador.WinApp.GUI
             IGridFill(DetallesDebtor);
             TssLblProgBar.Value = 0;
             IsCreditor = false;
+            IsRunning = false;
         }
 
         #endregion
@@ -681,36 +702,35 @@ namespace Centralizador.WinApp.GUI
         }
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
-            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
+            if (!IsRunning)
             {
-                return;
-            }
-            CleanControls();
-            Detalle detalle = null;
-            if (IsCreditor)
-            {
-                detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
-            }
-            else
-            {
-                detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
-            }
-            if (detalle.DTEDef != null)
-            {
-                DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-                DTEDefTypeDocumentoDetalle[] detalles = dte.Detalle;
-                TxtFmaPago.Text = dte.Encabezado.IdDoc.FmaPago.ToString();
-                foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
+                CleanControls();
+                Detalle detalle = null;
+                if (IsCreditor)
                 {
-                    TxtNmbItem.Text += "+" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
+                    detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
-                if (dte.Referencia != null)
+                else
                 {
-                    DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                    if (referencia != null)
+                    detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                }
+                if (detalle.DTEDef != null)
+                {
+                    DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                    DTEDefTypeDocumentoDetalle[] detalles = dte.Detalle;
+                    TxtFmaPago.Text = dte.Encabezado.IdDoc.FmaPago.ToString();
+                    foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
                     {
-                        TxtFolioRef.Text = referencia.FolioRef;
-                        TxtRznRef.Text = referencia.RazonRef;
+                        TxtNmbItem.Text += "+ :" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
+                    }
+                    if (dte.Referencia != null)
+                    {
+                        DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                        if (referencia != null)
+                        {
+                            TxtFolioRef.Text = referencia.FolioRef;
+                            TxtRznRef.Text = referencia.RazonRef;
+                        }
                     }
                 }
             }
@@ -721,49 +741,40 @@ namespace Centralizador.WinApp.GUI
         }
         private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
         {
-            if (BgwDebtor.IsBusy == true || BgwCreditor.IsBusy == true)
+            if (!IsRunning)
             {
-                return;
-            }
-            Detalle detalle;
-            List<Detalle> detalles = new List<Detalle>();
-            if (IsCreditor)
-            {
-                detalle = DetallesCreditor.First(x => x.Nro == e.RowIndex + 1);
-            }
-            else
-            {
-                detalle = DetallesDebtor.First(x => x.Nro == e.RowIndex + 1);
-            }
-            if (detalle.DTEDef != null)
-            {
-                TssLblMensaje.Text = "Converting invoice to Pdf file, wait please.";
-                detalles.Add(detalle);
-                ServicePdf.ConvertToPdf(detalles);
+                Detalle detalle;
+                if (IsCreditor)
+                {
+                    detalle = DetallesCreditor.First(x => x.Nro == e.RowIndex + 1);
+                }
+                else
+                {
+                    detalle = DetallesDebtor.First(x => x.Nro == e.RowIndex + 1);
+                }
+                if (detalle.DTEDef != null)
+                {
+                    ServicePdf.ConvertToPdf(detalle);
+                }
             }
         }
         #endregion
 
         #region Outlook
 
-
-        /// <summary>
-        /// Method download & read email from account of CVE company.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
-            ServiceOutlook outlook = new ServiceOutlook(TokenSii);
+            ServiceOutlook ServiceOutlook = new ServiceOutlook(TokenSii);
             BackgroundWorker bgwReadEmail = new BackgroundWorker
             {
                 WorkerReportsProgress = true
             };
             bgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
             bgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
-            if (bgwReadEmail.IsBusy == false)
+            if (!IsRunning)
             {
-                outlook.GetXmlFromEmail(bgwReadEmail);
+                IsRunning = true;
+                ServiceOutlook.GetXmlFromEmail(bgwReadEmail);
             }
         }
         private void BgwReadEmail_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -776,8 +787,8 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = 0;
             BtnOutlook.Enabled = true;
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", e.Result);
+            IsRunning = false;
             IGridMain.Focus();
-
         }
 
         #endregion
