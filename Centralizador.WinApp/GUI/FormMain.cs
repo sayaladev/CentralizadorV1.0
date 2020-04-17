@@ -658,6 +658,7 @@ namespace Centralizador.WinApp.GUI
             TxtFolioRef.Text = "";
             TxtRznRef.Text = "";
             TxtFmaPago.Text = "";
+            TxtDscItem.Text = "";
         }
 
         #endregion
@@ -721,7 +722,7 @@ namespace Centralizador.WinApp.GUI
                     TxtFmaPago.Text = dte.Encabezado.IdDoc.FmaPago.ToString();
                     foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
                     {
-                        TxtNmbItem.Text += "+ :" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
+                        TxtNmbItem.Text += "+ :" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;                       
                     }
                     if (dte.Referencia != null)
                     {
@@ -730,6 +731,7 @@ namespace Centralizador.WinApp.GUI
                         {
                             TxtFolioRef.Text = referencia.FolioRef;
                             TxtRznRef.Text = referencia.RazonRef;
+                            TxtDscItem.Text = dte.Detalle[0].DscItem;
                         }
                     }
                 }

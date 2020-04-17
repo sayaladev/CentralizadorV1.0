@@ -136,10 +136,8 @@
             // 
             // SplitContainer.Panel2
             // 
-            this.SplitContainer.Panel2.Controls.Add(this.TxtDateTimeEmail);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox4);
             this.SplitContainer.Panel2.Controls.Add(this.BtnPdfConvert);
-            this.SplitContainer.Panel2.Controls.Add(this.BtnOutlook);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox3);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox2);
             this.SplitContainer.Panel2.Controls.Add(this.GroupBox1);
@@ -176,10 +174,10 @@
             // TxtDateTimeEmail
             // 
             this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(137, 661);
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(86, 87);
             this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
             this.TxtDateTimeEmail.ReadOnly = true;
-            this.TxtDateTimeEmail.Size = new System.Drawing.Size(104, 20);
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
             this.TxtDateTimeEmail.TabIndex = 2;
             // 
             // groupBox4
@@ -191,7 +189,7 @@
             this.groupBox4.Controls.Add(this.TxtNmbItem);
             this.groupBox4.Location = new System.Drawing.Point(13, 197);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(234, 222);
+            this.groupBox4.Size = new System.Drawing.Size(234, 197);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
@@ -199,7 +197,7 @@
             // TxtFmaPago
             // 
             this.TxtFmaPago.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFmaPago.Location = new System.Drawing.Point(128, 149);
+            this.TxtFmaPago.Location = new System.Drawing.Point(129, 124);
             this.TxtFmaPago.Name = "TxtFmaPago";
             this.TxtFmaPago.ReadOnly = true;
             this.TxtFmaPago.Size = new System.Drawing.Size(100, 18);
@@ -209,7 +207,7 @@
             // TxtFolioRef
             // 
             this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFolioRef.Location = new System.Drawing.Point(63, 101);
+            this.TxtFolioRef.Location = new System.Drawing.Point(64, 76);
             this.TxtFolioRef.Name = "TxtFolioRef";
             this.TxtFolioRef.ReadOnly = true;
             this.TxtFolioRef.Size = new System.Drawing.Size(165, 18);
@@ -218,7 +216,7 @@
             // TxtRznRef
             // 
             this.TxtRznRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRznRef.Location = new System.Drawing.Point(63, 125);
+            this.TxtRznRef.Location = new System.Drawing.Point(64, 100);
             this.TxtRznRef.Name = "TxtRznRef";
             this.TxtRznRef.ReadOnly = true;
             this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
@@ -237,7 +235,7 @@
             // 
             // BtnPdfConvert
             // 
-            this.BtnPdfConvert.Location = new System.Drawing.Point(13, 647);
+            this.BtnPdfConvert.Location = new System.Drawing.Point(99, 647);
             this.BtnPdfConvert.Name = "BtnPdfConvert";
             this.BtnPdfConvert.Size = new System.Drawing.Size(56, 46);
             this.BtnPdfConvert.TabIndex = 4;
@@ -247,7 +245,7 @@
             // 
             // BtnOutlook
             // 
-            this.BtnOutlook.Location = new System.Drawing.Point(75, 647);
+            this.BtnOutlook.Location = new System.Drawing.Point(9, 73);
             this.BtnOutlook.Name = "BtnOutlook";
             this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
             this.BtnOutlook.TabIndex = 1;
@@ -257,11 +255,13 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.TxtDateTimeEmail);
             this.groupBox3.Controls.Add(this.button1);
             this.groupBox3.Controls.Add(this.BtnPagar);
+            this.groupBox3.Controls.Add(this.BtnOutlook);
             this.groupBox3.Location = new System.Drawing.Point(13, 510);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(234, 112);
+            this.groupBox3.Size = new System.Drawing.Size(234, 131);
             this.groupBox3.TabIndex = 3;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Debtor";
@@ -288,9 +288,9 @@
             // 
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.BtnFacturar);
-            this.groupBox2.Location = new System.Drawing.Point(13, 425);
+            this.groupBox2.Location = new System.Drawing.Point(13, 400);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(234, 79);
+            this.groupBox2.Size = new System.Drawing.Size(234, 104);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Creditor";
@@ -427,10 +427,11 @@
             // TxtDscItem
             // 
             this.TxtDscItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDscItem.Location = new System.Drawing.Point(8, 77);
+            this.TxtDscItem.Location = new System.Drawing.Point(9, 148);
+            this.TxtDscItem.Multiline = true;
             this.TxtDscItem.Name = "TxtDscItem";
             this.TxtDscItem.ReadOnly = true;
-            this.TxtDscItem.Size = new System.Drawing.Size(220, 18);
+            this.TxtDscItem.Size = new System.Drawing.Size(220, 36);
             this.TxtDscItem.TabIndex = 10;
             // 
             // FormMain
@@ -448,7 +449,6 @@
             this.StatusStrip.PerformLayout();
             this.SplitContainer.Panel1.ResumeLayout(false);
             this.SplitContainer.Panel2.ResumeLayout(false);
-            this.SplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).EndInit();
             this.SplitContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).EndInit();
@@ -456,6 +456,7 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.GroupBox1.PerformLayout();
