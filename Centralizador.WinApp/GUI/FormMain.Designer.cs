@@ -41,17 +41,19 @@
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
-            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
-            this.TxtFolioRef = new System.Windows.Forms.TextBox();
+            this.TxtDscItem = new System.Windows.Forms.TextBox();
             this.TxtRznRef = new System.Windows.Forms.TextBox();
+            this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
-            this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.BtnPagar = new System.Windows.Forms.Button();
+            this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button2 = new System.Windows.Forms.Button();
             this.BtnFacturar = new System.Windows.Forms.Button();
@@ -64,7 +66,7 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
-            this.TxtDscItem = new System.Windows.Forms.TextBox();
+            this.TxtStatusSii = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -171,17 +173,10 @@
             this.IGridMain.CellEllipsisButtonClick += new TenTec.Windows.iGridLib.iGEllipsisButtonClickEventHandler(this.IGridMain_CellEllipsisButtonClick);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             // 
-            // TxtDateTimeEmail
-            // 
-            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(86, 87);
-            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
-            this.TxtDateTimeEmail.ReadOnly = true;
-            this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
-            this.TxtDateTimeEmail.TabIndex = 2;
-            // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.TxtStatusSii);
+            this.groupBox4.Controls.Add(this.TxtTpoDocRef);
             this.groupBox4.Controls.Add(this.TxtFmaPago);
             this.groupBox4.Controls.Add(this.TxtDscItem);
             this.groupBox4.Controls.Add(this.TxtRznRef);
@@ -194,33 +189,52 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
             // 
+            // TxtTpoDocRef
+            // 
+            this.TxtTpoDocRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtTpoDocRef.Location = new System.Drawing.Point(8, 100);
+            this.TxtTpoDocRef.Name = "TxtTpoDocRef";
+            this.TxtTpoDocRef.ReadOnly = true;
+            this.TxtTpoDocRef.Size = new System.Drawing.Size(31, 18);
+            this.TxtTpoDocRef.TabIndex = 11;
+            // 
             // TxtFmaPago
             // 
             this.TxtFmaPago.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFmaPago.Location = new System.Drawing.Point(129, 124);
+            this.TxtFmaPago.Location = new System.Drawing.Point(45, 100);
             this.TxtFmaPago.Name = "TxtFmaPago";
             this.TxtFmaPago.ReadOnly = true;
-            this.TxtFmaPago.Size = new System.Drawing.Size(100, 18);
+            this.TxtFmaPago.Size = new System.Drawing.Size(70, 18);
             this.TxtFmaPago.TabIndex = 9;
             this.TxtFmaPago.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // TxtFolioRef
+            // TxtDscItem
             // 
-            this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFolioRef.Location = new System.Drawing.Point(64, 76);
-            this.TxtFolioRef.Name = "TxtFolioRef";
-            this.TxtFolioRef.ReadOnly = true;
-            this.TxtFolioRef.Size = new System.Drawing.Size(165, 18);
-            this.TxtFolioRef.TabIndex = 7;
+            this.TxtDscItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtDscItem.Location = new System.Drawing.Point(7, 124);
+            this.TxtDscItem.Multiline = true;
+            this.TxtDscItem.Name = "TxtDscItem";
+            this.TxtDscItem.ReadOnly = true;
+            this.TxtDscItem.Size = new System.Drawing.Size(222, 36);
+            this.TxtDscItem.TabIndex = 10;
             // 
             // TxtRznRef
             // 
             this.TxtRznRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRznRef.Location = new System.Drawing.Point(64, 100);
+            this.TxtRznRef.Location = new System.Drawing.Point(35, 76);
             this.TxtRznRef.Name = "TxtRznRef";
             this.TxtRznRef.ReadOnly = true;
             this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
             this.TxtRznRef.TabIndex = 8;
+            // 
+            // TxtFolioRef
+            // 
+            this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtFolioRef.Location = new System.Drawing.Point(121, 100);
+            this.TxtFolioRef.Name = "TxtFolioRef";
+            this.TxtFolioRef.ReadOnly = true;
+            this.TxtFolioRef.Size = new System.Drawing.Size(107, 18);
+            this.TxtFolioRef.TabIndex = 7;
             // 
             // TxtNmbItem
             // 
@@ -230,28 +244,18 @@
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
             this.TxtNmbItem.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TxtNmbItem.Size = new System.Drawing.Size(221, 51);
+            this.TxtNmbItem.Size = new System.Drawing.Size(222, 51);
             this.TxtNmbItem.TabIndex = 1;
             // 
             // BtnPdfConvert
             // 
-            this.BtnPdfConvert.Location = new System.Drawing.Point(99, 647);
+            this.BtnPdfConvert.Location = new System.Drawing.Point(76, 647);
             this.BtnPdfConvert.Name = "BtnPdfConvert";
-            this.BtnPdfConvert.Size = new System.Drawing.Size(56, 46);
+            this.BtnPdfConvert.Size = new System.Drawing.Size(107, 46);
             this.BtnPdfConvert.TabIndex = 4;
             this.BtnPdfConvert.Text = "Pdf";
             this.BtnPdfConvert.UseVisualStyleBackColor = true;
             this.BtnPdfConvert.Click += new System.EventHandler(this.BtnPdfConvert_Click);
-            // 
-            // BtnOutlook
-            // 
-            this.BtnOutlook.Location = new System.Drawing.Point(9, 73);
-            this.BtnOutlook.Name = "BtnOutlook";
-            this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
-            this.BtnOutlook.TabIndex = 1;
-            this.BtnOutlook.Text = "Outlook";
-            this.BtnOutlook.UseVisualStyleBackColor = true;
-            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
             // 
             // groupBox3
             // 
@@ -265,6 +269,15 @@
             this.groupBox3.TabIndex = 3;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Debtor";
+            // 
+            // TxtDateTimeEmail
+            // 
+            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(86, 87);
+            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
+            this.TxtDateTimeEmail.ReadOnly = true;
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
+            this.TxtDateTimeEmail.TabIndex = 2;
             // 
             // button1
             // 
@@ -283,6 +296,16 @@
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = true;
+            // 
+            // BtnOutlook
+            // 
+            this.BtnOutlook.Location = new System.Drawing.Point(9, 73);
+            this.BtnOutlook.Name = "BtnOutlook";
+            this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
+            this.BtnOutlook.TabIndex = 1;
+            this.BtnOutlook.Text = "Outlook";
+            this.BtnOutlook.UseVisualStyleBackColor = true;
+            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
             // 
             // groupBox2
             // 
@@ -424,15 +447,14 @@
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
             // 
-            // TxtDscItem
+            // TxtStatusSii
             // 
-            this.TxtDscItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDscItem.Location = new System.Drawing.Point(9, 148);
-            this.TxtDscItem.Multiline = true;
-            this.TxtDscItem.Name = "TxtDscItem";
-            this.TxtDscItem.ReadOnly = true;
-            this.TxtDscItem.Size = new System.Drawing.Size(220, 36);
-            this.TxtDscItem.TabIndex = 10;
+            this.TxtStatusSii.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtStatusSii.Location = new System.Drawing.Point(7, 167);
+            this.TxtStatusSii.Name = "TxtStatusSii";
+            this.TxtStatusSii.ReadOnly = true;
+            this.TxtStatusSii.Size = new System.Drawing.Size(222, 18);
+            this.TxtStatusSii.TabIndex = 12;
             // 
             // FormMain
             // 
@@ -502,5 +524,7 @@
         private System.Windows.Forms.PictureBox FpicBoxSearch;
         private System.Windows.Forms.ImageList FListPics;
         private System.Windows.Forms.TextBox TxtDscItem;
+        private System.Windows.Forms.TextBox TxtTpoDocRef;
+        private System.Windows.Forms.TextBox TxtStatusSii;
     }
 }

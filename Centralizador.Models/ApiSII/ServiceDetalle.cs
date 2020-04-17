@@ -12,36 +12,36 @@ using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiSII
 {
-    public class ServiceLibro
+    public class ServiceDetalle
     {
 
         [JsonProperty("data")]
-        public object Data { get; set; }
+        public Data Data { get; set; }
 
         [JsonProperty("metaData")]
         public MetaData MetaData { get; set; }
 
-        public ServiceLibro(MetaData metaData, Data data)
+        public ServiceDetalle(MetaData metaData, Data data)
         {
             MetaData = metaData;
             Data = data;
         }
 
 
-        public static IList<Detalle> GetLibro(string tipoLibro, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
+        public static IList<Detalle> GetLibro(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
         {
             string ns = "", url = "";
-            byte op = 0;
-            switch (tipoLibro)
+            string op = "";
+            switch (tipoUser)
             {
                 case "Debtor":
                     ns = "cl.sii.sdi.lob.diii.consemitidos.data.api.interfaces.FacadeService/getDetalleRecibidos";
-                    op = 2;
+                    op = "2";
                     url = "https://www4.sii.cl/consemitidosinternetui/services/data/facadeService/getDetalleRecibidos";
                     break;
                 case "Creditor":
                     ns = "cl.sii.sdi.lob.diii.consemitidos.data.api.interfaces.FacadeService/getDetalle";
-                    op = 1;
+                    op = "1";
                     url = "https://www4.sii.cl/consemitidosinternetui/services/data/facadeService/getDetalle";
                     break;
             }
@@ -61,11 +61,12 @@ namespace Centralizador.Models.ApiSII
                 DerrCodigo = tipoDoc,
                 RefNCD = "0"
             };
-            ServiceLibro apiDetalleLibroReq = new ServiceLibro(metaData, data);
+            ServiceDetalle apiDetalleLibroReq = new ServiceDetalle(metaData, data);
+            WebClient wc = new WebClient();
             try
             {
                 string jSon = JsonConvert.SerializeObject(apiDetalleLibroReq, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                WebClient wc = new WebClient();
+
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
                 wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={userParticipant.Rut}; DV_NS={userParticipant.VerificationCode};TOKEN={token}";
@@ -102,6 +103,10 @@ namespace Centralizador.Models.ApiSII
                     MessageBox.Show($"Message from Http:{Environment.NewLine}{http.StatusDescription}");
                     return null;
                 }
+            }
+            finally
+            {
+                wc.Dispose();
             }
             return null;
         }
@@ -160,7 +165,7 @@ namespace Centralizador.Models.ApiSII
         public ResultInstruction Instruction { get; set; }
         public Reference References { get; set; }
         public DTEDefType DTEDef { get; set; }
-
+        public DataEvento DataEvento { get; set; }
 
     }
 
@@ -183,30 +188,6 @@ namespace Centralizador.Models.ApiSII
         public int TotMntTotal { get; set; }
     }
 
-    public class MetaData
-    {
-
-        [JsonProperty("conversationId")]
-        public object ConversationId { get; set; }
-
-        [JsonProperty("transactionId")]
-        public object TransactionId { get; set; }
-
-        [JsonProperty("namespace")]
-        public object Namespace { get; set; }
-
-        [JsonIgnore]
-        [JsonProperty("info")]
-        public object Info { get; set; }
-
-        //[JsonIgnore]
-        [JsonProperty("errors")]
-        public List<Error> Errors { get; set; }
-
-        [JsonProperty("page")]
-        public object Page { get; set; }
-    }
-
     public class RespEstado
     {
 
@@ -220,35 +201,10 @@ namespace Centralizador.Models.ApiSII
         public object CodError { get; set; }
     }
 
-    public class Data
-    {
-
-        [JsonProperty("tipoDoc")]
-        public string TipoDoc { get; set; }
-
-        [JsonProperty("rut")]
-        public string Rut { get; set; }
-
-        [JsonProperty("dv")]
-        public string Dv { get; set; }
-
-        [JsonProperty("periodo")]
-        public string Periodo { get; set; }
-
-        [JsonProperty("operacion")]
-        public int Operacion { get; set; }
-
-        [JsonProperty("derrCodigo")]
-        public string DerrCodigo { get; set; }
-
-        [JsonProperty("refNCD")]
-        public string RefNCD { get; set; }
-    }
-
     public class DetalleLibro
     {
         [JsonProperty("data")]
-        public object Data { get; set; }
+        public Data Data { get; set; }
 
         [JsonProperty("dataResp")]
         public DataResp DataResp { get; set; }

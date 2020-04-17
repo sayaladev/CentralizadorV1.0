@@ -28,7 +28,6 @@ namespace Centralizador.Models.ApiSII
                 }
             }
             store.Close();
-
             try
             {
                 RESPUESTA XmlObject;

@@ -305,7 +305,7 @@ namespace Centralizador.WinApp.GUI
                         {
                             lista.Add(item);
                         }
-                    }             
+                    }
                 }
                 else
                 {
@@ -316,11 +316,11 @@ namespace Centralizador.WinApp.GUI
                             lista.Add(item);
                         }
                     }
-                }            
-               
+                }
+
                 DialogResult = MessageBox.Show($"Are you sure you convert {lista.Count} documents?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (DialogResult == DialogResult.Yes)
-                {                    
+                {
                     BackgroundWorker bgwConvertPdf = new BackgroundWorker
                     {
                         WorkerReportsProgress = true
@@ -346,7 +346,7 @@ namespace Centralizador.WinApp.GUI
         }
 
         #endregion
-        
+
         #region Creditor Transactions
 
         private void BtnCreditor_Click(object sender, EventArgs e)
@@ -398,11 +398,13 @@ namespace Centralizador.WinApp.GUI
                 //}
                 Detalle detalle = new Detalle();
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
+                //instruction.ParticipantCreditor = UserParticipant;
                 detalle.Instruction = instruction;
                 detalle.MntNeto = instruction.Amount;
                 detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
                 detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
                 detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
+
                 // Mapping references Softland
                 IList<Reference> references = Reference.GetInfoFactura(instruction);
                 if (references != null)
@@ -415,15 +417,22 @@ namespace Centralizador.WinApp.GUI
                     {
                         xmlObjeto = ServicePdf.TransformXmlStringToObjectDTE(reference.FileBasico);
                     }
+                    detalle.Folio = reference.Folio;
                     if (xmlObjeto != null)
                     {
                         detalle.DTEDef = xmlObjeto;
                         DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
                         detalle.MntIva = Convert.ToUInt32(dte.Encabezado.Totales.IVA);
                         detalle.MntTotal = Convert.ToUInt32(dte.Encabezado.Totales.MntTotal);
-                    }
 
-                    detalle.Folio = reference.Folio;
+                        // Sii
+                        DataEvento evento = ServiceEvento.GetStatusDte("Creditor", TokenSii, "33", detalle, UserParticipant);
+                        if (evento != null)
+                        {
+                            detalle.DataEvento = evento;
+                        }
+
+                    }
                     detalle.References = reference;
                     if (reference.FechaRecepcionSii != null)
                     {
@@ -435,11 +444,13 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
                 c++;
-                detalle.Nro = c;
+                //detalle.Nro = c;
                 DetallesCreditor.Add(detalle);
                 porcent = (float)(100 * c) / instructions.Count;
                 BgwCreditor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{instructions.Count})");
             }
+            // Order the list
+            DetallesCreditor = DetallesCreditor.OrderBy(x => x.Folio).ToList();
         }
         private void BgwCreditor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -468,7 +479,7 @@ namespace Centralizador.WinApp.GUI
                 return;
             }
             DetallesDebtor = new List<Detalle>();
-            DetallesDebtor = ServiceLibro.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+            DetallesDebtor = ServiceDetalle.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
             string nameFile = "";
             nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
             if (DetallesDebtor != null && !IsRunning)
@@ -499,10 +510,10 @@ namespace Centralizador.WinApp.GUI
                             ResultBillingWindow window = null;
                             if (r.RazonRef != null)
                             {
-                                string r1 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']') + 1);
+                                string r1 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']') + 1).TrimStart();
                                 string r2 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
                                 r2 = r2.Substring(r2.IndexOf(']') + 1);
-                                string r3 = r.RazonRef.Substring(r1.Length + r2.Length);
+                                string r3 = r.RazonRef.Substring(r1.Length + r2.Length).TrimEnd();
                                 TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
                                 rznRef = ti.ToTitleCase(r2.ToLower());
                                 window = BillingWindow.GetBillingWindowByNaturalKey(r1 + rznRef);
@@ -515,20 +526,33 @@ namespace Centralizador.WinApp.GUI
                                     {
                                         // Get the instruction                                        
                                         ResultParticipant participant = Participant.GetParticipantByRut(dte.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
-                                        item.Instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
+                                        ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
+                                        if (instruction != null)
+                                        {
+                                            item.Instruction = instruction;                                           
+                                        }                                       
                                     }
                                 }
                             }
 
                         }
                     }
+                    // Sii
+                    DataEvento evento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
+                    if (evento != null)
+                    {
+                        item.DataEvento = evento;
+                    }
                 }
                 c++;
-                item.Nro = c;
+                //item.Nro = c;
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
                 BgwDebtor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{DetallesDebtor.Count})");
                 Thread.Sleep(100);
             }
+            // Order the list
+            DetallesDebtor =  DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
+
         }
         private void BgwDebtor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -558,10 +582,13 @@ namespace Centralizador.WinApp.GUI
                 // Set up the height of the first row (frozen).
 
                 iGRow myRow;
+                int c = 0;
                 DateTime? fechaRecepcion = null;
                 foreach (Detalle item in detalles)
                 {
                     myRow = IGridMain.Rows.Add();
+                    c++;
+                    item.Nro = c;
                     myRow.Cells[1].Value = item.Nro;
 
                     if (item.Instruction != null)
@@ -590,36 +617,57 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
                     }
 
-                    switch (item.DehOrdenEvento)
+                    if (item.DataEvento != null)
                     {
-                        case 1:
-                            myRow.Cells["status"].Value = TypeEvent.Reclamado;
-                            break;
-                        case 2:
-                            myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
-                            break;
-                        case 3:
-                            myRow.Cells["status"].Value = TypeEvent.Contado;
-                            break;
-                        case 4:
-                            myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
-                            break;
-                        case 5:
-                            TimeSpan len = DateTime.Today.Subtract((DateTime)fechaRecepcion);
-                            if (len.Days > 8)
-                            {
-                                myRow.Cells["status"].Value = TypeEvent.Aceptado;
-                            }
-                            else
-                            {
-                                myRow.Cells["status"].Value = $"{8 - len.Days} d.";
-                            }
+                        if (item.DataEvento.MayorOchoDias)
+                        {
+                            myRow.Cells["status"].Value = "Accepted";
+                        }
+                        if (item.DataEvento.ListEvenHistDoc.Count > 0)
+                        {
 
-                            break;
-                        case 6:
-                            myRow.Cells["status"].Value = TypeEvent.Emitido;
-                            break;
+                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null)
+                            {
+                                myRow.Cells["status"].Value = "Accepted";
+                            }
+                            else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
+                            {
+                                myRow.Cells["status"].Value = "Reclaimed";
+                            }
+                        }
                     }
+
+
+                    //switch (item.DehOrdenEvento)
+                    //{
+                    //    case 1:
+                    //        myRow.Cells["status"].Value = TypeEvent.Reclamado;
+                    //        break;
+                    //    case 2:
+                    //        myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
+                    //        break;
+                    //    case 3:
+                    //        myRow.Cells["status"].Value = TypeEvent.Contado;
+                    //        break;
+                    //    case 4:
+                    //        myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
+                    //        break;
+                    //    case 5:
+                    //        TimeSpan len = DateTime.Today.Subtract((DateTime)fechaRecepcion);
+                    //        if (len.Days > 8)
+                    //        {
+                    //            myRow.Cells["status"].Value = TypeEvent.Aceptado;
+                    //        }
+                    //        else
+                    //        {
+                    //            myRow.Cells["status"].Value = $"{8 - len.Days} d.";
+                    //        }
+
+                    //        break;
+                    //    case 6:
+                    //        myRow.Cells["status"].Value = TypeEvent.Emitido;
+                    //        break;
+                    //}
                     if (item.DTEDef != null)
                     {
                         myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton;
@@ -659,6 +707,7 @@ namespace Centralizador.WinApp.GUI
             TxtRznRef.Text = "";
             TxtFmaPago.Text = "";
             TxtDscItem.Text = "";
+            TxtTpoDocRef.Text = "";
         }
 
         #endregion
@@ -722,7 +771,7 @@ namespace Centralizador.WinApp.GUI
                     TxtFmaPago.Text = dte.Encabezado.IdDoc.FmaPago.ToString();
                     foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
                     {
-                        TxtNmbItem.Text += "+ :" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;                       
+                        TxtNmbItem.Text += "+ :" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
                     }
                     if (dte.Referencia != null)
                     {
@@ -732,6 +781,7 @@ namespace Centralizador.WinApp.GUI
                             TxtFolioRef.Text = referencia.FolioRef;
                             TxtRznRef.Text = referencia.RazonRef;
                             TxtDscItem.Text = dte.Detalle[0].DscItem;
+                            TxtTpoDocRef.Text = referencia.TpoDocRef;
                         }
                     }
                 }
@@ -795,6 +845,8 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
+        #region Enumerations
+
         private enum TypeEvent
         {
             AcuseRecibo = 2,
@@ -805,6 +857,7 @@ namespace Centralizador.WinApp.GUI
 
         }
 
+        #endregion
 
     }
 }
