@@ -38,10 +38,8 @@ namespace Centralizador.Models.ApiSII
                 }
             }
             store.Close();
-
             string rutToken = cert.Subject;
             rutToken = rutToken.Substring(rutToken.IndexOf('=') + 1, 10);
-
             MetaData metaData = new MetaData
             {
                 Namespace = "cl.sii.sdi.lob.diii.registrorechazodtej6.data.api.interfaces.FacadeService/validarAccesoReceptor",

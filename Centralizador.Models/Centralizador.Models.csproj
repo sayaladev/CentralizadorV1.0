@@ -94,8 +94,9 @@
     <Compile Include="DataBase\Auxiliar.cs" />
     <Compile Include="DataBase\Conexion.cs" />
     <Compile Include="DataBase\Reference.cs" />
-    <Compile Include="Outlook\DeserializerXml.cs" />
+    <Compile Include="Outlook\XsdEnvioDTE.cs" />
     <Compile Include="Outlook\ServiceOutlook.cs" />
+    <Compile Include="Outlook\XsdRespuestaDTE.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

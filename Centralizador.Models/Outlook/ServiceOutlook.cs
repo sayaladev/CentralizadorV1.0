@@ -15,11 +15,11 @@ using EAGetMail;
 namespace Centralizador.Models.Outlook
 {
     public class ServiceOutlook
-    {      
+    {
         private string TokenSii { get; set; }
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
         public ServiceOutlook(string tokenSii)
-        {         
+        {
             TokenSii = tokenSii;
         }
         public void GetXmlFromEmail(BackgroundWorker bgw)
@@ -96,7 +96,11 @@ namespace Centralizador.Models.Outlook
                         {
                             att.SaveAs(pathTemp + @"\" + att.Name, true);
                             XDocument xmlDocumnet = XDocument.Load(pathTemp + @"\" + att.Name);
-                            SaveFiles(xmlDocumnet, pathTemp + @"\" + att.Name);
+                            if (!SaveFiles(xmlDocumnet, pathTemp + @"\" + att.Name))
+                            {
+                                MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
                         }
                     }
                     c++;
@@ -113,60 +117,95 @@ namespace Centralizador.Models.Outlook
                 throw;
             }
         }
-        private void SaveFiles(XDocument xmlDocumnet, string path)
+        private bool SaveFiles(XDocument xmlDocumnet, string path)
         {
-            if (xmlDocumnet.Root.Name.LocalName == "EnvioDTE")
+            string response = "";
+            string nameFolder = "";
+            string nameFile = "";
+            switch (xmlDocumnet.Root.Name.LocalName)
             {
-                // Deserialize
-                EnvioDTE xmlObjeto = ServicePdf.TransformXmlToObject(path);
-                foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
-                {
-                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
-                    string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
-                    string response = "";
-                    try
+                case "EnvioDTE":
+                    // Deserialize
+                    EnvioDTE xmlObjeto = ServicePdf.TransformXmlEnvioDTEToObject(path);
+                    foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
                     {
-                        using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
+                        DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
+                        string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
+                        // Only process TipoDTE 33 & 34.
+                        if (document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item33 || document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item34)
                         {
-                            response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
-                            emisor.GetValue(1).ToString(),
-                            Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
-                            document.Encabezado.IdDoc.Folio);
+                            try
+                            {
+                                using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
+                                {
+                                    response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
+                                    emisor.GetValue(1).ToString(),
+                                    Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
+                                    document.Encabezado.IdDoc.Folio);
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                return false;
+                            }
+
+                            if (response.Length != 0)
+                            {
+                                DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
+                                nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
+                                nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
+                                Save(nameFolder + @"\EnvioDTE\", nameFile, dte);
+                                return true;
+                            }
+                            else
+                            {
+                                // Errors.
+                                nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
+                                nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
+                                Save(nameFolder + @"\Errors\", nameFile, dte);
+                                return true;
+                            }
                         }
                     }
-                    catch (Exception ex)
+                    break;
+                case "RespuestaDTE":
+                    RespuestaDTE respuestaDTE = ServicePdf.TransformXmlRespuestaDTEToObject(path);
+                    DateTime date = respuestaDTE.Resultado.Caratula.TmstFirmaResp;                  
+                    object[] respuestaDTEResultadoResultadoDTEs = respuestaDTE.Resultado.Items;
+                    if (respuestaDTEResultadoResultadoDTEs.GetType() == typeof(RespuestaDTEResultadoResultadoDTE))
                     {
-                        if (ex.Message == "Se excedió el tiempo de espera de la operación")
+                        foreach (RespuestaDTEResultadoResultadoDTE item in respuestaDTEResultadoResultadoDTEs)
                         {
-                            MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
+                            nameFolder = date.Year + @"\" + date.Month + @"\" + item.RUTEmisor;
+                            nameFile = Convert.ToInt32(item.TipoDTE).ToString() + "__" + item.Folio;
+                            Save(nameFolder + @"\RespuestaDTE\", nameFile, item);
+                            return true;
                         }
                     }
-                    if (response.Length != 0)
-                    {
-                        DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
-                        string nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
-                        string nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + document.Encabezado.IdDoc.Folio;
-                        if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder))
-                        {
-                            Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder);
-                        }
-                        ;
-                        File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
-                    }
-                    else
-                    {
-                        string nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
-                        string nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + document.Encabezado.IdDoc.Folio;
-                        if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\no_date"))
-                        {
-                            Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\no_date");
-                        }
-                        File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\no_date\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
-                    }
-                }
+                    break;
+                default:
+                    //MessageBox.Show("Test");
+                    return true;
             }
-        }        
+            return true;
+        }
+
+        private void Save(string nameFolder, string nameFile, DTEDefType dte)
+        {
+            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder))
+            {
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder);
+            }
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
+        }
+        private void Save(string nameFolder, string nameFile, RespuestaDTEResultadoResultadoDTE dte)
+        {
+            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder))
+            {
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder);
+            }
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
+        }
     }
 }
 

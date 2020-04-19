@@ -42,6 +42,7 @@
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.TxtStatusSii = new System.Windows.Forms.TextBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
             this.TxtDscItem = new System.Windows.Forms.TextBox();
@@ -66,7 +67,7 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
-            this.TxtStatusSii = new System.Windows.Forms.TextBox();
+            this.TxtEstadoDTEGlosa = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -172,9 +173,11 @@
             this.IGridMain.CellDoubleClick += new TenTec.Windows.iGridLib.iGCellDoubleClickEventHandler(this.IGridMain_CellDoubleClick);
             this.IGridMain.CellEllipsisButtonClick += new TenTec.Windows.iGridLib.iGEllipsisButtonClickEventHandler(this.IGridMain_CellEllipsisButtonClick);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
+            this.IGridMain.RequestCellToolTipText += new TenTec.Windows.iGridLib.iGRequestCellToolTipTextEventHandler(this.IGridMain_RequestCellToolTipText);
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.TxtEstadoDTEGlosa);
             this.groupBox4.Controls.Add(this.TxtStatusSii);
             this.groupBox4.Controls.Add(this.TxtTpoDocRef);
             this.groupBox4.Controls.Add(this.TxtFmaPago);
@@ -182,17 +185,26 @@
             this.groupBox4.Controls.Add(this.TxtRznRef);
             this.groupBox4.Controls.Add(this.TxtFolioRef);
             this.groupBox4.Controls.Add(this.TxtNmbItem);
-            this.groupBox4.Location = new System.Drawing.Point(13, 197);
+            this.groupBox4.Location = new System.Drawing.Point(13, 184);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(234, 197);
+            this.groupBox4.Size = new System.Drawing.Size(234, 242);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
             // 
+            // TxtStatusSii
+            // 
+            this.TxtStatusSii.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtStatusSii.Location = new System.Drawing.Point(6, 167);
+            this.TxtStatusSii.Name = "TxtStatusSii";
+            this.TxtStatusSii.ReadOnly = true;
+            this.TxtStatusSii.Size = new System.Drawing.Size(222, 18);
+            this.TxtStatusSii.TabIndex = 12;
+            // 
             // TxtTpoDocRef
             // 
             this.TxtTpoDocRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtTpoDocRef.Location = new System.Drawing.Point(8, 100);
+            this.TxtTpoDocRef.Location = new System.Drawing.Point(6, 100);
             this.TxtTpoDocRef.Name = "TxtTpoDocRef";
             this.TxtTpoDocRef.ReadOnly = true;
             this.TxtTpoDocRef.Size = new System.Drawing.Size(31, 18);
@@ -211,7 +223,7 @@
             // TxtDscItem
             // 
             this.TxtDscItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDscItem.Location = new System.Drawing.Point(7, 124);
+            this.TxtDscItem.Location = new System.Drawing.Point(6, 124);
             this.TxtDscItem.Multiline = true;
             this.TxtDscItem.Name = "TxtDscItem";
             this.TxtDscItem.ReadOnly = true;
@@ -239,7 +251,7 @@
             // TxtNmbItem
             // 
             this.TxtNmbItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtNmbItem.Location = new System.Drawing.Point(7, 19);
+            this.TxtNmbItem.Location = new System.Drawing.Point(6, 19);
             this.TxtNmbItem.Multiline = true;
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
@@ -311,9 +323,9 @@
             // 
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.BtnFacturar);
-            this.groupBox2.Location = new System.Drawing.Point(13, 400);
+            this.groupBox2.Location = new System.Drawing.Point(13, 432);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(234, 104);
+            this.groupBox2.Size = new System.Drawing.Size(234, 72);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Creditor";
@@ -330,7 +342,7 @@
             // BtnFacturar
             // 
             this.BtnFacturar.Enabled = false;
-            this.BtnFacturar.Location = new System.Drawing.Point(18, 19);
+            this.BtnFacturar.Location = new System.Drawing.Point(21, 19);
             this.BtnFacturar.Name = "BtnFacturar";
             this.BtnFacturar.Size = new System.Drawing.Size(69, 38);
             this.BtnFacturar.TabIndex = 0;
@@ -376,7 +388,7 @@
             // 
             // BtnCreditor
             // 
-            this.BtnCreditor.Location = new System.Drawing.Point(9, 99);
+            this.BtnCreditor.Location = new System.Drawing.Point(8, 99);
             this.BtnCreditor.Name = "BtnCreditor";
             this.BtnCreditor.Size = new System.Drawing.Size(97, 51);
             this.BtnCreditor.TabIndex = 4;
@@ -417,7 +429,7 @@
             // 
             // BtnDebtor
             // 
-            this.BtnDebtor.Location = new System.Drawing.Point(128, 99);
+            this.BtnDebtor.Location = new System.Drawing.Point(130, 99);
             this.BtnDebtor.Name = "BtnDebtor";
             this.BtnDebtor.Size = new System.Drawing.Size(97, 51);
             this.BtnDebtor.TabIndex = 5;
@@ -447,14 +459,15 @@
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
             // 
-            // TxtStatusSii
+            // TxtEstadoDTEGlosa
             // 
-            this.TxtStatusSii.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtStatusSii.Location = new System.Drawing.Point(7, 167);
-            this.TxtStatusSii.Name = "TxtStatusSii";
-            this.TxtStatusSii.ReadOnly = true;
-            this.TxtStatusSii.Size = new System.Drawing.Size(222, 18);
-            this.TxtStatusSii.TabIndex = 12;
+            this.TxtEstadoDTEGlosa.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtEstadoDTEGlosa.Location = new System.Drawing.Point(6, 191);
+            this.TxtEstadoDTEGlosa.Multiline = true;
+            this.TxtEstadoDTEGlosa.Name = "TxtEstadoDTEGlosa";
+            this.TxtEstadoDTEGlosa.ReadOnly = true;
+            this.TxtEstadoDTEGlosa.Size = new System.Drawing.Size(222, 36);
+            this.TxtEstadoDTEGlosa.TabIndex = 13;
             // 
             // FormMain
             // 
@@ -526,5 +539,6 @@
         private System.Windows.Forms.TextBox TxtDscItem;
         private System.Windows.Forms.TextBox TxtTpoDocRef;
         private System.Windows.Forms.TextBox TxtStatusSii;
+        private System.Windows.Forms.TextBox TxtEstadoDTEGlosa;
     }
 }

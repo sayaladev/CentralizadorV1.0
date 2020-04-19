@@ -120,6 +120,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.DefaultCol.IncludeInSelect = false;
             IGridMain.DefaultCol.AllowSizing = false;
 
+
             // Set up the width of the first frozen column (hot and current row indicator).
             IGridMain.DefaultCol.Width = 10;
             // Add the first frozen column.
@@ -134,18 +135,24 @@ namespace Centralizador.WinApp.GUI
             iGColPattern pattern = new iGColPattern();
             pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
             pattern.ColHdrStyle.Font = new Font("Calibri", 8.5f, FontStyle.Bold);
+            pattern.AllowSizing = false;
+            //pattern.AllowMoving = false;
+            pattern.AllowGrouping = true;
+
+
 
             // Info cols.
             iGCellStyle cellStyleCommon = new iGCellStyle
             {
                 TextAlign = iGContentAlignment.MiddleCenter
+
             };
             IGridMain.Cols.Add("folio", "F°", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("fechaEmision", "Emission", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("rut", "RUT", 63, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("rznsocial", "Name", 300, pattern).CellStyle = new iGCellStyle() { TextAlign = iGContentAlignment.MiddleCenter, Font = new Font("Microsoft Sans Serif", 8f) };
             IGridMain.Cols.Add("flagxml", "", 20, pattern);
-            IGridMain.Cols.Add("inst", "Inst", 47, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("inst", "Instructions", 47, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("codProd", "Code", 35, pattern).CellStyle = cellStyleCommon;
 
             // Info checkboxes
@@ -163,17 +170,21 @@ namespace Centralizador.WinApp.GUI
             iGCellStyle cellStyleMoney = new iGCellStyle
             {
                 TextAlign = iGContentAlignment.MiddleCenter,
-                FormatString = "{0:#,##}"
+                FormatString = "{0:#,##}",
+                SingleClickEdit = iGBool.True
             };
             IGridMain.Cols.Add("neto", "Net $", 64, pattern).CellStyle = cellStyleMoney;
+            IGridMain.Cols["neto"].AllowGrouping = false;
             IGridMain.Cols.Add("exento", "Exent $", 64, pattern).CellStyle = cellStyleMoney;
+            IGridMain.Cols["exento"].AllowGrouping = false;
             IGridMain.Cols.Add("iva", "Tax $", 64, pattern).CellStyle = cellStyleMoney;
+            IGridMain.Cols["iva"].AllowGrouping = false;
             IGridMain.Cols.Add("total", "Total $", 64, pattern).CellStyle = cellStyleMoney;
-
+            IGridMain.Cols["total"].AllowGrouping = false;
 
             // Sii info.
-            IGridMain.Cols.Add("fechaEnvio", "", 60, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("status", "", 50, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("status", "Status", 56, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("flagstatus", "", 70, pattern); // flag
 
             // IGridMain.Cols[14].CellStyle = new iGCellStyle { TextAlign = iGContentAlignment.MiddleCenter };
@@ -195,16 +206,13 @@ namespace Centralizador.WinApp.GUI
             IGridMain.SelectionMode = iGSelectionMode.One;
             IGridMain.DefaultRow.Height = 20;
             IGridMain.Font = new Font("Microsoft Sans Serif", 7.5f);
+            IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
+            IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
 
-            // Set up the default parameters of the data columns.
-            IGridMain.DefaultCol.AllowMoving = true;
-            //fGrid.DefaultCol.IncludeInSelect = true;
-            IGridMain.DefaultCol.AllowSizing = false;
 
             // Footer
             IGridMain.Footer.Visible = true;
-            IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
-            IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
+
 
 
             // Header
@@ -415,7 +423,7 @@ namespace Centralizador.WinApp.GUI
                     DTEDefType xmlObjeto = null;
                     if (reference.FileBasico != null)
                     {
-                        xmlObjeto = ServicePdf.TransformXmlStringToObjectDTE(reference.FileBasico);
+                        xmlObjeto = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
                     }
                     detalle.Folio = reference.Folio;
                     if (xmlObjeto != null)
@@ -491,13 +499,14 @@ namespace Centralizador.WinApp.GUI
         {
             IsRunning = true;
             string nameFilePath = e.Argument.ToString();
+            string nameFile = "";
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
             {
-                string nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
+                nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\EnvioDTE\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
                 if (File.Exists(nameFile))
                 {   // Deserialize  
-                    DTEDefType xmlObjeto = ServicePdf.TransformXmlToObjectDTE(nameFile);
+                    DTEDefType xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
                     item.DTEDef = xmlObjeto;
                     DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
                     DTEDefTypeDocumentoReferencia[] references = dte.Referencia;
@@ -529,20 +538,20 @@ namespace Centralizador.WinApp.GUI
                                         ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
                                         if (instruction != null)
                                         {
-                                            item.Instruction = instruction;                                           
-                                        }                                       
+                                            item.Instruction = instruction;
+                                        }
                                     }
                                 }
                             }
 
                         }
                     }
-                    // Sii
-                    DataEvento evento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
-                    if (evento != null)
-                    {
-                        item.DataEvento = evento;
-                    }
+                }
+                // Sii
+                DataEvento evento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
+                if (evento != null)
+                {
+                    item.DataEvento = evento;
                 }
                 c++;
                 //item.Nro = c;
@@ -551,7 +560,7 @@ namespace Centralizador.WinApp.GUI
                 Thread.Sleep(100);
             }
             // Order the list
-            DetallesDebtor =  DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
+            DetallesDebtor = DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
 
         }
         private void BgwDebtor_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -583,7 +592,6 @@ namespace Centralizador.WinApp.GUI
 
                 iGRow myRow;
                 int c = 0;
-                DateTime? fechaRecepcion = null;
                 foreach (Detalle item in detalles)
                 {
                     myRow = IGridMain.Rows.Add();
@@ -607,14 +615,12 @@ namespace Centralizador.WinApp.GUI
 
                     if (item.FechaEmision != null)
                     {
-                        DateTime FechaEmision = Convert.ToDateTime(item.FechaEmision, CultureInfo);
-                        myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", FechaEmision);
+                        myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision));
                     }
 
                     if (item.FechaRecepcion != null)
                     {
-                        fechaRecepcion = Convert.ToDateTime(item.FechaRecepcion, CultureInfo);
-                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
+                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion));
                     }
 
                     if (item.DataEvento != null)
@@ -634,40 +640,12 @@ namespace Centralizador.WinApp.GUI
                             {
                                 myRow.Cells["status"].Value = "Reclaimed";
                             }
+                            else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
+                            {
+                                myRow.Cells["status"].Value = "Accepted";
+                            }
                         }
                     }
-
-
-                    //switch (item.DehOrdenEvento)
-                    //{
-                    //    case 1:
-                    //        myRow.Cells["status"].Value = TypeEvent.Reclamado;
-                    //        break;
-                    //    case 2:
-                    //        myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
-                    //        break;
-                    //    case 3:
-                    //        myRow.Cells["status"].Value = TypeEvent.Contado;
-                    //        break;
-                    //    case 4:
-                    //        myRow.Cells["status"].Value = TypeEvent.AcuseRecibo;
-                    //        break;
-                    //    case 5:
-                    //        TimeSpan len = DateTime.Today.Subtract((DateTime)fechaRecepcion);
-                    //        if (len.Days > 8)
-                    //        {
-                    //            myRow.Cells["status"].Value = TypeEvent.Aceptado;
-                    //        }
-                    //        else
-                    //        {
-                    //            myRow.Cells["status"].Value = $"{8 - len.Days} d.";
-                    //        }
-
-                    //        break;
-                    //    case 6:
-                    //        myRow.Cells["status"].Value = TypeEvent.Emitido;
-                    //        break;
-                    //}
                     if (item.DTEDef != null)
                     {
                         myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton;
@@ -745,14 +723,18 @@ namespace Centralizador.WinApp.GUI
         private void IGridMain_ColHdrMouseDown(object sender, iGColHdrMouseDownEventArgs e)
         {
             // Prohibit sorting by the hot and current row indicator columns and by the row number column.
-            if (e.ColIndex == 0 || e.ColIndex == 1)
+            if (e.ColIndex == 0 || e.ColIndex == 6 || e.ColIndex == 7 || e.ColIndex == 10)
             {
                 e.DoDefault = false;
             }
         }
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
-            if (!IsRunning)
+            if (IGridMain.CurRow == null)
+            {
+                return;
+            }
+            if (!IsRunning && IGridMain.CurRow.Type != iGRowType.AutoGroupRow)
             {
                 CleanControls();
                 Detalle detalle = null;
@@ -816,7 +798,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
-            ServiceOutlook ServiceOutlook = new ServiceOutlook(TokenSii);
+            ServiceOutlook ServiceOutlook = new ServiceOutlook(TokenSii); // Este token debe renovarse cada 1 hora.
             BackgroundWorker bgwReadEmail = new BackgroundWorker
             {
                 WorkerReportsProgress = true
@@ -859,6 +841,40 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
+        private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
+        {
+            if (!IsRunning)
+            {
+                if (e.ColIndex == 19)
+                {
+                    Detalle detalle = null;
+                    if (IsCreditor)
+                    {
+                        detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    }
+                    else
+                    {
+                        detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    }
+                    if (detalle.DataEvento != null)
+                    {
+                        if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
+                        {
+                            foreach (ListEvenHistDoc item in detalle.DataEvento.ListEvenHistDoc)
+                            {
+                                //DateTime fechaRecepcion = Convert.ToDateTime(item.FechaEvento, CultureInfo);
+                                //myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
+
+                                e.Text = $"Events:{Environment.NewLine}";
+                                e.Text += $"{string.Format(CultureInfo, "{0:dd-MM-yyyy}", Convert.ToDateTime(item.FechaEvento))} - {item.CodEvento}: {item.DescEvento}{Environment.NewLine}";
+                            }
+
+
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

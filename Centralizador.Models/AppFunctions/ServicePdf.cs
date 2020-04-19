@@ -35,7 +35,7 @@ namespace Centralizador.Models.AppFunctions
         /// </summary>
         /// <param name="pathFile"></param>
         /// <returns>Sergio Ayala</returns>        
-        public static EnvioDTE TransformXmlToObject(string pathFile)
+        public static EnvioDTE TransformXmlEnvioDTEToObject(string pathFile)
         {
             try
             {
@@ -46,11 +46,48 @@ namespace Centralizador.Models.AppFunctions
                     return document;
                 }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return null;
             }
 
+        }
+
+        public static  RespuestaDTE TransformXmlRespuestaDTEToObject(string pathFile)
+        {
+            try
+            {
+                XmlSerializer deserializer = new XmlSerializer(typeof(RespuestaDTE));
+                using (StreamReader reader = new StreamReader(pathFile, Encoding.Default))
+                {
+                    RespuestaDTE document = (RespuestaDTE)deserializer.Deserialize(reader);
+                    return document;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+        }
+        public static string TransformObjectToXml(RespuestaDTEResultadoResultadoDTE obj)
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(RespuestaDTEResultadoResultadoDTE), new XmlRootAttribute("ResultadoDTE"));
+                using (Utf8StringWriter stringWriter = new Utf8StringWriter())
+                {
+                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
+                    {
+                        serializer.Serialize(xmlWriter, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
+                    }
+                    return stringWriter.ToString();
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -58,7 +95,7 @@ namespace Centralizador.Models.AppFunctions
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns>Method return a object (Xml 'DTE' to object).</returns>
-        public static DTEDefType TransformXmlToObjectDTE(string filePath)
+        public static DTEDefType TransformXmlDTEDefTypeToObjectDTE(string filePath)
         {
             try
             {
@@ -80,7 +117,7 @@ namespace Centralizador.Models.AppFunctions
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public static DTEDefType TransformXmlStringToObjectDTE(string file)
+        public static DTEDefType TransformStringDTEDefTypeToObjectDTE(string file)
         {
             try
             {
