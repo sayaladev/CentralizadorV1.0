@@ -17,6 +17,8 @@ using Centralizador.Models.Outlook;
 
 using TenTec.Windows.iGridLib;
 
+using Timer = System.Windows.Forms.Timer;
+
 namespace Centralizador.WinApp.GUI
 {
 
@@ -39,6 +41,7 @@ namespace Centralizador.WinApp.GUI
         public string TokenSii { get; set; }
         private bool IsCreditor { get; set; }
         public bool IsRunning { get; set; }
+        public ServiceOutlook ServiceOutlook { get; set; }
 
 
         #endregion
@@ -104,9 +107,27 @@ namespace Centralizador.WinApp.GUI
             // Date Time Outlook
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
 
-
+            // Timer            
+            Timer timer = new Timer
+            {
+                // 1 hour = 3600 seconds (1000 = 1 second)
+                Enabled = true,
+                Interval = 3600000
+            };
+            timer.Tick += Timer_Tick;
 
         }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            TokenSii = TokenSeed.GETTokenFromSii();
+            TssLblTokenSii.Text = TokenSii;
+            if (ServiceOutlook != null)
+            {
+                ServiceOutlook.TokenSii = TokenSii;
+            }
+        }
+
         private void FormMain_Shown(object sender, EventArgs e)
         {
             // frozen column will display row numbers.
@@ -503,7 +524,7 @@ namespace Centralizador.WinApp.GUI
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
             {
-                nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\EnvioDTE\\{item.RutReceptor}-{item.DvReceptor}__{item.Folio}.xml";
+                nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\EnvioDTE\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
                 if (File.Exists(nameFile))
                 {   // Deserialize  
                     DTEDefType xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
@@ -798,7 +819,10 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnOutlook_Click(object sender, EventArgs e)
         {
-            ServiceOutlook ServiceOutlook = new ServiceOutlook(TokenSii); // Este token debe renovarse cada 1 hora.
+            ServiceOutlook = new ServiceOutlook
+            {
+                TokenSii = TokenSii
+            };
             BackgroundWorker bgwReadEmail = new BackgroundWorker
             {
                 WorkerReportsProgress = true
@@ -821,6 +845,7 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = 0;
             BtnOutlook.Enabled = true;
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", e.Result);
+            TssLblMensaje.Text = "Complete!";
             IsRunning = false;
             IGridMain.Focus();
         }

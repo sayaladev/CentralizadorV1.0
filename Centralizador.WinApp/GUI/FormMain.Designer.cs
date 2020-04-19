@@ -42,6 +42,7 @@
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.TxtEstadoDTEGlosa = new System.Windows.Forms.TextBox();
             this.TxtStatusSii = new System.Windows.Forms.TextBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
@@ -67,7 +68,6 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
-            this.TxtEstadoDTEGlosa = new System.Windows.Forms.TextBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -191,6 +191,16 @@
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
+            // 
+            // TxtEstadoDTEGlosa
+            // 
+            this.TxtEstadoDTEGlosa.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtEstadoDTEGlosa.Location = new System.Drawing.Point(6, 191);
+            this.TxtEstadoDTEGlosa.Multiline = true;
+            this.TxtEstadoDTEGlosa.Name = "TxtEstadoDTEGlosa";
+            this.TxtEstadoDTEGlosa.ReadOnly = true;
+            this.TxtEstadoDTEGlosa.Size = new System.Drawing.Size(222, 36);
+            this.TxtEstadoDTEGlosa.TabIndex = 13;
             // 
             // TxtStatusSii
             // 
@@ -458,16 +468,6 @@
             this.FListPics.Images.SetKeyName(14, "");
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
-            // 
-            // TxtEstadoDTEGlosa
-            // 
-            this.TxtEstadoDTEGlosa.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtEstadoDTEGlosa.Location = new System.Drawing.Point(6, 191);
-            this.TxtEstadoDTEGlosa.Multiline = true;
-            this.TxtEstadoDTEGlosa.Name = "TxtEstadoDTEGlosa";
-            this.TxtEstadoDTEGlosa.ReadOnly = true;
-            this.TxtEstadoDTEGlosa.Size = new System.Drawing.Size(222, 36);
-            this.TxtEstadoDTEGlosa.TabIndex = 13;
             // 
             // FormMain
             // 

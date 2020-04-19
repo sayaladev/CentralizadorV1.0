@@ -46,8 +46,5 @@
     <Setting Name="UserPassword" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Che@2019!</Value>
     </Setting>
-    <Setting Name="UIdEmail" Type="System.Int64" Scope="User">
-      <Value Profile="(Default)">65001</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

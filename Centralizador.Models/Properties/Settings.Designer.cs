@@ -12,7 +12,7 @@ namespace Centralizador.Models.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -112,7 +112,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("02/12/2020 13:07:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("12/01/2019 10:00:00")]
         public global::System.DateTime DateTimeEmail {
             get {
                 return ((global::System.DateTime)(this["DateTimeEmail"]));
@@ -137,18 +137,6 @@ namespace Centralizador.Models.Properties {
         public string UserPassword {
             get {
                 return ((string)(this["UserPassword"]));
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("65001")]
-        public long UIdEmail {
-            get {
-                return ((long)(this["UIdEmail"]));
-            }
-            set {
-                this["UIdEmail"] = value;
             }
         }
     }
