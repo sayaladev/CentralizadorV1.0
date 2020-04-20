@@ -35,14 +35,12 @@
             this.TssLblProgBar = new System.Windows.Forms.ToolStripProgressBar();
             this.TssLblMensaje = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
-            this.TssLblTokenSii = new System.Windows.Forms.ToolStripStatusLabel();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.FpicBoxSearch = new System.Windows.Forms.PictureBox();
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.TxtEstadoDTEGlosa = new System.Windows.Forms.TextBox();
             this.TxtStatusSii = new System.Windows.Forms.TextBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
@@ -87,8 +85,7 @@
             this.TssLblFechaHora,
             this.TssLblProgBar,
             this.TssLblMensaje,
-            this.TssLblUserEmail,
-            this.TssLblTokenSii});
+            this.TssLblUserEmail});
             this.StatusStrip.Location = new System.Drawing.Point(0, 707);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(1350, 22);
@@ -111,7 +108,7 @@
             this.TssLblMensaje.AutoSize = false;
             this.TssLblMensaje.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.TssLblMensaje.Name = "TssLblMensaje";
-            this.TssLblMensaje.Size = new System.Drawing.Size(500, 17);
+            this.TssLblMensaje.Size = new System.Drawing.Size(600, 17);
             this.TssLblMensaje.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // TssLblUserEmail
@@ -119,12 +116,6 @@
             this.TssLblUserEmail.AutoSize = false;
             this.TssLblUserEmail.Name = "TssLblUserEmail";
             this.TssLblUserEmail.Size = new System.Drawing.Size(200, 17);
-            // 
-            // TssLblTokenSii
-            // 
-            this.TssLblTokenSii.AutoSize = false;
-            this.TssLblTokenSii.Name = "TssLblTokenSii";
-            this.TssLblTokenSii.Size = new System.Drawing.Size(100, 17);
             // 
             // SplitContainer
             // 
@@ -170,14 +161,12 @@
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
             this.IGridMain.ColDividerDoubleClick += new TenTec.Windows.iGridLib.iGColDividerDoubleClickEventHandler(this.IGridMain_ColDividerDoubleClick);
-            this.IGridMain.CellDoubleClick += new TenTec.Windows.iGridLib.iGCellDoubleClickEventHandler(this.IGridMain_CellDoubleClick);
             this.IGridMain.CellEllipsisButtonClick += new TenTec.Windows.iGridLib.iGEllipsisButtonClickEventHandler(this.IGridMain_CellEllipsisButtonClick);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             this.IGridMain.RequestCellToolTipText += new TenTec.Windows.iGridLib.iGRequestCellToolTipTextEventHandler(this.IGridMain_RequestCellToolTipText);
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.TxtEstadoDTEGlosa);
             this.groupBox4.Controls.Add(this.TxtStatusSii);
             this.groupBox4.Controls.Add(this.TxtTpoDocRef);
             this.groupBox4.Controls.Add(this.TxtFmaPago);
@@ -191,16 +180,6 @@
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
-            // 
-            // TxtEstadoDTEGlosa
-            // 
-            this.TxtEstadoDTEGlosa.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtEstadoDTEGlosa.Location = new System.Drawing.Point(6, 191);
-            this.TxtEstadoDTEGlosa.Multiline = true;
-            this.TxtEstadoDTEGlosa.Name = "TxtEstadoDTEGlosa";
-            this.TxtEstadoDTEGlosa.ReadOnly = true;
-            this.TxtEstadoDTEGlosa.Size = new System.Drawing.Size(222, 36);
-            this.TxtEstadoDTEGlosa.TabIndex = 13;
             // 
             // TxtStatusSii
             // 
@@ -523,7 +502,6 @@
         private System.Windows.Forms.Button BtnFacturar;
         private System.Windows.Forms.Button BtnOutlook;
         private System.Windows.Forms.TextBox TxtDateTimeEmail;
-        private System.Windows.Forms.ToolStripStatusLabel TssLblTokenSii;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TextBox TxtRznRef;
         private System.Windows.Forms.TextBox TxtFolioRef;
@@ -539,6 +517,5 @@
         private System.Windows.Forms.TextBox TxtDscItem;
         private System.Windows.Forms.TextBox TxtTpoDocRef;
         private System.Windows.Forms.TextBox TxtStatusSii;
-        private System.Windows.Forms.TextBox TxtEstadoDTEGlosa;
     }
 }

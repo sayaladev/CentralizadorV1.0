@@ -42,7 +42,7 @@ namespace Centralizador.WinApp.GUI
         private bool IsCreditor { get; set; }
         public bool IsRunning { get; set; }
         public ServiceOutlook ServiceOutlook { get; set; }
-
+        public int Intervalo { get; set; }
 
         #endregion
 
@@ -78,12 +78,11 @@ namespace Centralizador.WinApp.GUI
             //Biling types
             BillingTypes = BilingType.GetBilinTypes();
 
-
             // User email
             TssLblUserEmail.Text = "|  " + agent.Email;
 
             // Time
-            TssLblFechaHora.Text = string.Format(CultureInfo, "{0:D}", DateTime.Today);
+            //TssLblFechaHora.Text = string.Format(CultureInfo, "{0:D}", DateTime.Today);
 
             // Controls
             BgwDebtor = new BackgroundWorker
@@ -101,33 +100,36 @@ namespace Centralizador.WinApp.GUI
             BgwCreditor.RunWorkerCompleted += BgwCreditor_RunWorkerCompleted;
             BgwCreditor.DoWork += BgwCreditor_DoWork;
 
-            // Token
-            TssLblTokenSii.Text = TokenSii;
 
             // Date Time Outlook
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
 
-            // Timer            
+            // Timer 1 hour = 3600 seconds (1000 = 1 second)            
             Timer timer = new Timer
             {
-                // 1 hour = 3600 seconds (1000 = 1 second)
                 Enabled = true,
-                Interval = 3600000
+                Interval = 60000
             };
             timer.Tick += Timer_Tick;
+            Intervalo = timer.Interval;
+            TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
 
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            TokenSii = TokenSeed.GETTokenFromSii();
-            TssLblTokenSii.Text = TokenSii;
-            if (ServiceOutlook != null)
+            TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
+            Intervalo += 60000;
+            if (Intervalo == 3600000)
             {
-                ServiceOutlook.TokenSii = TokenSii;
+                TokenSii = TokenSeed.GETTokenFromSii();
+                if (ServiceOutlook != null)
+                {
+                    ServiceOutlook.TokenSii = TokenSii;
+                }
             }
-        }
 
+        }
         private void FormMain_Shown(object sender, EventArgs e)
         {
             // frozen column will display row numbers.
@@ -380,13 +382,13 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
-            if (CboParticipants.SelectedIndex == 0)
+            if (CboParticipants.SelectedIndex == 0 && IsRunning)
             {
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
             }
             IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-            if (matrices != null && !IsRunning)
+            if (matrices != null)
             {
                 BgwCreditor.RunWorkerAsync(matrices);
             }
@@ -502,7 +504,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnDebtor_Click(object sender, EventArgs e)
         {
-            if (CboParticipants.SelectedIndex == 0)
+            if (CboParticipants.SelectedIndex == 0 && IsRunning)
             {
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
@@ -511,7 +513,7 @@ namespace Centralizador.WinApp.GUI
             DetallesDebtor = ServiceDetalle.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
             string nameFile = "";
             nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
-            if (DetallesDebtor != null && !IsRunning)
+            if (DetallesDebtor != null)
             {
                 BgwDebtor.RunWorkerAsync(nameFile);
             }
@@ -713,10 +715,6 @@ namespace Centralizador.WinApp.GUI
 
         #region IGridMain methods
 
-        private void IGridMain_CellDoubleClick(object sender, iGCellDoubleClickEventArgs e)
-        {
-
-        }
         private void IGridMain_CustomDrawCellForeground(object sender, iGCustomDrawCellEventArgs e)
         {
             iGCell fCurCell = IGridMain.CurCell;
@@ -813,6 +811,40 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
+        private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
+        {
+            if (!IsRunning)
+            {
+                if (e.ColIndex == 19)
+                {
+                    Detalle detalle = null;
+                    if (IsCreditor)
+                    {
+                        detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    }
+                    else
+                    {
+                        detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    }
+                    if (detalle.DataEvento != null)
+                    {
+                        if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
+                        {
+                            foreach (ListEvenHistDoc item in detalle.DataEvento.ListEvenHistDoc)
+                            {
+                                //DateTime fechaRecepcion = Convert.ToDateTime(item.FechaEvento, CultureInfo);
+                                //myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
+
+                                e.Text = $"Events:{Environment.NewLine}";
+                                e.Text += $"{string.Format(CultureInfo, "{0:dd-MM-yyyy}", Convert.ToDateTime(item.FechaEvento))} - {item.CodEvento}: {item.DescEvento}{Environment.NewLine}";
+                            }
+
+
+                        }
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Outlook
@@ -852,54 +884,8 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-        #region Enumerations
-
-        private enum TypeEvent
-        {
-            AcuseRecibo = 2,
-            Contado = 3,
-            Reclamado = 1,
-            Aceptado = 5,
-            Emitido = 6
-
-        }
-
-        #endregion
-
-        private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
-        {
-            if (!IsRunning)
-            {
-                if (e.ColIndex == 19)
-                {
-                    Detalle detalle = null;
-                    if (IsCreditor)
-                    {
-                        detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
-                    }
-                    else
-                    {
-                        detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
-                    }
-                    if (detalle.DataEvento != null)
-                    {
-                        if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
-                        {
-                            foreach (ListEvenHistDoc item in detalle.DataEvento.ListEvenHistDoc)
-                            {
-                                //DateTime fechaRecepcion = Convert.ToDateTime(item.FechaEvento, CultureInfo);
-                                //myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
-
-                                e.Text = $"Events:{Environment.NewLine}";
-                                e.Text += $"{string.Format(CultureInfo, "{0:dd-MM-yyyy}", Convert.ToDateTime(item.FechaEvento))} - {item.CodEvento}: {item.DescEvento}{Environment.NewLine}";
-                            }
 
 
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 

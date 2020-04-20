@@ -40,9 +40,14 @@ namespace Centralizador.Models.Outlook
                 bgw.ReportProgress(0, "Trying to connect to the mail server...");
                 oClient.Connect(oServer);
                 oClient.GetMailInfosParam.Reset();
-                oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.DateRange;
-                oClient.GetMailInfosParam.DateRange.SINCE = Properties.Settings.Default.DateTimeEmail;
+                //oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.NewOnly;
+                //oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.DateRange;
+                oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
+                //oClient.GetMailInfosParam.DateRange.SINCE = Properties.Settings.Default.DateTimeEmail;
+                oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
                 MailInfo[] infos = oClient.GetMailInfos();
+                // MailInfo[] infoss = oClient.SearchMail($"ALL SINCE {Properties.Settings.Default.DateTimeEmail}");
+                //Properties.Settings.Default.Save();
                 string pathTemp = Directory.GetCurrentDirectory() + @"\temp";
                 if (!Directory.Exists(pathTemp))
                 {
@@ -85,6 +90,7 @@ namespace Centralizador.Models.Outlook
                     }
                     e.Result = oMail.ReceivedDate;
                     Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
+                    Properties.Settings.Default.UIDRange = info.UIDL;
                     c++;
                     porcent = (float)(100 * c) / infos.Length;
                     bgw.ReportProgress((int)porcent, $"Dowloading email from server... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})");

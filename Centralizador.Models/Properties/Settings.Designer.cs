@@ -110,18 +110,6 @@ namespace Centralizador.Models.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("12/01/2019 10:00:00")]
-        public global::System.DateTime DateTimeEmail {
-            get {
-                return ((global::System.DateTime)(this["DateTimeEmail"]));
-            }
-            set {
-                this["DateTimeEmail"] = value;
-            }
-        }
-        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("facturacionchile@capvertenergie.com")]
@@ -137,6 +125,30 @@ namespace Centralizador.Models.Properties {
         public string UserPassword {
             get {
                 return ((string)(this["UserPassword"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("12/01/2019 10:00:00")]
+        public global::System.DateTime DateTimeEmail {
+            get {
+                return ((global::System.DateTime)(this["DateTimeEmail"]));
+            }
+            set {
+                this["DateTimeEmail"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("45000")]
+        public string UIDRange {
+            get {
+                return ((string)(this["UIDRange"]));
+            }
+            set {
+                this["UIDRange"] = value;
             }
         }
     }

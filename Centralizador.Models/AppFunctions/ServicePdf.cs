@@ -270,7 +270,7 @@ namespace Centralizador.Models.AppFunctions
                     RowHeight = 6,
                     NarrowBarWidth = 2
                 };
-                encoder.WidthToHeightRatio(1.9);
+                //encoder.WidthToHeightRatio(1.9);
                 encoder.Encode(TransformObjectToXml(documento.TED).ToString());
                 encoder.SaveBarcodeToPngFile(Path.GetTempPath() + "\\timbre.png");
                 XsltArgumentList argumentList = new XsltArgumentList();
