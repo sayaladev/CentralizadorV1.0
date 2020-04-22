@@ -63,18 +63,9 @@ namespace Centralizador.Models.ApiCEN
         public DateTime UpdatedTs { get; set; }
 
         //Mapping (new properties)    
-
         public ResultParticipant ParticipantDebtor { get; set; }
-
         public ResultParticipant ParticipantCreditor { get; set; }
-
         public ResultPaymentMatrix PaymentMatrix { get; set; }
-
-
-
-        //public IList<Reference> References { get; set; }
-
-
 
     }
 
@@ -164,6 +155,40 @@ namespace Centralizador.Models.ApiCEN
                         instruction.Results[0].ParticipantCreditor = participant;
                         instruction.Results[0].ParticipantDebtor = userParticipant;
                         return instruction.Results[0];
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
+
+        public static IList<ResultInstruction> GetInstructionByParticipants(ResultParticipant participant, ResultParticipant userParticipant)
+        {
+            string res = "";
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;
+                res = wc.DownloadString($"instructions/?creditor={participant.Id}&debtor={userParticipant.Id}&status=Publicado");
+                if (res != null)
+                {
+                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    if (instruction.Results.Count > 0)
+                    {                       
+                        instruction.Results[0].ParticipantCreditor = participant;
+                        instruction.Results[0].ParticipantDebtor = userParticipant;
+                        return instruction.Results;
                     }
                 }
             }

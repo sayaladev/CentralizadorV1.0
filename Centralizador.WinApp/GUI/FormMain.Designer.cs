@@ -32,9 +32,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblProgBar = new System.Windows.Forms.ToolStripProgressBar();
             this.TssLblMensaje = new System.Windows.Forms.ToolStripStatusLabel();
-            this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.FpicBoxSearch = new System.Windows.Forms.PictureBox();
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
@@ -83,9 +83,9 @@
             // 
             this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.TssLblFechaHora,
+            this.TssLblUserEmail,
             this.TssLblProgBar,
-            this.TssLblMensaje,
-            this.TssLblUserEmail});
+            this.TssLblMensaje});
             this.StatusStrip.Location = new System.Drawing.Point(0, 707);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(1350, 22);
@@ -97,6 +97,12 @@
             this.TssLblFechaHora.AutoSize = false;
             this.TssLblFechaHora.Name = "TssLblFechaHora";
             this.TssLblFechaHora.Size = new System.Drawing.Size(180, 17);
+            // 
+            // TssLblUserEmail
+            // 
+            this.TssLblUserEmail.AutoSize = false;
+            this.TssLblUserEmail.Name = "TssLblUserEmail";
+            this.TssLblUserEmail.Size = new System.Drawing.Size(200, 17);
             // 
             // TssLblProgBar
             // 
@@ -110,12 +116,6 @@
             this.TssLblMensaje.Name = "TssLblMensaje";
             this.TssLblMensaje.Size = new System.Drawing.Size(600, 17);
             this.TssLblMensaje.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // TssLblUserEmail
-            // 
-            this.TssLblUserEmail.AutoSize = false;
-            this.TssLblUserEmail.Name = "TssLblUserEmail";
-            this.TssLblUserEmail.Size = new System.Drawing.Size(200, 17);
             // 
             // SplitContainer
             // 
@@ -330,7 +330,6 @@
             // 
             // BtnFacturar
             // 
-            this.BtnFacturar.Enabled = false;
             this.BtnFacturar.Location = new System.Drawing.Point(21, 19);
             this.BtnFacturar.Name = "BtnFacturar";
             this.BtnFacturar.Size = new System.Drawing.Size(69, 38);

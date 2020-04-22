@@ -81,9 +81,6 @@ namespace Centralizador.WinApp.GUI
             // User email
             TssLblUserEmail.Text = "|  " + agent.Email;
 
-            // Time
-            //TssLblFechaHora.Text = string.Format(CultureInfo, "{0:D}", DateTime.Today);
-
             // Controls
             BgwDebtor = new BackgroundWorker
             {
@@ -115,7 +112,6 @@ namespace Centralizador.WinApp.GUI
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
 
         }
-
         private void Timer_Tick(object sender, EventArgs e)
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
@@ -143,7 +139,6 @@ namespace Centralizador.WinApp.GUI
             IGridMain.DefaultCol.IncludeInSelect = false;
             IGridMain.DefaultCol.AllowSizing = false;
 
-
             // Set up the width of the first frozen column (hot and current row indicator).
             IGridMain.DefaultCol.Width = 10;
             // Add the first frozen column.
@@ -161,7 +156,6 @@ namespace Centralizador.WinApp.GUI
             pattern.AllowSizing = false;
             //pattern.AllowMoving = false;
             pattern.AllowGrouping = true;
-
 
 
             // Info cols.
@@ -183,7 +177,7 @@ namespace Centralizador.WinApp.GUI
             {
                 ImageAlign = iGContentAlignment.MiddleCenter
             };
-            IGridMain.Cols.Add("flagRef", "", 25, pattern); // steps CEN
+            IGridMain.Cols.Add("flagRef", "", 17, pattern);
             IGridMain.Cols.Add("P1", "", 16, pattern).CellStyle = cellStyleChk;
             IGridMain.Cols.Add("P2", "", 16, pattern).CellStyle = cellStyleChk;
             IGridMain.Cols.Add("P3", "", 16, pattern).CellStyle = cellStyleChk;
@@ -231,6 +225,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Font = new Font("Microsoft Sans Serif", 7.5f);
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
             IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
+            IGridMain.ImageList = FListPics;
 
 
             // Footer
@@ -263,10 +258,27 @@ namespace Centralizador.WinApp.GUI
         }
         private void BtnFacturar_Click(object sender, EventArgs e)
         {
-            // Update Dte from Sii
+            // Exist file?
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ce_empresas_dwnld_20200408.csv";
+            if (File.Exists(path))
+            {
+                // Update Dte from Sii        
+                IEnumerable<string[]> Lines = File.ReadLines(path).Select(a => a.Split(';'));
+                foreach (string[] item in Lines)
+                {
+                    if (item[0] == "76470581-5")
+                    {
+                        if (!string.IsNullOrWhiteSpace(item[4].ToString()))
+                        {
+                            MessageBox.Show("Encontrado" + item[4].ToString());
+                        }
+                      
+                    }
+                }
+                //var CSV = from line in Lines select line.Split(',').ToArray();
+            }
 
 
-            //**************obligar al suario a descargar el archivo desde sii y dejarlo en el escritorio.
 
 
 
@@ -382,9 +394,13 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnCreditor_Click(object sender, EventArgs e)
         {
-            if (CboParticipants.SelectedIndex == 0 && IsRunning)
+            if (CboParticipants.SelectedIndex == 0)
             {
                 TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
+            else if (IsRunning)
+            {
                 return;
             }
             IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
@@ -504,9 +520,13 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnDebtor_Click(object sender, EventArgs e)
         {
-            if (CboParticipants.SelectedIndex == 0 && IsRunning)
+            if (CboParticipants.SelectedIndex == 0)
             {
                 TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
+            else if (IsRunning)
+            {
                 return;
             }
             DetallesDebtor = new List<Detalle>();
@@ -527,49 +547,70 @@ namespace Centralizador.WinApp.GUI
             foreach (Detalle item in DetallesDebtor)
             {
                 nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\EnvioDTE\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
-                if (File.Exists(nameFile))
-                {   // Deserialize  
-                    DTEDefType xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
-                    item.DTEDef = xmlObjeto;
-                    DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
-                    DTEDefTypeDocumentoReferencia[] references = dte.Referencia;
-                    if (references != null)
+                ResultParticipant participant = Participant.GetParticipantByRut(item.RutReceptor.ToString());
+                if (participant != null)
+                {
+                    item.IsParticipant = true;
+                    IList<ResultInstruction> instructions = Instruction.GetInstructionByParticipants(participant, UserParticipant);
+                    if (instructions != null)
                     {
-                        DTEDefTypeDocumentoReferencia r = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                        if (r != null)
+                        IList<ResultInstruction> i = instructions.Where(x => x.Amount == item.MntNeto).ToList();
+                        if (i.Count == 1)
                         {
-                            string rznRef = "";
-                            ResultBillingWindow window = null;
-                            if (r.RazonRef != null)
-                            {
-                                string r1 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']') + 1).TrimStart();
-                                string r2 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
-                                r2 = r2.Substring(r2.IndexOf(']') + 1);
-                                string r3 = r.RazonRef.Substring(r1.Length + r2.Length).TrimEnd();
-                                TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-                                rznRef = ti.ToTitleCase(r2.ToLower());
-                                window = BillingWindow.GetBillingWindowByNaturalKey(r1 + rznRef);
-                                if (window != null)
-                                {
-                                    // Get the asociated matrix  
-                                    IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                                    ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == r1 + rznRef + r3);
-                                    if (matrix != null)
-                                    {
-                                        // Get the instruction                                        
-                                        ResultParticipant participant = Participant.GetParticipantByRut(dte.Encabezado.Emisor.RUTEmisor.Split('-').GetValue(0).ToString());
-                                        ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
-                                        if (instruction != null)
-                                        {
-                                            item.Instruction = instruction;
-                                        }
-                                    }
-                                }
-                            }
-
+                            item.IsParticipant = true;
+                            item.Instruction = i[0];
+                            item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixById(i[0]);
+                            item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowById(item.Instruction.PaymentMatrix);
                         }
                     }
                 }
+                DTEDefTypeDocumento dte = null;
+                if (File.Exists(nameFile))
+                {   // Deserialize  
+                    DTEDefType xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
+                    if (xmlObjeto == null || item.Instruction != null)
+                    {
+                        continue;
+                    }
+                    item.DTEDef = xmlObjeto;
+                    dte = (DTEDefTypeDocumento)xmlObjeto.Item;
+                }
+                DTEDefTypeDocumentoReferencia[] references = dte.Referencia;
+                if (references != null)
+                {
+                    DTEDefTypeDocumentoReferencia r = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                    if (r != null)
+                    {
+                        string rznRef = "";
+                        ResultBillingWindow window = null;
+                        if (r.RazonRef != null)
+                        {
+                            string r1 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']') + 1).TrimStart();
+                            string r2 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
+                            r2 = r2.Substring(r2.IndexOf(']') + 1);
+                            string r3 = r.RazonRef.Substring(r1.Length + r2.Length).TrimEnd();
+                            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                            rznRef = ti.ToTitleCase(r2.ToLower());
+                            window = BillingWindow.GetBillingWindowByNaturalKey(r1 + rznRef);
+                            if (window != null)
+                            {
+                                // Get the asociated matrix  
+                                IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == r1 + rznRef + r3);
+                                if (matrix != null)
+                                {
+                                    // Get the instruction
+                                    ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
+                                    if (instruction != null)
+                                    {
+                                        item.Instruction = instruction;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Sii
                 DataEvento evento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
                 if (evento != null)
@@ -609,10 +650,7 @@ namespace Centralizador.WinApp.GUI
             try
             {
                 IGridMain.BeginUpdate();
-                // Fill up the cells with data.
                 IGridMain.Rows.Clear();
-                // Set up the height of the first row (frozen).
-
                 iGRow myRow;
                 int c = 0;
                 foreach (Detalle item in detalles)
@@ -621,7 +659,6 @@ namespace Centralizador.WinApp.GUI
                     c++;
                     item.Nro = c;
                     myRow.Cells[1].Value = item.Nro;
-
                     if (item.Instruction != null)
                     {
                         myRow.Cells["inst"].Value = item.Instruction.Id;
@@ -683,6 +720,10 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["P3"].Type = iGCellType.Check;
                         myRow.Cells["P4"].Type = iGCellType.Check;
                     }
+                    // Flags
+                    LetterFlag myFlag = ValidateCen(item);
+                    myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(myFlag);
+                    myRow.Cells["flagRef"].BackColor = GetFlagBackColor(myFlag);
 
                 }
                 IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
@@ -710,7 +751,92 @@ namespace Centralizador.WinApp.GUI
             TxtDscItem.Text = "";
             TxtTpoDocRef.Text = "";
         }
-
+        public enum LetterFlag
+        {
+            Red,
+            Blue,
+            Yellow,
+            Green,
+            Complete,
+            Clear
+        }
+        private int GetFlagImageIndex(LetterFlag flag)
+        {
+            switch (flag)
+            {
+                case LetterFlag.Red:
+                    return 11;
+                case LetterFlag.Blue:
+                    return 12;
+                case LetterFlag.Yellow:
+                    return 13;
+                case LetterFlag.Green:
+                    return 14;
+                case LetterFlag.Complete:
+                    return 15;
+                default:
+                    return 16;
+            }
+        }
+        private Color GetFlagBackColor(LetterFlag flag)
+        {
+            switch (flag)
+            {
+                case LetterFlag.Red:
+                    return Color.FromArgb(207, 93, 96);
+                case LetterFlag.Blue:
+                    return Color.FromArgb(92, 131, 180);
+                case LetterFlag.Yellow:
+                    return Color.FromArgb(255, 193, 96);
+                case LetterFlag.Green:
+                    return Color.FromArgb(139, 180, 103);
+                case LetterFlag.Complete:
+                    return Color.White;
+                default:
+                    return Color.Empty;
+            }
+        }
+        private LetterFlag ValidateCen(Detalle detalle)
+        {
+            if (detalle.IsParticipant)
+            {
+                if (detalle.DTEDef != null && detalle.Instruction != null)
+                {
+                    DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                    if (dte.Referencia != null)
+                    {
+                        DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                        if (referencia != null)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (referencia == null)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (referencia.FolioRef != detalle.Instruction.PaymentMatrix.ReferenceCode)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (referencia.RazonRef != detalle.Instruction.PaymentMatrix.NaturalKey)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        return LetterFlag.Green;
+                    }
+                }
+                return LetterFlag.Red;
+            }
+            return LetterFlag.Clear;
+        }
         #endregion
 
         #region IGridMain methods
@@ -749,6 +875,7 @@ namespace Centralizador.WinApp.GUI
         }
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
+            //IGridMain.CurRow.Cells["flagRef"].Col.IncludeInSelect = false;  INTENTAR NO PINTAR LA CELDA CON PICS.
             if (IGridMain.CurRow == null)
             {
                 return;

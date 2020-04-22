@@ -6,7 +6,6 @@ using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.DataBase;
-using Centralizador.Models.Outlook;
 
 using Newtonsoft.Json;
 
@@ -166,6 +165,7 @@ namespace Centralizador.Models.ApiSII
         public Reference References { get; set; }
         public DTEDefType DTEDef { get; set; }
         public DataEvento DataEvento { get; set; }
+        public bool IsParticipant { get; set; }
 
     }
 

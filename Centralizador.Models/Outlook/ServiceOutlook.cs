@@ -139,7 +139,7 @@ namespace Centralizador.Models.Outlook
                         DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
                         nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
                         nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
-                        Save(nameFolder + @"\EnvioDTE\", nameFile, dte);
+                        Save(nameFolder, nameFile, dte);
                         return true;
                     }
                     else
