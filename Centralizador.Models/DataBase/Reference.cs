@@ -58,7 +58,7 @@ namespace Centralizador.Models.DataBase
 
                 con.Query = query.ToString();
                 DataTable dataTable = new DataTable();
-                dataTable = Conexion.ConexionBdQuery(con);
+                dataTable = Conexion.ExecuteReader(con);
                 if (dataTable != null)
                 {
                     foreach (DataRow item in dataTable.Rows)

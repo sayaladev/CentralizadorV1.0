@@ -29,6 +29,7 @@ namespace Centralizador.WinApp.GUI
         //Creditor     
         private IList<Detalle> DetallesCreditor { get; set; }
         private BackgroundWorker BgwCreditor { get; set; }
+        private BackgroundWorker Bgwinvoicing { get; set; }
 
         //Debitor
         private IList<Detalle> DetallesDebtor { get; set; }
@@ -81,7 +82,7 @@ namespace Centralizador.WinApp.GUI
             // User email
             TssLblUserEmail.Text = "|  " + agent.Email;
 
-            // Controls
+            // Worker Debtor
             BgwDebtor = new BackgroundWorker
             {
                 WorkerReportsProgress = true
@@ -89,6 +90,7 @@ namespace Centralizador.WinApp.GUI
             BgwDebtor.ProgressChanged += BgwDebtor_ProgressChanged;
             BgwDebtor.RunWorkerCompleted += BgwDebtor_RunWorkerCompleted;
             BgwDebtor.DoWork += BgwDebtor_DoWork;
+            // Worker Creditor
             BgwCreditor = new BackgroundWorker
             {
                 WorkerReportsProgress = true
@@ -96,6 +98,12 @@ namespace Centralizador.WinApp.GUI
             BgwCreditor.ProgressChanged += BgwCreditor_ProgressChanged;
             BgwCreditor.RunWorkerCompleted += BgwCreditor_RunWorkerCompleted;
             BgwCreditor.DoWork += BgwCreditor_DoWork;
+
+            Bgwinvoicing = new BackgroundWorker();
+            Bgwinvoicing.WorkerReportsProgress = true;
+            Bgwinvoicing.ProgressChanged += Bgwinvoicing_ProgressChanged;
+            Bgwinvoicing.RunWorkerCompleted += Bgwinvoicing_RunWorkerCompleted;
+            Bgwinvoicing.DoWork += Bgwinvoicing_DoWork;
 
 
             // Date Time Outlook
@@ -112,6 +120,9 @@ namespace Centralizador.WinApp.GUI
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
 
         }
+
+        
+
         private void Timer_Tick(object sender, EventArgs e)
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
@@ -138,7 +149,6 @@ namespace Centralizador.WinApp.GUI
             IGridMain.DefaultCol.AllowMoving = false;
             IGridMain.DefaultCol.IncludeInSelect = false;
             IGridMain.DefaultCol.AllowSizing = false;
-
             // Set up the width of the first frozen column (hot and current row indicator).
             IGridMain.DefaultCol.Width = 10;
             // Add the first frozen column.
@@ -202,20 +212,7 @@ namespace Centralizador.WinApp.GUI
             // Sii info.
             IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("status", "Status", 56, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("flagstatus", "", 70, pattern); // flag
-
-            // IGridMain.Cols[14].CellStyle = new iGCellStyle { TextAlign = iGContentAlignment.MiddleCenter };
-
-            //IGridMain.Cols[15].CellStyle = new iGCellStyle { FormatString = "{0:d}" };
-            //IGridMain.Cols.Add("Cbte.", "", 70, pattern);
-            //IGridMain.Cols.Add("F. de pago", "", 65, pattern);
-            //IGridMain.Cols.Add("pic", "", 25, pattern);
-
-            //IGridMain.Cols.Add("flag", "", 25, pattern);
-
-            //IGridMain.Cols.Add("F.", "", 65, pattern);
-            //IGridMain.Cols.Add("M", "", 25, pattern);
-            //IGridMain.Cols.Add("Aceptado cliente", "", 70, pattern);
+            IGridMain.Cols.Add("flagstatus", "", 70, pattern); // flag         
 
             // General options
             IGridMain.GroupBox.Visible = true;
@@ -230,11 +227,6 @@ namespace Centralizador.WinApp.GUI
 
             // Footer
             IGridMain.Footer.Visible = true;
-
-
-
-            // Header
-
 
             // Footer freezer section
             IGridMain.Footer.Cells[0, 0].SpanCols = 3;
@@ -256,65 +248,7 @@ namespace Centralizador.WinApp.GUI
 
 
         }
-        private void BtnFacturar_Click(object sender, EventArgs e)
-        {
-            // Exist file?
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ce_empresas_dwnld_20200408.csv";
-            if (File.Exists(path))
-            {
-                // Update Dte from Sii        
-                IEnumerable<string[]> Lines = File.ReadLines(path).Select(a => a.Split(';'));
-                foreach (string[] item in Lines)
-                {
-                    if (item[0] == "76470581-5")
-                    {
-                        if (!string.IsNullOrWhiteSpace(item[4].ToString()))
-                        {
-                            MessageBox.Show("Encontrado" + item[4].ToString());
-                        }
-                      
-                    }
-                }
-                //var CSV = from line in Lines select line.Split(',').ToArray();
-            }
-
-
-
-
-
-            if (CboParticipants.SelectedIndex == 0)
-            {
-                TssLblMensaje.Text = "Plesase select a Company!";
-                return;
-            }
-            else
-            {
-                DialogResult resp = MessageBox.Show($"Se van a insertar las siguientes NV:{Environment.NewLine} Folio 5478  a 5498 {Environment.NewLine} ¿Quiere continuar?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                if (resp == DialogResult.OK)
-                {
-                    //UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-
-                    DialogResult b = MessageBox.Show("Are you sure?", "Insert NV to Softland", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-
-                }
-
-
-                // Check aux (comuna, giro, dte, )
-
-
-
-                // Insert NV
-                // Check if exists?
-
-
-
-
-
-
-                // Insert Ref
-
-            }
-        }
+   
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex != 0)
@@ -332,6 +266,105 @@ namespace Centralizador.WinApp.GUI
         }
 
         #endregion
+
+        #region Billing Creditor
+        private void BtnFacturar_Click(object sender, EventArgs e)
+        {
+            if (IsRunning)
+            {
+                return;
+            }
+            if (!IsCreditor || IGridMain.Rows.Count == 0)
+            {
+                TssLblMensaje.Text = "Plesase select Creditor!";
+                return;
+            }
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
+            // Exist file?
+            DateTime now = DateTime.Now;
+            string file = $"\\ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + file;
+            if (!File.Exists(path))
+            {
+                MessageBox.Show($"The file 'ce_empresas_dwnld_{now.Year}{now.Month}{now.Day}.csv' NOT found, please download...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                System.Diagnostics.Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
+                return;
+            }
+            Bgwinvoicing.RunWorkerAsync(path);
+        }
+        private void Bgwinvoicing_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string path = e.Argument.ToString();
+            int c = 0;
+            float porcent = 0;                   
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+            porcent = (float)(100 * c) / DetallesCreditor.Count;
+            Bgwinvoicing.ReportProgress((int)porcent, "Updating DTE email from Sii file, please wait...");
+            Cursor = Cursors.WaitCursor;
+            List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+            foreach (Detalle item in DetallesCreditor)
+            {
+                try
+                {                    
+                    AuxCsv a = values.FirstOrDefault(x => x.Rut == item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode);
+                    if (a != null)
+                    {
+                        // Update dte & name aux from all instructions 
+                        string name = ti.ToTitleCase(a.Name.ToLower());
+                        item.Instruction.ParticipantDebtor.BusinessName = name;
+                        item.Instruction.ParticipantDebtor.DteReceptionEmail = a.Email;
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                c++;
+                porcent = (float)(100 * c) / DetallesCreditor.Count;
+                // Insert or Update in Softland
+                InsertUpdateAuxSoftland(item);
+                Bgwinvoicing.ReportProgress((int)porcent, $"Updating in Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
+
+
+
+
+            }
+        }
+
+        private void Bgwinvoicing_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {          
+            TssLblProgBar.Value = 0;
+            IsCreditor = true;
+            IsRunning = false;
+        }
+
+        private void Bgwinvoicing_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+        private void InsertUpdateAuxSoftland(Detalle detalle)
+        {
+            // Comuna
+
+            // Giro
+
+            int resp = Auxiliar.InsertAuxiliar(detalle.Instruction);
+            if (resp == -1)
+            {
+                // escribir log txt si error.
+            }
+           
+
+           
+        }
+
+        #endregion
+
 
         #region Convert Pdf
 
@@ -517,7 +550,6 @@ namespace Centralizador.WinApp.GUI
 
         #region Debtor Transactions
 
-
         private void BtnDebtor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0)
@@ -546,7 +578,7 @@ namespace Centralizador.WinApp.GUI
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
             {
-                nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\EnvioDTE\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
+                nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
                 ResultParticipant participant = Participant.GetParticipantByRut(item.RutReceptor.ToString());
                 if (participant != null)
                 {
@@ -565,6 +597,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
                 DTEDefTypeDocumento dte = null;
+                DTEDefTypeDocumentoReferencia[] references = null;
                 if (File.Exists(nameFile))
                 {   // Deserialize  
                     DTEDefType xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
@@ -574,43 +607,49 @@ namespace Centralizador.WinApp.GUI
                     }
                     item.DTEDef = xmlObjeto;
                     dte = (DTEDefTypeDocumento)xmlObjeto.Item;
-                }
-                DTEDefTypeDocumentoReferencia[] references = dte.Referencia;
-                if (references != null)
-                {
-                    DTEDefTypeDocumentoReferencia r = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                    if (r != null)
+                    if (dte != null)
                     {
-                        string rznRef = "";
-                        ResultBillingWindow window = null;
-                        if (r.RazonRef != null)
+                        if (dte.Referencia != null)
                         {
-                            string r1 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']') + 1).TrimStart();
-                            string r2 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
-                            r2 = r2.Substring(r2.IndexOf(']') + 1);
-                            string r3 = r.RazonRef.Substring(r1.Length + r2.Length).TrimEnd();
-                            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-                            rznRef = ti.ToTitleCase(r2.ToLower());
-                            window = BillingWindow.GetBillingWindowByNaturalKey(r1 + rznRef);
-                            if (window != null)
+                            references = dte.Referencia;
+                        }
+                    }
+                    if (references != null)
+                    {
+                        DTEDefTypeDocumentoReferencia r = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                        if (r != null)
+                        {
+                            string rznRef = "";
+                            ResultBillingWindow window = null;
+                            if (r.RazonRef != null)
                             {
-                                // Get the asociated matrix  
-                                IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                                ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == r1 + rznRef + r3);
-                                if (matrix != null)
+                                // Controlling lower & upper
+                                string r1 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']') + 1).TrimStart();
+                                string r2 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
+                                r2 = r2.Substring(r2.IndexOf(']') + 1);
+                                string r3 = r.RazonRef.Substring(r1.Length + r2.Length).TrimEnd();
+                                TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                                rznRef = ti.ToTitleCase(r2.ToLower());
+                                window = BillingWindow.GetBillingWindowByNaturalKey(r1 + rznRef);
+                                if (window != null)
                                 {
-                                    // Get the instruction
-                                    ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
-                                    if (instruction != null)
+                                    // Get the asociated matrix  
+                                    IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                    ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == r1 + rznRef + r3);
+                                    if (matrix != null)
                                     {
-                                        item.Instruction = instruction;
+                                        // Get the instruction
+                                        ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
+                                        if (instruction != null)
+                                        {
+                                            item.Instruction = instruction;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-
                 // Sii
                 DataEvento evento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
                 if (evento != null)
@@ -625,7 +664,6 @@ namespace Centralizador.WinApp.GUI
             }
             // Order the list
             DetallesDebtor = DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
-
         }
         private void BgwDebtor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {

@@ -12,7 +12,7 @@ namespace Centralizador.Models.DataBase
         public static SqlDataReader SqlDataReader { get; set; }
 
 
-        public static DataTable ConexionBdQuery(Conexion conn)
+        public static DataTable ExecuteReader(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
@@ -26,8 +26,7 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
-                    SqlDataReader = cmd.ExecuteReader();
-                    //Para nonquery: cmd.ExecuteNonQuery();
+                    SqlDataReader = cmd.ExecuteReader();     
                     if (SqlDataReader.HasRows)
                     {
                         DataTable dataTable = new DataTable();
@@ -46,6 +45,34 @@ namespace Centralizador.Models.DataBase
                 }
             }
             return null;
+        }
+
+        public static int ExecuteNonQuery(Conexion conn)
+        {
+            using (SqlConnection cnn = new SqlConnection(conn.Cnn))
+            {
+                try
+                {
+                    cnn.Open();
+                    SqlCommand cmd = new SqlCommand
+                    {
+                        CommandTimeout = 900000,
+                        Connection = cnn,
+                        CommandText = conn.Query,
+                        CommandType = CommandType.Text
+                    };                   
+                    return cmd.ExecuteNonQuery();               
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    SqlDataReader.Close();
+                    cnn.Close();
+                }
+            }          
         }
     }
 }

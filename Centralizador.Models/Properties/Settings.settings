@@ -49,5 +49,11 @@
     <Setting Name="UIDRange" Type="System.String" Scope="User">
       <Value Profile="(Default)">45000</Value>
     </Setting>
+    <Setting Name="DBUser" Type="System.String" Scope="User">
+      <Value Profile="(Default)">sa</Value>
+    </Setting>
+    <Setting Name="DBPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">123456</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
