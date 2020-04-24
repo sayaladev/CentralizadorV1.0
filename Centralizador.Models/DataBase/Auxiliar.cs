@@ -17,7 +17,11 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
-                IList<Reference> softland = new List<Reference>();
+                string ServerName = Properties.Settings.Default.ServerName;
+                string id = Properties.Settings.Default.DBUser;
+                string password = Properties.Settings.Default.DBPassword;
+                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
+
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -26,15 +30,14 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
-                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
-
+                if (DataBaseName == null || ServerName == null || id == null || password == null)
+                {
+                    return -1;
+                }
                 Conexion con = new Conexion
                 {
-                    Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
+                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
                 };
-
                 StringBuilder query = new StringBuilder();
                 query.Append($"IF (NOT EXISTS(SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}')) BEGIN ");
                 query.Append("Insert Into softland.CWTAUXI (CodAux,NomAux,NoFAux, RutAux,ActAux,GirAux, PaiAux,Comaux, ");
@@ -52,44 +55,6 @@ namespace Centralizador.Models.DataBase
                 throw;
             }
         }
-        public static bool GetComunas(ResultInstruction instruction)
-        {
-
-            try
-            {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                IList<Reference> softland = new List<Reference>();
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                if (DataBaseName == null)
-                {
-                    return false;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID=sa;Password=123456"
-                };
-                con.Query = "select * softland.cwtcomu";
-
-
-
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-
-            return true;
-        }
-
     }
 
     public class AuxCsv
@@ -130,4 +95,5 @@ namespace Centralizador.Models.DataBase
             }
         }
     }
+   
 }

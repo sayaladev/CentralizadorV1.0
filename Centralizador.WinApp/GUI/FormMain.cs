@@ -267,7 +267,7 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-        #region Billing Creditor
+        #region Invoicing Creditor
         private void BtnFacturar_Click(object sender, EventArgs e)
         {
             if (IsRunning)
@@ -298,13 +298,13 @@ namespace Centralizador.WinApp.GUI
         }
         private void Bgwinvoicing_DoWork(object sender, DoWorkEventArgs e)
         {
+            IsRunning = true;
             string path = e.Argument.ToString();
             int c = 0;
             float porcent = 0;                   
-            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-            porcent = (float)(100 * c) / DetallesCreditor.Count;
-            Bgwinvoicing.ReportProgress((int)porcent, "Updating DTE email from Sii file, please wait...");
-            Cursor = Cursors.WaitCursor;
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;           
+            Bgwinvoicing.ReportProgress(0, "Updating DTE email from Sii file, please wait...");
+            //Cursor = Cursors.WaitCursor;
             List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
             foreach (Detalle item in DetallesCreditor)
             {
@@ -324,10 +324,15 @@ namespace Centralizador.WinApp.GUI
                     throw;
                 }
                 c++;
-                porcent = (float)(100 * c) / DetallesCreditor.Count;
-                // Insert or Update in Softland
-                InsertUpdateAuxSoftland(item);
-                Bgwinvoicing.ReportProgress((int)porcent, $"Updating in Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
+                porcent = (float)(100 * c) / DetallesCreditor.Count;               
+                Bgwinvoicing.ReportProgress((int)porcent, $"Inserting into Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
+
+
+                // Get comunas
+               IList<Comuna> comunas = Comuna.GetComunas(item.Instruction);
+
+                // Insert or Update Softland news aux
+                Auxiliar.InsertAuxiliar(item.Instruction);
 
 
 
@@ -347,21 +352,7 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
-        private void InsertUpdateAuxSoftland(Detalle detalle)
-        {
-            // Comuna
-
-            // Giro
-
-            int resp = Auxiliar.InsertAuxiliar(detalle.Instruction);
-            if (resp == -1)
-            {
-                // escribir log txt si error.
-            }
-           
-
-           
-        }
+      
 
         #endregion
 

@@ -101,6 +101,9 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonProperty("updated_ts")]
         public DateTime UpdatedTs { get; set; }
+
+        // New properties
+        public string Comuna { get; set; }
     }
 
     public class Participant

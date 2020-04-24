@@ -27,6 +27,9 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
+                string ServerName = Properties.Settings.Default.ServerName;
+                string id = Properties.Settings.Default.DBUser;
+                string password = Properties.Settings.Default.DBPassword;
                 IList<Reference> softland = new List<Reference>();
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
@@ -36,13 +39,13 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null)
+                if (DataBaseName == null || ServerName == null || id == null || password == null)
                 {
                     return null;
                 }
                 Conexion con = new Conexion
                 {
-                    Cnn = $"Data Source=DEVELOPER;Initial Catalog={DataBaseName};Persist Security Info=True;User ID=sa;Password=123456"
+                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
                 };
                 StringBuilder query = new StringBuilder();
                 query.Append("select g.Folio,g.NroInt, l.Fecha 'RecepcionSii', g.Fecha, ");
@@ -65,10 +68,6 @@ namespace Centralizador.Models.DataBase
                     {
 
                         Reference r = new Reference();
-
-
-
-
                         if (item["Folio"] != DBNull.Value)
                         {
                             r.Folio = Convert.ToUInt32(item["Folio"]);
@@ -77,7 +76,6 @@ namespace Centralizador.Models.DataBase
                         {
                             r.NroInt = Convert.ToUInt32(item["NroInt"]);
                         }
-
                         if (item["RecepcionSii"] != DBNull.Value)
                         {
                             r.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
@@ -94,12 +92,7 @@ namespace Centralizador.Models.DataBase
                         {
                             r.FileBasico = item["FileBasico"].ToString();
                         }
-
-
-
-
                         softland.Add(r);
-
                     }
                     return softland;
                 }

@@ -86,8 +86,9 @@ namespace Centralizador.Models.ApiSII
                 }
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Windows.Forms.MessageBox.Show($"Sii: {ex.Message}");
                 return null;
             }
             finally
