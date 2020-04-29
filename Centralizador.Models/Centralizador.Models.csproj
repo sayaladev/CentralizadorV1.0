@@ -91,6 +91,7 @@
     <Compile Include="ApiSII\ServiceDetalle.cs" />
     <Compile Include="ApiSII\TokenSeed.cs" />
     <Compile Include="AppFunctions\ServicePdf.cs" />
+    <Compile Include="DataBase\Acteco.cs" />
     <Compile Include="DataBase\Auxiliar.cs" />
     <Compile Include="DataBase\Comuna.cs" />
     <Compile Include="DataBase\Conexion.cs" />
@@ -130,7 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="DataBase\acteco.csv" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

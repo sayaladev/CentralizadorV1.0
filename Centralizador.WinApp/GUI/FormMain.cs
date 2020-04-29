@@ -121,7 +121,7 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-        
+
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -248,7 +248,7 @@ namespace Centralizador.WinApp.GUI
 
 
         }
-   
+
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex != 0)
@@ -301,15 +301,14 @@ namespace Centralizador.WinApp.GUI
             IsRunning = true;
             string path = e.Argument.ToString();
             int c = 0;
-            float porcent = 0;                   
-            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;           
-            Bgwinvoicing.ReportProgress(0, "Updating DTE email from Sii file, please wait...");
-            //Cursor = Cursors.WaitCursor;
+            float porcent = 0;
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+            Bgwinvoicing.ReportProgress(0, "Updating DTE email from Sii file, please wait...");            
             List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
             foreach (Detalle item in DetallesCreditor)
             {
                 try
-                {                    
+                {
                     AuxCsv a = values.FirstOrDefault(x => x.Rut == item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode);
                     if (a != null)
                     {
@@ -317,31 +316,63 @@ namespace Centralizador.WinApp.GUI
                         string name = ti.ToTitleCase(a.Name.ToLower());
                         item.Instruction.ParticipantDebtor.BusinessName = name;
                         item.Instruction.ParticipantDebtor.DteReceptionEmail = a.Email;
+                        item.Instruction.ParticipantDebtor.Name = item.Instruction.ParticipantDebtor.Name.ToUpper();
                     }
                 }
                 catch (Exception)
                 {
                     throw;
                 }
+               
+
+                if (item.Folio > 0)
+                {
+                    // Exists Aux?
+                    if (!Auxiliar.GetAuxiliar(item.Instruction))
+                    {
+                        // Get comunas
+                        Comuna comuna = null;
+                        IList<Comuna> comunas = Comuna.GetComunas(item.Instruction);
+                        if (comunas != null)
+                        {
+                            foreach (Comuna com in comunas)
+                            {
+                                if (item.Instruction.ParticipantDebtor.CommercialAddress.Contains(com.ComDes))
+                                {
+                                    comuna = com;
+                                    break;
+                                }
+                            }
+                        }
+                        // Get acteco
+                        IList<Actividade> actividades = Herokuapp.GetActecoCode(item.Instruction.ParticipantDebtor);
+                        string acteco = null;
+                        if (actividades != null)
+                        {
+                            acteco = actividades[0].Giro.Substring(0, 60);
+                        }
+                        // Insert acteco
+                        Herokuapp.InsertActeco(item.Instruction, acteco);
+                        // Insert aux
+                        Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
+                    }
+                    else
+                    {
+                        // Update Aux
+                        Auxiliar.UpdateAuxiliar(item.Instruction);
+                    }
+
+                    // Insert NV
+
+                }
                 c++;
-                porcent = (float)(100 * c) / DetallesCreditor.Count;               
-                Bgwinvoicing.ReportProgress((int)porcent, $"Inserting into Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
-
-
-                // Get comunas
-               IList<Comuna> comunas = Comuna.GetComunas(item.Instruction);
-
-                // Insert or Update Softland news aux
-                Auxiliar.InsertAuxiliar(item.Instruction);
-
-
-
-
+                porcent = (float)(100 * c) / DetallesCreditor.Count;
+                Bgwinvoicing.ReportProgress((int)porcent, $"Inserting/Updating into Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
             }
         }
 
         private void Bgwinvoicing_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {          
+        {
             TssLblProgBar.Value = 0;
             IsCreditor = true;
             IsRunning = false;
@@ -352,7 +383,7 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
-      
+
 
         #endregion
 
@@ -463,7 +494,7 @@ namespace Centralizador.WinApp.GUI
             foreach (ResultInstruction instruction in instructions)
             {
                 // Tester
-                //if (instruction.Id != 1669491) 
+                //if (instruction.Id != 1595558)
                 //{
                 //    continue;
                 //}
@@ -475,6 +506,7 @@ namespace Centralizador.WinApp.GUI
                 detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
                 detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
                 detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
+                detalle.IsParticipant = true;
 
                 // Mapping references Softland
                 IList<Reference> references = Reference.GetInfoFactura(instruction);
@@ -700,7 +732,11 @@ namespace Centralizador.WinApp.GUI
                     myRow.Cells["exento"].Value = item.MntExento;
                     myRow.Cells["iva"].Value = item.MntIva;
                     myRow.Cells["total"].Value = item.MntTotal;
-                    myRow.Cells["folio"].Value = item.Folio;
+                    if (item.Folio > 0)
+                    {
+                        myRow.Cells["folio"].Value = item.Folio;
+                    }
+
 
                     if (item.FechaEmision != null)
                     {
@@ -835,7 +871,7 @@ namespace Centralizador.WinApp.GUI
                     if (dte.Referencia != null)
                     {
                         DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                        if (referencia != null)
+                        if (referencia == null)
                         {
                             return LetterFlag.Red;
                         }
@@ -942,6 +978,10 @@ namespace Centralizador.WinApp.GUI
                         }
                     }
                 }
+                if (detalle.References.FileEnviado == null)
+                {
+                    TssLblMensaje.Text = "This Invoice has not been sent to Sii.";
+                }
             }
         }
         private void IGridMain_ColDividerDoubleClick(object sender, iGColDividerDoubleClickEventArgs e)
@@ -953,13 +993,14 @@ namespace Centralizador.WinApp.GUI
             if (!IsRunning)
             {
                 Detalle detalle;
+                iGRow fCurRow = IGridMain.CurRow;
                 if (IsCreditor)
                 {
-                    detalle = DetallesCreditor.First(x => x.Nro == e.RowIndex + 1);
+                    detalle = DetallesCreditor.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
                 }
                 else
                 {
-                    detalle = DetallesDebtor.First(x => x.Nro == e.RowIndex + 1);
+                    detalle = DetallesDebtor.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
                 }
                 if (detalle.DTEDef != null)
                 {

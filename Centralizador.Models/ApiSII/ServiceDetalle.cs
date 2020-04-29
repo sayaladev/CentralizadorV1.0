@@ -65,7 +65,6 @@ namespace Centralizador.Models.ApiSII
             try
             {
                 string jSon = JsonConvert.SerializeObject(apiDetalleLibroReq, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
                 wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={userParticipant.Rut}; DV_NS={userParticipant.VerificationCode};TOKEN={token}";
@@ -88,20 +87,14 @@ namespace Centralizador.Models.ApiSII
                             break;
                     }
                 }
-            }
-            catch (WebException e)
-            {
-                HttpWebResponse http = (HttpWebResponse)e.Response;
-                if (http.StatusCode.ToString() == "Unauthorized")
-                {
-
-                    MessageBox.Show($"Error in the server/paswword.", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
                 else
                 {
-                    MessageBox.Show($"Message from Http:{Environment.NewLine}{http.StatusDescription}");
                     return null;
-                }
+                }               
+            }
+            catch (WebException ex)
+            { 
+                    MessageBox.Show(ex.Message, "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error); 
             }
             finally
             {

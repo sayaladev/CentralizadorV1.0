@@ -172,7 +172,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DEVELOPER")]
         public string ServerName {
             get {
                 return ((string)(this["ServerName"]));

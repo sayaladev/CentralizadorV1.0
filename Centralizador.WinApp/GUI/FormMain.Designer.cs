@@ -41,7 +41,6 @@
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.TxtStatusSii = new System.Windows.Forms.TextBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
             this.TxtDscItem = new System.Windows.Forms.TextBox();
@@ -167,7 +166,6 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.TxtStatusSii);
             this.groupBox4.Controls.Add(this.TxtTpoDocRef);
             this.groupBox4.Controls.Add(this.TxtFmaPago);
             this.groupBox4.Controls.Add(this.TxtDscItem);
@@ -176,19 +174,10 @@
             this.groupBox4.Controls.Add(this.TxtNmbItem);
             this.groupBox4.Location = new System.Drawing.Point(13, 184);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(234, 242);
+            this.groupBox4.Size = new System.Drawing.Size(234, 190);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
-            // 
-            // TxtStatusSii
-            // 
-            this.TxtStatusSii.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtStatusSii.Location = new System.Drawing.Point(6, 167);
-            this.TxtStatusSii.Name = "TxtStatusSii";
-            this.TxtStatusSii.ReadOnly = true;
-            this.TxtStatusSii.Size = new System.Drawing.Size(222, 18);
-            this.TxtStatusSii.TabIndex = 12;
             // 
             // TxtTpoDocRef
             // 
@@ -515,6 +504,5 @@
         private System.Windows.Forms.ImageList FListPics;
         private System.Windows.Forms.TextBox TxtDscItem;
         private System.Windows.Forms.TextBox TxtTpoDocRef;
-        private System.Windows.Forms.TextBox TxtStatusSii;
     }
 }

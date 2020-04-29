@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-
+using System.Windows.Forms;
 using Centralizador.Models.ApiCEN;
 
 using Newtonsoft.Json;
@@ -84,17 +84,21 @@ namespace Centralizador.Models.ApiSII
                         return detalleLibro.DataEvento;
                     }
                 }
-                return null;
+                else
+                {
+                    return null;
+                }                
             }
-            catch (Exception ex)
+            catch (WebException ex)
             {
-                System.Windows.Forms.MessageBox.Show($"Sii: {ex.Message}");
-                return null;
+                MessageBox.Show(ex.Message, "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
+                
                 wc.Dispose();
             }
+            return null;
         }
     }
 
