@@ -25,7 +25,7 @@ namespace Centralizador.Models.DataBase
         public bool Afecta { get; set; }
     }
 
-    public class Herokuapp
+    public class Acteco
     {
         [JsonProperty("rut")]
         public string Rut { get; set; }
@@ -49,7 +49,7 @@ namespace Centralizador.Models.DataBase
                 string res = wc.DownloadString($"https://siichile.herokuapp.com/consulta?rut={participant.Rut}-{participant.VerificationCode}");
                 if (res != null)
                 {
-                    Herokuapp herokuapp = JsonConvert.DeserializeObject<Herokuapp>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    Acteco herokuapp = JsonConvert.DeserializeObject<Acteco>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     if (herokuapp.Actividades.Count > 0)
                     {
                         return herokuapp.Actividades;
@@ -96,7 +96,7 @@ namespace Centralizador.Models.DataBase
                 StringBuilder query = new StringBuilder();
                 query.Append($"IF (NOT EXISTS (SELECT * FROM softland.cwtgiro WHERE GirDes = '{descripcion}')) BEGIN ");
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
-                query.Append($"'{descripcion}') END;SELECT SCOPE_IDENTITY();"); 
+                query.Append($"'{descripcion}') END"); 
                 con.Query = query.ToString();
                 return Conexion.ExecuteNonQuery(con);
             }

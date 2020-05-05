@@ -95,6 +95,7 @@
     <Compile Include="DataBase\Auxiliar.cs" />
     <Compile Include="DataBase\Comuna.cs" />
     <Compile Include="DataBase\Conexion.cs" />
+    <Compile Include="DataBase\NotaVenta.cs" />
     <Compile Include="DataBase\Reference.cs" />
     <Compile Include="Outlook\XsdEnvioDTE.cs" />
     <Compile Include="Outlook\ServiceOutlook.cs" />

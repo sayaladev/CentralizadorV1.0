@@ -121,8 +121,6 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-
-
         private void Timer_Tick(object sender, EventArgs e)
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
@@ -302,8 +300,9 @@ namespace Centralizador.WinApp.GUI
             string path = e.Argument.ToString();
             int c = 0;
             float porcent = 0;
+            int result = 0;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-            Bgwinvoicing.ReportProgress(0, "Updating DTE email from Sii file, please wait...");            
+            Bgwinvoicing.ReportProgress(0, "Updating DTE email from Sii file, please wait...");
             List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
             foreach (Detalle item in DetallesCreditor)
             {
@@ -323,11 +322,11 @@ namespace Centralizador.WinApp.GUI
                 {
                     throw;
                 }
-               
 
-                if (item.Folio > 0)
+                // si tiene folio 0 (null) se factura!
+                if (item.Folio == 0)
                 {
-                    // Exists Aux?
+                    // Crear auxiliares nuevos
                     if (!Auxiliar.GetAuxiliar(item.Instruction))
                     {
                         // Get comunas
@@ -345,24 +344,39 @@ namespace Centralizador.WinApp.GUI
                             }
                         }
                         // Get acteco
-                        IList<Actividade> actividades = Herokuapp.GetActecoCode(item.Instruction.ParticipantDebtor);
+                        IList<Actividade> actividades = Acteco.GetActecoCode(item.Instruction.ParticipantDebtor);
                         string acteco = null;
                         if (actividades != null)
                         {
                             acteco = actividades[0].Giro.Substring(0, 60);
+                            // Insert acteco
+                            Acteco.InsertActeco(item.Instruction, acteco);
+                            // Insert aux
+                            Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
                         }
-                        // Insert acteco
-                        Herokuapp.InsertActeco(item.Instruction, acteco);
-                        // Insert aux
-                        Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
+                        else
+                        {
+                            // Api HeroKuapp no disponible.
+                        }
+
                     }
                     else
                     {
                         // Update Aux
-                        Auxiliar.UpdateAuxiliar(item.Instruction);
+                        result = Auxiliar.UpdateAuxiliar(item.Instruction);
+                        if (result != 1)
+                        {
+                            // Log de que no hubo update.
+                        }
+                        else
+                        {
+                            // Insert NV
+                            int lastF = NotaVenta.GetLastNv(item.Instruction);
+
+                        }
                     }
 
-                    // Insert NV
+
 
                 }
                 c++;
@@ -494,7 +508,7 @@ namespace Centralizador.WinApp.GUI
             foreach (ResultInstruction instruction in instructions)
             {
                 // Tester
-                //if (instruction.Id != 1595558)
+                //if (instruction.Id != 1775998)
                 //{
                 //    continue;
                 //}
@@ -978,10 +992,13 @@ namespace Centralizador.WinApp.GUI
                         }
                     }
                 }
-                if (detalle.References.FileEnviado == null)
+                if (detalle.References != null)
                 {
-                    TssLblMensaje.Text = "This Invoice has not been sent to Sii.";
-                }
+                    if (detalle.References.FileEnviado == null)
+                    {
+                        TssLblMensaje.Text = "This Invoice has not been sent to Sii.";
+                    }
+                }               
             }
         }
         private void IGridMain_ColDividerDoubleClick(object sender, iGColDividerDoubleClickEventArgs e)

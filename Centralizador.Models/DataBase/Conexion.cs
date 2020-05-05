@@ -74,5 +74,33 @@ namespace Centralizador.Models.DataBase
                 }
             }          
         }
+
+        public static object ExecuteScalar(Conexion conn)
+        {
+            using (SqlConnection cnn = new SqlConnection(conn.Cnn))
+            {
+                try
+                {
+                    cnn.Open();
+                    SqlCommand cmd = new SqlCommand
+                    {
+                        CommandTimeout = 900000,
+                        Connection = cnn,
+                        CommandText = conn.Query,
+                        CommandType = CommandType.Text
+                    };
+                    return cmd.ExecuteScalar();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    SqlDataReader.Close();
+                    cnn.Close();
+                }
+            }
+        }
     }
 }
