@@ -284,11 +284,11 @@ namespace Centralizador.WinApp.GUI
             }
             // Exist file?
             DateTime now = DateTime.Now;
-            string file = $"\\ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + file;
+            string file = $"ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
             if (!File.Exists(path))
             {
-                MessageBox.Show($"The file 'ce_empresas_dwnld_{now.Year}{now.Month}{now.Day}.csv' NOT found, please download...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"The file '{file}' NOT found, please download...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 System.Diagnostics.Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
                 return;
             }
@@ -324,13 +324,15 @@ namespace Centralizador.WinApp.GUI
                 }
 
                 // si tiene folio 0 (null) se factura!
+                Comuna comuna = null;
+                string acteco = null;
                 if (item.Folio == 0)
                 {
                     // Crear auxiliares nuevos
-                    if (!Auxiliar.GetAuxiliar(item.Instruction))
+                    Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction);
+                    if (auxiliar == null )
                     {
-                        // Get comunas
-                        Comuna comuna = null;
+                        // Get comunas                      
                         IList<Comuna> comunas = Comuna.GetComunas(item.Instruction);
                         if (comunas != null)
                         {
@@ -345,36 +347,62 @@ namespace Centralizador.WinApp.GUI
                         }
                         // Get acteco
                         IList<Actividade> actividades = Acteco.GetActecoCode(item.Instruction.ParticipantDebtor);
-                        string acteco = null;
                         if (actividades != null)
                         {
                             acteco = actividades[0].Giro.Substring(0, 60);
                             // Insert acteco
                             Acteco.InsertActeco(item.Instruction, acteco);
-                            // Insert aux
-                            Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
                         }
                         else
                         {
                             // Api HeroKuapp no disponible.
                         }
-
+                        // Insert aux
+                        Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
                     }
                     else
                     {
+                        if (auxiliar.ComAux == null)
+                        {
+                            // log error
+                            continue;
+                        }
+                        if (auxiliar.DirAux == null)
+                        {
+                            // log error
+                            continue;
+                        }
+                        if (auxiliar.GirAux == null)
+                        {
+                            // log error
+                            continue;
+                        }
+                        if (auxiliar.RutAux == null)
+                        {
+                            // log error
+                            continue;
+                        }
+
                         // Update Aux
                         result = Auxiliar.UpdateAuxiliar(item.Instruction);
                         if (result != 1)
                         {
                             // Log de que no hubo update.
                         }
-                        else
-                        {
-                            // Insert NV
-                            int lastF = NotaVenta.GetLastNv(item.Instruction);
-
-                        }
                     }
+                 
+
+                 
+                    // Insert NV
+                    int lastF = NotaVenta.GetLastNv(item.Instruction);
+                    string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                    result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod);
+
+                    if (result != 1)
+                    {
+                        // Error in insert
+                    }
+
 
 
 
@@ -998,7 +1026,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         TssLblMensaje.Text = "This Invoice has not been sent to Sii.";
                     }
-                }               
+                }
             }
         }
         private void IGridMain_ColDividerDoubleClick(object sender, iGColDividerDoubleClickEventArgs e)

@@ -3,6 +3,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Web.Services.Configuration;
 using System.Xml;
 
 using Centralizador.Models.ApiCEN;
@@ -11,6 +12,13 @@ namespace Centralizador.Models.DataBase
 {
     public class Auxiliar
     {
+        public string CodAux { get; set; }
+        public string NomAux { get; set; }
+        public string RutAux { get; set; }
+        public string GirAux { get; set; }
+        public string DirAux { get; set; }
+        public string ComAux { get; set; }
+
         public static int InsertAuxiliar(ResultInstruction instruction, string acteco, Comuna comuna)
         {
             try
@@ -56,7 +64,7 @@ namespace Centralizador.Models.DataBase
             }
         }
 
-        public static bool GetAuxiliar(ResultInstruction instruction)
+        public static Auxiliar GetAuxiliar(ResultInstruction instruction)
         {
             try
             {
@@ -76,7 +84,7 @@ namespace Centralizador.Models.DataBase
                 }
                 if (DataBaseName == null || ServerName == null || id == null || password == null)
                 {
-                    return false;
+                    return null;
                 }
                 Conexion con = new Conexion
                 {
@@ -88,16 +96,42 @@ namespace Centralizador.Models.DataBase
                 con.Query = query.ToString();
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReader(con);
-                if (dataTable != null)
+                if (dataTable != null && dataTable.Rows.Count == 1)
                 {
-                    return true;
+                    Auxiliar auxiliar = new Auxiliar();
+                    if (dataTable.Rows[0]["CodAux"] != DBNull.Value)
+                    {
+                        auxiliar.CodAux = dataTable.Rows[0]["CodAux"].ToString();
+                    }
+                    if (dataTable.Rows[0]["NomAux"] != DBNull.Value)
+                    {
+                        auxiliar.NomAux = dataTable.Rows[0]["NomAux"].ToString();
+                    }
+                    if (dataTable.Rows[0]["RutAux"] != DBNull.Value)
+                    {
+                        auxiliar.RutAux = dataTable.Rows[0]["RutAux"].ToString();
+                    }
+                    if (dataTable.Rows[0]["GirAux"] != DBNull.Value)
+                    {
+                        auxiliar.GirAux = dataTable.Rows[0]["GirAux"].ToString();
+                    }
+                    if (dataTable.Rows[0]["DirAux"] != DBNull.Value)
+                    {
+                        auxiliar.DirAux = dataTable.Rows[0]["DirAux"].ToString();
+                    }
+                    if (dataTable.Rows[0]["ComAux"] != DBNull.Value)
+                    {
+                        auxiliar.ComAux = dataTable.Rows[0]["ComAux"].ToString();
+                    }                
+
+                    return auxiliar;
                 }
             }
             catch (Exception)
             {
                 throw;
             }
-            return false;
+            return null;
         }
 
         public static int UpdateAuxiliar(ResultInstruction instruction)
@@ -121,14 +155,13 @@ namespace Centralizador.Models.DataBase
                 }
                 if (DataBaseName == null || ServerName == null || id == null || password == null)
                 {
-                    return -1;
+                    return 0;
                 }
                 Conexion con = new Conexion
                 {
                     Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
                 };
                 StringBuilder query = new StringBuilder();
-
                 query.Append($"UPDATE softland.cwtauxi SET NomAux='{instruction.ParticipantDebtor.BusinessName}', NoFAux='{instruction.ParticipantDebtor.Name}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 con.Query = query.ToString();

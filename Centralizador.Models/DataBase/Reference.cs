@@ -67,32 +67,32 @@ namespace Centralizador.Models.DataBase
                     foreach (DataRow item in dataTable.Rows)
                     {
 
-                        Reference r = new Reference();
+                        Reference reference = new Reference();
                         if (item["Folio"] != DBNull.Value)
                         {
-                            r.Folio = Convert.ToUInt32(item["Folio"]);
+                            reference.Folio = Convert.ToUInt32(item["Folio"]);
                         }
                         if (item["NroInt"] != DBNull.Value)
                         {
-                            r.NroInt = Convert.ToUInt32(item["NroInt"]);
+                            reference.NroInt = Convert.ToUInt32(item["NroInt"]);
                         }
                         if (item["RecepcionSii"] != DBNull.Value)
                         {
-                            r.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
+                            reference.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
                         }
                         if (item["Fecha"] != DBNull.Value)
                         {
-                            r.FechaEmision = Convert.ToDateTime(item["Fecha"]);
+                            reference.FechaEmision = Convert.ToDateTime(item["Fecha"]);
                         }
                         if (item["FileEnviado"] != DBNull.Value)
                         {
-                            r.FileEnviado = item["FileEnviado"].ToString();
+                            reference.FileEnviado = item["FileEnviado"].ToString();
                         }
                         if (item["FileBasico"] != DBNull.Value)
                         {
-                            r.FileBasico = item["FileBasico"].ToString();
+                            reference.FileBasico = item["FileBasico"].ToString();
                         }
-                        softland.Add(r);
+                        softland.Add(reference);
                     }
                     return softland;
                 }
