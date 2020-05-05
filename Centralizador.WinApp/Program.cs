@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
+using Centralizador.Models.ApiCEN;
 using Centralizador.WinApp.GUI;
 
 namespace Centralizador.WinApp
@@ -18,14 +20,32 @@ namespace Centralizador.WinApp
 
 
             string tokenSii = Models.ApiSII.TokenSeed.GETTokenFromSii();
-            if (tokenSii != null)
+            ResultAgent agent = Agent.GetAgetByEmail();
+            IList<ResultParticipant> participants = new List<ResultParticipant>();
+            if (tokenSii != null && agent != null)
             {
-                Application.Run(new FormMain(tokenSii));
+                foreach (ResultParticipant item in agent.Participants)
+                {
+                    participants.Add(Participant.GetParticipantById(item.ParticipantId));
+                }
+                Application.Run(new FormMain(tokenSii, participants));
             }
             else
             {
-                MessageBox.Show("Missing Sii Token. Please check the digital cert...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (tokenSii == null)
+                {
+                    MessageBox.Show("Missing Sii Token. Please check the digital cert...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                else if (agent == null)
+                {
+                    MessageBox.Show($"The web service belonging to CEN is under maintenance.{Environment.NewLine}Impossible to start!", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
+
+           
+
 
         }
     }

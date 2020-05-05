@@ -29,7 +29,8 @@ namespace Centralizador.WinApp.GUI
         //Creditor     
         private IList<Detalle> DetallesCreditor { get; set; }
         private BackgroundWorker BgwCreditor { get; set; }
-        private BackgroundWorker Bgwinvoicing { get; set; }
+        private BackgroundWorker BgwInsertNv { get; set; }
+        private BackgroundWorker BgwInsertRef { get; set; }
 
         //Debitor
         private IList<Detalle> DetallesDebtor { get; set; }
@@ -40,6 +41,7 @@ namespace Centralizador.WinApp.GUI
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
         private IEnumerable<ResultBilingType> BillingTypes { get; set; }
         public string TokenSii { get; set; }
+        public IList<ResultParticipant> Participants { get; set; }
         private bool IsCreditor { get; set; }
         public bool IsRunning { get; set; }
         public ServiceOutlook ServiceOutlook { get; set; }
@@ -49,24 +51,20 @@ namespace Centralizador.WinApp.GUI
 
         #region FormMain methods
 
-        public FormMain(string value)
+        public FormMain(string value, IList<ResultParticipant> participants)
         {
             InitializeComponent();
             TokenSii = value;
+            Participants = participants;
+
         }
         private void FormMain_Load(object sender, EventArgs e)
         {
 
-            //Load ComboBox with CVE companies 
-            ResultAgent agent = Agent.GetAgetByEmail();
-            IList<ResultParticipant> participants = new List<ResultParticipant>();
-            foreach (ResultParticipant item in agent.Participants)
-            {
-                participants.Add(Participant.GetParticipantById(item.ParticipantId));
-            }
-            participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
+          
+            Participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
             CboParticipants.DisplayMember = "Name";
-            CboParticipants.DataSource = participants;
+            CboParticipants.DataSource = Participants;
             CboParticipants.SelectedIndex = 0;
 
             //Load ComboBox months
@@ -98,12 +96,24 @@ namespace Centralizador.WinApp.GUI
             BgwCreditor.ProgressChanged += BgwCreditor_ProgressChanged;
             BgwCreditor.RunWorkerCompleted += BgwCreditor_RunWorkerCompleted;
             BgwCreditor.DoWork += BgwCreditor_DoWork;
+            // Worker Insert Nv
+            BgwInsertNv = new BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
+            BgwInsertNv.ProgressChanged += BgwInsertNv_ProgressChanged;
+            BgwInsertNv.RunWorkerCompleted += BgwInsertNv_RunWorkerCompleted;
+            BgwInsertNv.DoWork += BgwInsertNv_DoWork;
+            // Worker Insert References
+            BgwInsertRef = new BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
+            BgwInsertRef.ProgressChanged += BgwInsertRef_ProgressChanged;
+            BgwInsertRef.RunWorkerCompleted += BgwInsertRef_RunWorkerCompleted;
+            BgwInsertRef.DoWork += BgwInsertRef_DoWork;
 
-            Bgwinvoicing = new BackgroundWorker();
-            Bgwinvoicing.WorkerReportsProgress = true;
-            Bgwinvoicing.ProgressChanged += Bgwinvoicing_ProgressChanged;
-            Bgwinvoicing.RunWorkerCompleted += Bgwinvoicing_RunWorkerCompleted;
-            Bgwinvoicing.DoWork += Bgwinvoicing_DoWork;
+
 
 
             // Date Time Outlook
@@ -120,6 +130,8 @@ namespace Centralizador.WinApp.GUI
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
 
         }
+
+
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -266,7 +278,8 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
         #region Invoicing Creditor
-        private void BtnFacturar_Click(object sender, EventArgs e)
+
+        private void BtnInsertNv_Click(object sender, EventArgs e)
         {
             if (IsRunning)
             {
@@ -292,9 +305,17 @@ namespace Centralizador.WinApp.GUI
                 System.Diagnostics.Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
                 return;
             }
-            Bgwinvoicing.RunWorkerAsync(path);
+            // Count
+            int count = DetallesCreditor.Count(x => x.Folio == 0);
+            DialogResult resp = MessageBox.Show($"There are {count} pending payment instructions for billing {Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (resp == DialogResult.Yes)
+            {
+                BgwInsertNv.RunWorkerAsync(path);
+            }
+
         }
-        private void Bgwinvoicing_DoWork(object sender, DoWorkEventArgs e)
+        private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
         {
             IsRunning = true;
             string path = e.Argument.ToString();
@@ -302,7 +323,7 @@ namespace Centralizador.WinApp.GUI
             float porcent = 0;
             int result = 0;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-            Bgwinvoicing.ReportProgress(0, "Updating DTE email from Sii file, please wait...");
+            BgwInsertNv.ReportProgress(0, "Updating DTE email from Sii file, please wait...");
             List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
             foreach (Detalle item in DetallesCreditor)
             {
@@ -326,11 +347,27 @@ namespace Centralizador.WinApp.GUI
                 // si tiene folio 0 (null) se factura!
                 Comuna comuna = null;
                 string acteco = null;
-                if (item.Folio == 0)
+                bool includeRCD = false;
+                if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
+                {
+                    if (item.DataEvento != null)
+                    {
+                        if (item.DataEvento.ListEvenHistDoc.Count > 0)
+                        {
+                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
+                            {
+                                includeRCD = true;
+                            }
+                        }
+                    }
+
+                }
+
+                if (item.Folio == 0 || includeRCD)
                 {
                     // Crear auxiliares nuevos
                     Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction);
-                    if (auxiliar == null )
+                    if (auxiliar == null)
                     {
                         // Get comunas                      
                         IList<Comuna> comunas = Comuna.GetComunas(item.Instruction);
@@ -390,40 +427,68 @@ namespace Centralizador.WinApp.GUI
                             // Log de que no hubo update.
                         }
                     }
-                 
-
-                 
                     // Insert NV
                     int lastF = NotaVenta.GetLastNv(item.Instruction);
+
                     string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod);
-
                     if (result != 1)
                     {
                         // Error in insert
                     }
 
-
-
-
                 }
                 c++;
                 porcent = (float)(100 * c) / DetallesCreditor.Count;
-                Bgwinvoicing.ReportProgress((int)porcent, $"Inserting/Updating into Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
+                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV into Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
             }
         }
 
-        private void Bgwinvoicing_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BgwInsertNv_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TssLblProgBar.Value = 0;
             IsCreditor = true;
             IsRunning = false;
         }
 
-        private void Bgwinvoicing_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
+        }
+
+        private void BtnInsertRef_Click(object sender, EventArgs e)
+        {
+            BgwInsertRef.RunWorkerAsync();
+        }
+        private void BgwInsertRef_DoWork(object sender, DoWorkEventArgs e)
+        {
+            foreach (Detalle item in DetallesCreditor)
+            {
+                if (item.References == null)
+                {
+                    // Insert References
+                    int lastR = Reference.GetLastRef(item.Instruction);
+                    if (lastR > 0)
+                    {
+                        int result = Reference.InsertReference(item.Instruction, lastR + 1);
+                        if (result != 1)
+                        {
+                            // Error o indicar que ya existe la NV o REf
+                        }
+                    }
+                }
+            }
+        }
+
+        private void BgwInsertRef_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+        }
+
+        private void BgwInsertRef_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
         }
 
 
@@ -1124,8 +1189,10 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Focus();
         }
 
-        #endregion
 
+
+
+        #endregion
 
 
     }

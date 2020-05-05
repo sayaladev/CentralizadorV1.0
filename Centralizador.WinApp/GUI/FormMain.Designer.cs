@@ -54,8 +54,9 @@
             this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.BtnFacturar = new System.Windows.Forms.Button();
+            this.BtnInsertNv = new System.Windows.Forms.Button();
+            this.ChkIncludeReclaimed = new System.Windows.Forms.CheckBox();
+            this.BtnInsertRef = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
             this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
             this.TxtRutParticipant = new System.Windows.Forms.TextBox();
@@ -299,33 +300,45 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.button2);
-            this.groupBox2.Controls.Add(this.BtnFacturar);
-            this.groupBox2.Location = new System.Drawing.Point(13, 432);
+            this.groupBox2.Controls.Add(this.BtnInsertNv);
+            this.groupBox2.Controls.Add(this.ChkIncludeReclaimed);
+            this.groupBox2.Controls.Add(this.BtnInsertRef);
+            this.groupBox2.Location = new System.Drawing.Point(13, 380);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(234, 72);
+            this.groupBox2.Size = new System.Drawing.Size(234, 124);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Creditor";
             // 
-            // button2
+            // BtnInsertNv
             // 
-            this.button2.Location = new System.Drawing.Point(121, 19);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(69, 38);
-            this.button2.TabIndex = 8;
-            this.button2.Text = "Cen";
-            this.button2.UseVisualStyleBackColor = true;
+            this.BtnInsertNv.Location = new System.Drawing.Point(21, 19);
+            this.BtnInsertNv.Name = "BtnInsertNv";
+            this.BtnInsertNv.Size = new System.Drawing.Size(84, 38);
+            this.BtnInsertNv.TabIndex = 10;
+            this.BtnInsertNv.Text = "Insert NV";
+            this.BtnInsertNv.UseVisualStyleBackColor = true;
+            this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_Click);
             // 
-            // BtnFacturar
+            // ChkIncludeReclaimed
             // 
-            this.BtnFacturar.Location = new System.Drawing.Point(21, 19);
-            this.BtnFacturar.Name = "BtnFacturar";
-            this.BtnFacturar.Size = new System.Drawing.Size(69, 38);
-            this.BtnFacturar.TabIndex = 0;
-            this.BtnFacturar.Text = "Facturar";
-            this.BtnFacturar.UseVisualStyleBackColor = true;
-            this.BtnFacturar.Click += new System.EventHandler(this.BtnFacturar_Click);
+            this.ChkIncludeReclaimed.AutoSize = true;
+            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(130, 31);
+            this.ChkIncludeReclaimed.Name = "ChkIncludeReclaimed";
+            this.ChkIncludeReclaimed.Size = new System.Drawing.Size(76, 17);
+            this.ChkIncludeReclaimed.TabIndex = 9;
+            this.ChkIncludeReclaimed.Text = "Reclaimed";
+            this.ChkIncludeReclaimed.UseVisualStyleBackColor = true;
+            // 
+            // BtnInsertRef
+            // 
+            this.BtnInsertRef.Location = new System.Drawing.Point(21, 80);
+            this.BtnInsertRef.Name = "BtnInsertRef";
+            this.BtnInsertRef.Size = new System.Drawing.Size(84, 38);
+            this.BtnInsertRef.TabIndex = 8;
+            this.BtnInsertRef.Text = "Insert References";
+            this.BtnInsertRef.UseVisualStyleBackColor = true;
+            this.BtnInsertRef.Click += new System.EventHandler(this.BtnInsertRef_Click);
             // 
             // GroupBox1
             // 
@@ -460,6 +473,7 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.GroupBox1.ResumeLayout(false);
             this.GroupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -487,13 +501,12 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStripStatusLabel TssLblUserEmail;
         private System.Windows.Forms.Button BtnPdfConvert;
-        private System.Windows.Forms.Button BtnFacturar;
         private System.Windows.Forms.Button BtnOutlook;
         private System.Windows.Forms.TextBox TxtDateTimeEmail;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TextBox TxtRznRef;
         private System.Windows.Forms.TextBox TxtFolioRef;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button BtnInsertRef;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button BtnPagar;
         private System.Windows.Forms.TextBox TxtCtaCteParticipant;
@@ -504,5 +517,7 @@
         private System.Windows.Forms.ImageList FListPics;
         private System.Windows.Forms.TextBox TxtDscItem;
         private System.Windows.Forms.TextBox TxtTpoDocRef;
+        private System.Windows.Forms.CheckBox ChkIncludeReclaimed;
+        private System.Windows.Forms.Button BtnInsertNv;
     }
 }

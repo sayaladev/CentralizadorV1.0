@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 
@@ -102,6 +103,89 @@ namespace Centralizador.Models.DataBase
             catch (Exception)
             {
 
+                throw;
+            }
+        }
+
+
+        public static int InsertReference(ResultInstruction instruction, int nroInt)
+        {
+
+            try
+            {
+                XmlDocument document = Properties.Settings.Default.DBSoftland;
+                string DataBaseName = "";
+                string ServerName = Properties.Settings.Default.ServerName;
+                string id = Properties.Settings.Default.DBUser;
+                string password = Properties.Settings.Default.DBPassword;
+
+                foreach (XmlNode item in document.ChildNodes[0])
+                {
+                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
+                    {
+                        DataBaseName = item.FirstChild.InnerText;
+                        break;
+                    }
+                }
+                if (DataBaseName == null || ServerName == null || id == null || password == null)
+                {
+                    return 0;
+                }
+                Conexion con = new Conexion
+                {
+                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
+                };
+                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+                StringBuilder query = new StringBuilder();
+                string time = string.Format(cultureInfo,"{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
+                query.Append("Insert Into softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) values ");
+                query.Append($"('F', {nroInt},2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{time}', '{instruction.PaymentMatrix.NaturalKey}')");
+                con.Query = query.ToString();
+                if (Convert.ToInt32(Conexion.ExecuteNonQuery(con)) == 1) // 
+                {
+                    return Convert.ToInt32(Conexion.ExecuteNonQuery(con)); // Return 1 if ok!
+
+                }
+                return 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public static int GetLastRef(ResultInstruction instruction)
+        {
+            try
+            {
+                XmlDocument document = Properties.Settings.Default.DBSoftland;
+                string DataBaseName = "";
+                string ServerName = Properties.Settings.Default.ServerName;
+                string id = Properties.Settings.Default.DBUser;
+                string password = Properties.Settings.Default.DBPassword;
+
+                foreach (XmlNode item in document.ChildNodes[0])
+                {
+                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
+                    {
+                        DataBaseName = item.FirstChild.InnerText;
+                        break;
+                    }
+                }
+                if (DataBaseName == null || ServerName == null || id == null || password == null)
+                {
+                    return 0;
+                }
+                Conexion con = new Conexion
+                {
+                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
+                };
+                con.Query = "select MAX(NroInt) from softland.iw_gsaen where Tipo = 'F'";
+                return Convert.ToInt32(Conexion.ExecuteScalar(con));
+
+            }
+            catch (Exception)
+            {
                 throw;
             }
         }

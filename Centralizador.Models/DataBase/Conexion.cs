@@ -36,7 +36,7 @@ namespace Centralizador.Models.DataBase
                 }
                 catch (Exception)
                 {
-                    //
+                    throw;
                 }
                 finally
                 {
@@ -89,11 +89,19 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
-                    return cmd.ExecuteScalar();
+                    object obj  = cmd.ExecuteScalar();
+                    if (obj != null && DBNull.Value != obj)
+                    {
+                        return obj;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 catch (Exception)
                 {
-                    throw;
+                    return null;
                 }
                 finally
                 {

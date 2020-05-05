@@ -38,7 +38,15 @@ namespace Centralizador.Models.DataBase
                     Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
                 };
                 con.Query = "select MAX(NVNumero) from softland.nw_nventa";
-                return Convert.ToInt32(Conexion.ExecuteScalar(con));
+                if (Conexion.ExecuteScalar(con) != null )
+                {
+                    return Convert.ToInt32(Conexion.ExecuteScalar(con));
+                }
+                else
+                {
+                    return 0;
+                }
+              
 
             }
             catch (Exception)
