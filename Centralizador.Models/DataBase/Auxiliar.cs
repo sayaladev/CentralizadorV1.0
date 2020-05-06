@@ -3,7 +3,6 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Web.Services.Configuration;
 using System.Xml;
 
 using Centralizador.Models.ApiCEN;
@@ -24,10 +23,7 @@ namespace Centralizador.Models.DataBase
             try
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
+                string DataBaseName = "";             
                 string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
 
                 foreach (XmlNode item in document.ChildNodes[0])
@@ -38,14 +34,9 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return -1;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+           
+           
+                Conexion con = new Conexion(DataBaseName);
                 StringBuilder query = new StringBuilder();
                 query.Append($"IF (NOT EXISTS(SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}')) BEGIN ");
                 query.Append("INSERT INTO softland.CWTAUXI (CodAux, NomAux, NoFAux, RutAux, ActAux, GirAux, PaiAux, Comaux, ");
@@ -70,10 +61,6 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
-
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -82,15 +69,9 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return null;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+                Conexion con = new Conexion(DataBaseName);
                 StringBuilder query = new StringBuilder();
+              
 
                 query.Append($"SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 con.Query = query.ToString();
@@ -122,7 +103,7 @@ namespace Centralizador.Models.DataBase
                     if (dataTable.Rows[0]["ComAux"] != DBNull.Value)
                     {
                         auxiliar.ComAux = dataTable.Rows[0]["ComAux"].ToString();
-                    }                
+                    }
 
                     return auxiliar;
                 }
@@ -141,10 +122,6 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
-
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -153,25 +130,18 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return 0;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+                Conexion con = new Conexion(DataBaseName);
                 StringBuilder query = new StringBuilder();
+
                 query.Append($"UPDATE softland.cwtauxi SET NomAux='{instruction.ParticipantDebtor.BusinessName}', NoFAux='{instruction.ParticipantDebtor.Name}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 con.Query = query.ToString();
                 return Conexion.ExecuteNonQuery(con);
-
             }
             catch (Exception)
             {
                 throw;
-            }          
+            }
         }
     }
 

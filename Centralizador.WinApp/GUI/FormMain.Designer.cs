@@ -50,7 +50,7 @@
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.BtnRechazar = new System.Windows.Forms.Button();
             this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -251,7 +251,7 @@
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.TxtDateTimeEmail);
-            this.groupBox3.Controls.Add(this.button1);
+            this.groupBox3.Controls.Add(this.BtnRechazar);
             this.groupBox3.Controls.Add(this.BtnPagar);
             this.groupBox3.Controls.Add(this.BtnOutlook);
             this.groupBox3.Location = new System.Drawing.Point(13, 510);
@@ -270,20 +270,20 @@
             this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
             this.TxtDateTimeEmail.TabIndex = 2;
             // 
-            // button1
+            // BtnRechazar
             // 
-            this.button1.Location = new System.Drawing.Point(139, 29);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(69, 38);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Cen";
-            this.button1.UseVisualStyleBackColor = true;
+            this.BtnRechazar.Location = new System.Drawing.Point(121, 29);
+            this.BtnRechazar.Name = "BtnRechazar";
+            this.BtnRechazar.Size = new System.Drawing.Size(104, 38);
+            this.BtnRechazar.TabIndex = 7;
+            this.BtnRechazar.Text = "Rechazar";
+            this.BtnRechazar.UseVisualStyleBackColor = true;
             // 
             // BtnPagar
             // 
             this.BtnPagar.Location = new System.Drawing.Point(8, 29);
             this.BtnPagar.Name = "BtnPagar";
-            this.BtnPagar.Size = new System.Drawing.Size(69, 38);
+            this.BtnPagar.Size = new System.Drawing.Size(104, 38);
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = true;
@@ -507,7 +507,7 @@
         private System.Windows.Forms.TextBox TxtRznRef;
         private System.Windows.Forms.TextBox TxtFolioRef;
         private System.Windows.Forms.Button BtnInsertRef;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button BtnRechazar;
         private System.Windows.Forms.Button BtnPagar;
         private System.Windows.Forms.TextBox TxtCtaCteParticipant;
         private System.Windows.Forms.TextBox TxtRutParticipant;

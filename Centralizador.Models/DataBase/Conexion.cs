@@ -9,6 +9,12 @@ namespace Centralizador.Models.DataBase
         public string Cnn { get; set; }
         public string Query { get; set; }
 
+        public Conexion(string dataBaseName)
+        {
+            Cnn = Cnn = $"Data Source={Properties.Settings.Default.ServerName};Initial Catalog={dataBaseName};Persist Security Info=True;User ID={Properties.Settings.Default.DBUser};Password={Properties.Settings.Default.DBPassword}";
+           
+        }
+
         public static SqlDataReader SqlDataReader { get; set; }
 
 

@@ -24,9 +24,7 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
+           
                 IList<Comuna> comunas = new List<Comuna>();
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
@@ -36,15 +34,10 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
+                Conexion con = new Conexion(DataBaseName)
                 {
-                    return null;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
+                    Query = "SELECT * FROM softland.cwtcomu"
                 };
-                con.Query = "SELECT * FROM softland.cwtcomu";
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReader(con);
                 if (dataTable != null)

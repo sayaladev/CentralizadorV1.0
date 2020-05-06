@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -32,6 +34,7 @@ namespace Centralizador.WinApp.GUI
         private BackgroundWorker BgwInsertNv { get; set; }
         private BackgroundWorker BgwInsertRef { get; set; }
 
+
         //Debitor
         private IList<Detalle> DetallesDebtor { get; set; }
         private BackgroundWorker BgwDebtor { get; set; }
@@ -41,30 +44,38 @@ namespace Centralizador.WinApp.GUI
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
         private IEnumerable<ResultBilingType> BillingTypes { get; set; }
         public string TokenSii { get; set; }
-        public IList<ResultParticipant> Participants { get; set; }
+        public ResultAgent Agent { get; set; }
         private bool IsCreditor { get; set; }
         public bool IsRunning { get; set; }
         public ServiceOutlook ServiceOutlook { get; set; }
         public int Intervalo { get; set; }
+        public StringBuilder StringLogging { get; set; }
+
+
 
         #endregion
 
         #region FormMain methods
 
-        public FormMain(string value, IList<ResultParticipant> participants)
+        public FormMain(string value, ResultAgent agent)
         {
             InitializeComponent();
             TokenSii = value;
-            Participants = participants;
+            Agent = agent;
 
         }
         private void FormMain_Load(object sender, EventArgs e)
         {
+            // Load
+            IList<ResultParticipant> participants = new List<ResultParticipant>();
+            foreach (ResultParticipant item in Agent.Participants)
+            {
+                participants.Add(Participant.GetParticipantById(item.ParticipantId));
+            }
 
-          
-            Participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
+            participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
             CboParticipants.DisplayMember = "Name";
-            CboParticipants.DataSource = Participants;
+            CboParticipants.DataSource = participants;
             CboParticipants.SelectedIndex = 0;
 
             //Load ComboBox months
@@ -78,7 +89,7 @@ namespace Centralizador.WinApp.GUI
             BillingTypes = BilingType.GetBilinTypes();
 
             // User email
-            TssLblUserEmail.Text = "|  " + agent.Email;
+            TssLblUserEmail.Text = "|  " + Agent.Email;
 
             // Worker Debtor
             BgwDebtor = new BackgroundWorker
@@ -113,8 +124,8 @@ namespace Centralizador.WinApp.GUI
             BgwInsertRef.RunWorkerCompleted += BgwInsertRef_RunWorkerCompleted;
             BgwInsertRef.DoWork += BgwInsertRef_DoWork;
 
-
-
+            // Logging file
+            StringLogging = new StringBuilder();
 
             // Date Time Outlook
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
@@ -130,9 +141,6 @@ namespace Centralizador.WinApp.GUI
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
 
         }
-
-
-
         private void Timer_Tick(object sender, EventArgs e)
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
@@ -258,7 +266,6 @@ namespace Centralizador.WinApp.GUI
 
 
         }
-
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex != 0)
@@ -302,52 +309,13 @@ namespace Centralizador.WinApp.GUI
             if (!File.Exists(path))
             {
                 MessageBox.Show($"The file '{file}' NOT found, please download...", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                System.Diagnostics.Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
+                Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
                 return;
             }
-            // Count
-            int count = DetallesCreditor.Count(x => x.Folio == 0);
-            DialogResult resp = MessageBox.Show($"There are {count} pending payment instructions for billing {Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-            if (resp == DialogResult.Yes)
-            {
-                BgwInsertNv.RunWorkerAsync(path);
-            }
-
-        }
-        private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
-        {
-            IsRunning = true;
-            string path = e.Argument.ToString();
-            int c = 0;
-            float porcent = 0;
-            int result = 0;
-            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-            BgwInsertNv.ReportProgress(0, "Updating DTE email from Sii file, please wait...");
-            List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+            IList<Detalle> detallesFinal = new List<Detalle>();
             foreach (Detalle item in DetallesCreditor)
             {
-                try
-                {
-                    AuxCsv a = values.FirstOrDefault(x => x.Rut == item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode);
-                    if (a != null)
-                    {
-                        // Update dte & name aux from all instructions 
-                        string name = ti.ToTitleCase(a.Name.ToLower());
-                        item.Instruction.ParticipantDebtor.BusinessName = name;
-                        item.Instruction.ParticipantDebtor.DteReceptionEmail = a.Email;
-                        item.Instruction.ParticipantDebtor.Name = item.Instruction.ParticipantDebtor.Name.ToUpper();
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-
-                // si tiene folio 0 (null) se factura!
-                Comuna comuna = null;
-                string acteco = null;
-                bool includeRCD = false;
                 if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
                 {
                     if (item.DataEvento != null)
@@ -356,15 +324,68 @@ namespace Centralizador.WinApp.GUI
                         {
                             if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
                             {
-                                includeRCD = true;
+                                detallesFinal.Add(item);
                             }
                         }
                     }
-
                 }
-
-                if (item.Folio == 0 || includeRCD)
+                if (item.Folio == 0)
                 {
+                    detallesFinal.Add(item);
+                }
+            }
+            if (detallesFinal.Count > 0)
+            {
+                DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for billing {Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (resp == DialogResult.Yes)
+                {
+                    BgwInsertNv.RunWorkerAsync(detallesFinal);
+                }
+            }
+        }
+        private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
+        {
+            IsRunning = true;
+            IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
+            int c = 0;
+            float porcent = 0;
+            int result = 0;
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+            StringLogging.Clear();
+            DateTime now = DateTime.Now;
+            string file = $"ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
+
+            BgwInsertNv.ReportProgress(0, "Wait please...");
+            List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+            foreach (Detalle item in detallesFinal)
+            {
+                Comuna comuna = null;
+                string acteco = null;
+                // Get F° NV if exists
+                int F = NotaVenta.GetNv(item.Instruction);
+                if (F == 0)
+                {
+                    try
+                    {
+                        AuxCsv a = values.FirstOrDefault(x => x.Rut == item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode);
+                        if (a != null)
+                        {
+                            // Update dte & name aux from all instructions 
+                            string name = ti.ToTitleCase(a.Name.ToLower());
+                            item.Instruction.ParticipantDebtor.BusinessName = name;
+                            item.Instruction.ParticipantDebtor.DteReceptionEmail = a.Email;
+                            item.Instruction.ParticipantDebtor.Name = item.Instruction.ParticipantDebtor.Name.ToUpper();
+                            //StringLogging.Append(item.Instruction.Id + "\t" + "Update email" + "\t\t" + "Yes" + Environment.NewLine);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        StringLogging.Append(item.Instruction.Id + "\t" + "Update email" + "\t\t" + "Error in CSV file." + Environment.NewLine);
+                        continue;
+                    }
+
                     // Crear auxiliares nuevos
                     Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction);
                     if (auxiliar == null)
@@ -395,28 +416,36 @@ namespace Centralizador.WinApp.GUI
                             // Api HeroKuapp no disponible.
                         }
                         // Insert aux
-                        Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
+                        result = Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
+                        if (result == 1)
+                        {
+                            //StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Yes" + Environment.NewLine);
+                        }
+                        else
+                        {
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "No" + Environment.NewLine);
+                        }
                     }
                     else
                     {
-                        if (auxiliar.ComAux == null)
+                        if (string.IsNullOrEmpty(auxiliar.ComAux))
                         {
-                            // log error
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: ComAux" + Environment.NewLine);
                             continue;
                         }
-                        if (auxiliar.DirAux == null)
+                        if (string.IsNullOrEmpty(auxiliar.DirAux))
                         {
-                            // log error
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: DirAux" + Environment.NewLine);
                             continue;
                         }
-                        if (auxiliar.GirAux == null)
+                        if (string.IsNullOrEmpty(auxiliar.GirAux))
                         {
-                            // log error
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: GirAux" + Environment.NewLine);
                             continue;
                         }
-                        if (auxiliar.RutAux == null)
+                        if (string.IsNullOrEmpty(auxiliar.RutAux))
                         {
-                            // log error
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: RutAux" + Environment.NewLine);
                             continue;
                         }
 
@@ -424,23 +453,34 @@ namespace Centralizador.WinApp.GUI
                         result = Auxiliar.UpdateAuxiliar(item.Instruction);
                         if (result != 1)
                         {
-                            // Log de que no hubo update.
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "No" + Environment.NewLine);
+                        }
+                        else
+                        {
+                            //StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Yes" + Environment.NewLine);
                         }
                     }
+
                     // Insert NV
                     int lastF = NotaVenta.GetLastNv(item.Instruction);
-
                     string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod);
                     if (result != 1)
                     {
-                        // Error in insert
+                        StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "No" + Environment.NewLine);
                     }
-
+                    else
+                    {
+                        StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
+                    }
+                }
+                else
+                {
+                    StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "*" + (F) + Environment.NewLine);
                 }
                 c++;
-                porcent = (float)(100 * c) / DetallesCreditor.Count;
-                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV into Softland DB, wait please...   ({c}/{DetallesCreditor.Count})");
+                porcent = (float)(100 * c) / detallesFinal.Count;
+                BgwInsertNv.ReportProgress((int)porcent, $"Inserting, wait please...   ({c}/{detallesFinal.Count})");
             }
         }
 
@@ -449,6 +489,19 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = 0;
             IsCreditor = true;
             IsRunning = false;
+            TssLblMensaje.Text = "Check the log file.";
+            string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
+
+            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+            {
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+            }
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt", StringLogging.ToString());
+            ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt")
+            {
+                WindowStyle = ProcessWindowStyle.Minimized
+            };
+            Process.Start(process);
         }
 
         private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -459,25 +512,49 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnInsertRef_Click(object sender, EventArgs e)
         {
+            if (IsRunning)
+            {
+                return;
+            }
+            if (!IsCreditor || IGridMain.Rows.Count == 0)
+            {
+                TssLblMensaje.Text = "Plesase select Creditor!";
+                return;
+            }
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
             BgwInsertRef.RunWorkerAsync();
         }
         private void BgwInsertRef_DoWork(object sender, DoWorkEventArgs e)
         {
+            StringLogging.Clear();
             foreach (Detalle item in DetallesCreditor)
             {
-                if (item.References == null)
+                if (item.Folio != 0)
                 {
-                    // Insert References
-                    int lastR = Reference.GetLastRef(item.Instruction);
-                    if (lastR > 0)
+                    if (item.References == null)
                     {
-                        int result = Reference.InsertReference(item.Instruction, lastR + 1);
-                        if (result != 1)
+                        // Insert References
+                        int lastR = Reference.GetLastRef(item.Instruction);
+                        if (lastR > 0)
                         {
-                            // Error o indicar que ya existe la NV o REf
+                            int result = Reference.InsertReference(item.Instruction, lastR + 1);
+                            if (result != 1)
+                            {
+                                // Error o indicar que ya existe la NV o REf
+                            }
                         }
                     }
                 }
+                else
+                {
+
+                }
+
+
             }
         }
 
@@ -523,7 +600,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
 
-                DialogResult = MessageBox.Show($"Are you sure you convert {lista.Count} documents?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (DialogResult == DialogResult.Yes)
                 {
                     BackgroundWorker bgwConvertPdf = new BackgroundWorker
@@ -731,7 +808,7 @@ namespace Centralizador.WinApp.GUI
                 if (File.Exists(nameFile))
                 {   // Deserialize  
                     DTEDefType xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
-                    if (xmlObjeto == null || item.Instruction != null)
+                    if (xmlObjeto == null)
                     {
                         continue;
                     }

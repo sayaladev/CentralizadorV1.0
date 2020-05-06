@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Xml;
 
@@ -10,17 +9,13 @@ namespace Centralizador.Models.DataBase
 {
     public class NotaVenta
     {
-        
+
         public static int GetLastNv(ResultInstruction instruction)
         {
             try
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
-
+                string DataBaseName = "";    
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -28,17 +23,11 @@ namespace Centralizador.Models.DataBase
                         DataBaseName = item.FirstChild.InnerText;
                         break;
                     }
-                }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return 0;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+                }              
+                Conexion con = new Conexion(DataBaseName);
+
                 con.Query = "select MAX(NVNumero) from softland.nw_nventa";
-                if (Conexion.ExecuteScalar(con) != null )
+                if (Conexion.ExecuteScalar(con) != null)
                 {
                     return Convert.ToInt32(Conexion.ExecuteScalar(con));
                 }
@@ -46,8 +35,6 @@ namespace Centralizador.Models.DataBase
                 {
                     return 0;
                 }
-              
-
             }
             catch (Exception)
             {
@@ -61,10 +48,7 @@ namespace Centralizador.Models.DataBase
             try
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
+                string DataBaseName = "";  
 
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
@@ -74,14 +58,8 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return 0;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+             
+                Conexion con = new Conexion(DataBaseName);           
                 StringBuilder query = new StringBuilder();
                 string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
                 uint neto = instruction.Amount;
@@ -89,10 +67,14 @@ namespace Centralizador.Models.DataBase
                 double total = Math.Ceiling(neto + iva);
 
                 string concepto = $"Concepto: {instruction.AuxiliaryData.PaymentMatrixConcept}";
+                query.Append("IF (NOT EXISTS(SELECT distinct TOP (1) nv.NVNumero from softland.nw_nventa nv ");
+                query.Append("INNER JOIN softland.nw_detnv d on nv.NVNumero = d.NVNumero ");
+                query.Append("left join softland.nw_fFactNCredNV() f on f.nvnumero = d.nvnumero and  f.codprod = d.codprod and f.nvcorrela = d.nvlinea ");
+                query.Append($"where nv.CodAux = '{instruction.ParticipantDebtor.Rut}' and nv.nvSubTotal = {neto} and f.folio is null) ) BEGIN ");
                 query.Append("INSERT INTO softland.nw_nventa (CodAux,CveCod,NomCon,nvFeEnt,nvFem,NVNumero,nvObser,VenCod,nvSubTotal, ");
                 query.Append("nvNetoAfecto,nvNetoExento,nvMonto,proceso,nvEquiv,CodMon,nvEstado) values ( ");
                 query.Append($"'{instruction.ParticipantDebtor.Rut}','1','.','{time}','{time}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
-                query.Append("'Centralizador',1,'01','A')");
+                query.Append("'Centralizador',1,'01','A') END");
                 con.Query = query.ToString();
                 if (Convert.ToInt32(Conexion.ExecuteNonQuery(con)) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
                 {
@@ -109,15 +91,44 @@ namespace Centralizador.Models.DataBase
                         return Convert.ToInt32(Conexion.ExecuteNonQuery(con)); // Return 1 if ok!
                     }
                 }
-
                 return 0;
-
-                }
+            }
             catch (Exception)
             {
                 throw;
             }
         }
 
+        public static int GetNv(ResultInstruction instruction)
+        {
+            try
+            {
+                XmlDocument document = Properties.Settings.Default.DBSoftland;
+                string DataBaseName = "";         
+
+                foreach (XmlNode item in document.ChildNodes[0])
+                {
+                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
+                    {
+                        DataBaseName = item.FirstChild.InnerText;
+                        break;
+                    }
+                }             
+                Conexion con = new Conexion(DataBaseName);
+                StringBuilder query = new StringBuilder();
+                string concepto = $"Concepto: {instruction.AuxiliaryData.PaymentMatrixConcept}";
+
+                query.Append("SELECT distinct TOP (1) nv.NVNumero from softland.nw_nventa nv ");
+                query.Append("INNER JOIN softland.nw_detnv d on nv.NVNumero = d.NVNumero ");
+                query.Append("left join softland.nw_fFactNCredNV() f on f.nvnumero = d.nvnumero and  f.codprod = d.codprod and f.nvcorrela = d.nvlinea ");
+                query.Append($"where nv.CodAux = '{instruction.ParticipantDebtor.Rut}' and nv.nvSubTotal = {instruction.Amount} and f.folio is null");
+                con.Query = query.ToString();
+                return Convert.ToInt32(Conexion.ExecuteScalar(con));               
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

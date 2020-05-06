@@ -20,15 +20,10 @@ namespace Centralizador.WinApp
 
 
             string tokenSii = Models.ApiSII.TokenSeed.GETTokenFromSii();
-            ResultAgent agent = Agent.GetAgetByEmail();
-            IList<ResultParticipant> participants = new List<ResultParticipant>();
+            ResultAgent agent = Agent.GetAgetByEmail();         
             if (tokenSii != null && agent != null)
-            {
-                foreach (ResultParticipant item in agent.Participants)
-                {
-                    participants.Add(Participant.GetParticipantById(item.ParticipantId));
-                }
-                Application.Run(new FormMain(tokenSii, participants));
+            {               
+                Application.Run(new FormMain(tokenSii, agent));
             }
             else
             {

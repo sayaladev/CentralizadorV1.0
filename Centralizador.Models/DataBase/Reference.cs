@@ -28,9 +28,6 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
                 IList<Reference> softland = new List<Reference>();
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
@@ -40,15 +37,9 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return null;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+                Conexion con = new Conexion(DataBaseName);
                 StringBuilder query = new StringBuilder();
+
                 query.Append("select g.Folio,g.NroInt, l.Fecha 'RecepcionSii', g.Fecha, ");
                 query.Append("(select Archivo from softland.dte_archivos WHERE ID_Archivo = l.XMLSET) 'FileEnviado', ");
                 query.Append("(select Archivo from softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico' ");
@@ -115,10 +106,6 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
-
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -127,17 +114,11 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return 0;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+                Conexion con = new Conexion(DataBaseName);
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
                 StringBuilder query = new StringBuilder();
-                string time = string.Format(cultureInfo,"{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
+                string time = string.Format(cultureInfo, "{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
+
                 query.Append("Insert Into softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) values ");
                 query.Append($"('F', {nroInt},2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{time}', '{instruction.PaymentMatrix.NaturalKey}')");
                 con.Query = query.ToString();
@@ -160,10 +141,6 @@ namespace Centralizador.Models.DataBase
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
-
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -172,17 +149,11 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
+                Conexion con = new Conexion(DataBaseName)
                 {
-                    return 0;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
+                    Query = "select MAX(NroInt) from softland.iw_gsaen where Tipo = 'F'"
                 };
-                con.Query = "select MAX(NroInt) from softland.iw_gsaen where Tipo = 'F'";
                 return Convert.ToInt32(Conexion.ExecuteScalar(con));
-
             }
             catch (Exception)
             {

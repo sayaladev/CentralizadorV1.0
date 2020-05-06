@@ -72,11 +72,7 @@ namespace Centralizador.Models.DataBase
             try
             {
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                string ServerName = Properties.Settings.Default.ServerName;
-                string id = Properties.Settings.Default.DBUser;
-                string password = Properties.Settings.Default.DBPassword;
-
+                string DataBaseName = "";      
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == instruction.Creditor.ToString())
@@ -85,15 +81,9 @@ namespace Centralizador.Models.DataBase
                         break;
                     }
                 }
-                if (DataBaseName == null || ServerName == null || id == null || password == null)
-                {
-                    return -1;
-                }
-                Conexion con = new Conexion
-                {
-                    Cnn = $"Data Source={ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={id};Password={password}"
-                };
+                Conexion con = new Conexion(DataBaseName); 
                 StringBuilder query = new StringBuilder();
+
                 query.Append($"IF (NOT EXISTS (SELECT * FROM softland.cwtgiro WHERE GirDes = '{descripcion}')) BEGIN ");
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
                 query.Append($"'{descripcion}') END"); 
