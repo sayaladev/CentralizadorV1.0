@@ -65,16 +65,12 @@ namespace Centralizador.Models.DataBase
                 uint neto = instruction.Amount;
                 double iva = neto * 0.19;
                 double total = Math.Ceiling(neto + iva);
-
                 string concepto = $"Concepto: {instruction.AuxiliaryData.PaymentMatrixConcept}";
-                query.Append("IF (NOT EXISTS(SELECT distinct TOP (1) nv.NVNumero from softland.nw_nventa nv ");
-                query.Append("INNER JOIN softland.nw_detnv d on nv.NVNumero = d.NVNumero ");
-                query.Append("left join softland.nw_fFactNCredNV() f on f.nvnumero = d.nvnumero and  f.codprod = d.codprod and f.nvcorrela = d.nvlinea ");
-                query.Append($"where nv.CodAux = '{instruction.ParticipantDebtor.Rut}' and nv.nvSubTotal = {neto} and f.folio is null) ) BEGIN ");
+                
                 query.Append("INSERT INTO softland.nw_nventa (CodAux,CveCod,NomCon,nvFeEnt,nvFem,NVNumero,nvObser,VenCod,nvSubTotal, ");
                 query.Append("nvNetoAfecto,nvNetoExento,nvMonto,proceso,nvEquiv,CodMon,nvEstado) values ( ");
                 query.Append($"'{instruction.ParticipantDebtor.Rut}','1','.','{time}','{time}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
-                query.Append("'Centralizador',1,'01','A') END");
+                query.Append("'Centralizador',1,'01','A') ");
                 con.Query = query.ToString();
                 if (Convert.ToInt32(Conexion.ExecuteNonQuery(con)) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
                 {
