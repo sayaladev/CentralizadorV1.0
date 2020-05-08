@@ -526,46 +526,61 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Plesase select a Company!";
                 return;
             }
-            BgwInsertRef.RunWorkerAsync();
+            IList<Detalle> detallesFinal = new List<Detalle>();
+            foreach (Detalle item in DetallesCreditor)
+            {
+                if (item.Folio > 0)
+                {
+                    detallesFinal.Add(item);
+                }
+            }
+            BgwInsertRef.RunWorkerAsync(detallesFinal);
         }
         private void BgwInsertRef_DoWork(object sender, DoWorkEventArgs e)
         {
+            IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
             StringLogging.Clear();
-            foreach (Detalle item in DetallesCreditor)
+            foreach (Detalle item in detallesFinal)
             {
-                if (item.Folio != 0)
+                if (item.References != null)
                 {
-                    if (item.References == null)
+                    // Insert References 
+                    if (item.References.NroInt > 0)
                     {
-                        // Insert References
-                        int lastR = Reference.GetLastRef(item.Instruction);
-                        if (lastR > 0)
+                        int result = Reference.InsertReference(item.Instruction, item.References.NroInt);
+                        if (result != 1)
                         {
-                            int result = Reference.InsertReference(item.Instruction, lastR + 1);
-                            if (result != 1)
-                            {
-                                // Error o indicar que ya existe la NV o REf
-                            }
+                            StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert Ref:" + "\t\t" + "No" + Environment.NewLine);
                         }
                     }
                 }
-                else
-                {
-
-                }
-
-
             }
         }
 
         private void BgwInsertRef_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            TssLblProgBar.Value = 0;
+            IsCreditor = true;
+            IsRunning = false;
+            TssLblMensaje.Text = "Check the log file.";
+            string nameFile = $"{UserParticipant.Name}_InsertRef_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
 
+            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+            {
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+            }
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt", StringLogging.ToString());
+            ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt")
+            {
+                WindowStyle = ProcessWindowStyle.Minimized
+            };
+            Process.Start(process);
         }
 
         private void BgwInsertRef_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
         }
 
 
@@ -737,7 +752,7 @@ namespace Centralizador.WinApp.GUI
                 BgwCreditor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{instructions.Count})");
             }
             // Order the list
-            DetallesCreditor = DetallesCreditor.OrderBy(x => x.Folio).ToList();
+            //DetallesCreditor = DetallesCreditor.OrderBy(x => x.Folio).ToList();
         }
         private void BgwCreditor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {

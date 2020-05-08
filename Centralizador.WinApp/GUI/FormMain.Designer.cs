@@ -283,18 +283,18 @@
             // 
             // BtnRechazar
             // 
-            this.BtnRechazar.Location = new System.Drawing.Point(121, 29);
+            this.BtnRechazar.Location = new System.Drawing.Point(132, 29);
             this.BtnRechazar.Name = "BtnRechazar";
-            this.BtnRechazar.Size = new System.Drawing.Size(104, 38);
+            this.BtnRechazar.Size = new System.Drawing.Size(84, 38);
             this.BtnRechazar.TabIndex = 7;
             this.BtnRechazar.Text = "Rechazar";
             this.BtnRechazar.UseVisualStyleBackColor = true;
             // 
             // BtnPagar
             // 
-            this.BtnPagar.Location = new System.Drawing.Point(8, 29);
+            this.BtnPagar.Location = new System.Drawing.Point(19, 29);
             this.BtnPagar.Name = "BtnPagar";
-            this.BtnPagar.Size = new System.Drawing.Size(104, 38);
+            this.BtnPagar.Size = new System.Drawing.Size(84, 38);
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = true;
@@ -334,7 +334,7 @@
             // ChkIncludeReclaimed
             // 
             this.ChkIncludeReclaimed.AutoSize = true;
-            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(130, 31);
+            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(124, 31);
             this.ChkIncludeReclaimed.Name = "ChkIncludeReclaimed";
             this.ChkIncludeReclaimed.Size = new System.Drawing.Size(76, 17);
             this.ChkIncludeReclaimed.TabIndex = 9;
@@ -468,6 +468,7 @@
             this.Controls.Add(this.SplitContainer);
             this.Controls.Add(this.StatusStrip);
             this.Name = "FormMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FormMain";
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);

@@ -49,9 +49,9 @@ namespace Centralizador.Models.DataBase
                 string concepto = $"Concepto: {instruction.AuxiliaryData.PaymentMatrixConcept}";
                 
                 query.Append("INSERT INTO softland.nw_nventa (CodAux,CveCod,NomCon,nvFeEnt,nvFem,NVNumero,nvObser,VenCod,nvSubTotal, ");
-                query.Append("nvNetoAfecto,nvNetoExento,nvMonto,proceso,nvEquiv,CodMon,nvEstado) values ( ");
+                query.Append("nvNetoAfecto,nvNetoExento,nvMonto,proceso,nvEquiv,CodMon,nvEstado,FechaHoraCreacion) values ( ");
                 query.Append($"'{instruction.ParticipantDebtor.Rut}','1','.','{time}','{time}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
-                query.Append("'Centralizador',1,'01','A') ");
+                query.Append($"'Centralizador',1,'01','A','{time}') ");
                 con.Query = query.ToString();
                 if (Convert.ToInt32(Conexion.ExecuteNonQuery(con)) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
                 {
@@ -83,12 +83,20 @@ namespace Centralizador.Models.DataBase
 
                 Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
-                string concepto = $"Concepto: {instruction.AuxiliaryData.PaymentMatrixConcept}";
 
-                query.Append("SELECT distinct TOP (1) nv.NVNumero from softland.nw_nventa nv ");
-                query.Append("INNER JOIN softland.nw_detnv d on nv.NVNumero = d.NVNumero ");
-                query.Append("left join softland.nw_fFactNCredNV() f on f.nvnumero = d.nvnumero and  f.codprod = d.codprod and f.nvcorrela = d.nvlinea ");
-                query.Append($"where nv.CodAux = '{instruction.ParticipantDebtor.Rut}' and nv.nvSubTotal = {instruction.Amount} and f.folio is null");
+                query.Append("SELECT DISTINCT TOP (1) ");
+                query.Append("  nv.NVNumero ");
+                query.Append("FROM softland.nw_nventa nv ");
+                query.Append("INNER JOIN softland.nw_detnv d ");
+                query.Append("  ON nv.NVNumero = d.NVNumero ");
+                query.Append("LEFT JOIN softland.nw_fFactNCredNV() f ");
+                query.Append("  ON f.nvnumero = d.nvnumero ");
+                query.Append("  AND f.codprod = d.codprod ");
+                query.Append("  AND f.nvcorrela = d.nvlinea ");
+                query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
+                query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
+                query.Append("AND f.folio IS NULL ");
+
                 con.Query = query.ToString();
                 return Convert.ToInt32(Conexion.ExecuteScalar(con));               
             }

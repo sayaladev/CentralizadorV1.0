@@ -116,7 +116,7 @@ namespace Centralizador.Models.ApiSII
         public string RznSocRecep { get; set; }
 
         [JsonProperty("folio")]
-        public uint Folio { get; set; }
+        public int Folio { get; set; }
 
         [JsonProperty("fechaEmision")]
         public string FechaEmision { get; set; }
