@@ -14,19 +14,11 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";    
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }              
-                Conexion con = new Conexion(DataBaseName);
 
-                con.Query = "select MAX(NVNumero) from softland.nw_nventa";
+                Conexion con = new Conexion(instruction.Creditor.ToString())
+                {
+                    Query = "select MAX(NVNumero) from softland.nw_nventa"
+                };
                 if (Conexion.ExecuteScalar(con) != null)
                 {
                     return Convert.ToInt32(Conexion.ExecuteScalar(con));
@@ -47,19 +39,8 @@ namespace Centralizador.Models.DataBase
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";  
 
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-             
-                Conexion con = new Conexion(DataBaseName);           
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
                 string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
                 uint neto = instruction.Amount;
@@ -99,18 +80,8 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";         
 
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }             
-                Conexion con = new Conexion(DataBaseName);
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
                 string concepto = $"Concepto: {instruction.AuxiliaryData.PaymentMatrixConcept}";
 

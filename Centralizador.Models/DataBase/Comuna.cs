@@ -19,25 +19,14 @@ namespace Centralizador.Models.DataBase
 
         public static IList<Comuna> GetComunas(ResultInstruction instruction)
         {
-
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-           
-                IList<Comuna> comunas = new List<Comuna>();
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                Conexion con = new Conexion(DataBaseName)
+                IList<Comuna> comunas = new List<Comuna>();               
+                Conexion con = new Conexion(instruction.Creditor.ToString())
                 {
                     Query = "SELECT * FROM softland.cwtcomu"
                 };
+
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReader(con);
                 if (dataTable != null)

@@ -40,6 +40,7 @@
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
+            this.BtnExcelConvert = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
@@ -130,6 +131,7 @@
             // 
             // SplitContainer.Panel2
             // 
+            this.SplitContainer.Panel2.Controls.Add(this.BtnExcelConvert);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox4);
             this.SplitContainer.Panel2.Controls.Add(this.BtnPdfConvert);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox3);
@@ -164,6 +166,15 @@
             this.IGridMain.CellEllipsisButtonClick += new TenTec.Windows.iGridLib.iGEllipsisButtonClickEventHandler(this.IGridMain_CellEllipsisButtonClick);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             this.IGridMain.RequestCellToolTipText += new TenTec.Windows.iGridLib.iGRequestCellToolTipTextEventHandler(this.IGridMain_RequestCellToolTipText);
+            // 
+            // BtnExcelConvert
+            // 
+            this.BtnExcelConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnExcelConvert.Image")));
+            this.BtnExcelConvert.Location = new System.Drawing.Point(136, 647);
+            this.BtnExcelConvert.Name = "BtnExcelConvert";
+            this.BtnExcelConvert.Size = new System.Drawing.Size(73, 46);
+            this.BtnExcelConvert.TabIndex = 8;
+            this.BtnExcelConvert.UseVisualStyleBackColor = true;
             // 
             // groupBox4
             // 
@@ -240,11 +251,11 @@
             // 
             // BtnPdfConvert
             // 
-            this.BtnPdfConvert.Location = new System.Drawing.Point(76, 647);
+            this.BtnPdfConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnPdfConvert.Image")));
+            this.BtnPdfConvert.Location = new System.Drawing.Point(50, 647);
             this.BtnPdfConvert.Name = "BtnPdfConvert";
-            this.BtnPdfConvert.Size = new System.Drawing.Size(107, 46);
+            this.BtnPdfConvert.Size = new System.Drawing.Size(73, 46);
             this.BtnPdfConvert.TabIndex = 4;
-            this.BtnPdfConvert.Text = "Pdf";
             this.BtnPdfConvert.UseVisualStyleBackColor = true;
             this.BtnPdfConvert.Click += new System.EventHandler(this.BtnPdfConvert_Click);
             // 
@@ -290,11 +301,11 @@
             // 
             // BtnOutlook
             // 
+            this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
             this.BtnOutlook.Location = new System.Drawing.Point(9, 73);
             this.BtnOutlook.Name = "BtnOutlook";
             this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
             this.BtnOutlook.TabIndex = 1;
-            this.BtnOutlook.Text = "Outlook";
             this.BtnOutlook.UseVisualStyleBackColor = true;
             this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
             // 
@@ -519,5 +530,6 @@
         private System.Windows.Forms.TextBox TxtTpoDocRef;
         private System.Windows.Forms.CheckBox ChkIncludeReclaimed;
         private System.Windows.Forms.Button BtnInsertNv;
+        private System.Windows.Forms.Button BtnExcelConvert;
     }
 }

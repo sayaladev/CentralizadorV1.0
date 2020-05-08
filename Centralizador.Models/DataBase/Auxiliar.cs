@@ -22,22 +22,11 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";             
-                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
-
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-           
-           
-                Conexion con = new Conexion(DataBaseName);
+                                        
+                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');  
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
+
                 query.Append($"IF (NOT EXISTS(SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}')) BEGIN ");
                 query.Append("INSERT INTO softland.CWTAUXI (CodAux, NomAux, NoFAux, RutAux, ActAux, GirAux, PaiAux, Comaux, ");
                 query.Append("DirAux, ClaCli, ClaPro, Bloqueado, BloqueadoPro, EsReceptorDTE ,eMailDTE, Usuario, Proceso, Sistema, Region) ");
@@ -59,17 +48,8 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                Conexion con = new Conexion(DataBaseName);
+
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
               
 
@@ -119,18 +99,8 @@ namespace Centralizador.Models.DataBase
         {
 
             try
-            {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                Conexion con = new Conexion(DataBaseName);
+            {               
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
 
                 query.Append($"UPDATE softland.cwtauxi SET NomAux='{instruction.ParticipantDebtor.BusinessName}', NoFAux='{instruction.ParticipantDebtor.Name}', ");

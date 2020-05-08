@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Xml;
 
 namespace Centralizador.Models.DataBase
 {
@@ -9,8 +10,19 @@ namespace Centralizador.Models.DataBase
         public string Cnn { get; set; }
         public string Query { get; set; }
 
-        public Conexion(string dataBaseName)
+        public Conexion(string id)
         {
+            XmlDocument document = Properties.Settings.Default.DBSoftland;
+            string dataBaseName = "";
+            foreach (XmlNode item in document.ChildNodes[0])
+            {
+                if (item.Attributes["id"].Value == id)
+                {
+                    dataBaseName = item.FirstChild.InnerText;
+                    break;
+                }
+            }
+
             Cnn = Cnn = $"Data Source={Properties.Settings.Default.ServerName};Initial Catalog={dataBaseName};Persist Security Info=True;User ID={Properties.Settings.Default.DBUser};Password={Properties.Settings.Default.DBPassword}";
            
         }

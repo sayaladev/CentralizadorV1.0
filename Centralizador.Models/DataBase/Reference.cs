@@ -26,30 +26,33 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
+                
                 IList<Reference> softland = new List<Reference>();
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                Conexion con = new Conexion(DataBaseName);
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
 
-                query.Append("select g.Folio,g.NroInt, l.Fecha 'RecepcionSii', g.Fecha, ");
-                query.Append("(select Archivo from softland.dte_archivos WHERE ID_Archivo = l.XMLSET) 'FileEnviado', ");
-                query.Append("(select Archivo from softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico' ");
-                query.Append("from softland.IW_GSaEn_RefDTE r ");
-                query.Append("inner join softland.iw_gsaen g on r.NroInt = g.NroInt and r.Tipo = 'F' and ");
-                query.Append($"(r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' or r.FolioRef = '{instruction.PaymentMatrix.ReferenceCode}') ");
-                query.Append("left join softland.DTE_DocCab c on c.Folio = g.Folio and c.NroInt = g.NroInt ");
-                query.Append("left join softland.dte_logrecenv l on l.IDSetDTE = c.IDSetDTESII ");
-                query.Append($"where g.NetoAfecto = {instruction.Amount} and g.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
-                query.Append($"order by g.Folio desc ");
+                query.Append("SELECT");
+                query.Append("  g.Folio,");
+                query.Append("  g.NroInt,");
+                query.Append("  l.Fecha 'RecepcionSii',");
+                query.Append("  g.Fecha,");
+                query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = l.XMLSET) 'FileEnviado',");
+                query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico'");
+                query.Append("FROM softland.IW_GSaEn_RefDTE r");
+                query.Append("INNER JOIN softland.iw_gsaen g");
+                query.Append("  ON r.NroInt = g.NroInt");
+                query.Append("  AND r.Tipo = 'F'");
+                query.Append($"  AND (r.Glosa = '{instruction.PaymentMatrix.NaturalKey}'");
+                query.Append($"  OR r.FolioRef = '{instruction.PaymentMatrix.ReferenceCode}')");
+                query.Append("LEFT JOIN softland.DTE_DocCab c");
+                query.Append("  ON c.Folio = g.Folio");
+                query.Append("  AND c.NroInt = g.NroInt");
+                query.Append("LEFT JOIN softland.dte_logrecenv l");
+                query.Append("  ON l.IDSetDTE = c.IDSetDTESII");
+                query.Append($"WHERE g.NetoAfecto = {instruction.Amount}");
+                query.Append($"AND g.CodAux = '{instruction.ParticipantDebtor.Rut}'");
+                query.Append("ORDER BY g.Folio DESC");
+
 
                 con.Query = query.ToString();
                 DataTable dataTable = new DataTable();
@@ -104,17 +107,8 @@ namespace Centralizador.Models.DataBase
 
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                Conexion con = new Conexion(DataBaseName);
+
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
                 StringBuilder query = new StringBuilder();
                 string time = string.Format(cultureInfo, "{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
@@ -139,17 +133,8 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                Conexion con = new Conexion(DataBaseName)
+                
+                Conexion con = new Conexion(instruction.Creditor.ToString())
                 {
                     Query = "select MAX(NroInt) from softland.iw_gsaen where Tipo = 'F'"
                 };

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Xml;
+
 using Centralizador.Models.ApiCEN;
 
 using Newtonsoft.Json;
@@ -71,22 +71,13 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
-                string DataBaseName = "";      
-                foreach (XmlNode item in document.ChildNodes[0])
-                {
-                    if (item.Attributes["id"].Value == instruction.Creditor.ToString())
-                    {
-                        DataBaseName = item.FirstChild.InnerText;
-                        break;
-                    }
-                }
-                Conexion con = new Conexion(DataBaseName); 
+               
+                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
 
                 query.Append($"IF (NOT EXISTS (SELECT * FROM softland.cwtgiro WHERE GirDes = '{descripcion}')) BEGIN ");
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
-                query.Append($"'{descripcion}') END"); 
+                query.Append($"'{descripcion}') END");
                 con.Query = query.ToString();
                 return Conexion.ExecuteNonQuery(con);
             }
