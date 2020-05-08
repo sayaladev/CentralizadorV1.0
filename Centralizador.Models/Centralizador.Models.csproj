@@ -89,7 +89,7 @@
     <Compile Include="ApiSII\MetaData.cs" />
     <Compile Include="ApiSII\ServiceEvento.cs" />
     <Compile Include="ApiSII\ServiceDetalle.cs" />
-    <Compile Include="ApiSII\TokenSeed.cs" />
+    <Compile Include="ApiSII\ServiceSoap.cs" />
     <Compile Include="AppFunctions\ServicePdf.cs" />
     <Compile Include="DataBase\Acteco.cs" />
     <Compile Include="DataBase\Auxiliar.cs" />

@@ -160,6 +160,8 @@ namespace Centralizador.Models.ApiSII
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }
 
+        public  bool  IsRefCorrect { get; set; }
+
     }
 
     public class DataResp

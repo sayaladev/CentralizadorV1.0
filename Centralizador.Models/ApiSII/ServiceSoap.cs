@@ -7,10 +7,11 @@ using System.Xml.Serialization;
 
 using Centralizador.Models.CrSeed;
 using Centralizador.Models.GetTokenFromSeed;
+using Centralizador.Models.registroreclamodteservice;
 
 namespace Centralizador.Models.ApiSII
 {
-    public class TokenSeed
+    public class ServiceSoap
     {
         public string Seed { get; set; }
 
@@ -118,6 +119,23 @@ namespace Centralizador.Models.ApiSII
             }
         }
 
+        public static respuestaTo SendActionToSii(string token, Detalle detalle, string accionDoc)
+        {
+            try
+            {
+                using (RegistroReclamoDteServiceEndpointService proxy = new RegistroReclamoDteServiceEndpointService(token))
+                {
+                    respuestaTo response = proxy.ingresarAceptacionReclamoDoc(detalle.RutReceptor.ToString(), detalle.DvReceptor, "33", detalle.Folio.ToString(), accionDoc);
+
+                    return response;
+
+                }
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
     }
 
 

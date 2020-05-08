@@ -19,7 +19,7 @@ namespace Centralizador.WinApp
             Application.SetCompatibleTextRenderingDefault(false);
 
 
-            string tokenSii = Models.ApiSII.TokenSeed.GETTokenFromSii();
+            string tokenSii = Models.ApiSII.ServiceSoap.GETTokenFromSii();
             ResultAgent agent = Agent.GetAgetByEmail();         
             if (tokenSii != null && agent != null)
             {               

@@ -289,6 +289,7 @@
             this.BtnRechazar.TabIndex = 7;
             this.BtnRechazar.Text = "Rechazar";
             this.BtnRechazar.UseVisualStyleBackColor = true;
+            this.BtnRechazar.Click += new System.EventHandler(this.BtnRechazar_Click);
             // 
             // BtnPagar
             // 
@@ -298,6 +299,7 @@
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = true;
+            this.BtnPagar.Click += new System.EventHandler(this.BtnPagar_Click);
             // 
             // BtnOutlook
             // 

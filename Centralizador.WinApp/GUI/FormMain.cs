@@ -16,7 +16,7 @@ using Centralizador.Models.ApiSII;
 using Centralizador.Models.AppFunctions;
 using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
-
+using Centralizador.Models.registroreclamodteservice;
 using TenTec.Windows.iGridLib;
 
 using Timer = System.Windows.Forms.Timer;
@@ -147,7 +147,7 @@ namespace Centralizador.WinApp.GUI
             Intervalo += 60000;
             if (Intervalo == 3600000)
             {
-                TokenSii = TokenSeed.GETTokenFromSii();
+                TokenSii = ServiceSoap.GETTokenFromSii();
                 if (ServiceOutlook != null)
                 {
                     ServiceOutlook.TokenSii = TokenSii;
@@ -538,6 +538,7 @@ namespace Centralizador.WinApp.GUI
         }
         private void BgwInsertRef_DoWork(object sender, DoWorkEventArgs e)
         {
+            IsRunning = true;
             IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
             StringLogging.Clear();
             foreach (Detalle item in detallesFinal)
@@ -988,6 +989,10 @@ namespace Centralizador.WinApp.GUI
                     LetterFlag myFlag = ValidateCen(item);
                     myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(myFlag);
                     myRow.Cells["flagRef"].BackColor = GetFlagBackColor(myFlag);
+                    if (myFlag == LetterFlag.Red)
+                    {
+                        item.IsRefCorrect = true; // True = bad ref
+                    }
 
                 }
                 IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
@@ -1284,9 +1289,57 @@ namespace Centralizador.WinApp.GUI
 
 
 
+
         #endregion
 
+        private void BtnRechazar_Click(object sender, EventArgs e)
+        {
+            if (IsRunning)
+            {
+                return;
+            }
+            if (IsCreditor || IGridMain.Rows.Count == 0)
+            {
+                TssLblMensaje.Text = "Plesase select Debtor!";
+                return;
+            }
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
 
+            foreach (Detalle item in DetallesDebtor)
+            {
+                if (item.DataEvento != null)
+                {
+                    if (!item.DataEvento.MayorOchoDias)
+                    {
+                        if (item.IsRefCorrect)
+                        {
+                            respuestaTo result = ServiceSoap.SendActionToSii(TokenSii, item, "RCD");
+                            if (result.codResp == 0)
+                            {
+                                // Log Yes
+                                // Insert in CEN paso 3 y 4
+                            }
+                            else
+                            {
+                                // Log No
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+        private void BtnPagar_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
