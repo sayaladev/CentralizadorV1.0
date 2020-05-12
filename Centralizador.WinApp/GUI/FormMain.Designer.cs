@@ -49,7 +49,6 @@
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.BtnRechazar = new System.Windows.Forms.Button();
             this.BtnPagar = new System.Windows.Forms.Button();
@@ -75,7 +74,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).BeginInit();
             this.groupBox4.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -134,7 +132,6 @@
             this.SplitContainer.Panel2.Controls.Add(this.BtnExcelConvert);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox4);
             this.SplitContainer.Panel2.Controls.Add(this.BtnPdfConvert);
-            this.SplitContainer.Panel2.Controls.Add(this.groupBox3);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox2);
             this.SplitContainer.Panel2.Controls.Add(this.GroupBox1);
             this.SplitContainer.Size = new System.Drawing.Size(1350, 707);
@@ -186,10 +183,10 @@
             this.groupBox4.Controls.Add(this.TxtNmbItem);
             this.groupBox4.Location = new System.Drawing.Point(13, 184);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(234, 190);
+            this.groupBox4.Size = new System.Drawing.Size(234, 173);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Invoice Info:";
+            this.groupBox4.Text = "INVOICE INFO:";
             // 
             // TxtTpoDocRef
             // 
@@ -259,23 +256,10 @@
             this.BtnPdfConvert.UseVisualStyleBackColor = true;
             this.BtnPdfConvert.Click += new System.EventHandler(this.BtnPdfConvert_Click);
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.TxtDateTimeEmail);
-            this.groupBox3.Controls.Add(this.BtnRechazar);
-            this.groupBox3.Controls.Add(this.BtnPagar);
-            this.groupBox3.Controls.Add(this.BtnOutlook);
-            this.groupBox3.Location = new System.Drawing.Point(13, 510);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(234, 131);
-            this.groupBox3.TabIndex = 3;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Debtor";
-            // 
             // TxtDateTimeEmail
             // 
             this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(86, 87);
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(86, 199);
             this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
             this.TxtDateTimeEmail.ReadOnly = true;
             this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
@@ -283,7 +267,7 @@
             // 
             // BtnRechazar
             // 
-            this.BtnRechazar.Location = new System.Drawing.Point(132, 29);
+            this.BtnRechazar.Location = new System.Drawing.Point(21, 124);
             this.BtnRechazar.Name = "BtnRechazar";
             this.BtnRechazar.Size = new System.Drawing.Size(84, 38);
             this.BtnRechazar.TabIndex = 7;
@@ -293,7 +277,7 @@
             // 
             // BtnPagar
             // 
-            this.BtnPagar.Location = new System.Drawing.Point(19, 29);
+            this.BtnPagar.Location = new System.Drawing.Point(124, 124);
             this.BtnPagar.Name = "BtnPagar";
             this.BtnPagar.Size = new System.Drawing.Size(84, 38);
             this.BtnPagar.TabIndex = 6;
@@ -304,7 +288,7 @@
             // BtnOutlook
             // 
             this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
-            this.BtnOutlook.Location = new System.Drawing.Point(9, 73);
+            this.BtnOutlook.Location = new System.Drawing.Point(16, 185);
             this.BtnOutlook.Name = "BtnOutlook";
             this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
             this.BtnOutlook.TabIndex = 1;
@@ -313,15 +297,18 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.TxtDateTimeEmail);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
+            this.groupBox2.Controls.Add(this.BtnOutlook);
+            this.groupBox2.Controls.Add(this.BtnRechazar);
             this.groupBox2.Controls.Add(this.ChkIncludeReclaimed);
+            this.groupBox2.Controls.Add(this.BtnPagar);
             this.groupBox2.Controls.Add(this.BtnInsertRef);
-            this.groupBox2.Location = new System.Drawing.Point(13, 380);
+            this.groupBox2.Location = new System.Drawing.Point(13, 363);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(234, 124);
+            this.groupBox2.Size = new System.Drawing.Size(234, 264);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Creditor";
             // 
             // BtnInsertNv
             // 
@@ -345,7 +332,7 @@
             // 
             // BtnInsertRef
             // 
-            this.BtnInsertRef.Location = new System.Drawing.Point(21, 80);
+            this.BtnInsertRef.Location = new System.Drawing.Point(21, 63);
             this.BtnInsertRef.Name = "BtnInsertRef";
             this.BtnInsertRef.Size = new System.Drawing.Size(84, 38);
             this.BtnInsertRef.TabIndex = 8;
@@ -367,7 +354,6 @@
             this.GroupBox1.Size = new System.Drawing.Size(234, 166);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
-            this.GroupBox1.Text = "Start";
             // 
             // TxtCtaCteParticipant
             // 
@@ -484,8 +470,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.GroupBox1.ResumeLayout(false);
@@ -511,7 +495,6 @@
         private System.Windows.Forms.ToolStripProgressBar TssLblProgBar;
         private System.Windows.Forms.ToolStripStatusLabel TssLblMensaje;
         private System.Windows.Forms.ToolStripStatusLabel TssLblFechaHora;
-        private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStripStatusLabel TssLblUserEmail;
         private System.Windows.Forms.Button BtnPdfConvert;

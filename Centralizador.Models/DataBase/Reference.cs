@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Text;
-using System.Xml;
 
 using Centralizador.Models.ApiCEN;
 
@@ -22,15 +21,14 @@ namespace Centralizador.Models.DataBase
 
         public DateTime? FechaRecepcionSii { get; set; }
 
-        public static IList<Reference> GetInfoFactura(ResultInstruction instruction)
+        public static IList<Reference> GetInfoFactura(ResultInstruction instruction, Conexion conexion)
         {
             try
             {
-                
-                IList<Reference> softland = new List<Reference>();
-                Conexion con = new Conexion(instruction.Creditor.ToString());
+
+                IList<Reference> softland = new List<Reference>();      
                 StringBuilder query = new StringBuilder();
-                             
+
 
                 query.Append("SELECT ");
                 query.Append("  g.Folio, ");
@@ -55,10 +53,9 @@ namespace Centralizador.Models.DataBase
                 query.Append("ORDER BY g.Folio DESC ");
 
 
-
-                con.Query = query.ToString();
+                conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
-                dataTable = Conexion.ExecuteReader(con);
+                dataTable = Conexion.ExecuteReader(conexion);
                 if (dataTable != null)
                 {
                     foreach (DataRow item in dataTable.Rows)
@@ -104,47 +101,25 @@ namespace Centralizador.Models.DataBase
         }
 
 
-        public static int InsertReference(ResultInstruction instruction, int nroInt)
+        public static int InsertReference(ResultInstruction instruction, int nroInt, Conexion conexion)
         {
 
             try
             {
 
-                Conexion con = new Conexion(instruction.Creditor.ToString());
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
                 StringBuilder query = new StringBuilder();
                 string time = string.Format(cultureInfo, "{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
                 query.Append($"IF NOT EXISTS(SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt ={nroInt} AND Tipo = 'F' AND CodRefSII = 'SEN') BEGIN ");
                 query.Append("INSERT INTO softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) VALUES ");
                 query.Append($"('F', {nroInt},2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{time}', '{instruction.PaymentMatrix.NaturalKey}') END");
-                con.Query = query.ToString();
-                if (Convert.ToInt32(Conexion.ExecuteNonQuery(con)) == 1) // 
-                {
-                    return 1; // Return 1 if ok!
+                conexion.Query = query.ToString();
 
-                }
-                return 0;
+                return Convert.ToInt32(Conexion.ExecuteNonQuery(conexion)); // Return 1 if ok!
             }
             catch (Exception)
             {
-                throw;
-            }
-        }
-
-        public static int GetLastRef(ResultInstruction instruction)
-        {
-            try
-            {
-                
-                Conexion con = new Conexion(instruction.Creditor.ToString())
-                {
-                    Query = "select MAX(NroInt) from softland.iw_gsaen where Tipo = 'F'"
-                };
-                return Convert.ToInt32(Conexion.ExecuteScalar(con));
-            }
-            catch (Exception)
-            {
-                throw;
+                return 99;
             }
         }
     }

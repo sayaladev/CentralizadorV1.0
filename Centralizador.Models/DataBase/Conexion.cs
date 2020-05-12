@@ -1,33 +1,22 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Xml;
 
 namespace Centralizador.Models.DataBase
 {
     public class Conexion
     {
-        public string Cnn { get; set; }
+        private string Cnn { get; set; }
         public string Query { get; set; }
+        private string DataBaseName { get; set; }
+        private static SqlDataReader SqlDataReader { get; set; }
 
-        public Conexion(string id)
+        public Conexion(string dataBaseName)
         {
-            XmlDocument document = Properties.Settings.Default.DBSoftland;
-            string dataBaseName = "";
-            foreach (XmlNode item in document.ChildNodes[0])
-            {
-                if (item.Attributes["id"].Value == id)
-                {
-                    dataBaseName = item.FirstChild.InnerText;
-                    break;
-                }
-            }
+            DataBaseName = dataBaseName;
+            Cnn = Cnn = $"Data Source={Properties.Settings.Default.ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={Properties.Settings.Default.DBUser};Password={Properties.Settings.Default.DBPassword}";
 
-            Cnn = Cnn = $"Data Source={Properties.Settings.Default.ServerName};Initial Catalog={dataBaseName};Persist Security Info=True;User ID={Properties.Settings.Default.DBUser};Password={Properties.Settings.Default.DBPassword}";
-           
         }
-
-        public static SqlDataReader SqlDataReader { get; set; }
 
 
         public static DataTable ExecuteReader(Conexion conn)
@@ -44,7 +33,7 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
-                    SqlDataReader = cmd.ExecuteReader();     
+                    SqlDataReader = cmd.ExecuteReader();
                     if (SqlDataReader.HasRows)
                     {
                         DataTable dataTable = new DataTable();
@@ -64,7 +53,6 @@ namespace Centralizador.Models.DataBase
             }
             return null;
         }
-
         public static int ExecuteNonQuery(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -78,8 +66,8 @@ namespace Centralizador.Models.DataBase
                         Connection = cnn,
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
-                    };                   
-                    return cmd.ExecuteNonQuery();               
+                    };
+                    return cmd.ExecuteNonQuery();
                 }
                 catch (Exception)
                 {
@@ -90,9 +78,8 @@ namespace Centralizador.Models.DataBase
                     SqlDataReader.Close();
                     cnn.Close();
                 }
-            }          
+            }
         }
-
         public static object ExecuteScalar(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -107,7 +94,7 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
-                    object obj  = cmd.ExecuteScalar();
+                    object obj = cmd.ExecuteScalar();
                     if (obj != null && DBNull.Value != obj)
                     {
                         return obj;

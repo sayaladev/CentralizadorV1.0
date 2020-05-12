@@ -67,19 +67,17 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
-        public static int InsertActeco(ResultInstruction instruction, string descripcion)
+        public static int InsertActeco(string descripcion, Conexion conexion)
         {
             try
-            {
-               
-                Conexion con = new Conexion(instruction.Creditor.ToString());
+            {     
                 StringBuilder query = new StringBuilder();
 
                 query.Append($"IF (NOT EXISTS (SELECT * FROM softland.cwtgiro WHERE GirDes = '{descripcion}')) BEGIN ");
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
                 query.Append($"'{descripcion}') END");
-                con.Query = query.ToString();
-                return Conexion.ExecuteNonQuery(con);
+                conexion.Query = query.ToString();
+                return Conexion.ExecuteNonQuery(conexion);
             }
             catch (Exception)
             {

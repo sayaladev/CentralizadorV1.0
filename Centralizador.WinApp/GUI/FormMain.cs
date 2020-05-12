@@ -10,13 +10,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-
+using System.Xml;
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 using Centralizador.Models.AppFunctions;
 using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
 using Centralizador.Models.registroreclamodteservice;
+
 using TenTec.Windows.iGridLib;
 
 using Timer = System.Windows.Forms.Timer;
@@ -50,6 +51,8 @@ namespace Centralizador.WinApp.GUI
         public ServiceOutlook ServiceOutlook { get; set; }
         public int Intervalo { get; set; }
         public StringBuilder StringLogging { get; set; }
+
+        public string DataBaseName { get; set; }
 
 
 
@@ -270,9 +273,30 @@ namespace Centralizador.WinApp.GUI
         {
             if (CboParticipants.SelectedIndex != 0)
             {
+                DataBaseName = "";
                 UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-                TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
-                TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode; ;
+             
+                XmlDocument document = Models.Properties.Settings.Default.DBSoftland;
+                foreach (XmlNode item in document.ChildNodes[0])
+                {
+                    if (item.Attributes["id"].Value == UserParticipant.Id.ToString())
+                    {
+                        DataBaseName = item.FirstChild.InnerText;
+                        break;
+                    }
+                }
+                if (string.IsNullOrEmpty(DataBaseName))
+                {
+                    MessageBox.Show("This company does not have an associated database in the config file (Xml)", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    CboParticipants.SelectedIndex = 0;
+                    TxtCtaCteParticipant.Text = "";
+                    TxtRutParticipant.Text = "";
+                }
+                else
+                {
+                    TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
+                    TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
+                }
             }
             else
             {
@@ -339,7 +363,7 @@ namespace Centralizador.WinApp.GUI
                 DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for billing {Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resp == DialogResult.Yes)
-                {
+                {                    
                     BgwInsertNv.RunWorkerAsync(detallesFinal);
                 }
             }
@@ -359,12 +383,16 @@ namespace Centralizador.WinApp.GUI
 
             BgwInsertNv.ReportProgress(0, "Wait please...");
             List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+
+            // Sql 
+            Conexion con = new Conexion(DataBaseName);
+
             foreach (Detalle item in detallesFinal)
             {
                 Comuna comuna = null;
                 string acteco = null;
                 // Get F° NV if exists
-                int F = NotaVenta.GetNv(item.Instruction);
+                int F = NotaVenta.GetNv(item.Instruction, con);
                 if (F == 0)
                 {
                     try
@@ -387,11 +415,11 @@ namespace Centralizador.WinApp.GUI
                     }
 
                     // Crear auxiliares nuevos
-                    Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction);
+                    Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction, con);
                     if (auxiliar == null)
                     {
                         // Get comunas                      
-                        IList<Comuna> comunas = Comuna.GetComunas(item.Instruction);
+                        IList<Comuna> comunas = Comuna.GetComunas(con);
                         if (comunas != null)
                         {
                             foreach (Comuna com in comunas)
@@ -409,21 +437,26 @@ namespace Centralizador.WinApp.GUI
                         {
                             acteco = actividades[0].Giro.Substring(0, 60);
                             // Insert acteco
-                            Acteco.InsertActeco(item.Instruction, acteco);
+                            Acteco.InsertActeco(acteco, con);
                         }
                         else
                         {
-                            // Api HeroKuapp no disponible.
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Error API: " + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                         }
                         // Insert aux
-                        result = Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna);
-                        if (result == 1)
+                        result = Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna, con);
+                        switch (result)
                         {
-                            //StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Yes" + Environment.NewLine);
-                        }
-                        else
-                        {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "No" + Environment.NewLine);
+                            case 0:
+                                break;
+                            case 1:
+                                StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
+                                break;
+                            case -1:
+                                break;
+                            case 99:
+                                StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Error" + Environment.NewLine);
+                                break;
                         }
                     }
                     else
@@ -450,28 +483,40 @@ namespace Centralizador.WinApp.GUI
                         }
 
                         // Update Aux
-                        result = Auxiliar.UpdateAuxiliar(item.Instruction);
-                        if (result != 1)
+                        result = Auxiliar.UpdateAuxiliar(item.Instruction, con);
+                        switch (result)
                         {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "No" + Environment.NewLine);
-                        }
-                        else
-                        {
-                            //StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Yes" + Environment.NewLine);
+                            case 0:
+                                break;
+                            case 1:
+                                // StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Yes: " + item.Instruction.ParticipantDebtor.Rut  + Environment.NewLine);
+                                break;
+                            case -1:
+                                break;
+                            case 99:
+                                StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: " + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
+                                break;
                         }
                     }
 
                     // Insert NV
-                    int lastF = NotaVenta.GetLastNv(item.Instruction);
+                    int lastF = NotaVenta.GetLastNv(con);
                     string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                    result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod);
-                    if (result != 1)
+                    result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
+                    switch (result)
                     {
-                        StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "No" + Environment.NewLine);
-                    }
-                    else
-                    {
-                        StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
+                        case 1:
+                            StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
+                            break;
+                        case 0:
+                            break;
+                        case -1:
+                            // StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
+                            break;
+                        case 99: // Error
+                            StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "Error" + Environment.NewLine);
+                            break;
+
                     }
                 }
                 else
@@ -534,13 +579,21 @@ namespace Centralizador.WinApp.GUI
                     detallesFinal.Add(item);
                 }
             }
-            BgwInsertRef.RunWorkerAsync(detallesFinal);
+            DialogResult resp = MessageBox.Show($"CEN references will be inserted{Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (resp == DialogResult.Yes)
+            {
+                BgwInsertRef.RunWorkerAsync(detallesFinal);
+            }
         }
         private void BgwInsertRef_DoWork(object sender, DoWorkEventArgs e)
         {
             IsRunning = true;
             IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
             StringLogging.Clear();
+            // Sql 
+            Conexion con = new Conexion(DataBaseName);
+
             foreach (Detalle item in detallesFinal)
             {
                 if (item.References != null)
@@ -548,10 +601,20 @@ namespace Centralizador.WinApp.GUI
                     // Insert References 
                     if (item.References.NroInt > 0)
                     {
-                        int result = Reference.InsertReference(item.Instruction, item.References.NroInt);
-                        if (result != 1)
+                        int result = Reference.InsertReference(item.Instruction, item.References.NroInt, con);
+                        switch (result)
                         {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert Ref:" + "\t\t" + "No" + Environment.NewLine);
+                            case 1:
+                                StringLogging.Append(item.Instruction.Id + "\t" + "Insert Ref:" + "\t\t" + item.Folio + Environment.NewLine);
+                                break;
+                            case 0:
+                                break;
+                            case -1: // ya existe
+                                StringLogging.Append(item.Instruction.Id + "\t" + "Insert Ref:" + "\t\t" + "*" + item.Folio + Environment.NewLine);
+                                break;
+                            case 99: // Error
+                                StringLogging.Append(item.Instruction.Id + "\t" + "Insert Ref:" + "\t\t" + "Error" + Environment.NewLine);
+                                break;
                         }
                     }
                 }
@@ -676,6 +739,9 @@ namespace Centralizador.WinApp.GUI
             List<ResultInstruction> instructions = new List<ResultInstruction>();
             int c = 0;
             float porcent = 0;
+            // Sql 
+            Conexion con = new Conexion(DataBaseName);
+
             foreach (ResultPaymentMatrix m in matrices)
             {
                 ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
@@ -709,7 +775,7 @@ namespace Centralizador.WinApp.GUI
                 detalle.IsParticipant = true;
 
                 // Mapping references Softland
-                IList<Reference> references = Reference.GetInfoFactura(instruction);
+                IList<Reference> references = Reference.GetInfoFactura(instruction, con);
                 if (references != null)
                 {
                     // Search reference mostly recent for number folio

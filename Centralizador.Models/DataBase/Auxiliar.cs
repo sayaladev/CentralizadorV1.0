@@ -3,7 +3,6 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Xml;
 
 using Centralizador.Models.ApiCEN;
 
@@ -18,13 +17,13 @@ namespace Centralizador.Models.DataBase
         public string DirAux { get; set; }
         public string ComAux { get; set; }
 
-        public static int InsertAuxiliar(ResultInstruction instruction, string acteco, Comuna comuna)
+        public static int InsertAuxiliar(ResultInstruction instruction, string acteco, Comuna comuna, Conexion conexion)
         {
             try
             {
-                                        
-                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');  
-                Conexion con = new Conexion(instruction.Creditor.ToString());
+
+                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
+             
                 StringBuilder query = new StringBuilder();
 
                 query.Append($"IF (NOT EXISTS(SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}')) BEGIN ");
@@ -35,28 +34,27 @@ namespace Centralizador.Models.DataBase
                 query.Append($"'{rut}-{instruction.ParticipantDebtor.VerificationCode}','S',(select GirCod from softland.cwtgiro where GirDes = '{acteco}' ),'CL','{comuna.ComCod}', ");
                 query.Append($"'{instruction.ParticipantDebtor.CommercialAddress}','S', 'S','N', 'N', 'S','{instruction.ParticipantDebtor.DteReceptionEmail}' ");
                 query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}) END");
-                con.Query = query.ToString();
-                return Conexion.ExecuteNonQuery(con);
+                conexion.Query = query.ToString();
+                return Conexion.ExecuteNonQuery(conexion);
             }
             catch (Exception)
             {
-                throw;
+                return 99;
             }
         }
 
-        public static Auxiliar GetAuxiliar(ResultInstruction instruction)
+        public static Auxiliar GetAuxiliar(ResultInstruction instruction, Conexion conexion)
         {
             try
             {
 
-                Conexion con = new Conexion(instruction.Creditor.ToString());
                 StringBuilder query = new StringBuilder();
-              
+
 
                 query.Append($"SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}' ");
-                con.Query = query.ToString();
+                conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
-                dataTable = Conexion.ExecuteReader(con);
+                dataTable = Conexion.ExecuteReader(conexion);
                 if (dataTable != null && dataTable.Rows.Count == 1)
                 {
                     Auxiliar auxiliar = new Auxiliar();
@@ -95,22 +93,21 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
-        public static int UpdateAuxiliar(ResultInstruction instruction)
+        public static int UpdateAuxiliar(ResultInstruction instruction, Conexion conexion)
         {
 
             try
-            {               
-                Conexion con = new Conexion(instruction.Creditor.ToString());
+            {
                 StringBuilder query = new StringBuilder();
 
                 query.Append($"UPDATE softland.cwtauxi SET NomAux='{instruction.ParticipantDebtor.BusinessName}', NoFAux='{instruction.ParticipantDebtor.Name}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
-                con.Query = query.ToString();
-                return Conexion.ExecuteNonQuery(con);
+                conexion.Query = query.ToString();
+                return Conexion.ExecuteNonQuery(conexion);
             }
             catch (Exception)
             {
-                throw;
+                return 99;
             }
         }
     }
