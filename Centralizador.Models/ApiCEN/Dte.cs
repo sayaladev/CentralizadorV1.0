@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Net;
 using System.Text;
 
@@ -18,22 +19,25 @@ namespace Centralizador.Models.ApiCEN
         public int Instruction { get; set; }
 
         [JsonProperty("type")]
-        public byte Type { get; set; }
+        public int Type { get; set; }
+
+        [JsonProperty("type_sii_code")]
+        public int TypeSiiCode { get; set; } // Especial for POST 
 
         [JsonProperty("folio")]
-        public uint Folio { get; set; }
+        public int Folio { get; set; }
 
         [JsonProperty("gross_amount")]
-        public uint GrossAmount { get; set; }
+        public int GrossAmount { get; set; }
 
         [JsonProperty("net_amount")]
-        public uint NetAmount { get; set; }
+        public int NetAmount { get; set; }
 
         [JsonProperty("reported_by_creditor")]
         public bool ReportedByCreditor { get; set; }
 
         [JsonProperty("emission_dt")]
-        public DateTime EmissionDt { get; set; }
+        public string EmissionDt { get; set; }
 
         [JsonProperty("emission_file")]
         public string EmissionFile { get; set; }
@@ -45,7 +49,7 @@ namespace Centralizador.Models.ApiCEN
         public object EmissionErpB { get; set; }
 
         [JsonProperty("reception_dt")]
-        public DateTime ReceptionDt { get; set; }
+        public string ReceptionDt { get; set; }
 
         [JsonProperty("reception_erp")]
         public object ReceptionErp { get; set; }
@@ -65,13 +69,6 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("updated_ts")]
         public DateTime UpdatedTs { get; set; }
 
-        //Mapping (new properties) 
-        [JsonIgnore]
-        public uint NroInt { get; set; }
-
-        [JsonIgnore]
-        public bool IsPrincipal { get; set; }
-
 
     }
 
@@ -90,7 +87,7 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultDte> Results { get; set; }
 
-        public static ResultDte GetDte(ResultInstruction instruction)
+        public static IList<ResultDte> GetDteByParticipant(ResultInstruction instruction)
         {
             WebClient wc = new WebClient
             {
@@ -100,15 +97,14 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"dtes/?debtor={instruction.Debtor}&reported_by_creditor={true}&instruction={instruction.Id}&creditor={instruction.Creditor}");
+                string res = wc.DownloadString($"api/v1/resources/dtes/?reported_by_creditor=true&instruction={instruction.Id}&creditor={instruction.Creditor}");
                 if (res != null)
                 {
                     Dte dte = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (dte.Results.Count == 1)
+                    if (dte.Results.Count > 0)
                     {
-                        return dte.Results[0];
+                        return dte.Results;
                     }
-
                 }
             }
             catch (Exception)
@@ -122,7 +118,96 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-    }
+        public static ResultDte SendDte(ResultDte dte, string tokenCen, string doc)
+        {
+            string fileName = dte.Folio + "_" + dte.Instruction;
+            string idFile = SendFile(tokenCen, fileName, doc);
+            if (!string.IsNullOrEmpty(idFile))
+            {
+                dte.EmissionFile = idFile;
 
+                WebClient wc = new WebClient
+                {
+                    BaseAddress = Properties.Settings.Default.BaseAddress
+                };
+                try
+                {
+                    string d = JsonConvert.SerializeObject(dte);   
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                    wc.Encoding = Encoding.UTF8;
+                    wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                    NameValueCollection postData = new NameValueCollection() { { "data", d } };
+
+                    byte[] res = wc.UploadValues("api/v1/operations/dtes/create/", postData);
+                    if (res != null)
+                    {
+                        string json = Encoding.UTF8.GetString(res);
+                        InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                     
+                        if (r != null)
+                        {
+                            return r.ResultDte;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+                finally
+                {
+                    wc.Dispose();
+                }
+                return null;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static string SendFile(string tokenCen, string fileName, string doc)
+        {
+
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                wc.Encoding = Encoding.UTF8;
+                wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                wc.Headers.Add("Content-Disposition", "attachment; filename=" + fileName + ".xml");
+                string res = wc.UploadString("api/v1/resources/auxiliary-files/", WebRequestMethods.Http.Put, doc);
+                if (res != null)
+                {
+                    Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
+                    return dic["invoice_file_id"];
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
+    }
+    public class InsertDTe
+    {
+
+        [JsonProperty("result")]
+        public ResultDte ResultDte { get; set; }
+
+        [JsonProperty("errors")]
+        public IList<object> Errors { get; set; }
+
+        [JsonProperty("operation")]
+        public int Operation { get; set; }
+    }
 
 }

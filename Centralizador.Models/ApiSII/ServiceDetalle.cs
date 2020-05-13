@@ -125,16 +125,16 @@ namespace Centralizador.Models.ApiSII
         public string FechaRecepcion { get; set; }
 
         [JsonProperty("mntNeto")]
-        public uint MntNeto { get; set; }
+        public int MntNeto { get; set; }
 
         [JsonProperty("mntExento")]
-        public uint MntExento { get; set; }
+        public int MntExento { get; set; }
 
         [JsonProperty("mntIva")]
-        public uint MntIva { get; set; }
+        public int MntIva { get; set; }
 
         [JsonProperty("mntTotal")]
-        public uint MntTotal { get; set; }
+        public int MntTotal { get; set; }
 
         [JsonProperty("tasaImptoIVA")]
         public float TasaImptoIVA { get; set; }

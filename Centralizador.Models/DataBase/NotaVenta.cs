@@ -39,7 +39,7 @@ namespace Centralizador.Models.DataBase
 
                 StringBuilder query = new StringBuilder();
                 string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
-                uint neto = instruction.Amount;
+                int neto = instruction.Amount;
                 double iva = neto * 0.19;
                 double total = Math.Ceiling(neto + iva);
                 string concepto = $"Concepto: {instruction.AuxiliaryData.PaymentMatrixConcept}";

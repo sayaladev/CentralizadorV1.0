@@ -49,13 +49,13 @@
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
-            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
-            this.BtnRechazar = new System.Windows.Forms.Button();
-            this.BtnPagar = new System.Windows.Forms.Button();
-            this.BtnOutlook = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.BtnInsertNv = new System.Windows.Forms.Button();
+            this.BtnOutlook = new System.Windows.Forms.Button();
+            this.BtnRechazar = new System.Windows.Forms.Button();
             this.ChkIncludeReclaimed = new System.Windows.Forms.CheckBox();
+            this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnInsertRef = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
             this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
@@ -66,6 +66,7 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
+            this.BtnCenProcess = new System.Windows.Forms.Button();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -256,47 +257,9 @@
             this.BtnPdfConvert.UseVisualStyleBackColor = true;
             this.BtnPdfConvert.Click += new System.EventHandler(this.BtnPdfConvert_Click);
             // 
-            // TxtDateTimeEmail
-            // 
-            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(86, 199);
-            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
-            this.TxtDateTimeEmail.ReadOnly = true;
-            this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
-            this.TxtDateTimeEmail.TabIndex = 2;
-            // 
-            // BtnRechazar
-            // 
-            this.BtnRechazar.Location = new System.Drawing.Point(21, 124);
-            this.BtnRechazar.Name = "BtnRechazar";
-            this.BtnRechazar.Size = new System.Drawing.Size(84, 38);
-            this.BtnRechazar.TabIndex = 7;
-            this.BtnRechazar.Text = "Rechazar";
-            this.BtnRechazar.UseVisualStyleBackColor = true;
-            this.BtnRechazar.Click += new System.EventHandler(this.BtnRechazar_Click);
-            // 
-            // BtnPagar
-            // 
-            this.BtnPagar.Location = new System.Drawing.Point(124, 124);
-            this.BtnPagar.Name = "BtnPagar";
-            this.BtnPagar.Size = new System.Drawing.Size(84, 38);
-            this.BtnPagar.TabIndex = 6;
-            this.BtnPagar.Text = "Pagar";
-            this.BtnPagar.UseVisualStyleBackColor = true;
-            this.BtnPagar.Click += new System.EventHandler(this.BtnPagar_Click);
-            // 
-            // BtnOutlook
-            // 
-            this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
-            this.BtnOutlook.Location = new System.Drawing.Point(16, 185);
-            this.BtnOutlook.Name = "BtnOutlook";
-            this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
-            this.BtnOutlook.TabIndex = 1;
-            this.BtnOutlook.UseVisualStyleBackColor = true;
-            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
-            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.BtnCenProcess);
             this.groupBox2.Controls.Add(this.TxtDateTimeEmail);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
             this.groupBox2.Controls.Add(this.BtnOutlook);
@@ -310,6 +273,15 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
+            // TxtDateTimeEmail
+            // 
+            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(86, 199);
+            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
+            this.TxtDateTimeEmail.ReadOnly = true;
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
+            this.TxtDateTimeEmail.TabIndex = 2;
+            // 
             // BtnInsertNv
             // 
             this.BtnInsertNv.Location = new System.Drawing.Point(21, 19);
@@ -320,6 +292,26 @@
             this.BtnInsertNv.UseVisualStyleBackColor = true;
             this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_Click);
             // 
+            // BtnOutlook
+            // 
+            this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
+            this.BtnOutlook.Location = new System.Drawing.Point(16, 185);
+            this.BtnOutlook.Name = "BtnOutlook";
+            this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
+            this.BtnOutlook.TabIndex = 1;
+            this.BtnOutlook.UseVisualStyleBackColor = true;
+            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
+            // 
+            // BtnRechazar
+            // 
+            this.BtnRechazar.Location = new System.Drawing.Point(21, 124);
+            this.BtnRechazar.Name = "BtnRechazar";
+            this.BtnRechazar.Size = new System.Drawing.Size(84, 38);
+            this.BtnRechazar.TabIndex = 7;
+            this.BtnRechazar.Text = "Rechazar";
+            this.BtnRechazar.UseVisualStyleBackColor = true;
+            this.BtnRechazar.Click += new System.EventHandler(this.BtnRechazar_Click);
+            // 
             // ChkIncludeReclaimed
             // 
             this.ChkIncludeReclaimed.AutoSize = true;
@@ -329,6 +321,16 @@
             this.ChkIncludeReclaimed.TabIndex = 9;
             this.ChkIncludeReclaimed.Text = "Reclaimed";
             this.ChkIncludeReclaimed.UseVisualStyleBackColor = true;
+            // 
+            // BtnPagar
+            // 
+            this.BtnPagar.Location = new System.Drawing.Point(124, 124);
+            this.BtnPagar.Name = "BtnPagar";
+            this.BtnPagar.Size = new System.Drawing.Size(84, 38);
+            this.BtnPagar.TabIndex = 6;
+            this.BtnPagar.Text = "Pagar";
+            this.BtnPagar.UseVisualStyleBackColor = true;
+            this.BtnPagar.Click += new System.EventHandler(this.BtnPagar_Click);
             // 
             // BtnInsertRef
             // 
@@ -448,6 +450,16 @@
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
             // 
+            // BtnCenProcess
+            // 
+            this.BtnCenProcess.Location = new System.Drawing.Point(130, 63);
+            this.BtnCenProcess.Name = "BtnCenProcess";
+            this.BtnCenProcess.Size = new System.Drawing.Size(75, 38);
+            this.BtnCenProcess.TabIndex = 11;
+            this.BtnCenProcess.Text = "CEN";
+            this.BtnCenProcess.UseVisualStyleBackColor = true;
+            this.BtnCenProcess.Click += new System.EventHandler(this.BtnCenProcess_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -517,5 +529,6 @@
         private System.Windows.Forms.CheckBox ChkIncludeReclaimed;
         private System.Windows.Forms.Button BtnInsertNv;
         private System.Windows.Forms.Button BtnExcelConvert;
+        private System.Windows.Forms.Button BtnCenProcess;
     }
 }

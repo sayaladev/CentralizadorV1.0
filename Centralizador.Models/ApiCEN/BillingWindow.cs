@@ -54,7 +54,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"billing-windows/?id={matrix.BillingWindowId}");
+                string res = wc.DownloadString($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -93,7 +93,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"billing-windows/?natural_key={naturalKey}");
+                string res = wc.DownloadString($"api/v1/resources/billing-windows/?natural_key={naturalKey}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

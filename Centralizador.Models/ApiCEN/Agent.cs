@@ -66,7 +66,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"agents/?email={Properties.Settings.Default.UserCEN}");
+                string res = wc.DownloadString($"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}");
                 if (res != null)
                 {
                     Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -74,6 +74,40 @@ namespace Centralizador.Models.ApiCEN
                     {
                         return agent.Results[0];
                     }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+            return null;
+        }
+
+        public static string GetTokenCen()
+        {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress
+            };
+            try
+            {
+                Dictionary<string, string> dic = new Dictionary<string, string>
+                {
+                    { "username", Properties.Settings.Default.UserCEN },
+                    { "password", Properties.Settings.Default.PasswordCEN }
+                };               
+
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                wc.Encoding = Encoding.UTF8;                
+                string res = wc.UploadString("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented));
+                if (res != null)
+                {
+                    dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
+                    return dic["token"];
                 }
             }
             catch (Exception)

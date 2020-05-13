@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
+using Centralizador.Models.ApiSII;
 using Centralizador.WinApp.GUI;
 
 namespace Centralizador.WinApp
@@ -19,11 +20,12 @@ namespace Centralizador.WinApp
             Application.SetCompatibleTextRenderingDefault(false);
 
 
-            string tokenSii = Models.ApiSII.ServiceSoap.GETTokenFromSii();
+            string tokenSii = ServiceSoap.GETTokenFromSii();
+            string tokenCen = Agent.GetTokenCen();
             ResultAgent agent = Agent.GetAgetByEmail();         
-            if (tokenSii != null && agent != null)
+            if (!string.IsNullOrEmpty(tokenSii) && agent != null && !string.IsNullOrEmpty(tokenCen))
             {               
-                Application.Run(new FormMain(tokenSii, agent));
+                Application.Run(new FormMain(tokenSii, agent, tokenCen));
             }
             else
             {

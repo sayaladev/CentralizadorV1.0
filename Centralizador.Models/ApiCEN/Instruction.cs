@@ -24,10 +24,10 @@ namespace Centralizador.Models.ApiCEN
         public int Debtor { get; set; }
 
         [JsonProperty("amount")]
-        public uint Amount { get; set; }
+        public int Amount { get; set; }
 
         [JsonProperty("amount_gross")]
-        public uint AmountGross { get; set; }
+        public int AmountGross { get; set; }
 
         [JsonProperty("closed")]
         public bool Closed { get; set; }
@@ -66,6 +66,7 @@ namespace Centralizador.Models.ApiCEN
         public ResultParticipant ParticipantDebtor { get; set; }
         public ResultParticipant ParticipantCreditor { get; set; }
         public ResultPaymentMatrix PaymentMatrix { get; set; }
+        public IList<ResultDte> Dtes { get; set; }
 
     }
 
@@ -101,7 +102,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
+                res = wc.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -145,7 +146,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                res = wc.DownloadString($"instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userParticipant.Id}&status=Publicado");
+                res = wc.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userParticipant.Id}&status=Publicado");
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -180,7 +181,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
-                res = wc.DownloadString($"instructions/?creditor={participant.Id}&debtor={userParticipant.Id}&status=Publicado");
+                res = wc.DownloadString($"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userParticipant.Id}&status=Publicado");
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

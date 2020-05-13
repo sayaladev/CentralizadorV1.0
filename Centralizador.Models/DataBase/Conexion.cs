@@ -8,13 +8,15 @@ namespace Centralizador.Models.DataBase
     {
         private string Cnn { get; set; }
         public string Query { get; set; }
-        private string DataBaseName { get; set; }
         private static SqlDataReader SqlDataReader { get; set; }
 
         public Conexion(string dataBaseName)
         {
-            DataBaseName = dataBaseName;
-            Cnn = Cnn = $"Data Source={Properties.Settings.Default.ServerName};Initial Catalog={DataBaseName};Persist Security Info=True;User ID={Properties.Settings.Default.DBUser};Password={Properties.Settings.Default.DBPassword}";
+            Cnn += $"Data Source={Properties.Settings.Default.ServerName};";
+            Cnn += $"Initial Catalog={dataBaseName};";
+            Cnn += $"Persist Security Info=True;";
+            Cnn += $"User ID={Properties.Settings.Default.DBUser};";
+            Cnn += $"Password={Properties.Settings.Default.DBPassword}";
 
         }
 
