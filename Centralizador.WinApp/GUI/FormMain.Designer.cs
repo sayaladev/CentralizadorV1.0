@@ -50,6 +50,7 @@
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.BtnCenProcess = new System.Windows.Forms.Button();
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.BtnInsertNv = new System.Windows.Forms.Button();
             this.BtnOutlook = new System.Windows.Forms.Button();
@@ -66,7 +67,6 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
-            this.BtnCenProcess = new System.Windows.Forms.Button();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -259,6 +259,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
             this.groupBox2.Controls.Add(this.BtnCenProcess);
             this.groupBox2.Controls.Add(this.TxtDateTimeEmail);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
@@ -273,6 +274,18 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
+            // BtnCenProcess
+            // 
+            this.BtnCenProcess.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.BtnCenProcess.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("BtnCenProcess.BackgroundImage")));
+            this.BtnCenProcess.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.BtnCenProcess.Location = new System.Drawing.Point(111, 63);
+            this.BtnCenProcess.Name = "BtnCenProcess";
+            this.BtnCenProcess.Size = new System.Drawing.Size(97, 56);
+            this.BtnCenProcess.TabIndex = 11;
+            this.BtnCenProcess.UseVisualStyleBackColor = false;
+            this.BtnCenProcess.Click += new System.EventHandler(this.BtnCenProcess_Click);
+            // 
             // TxtDateTimeEmail
             // 
             this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -284,12 +297,13 @@
             // 
             // BtnInsertNv
             // 
+            this.BtnInsertNv.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.BtnInsertNv.Location = new System.Drawing.Point(21, 19);
             this.BtnInsertNv.Name = "BtnInsertNv";
             this.BtnInsertNv.Size = new System.Drawing.Size(84, 38);
             this.BtnInsertNv.TabIndex = 10;
             this.BtnInsertNv.Text = "Insert NV";
-            this.BtnInsertNv.UseVisualStyleBackColor = true;
+            this.BtnInsertNv.UseVisualStyleBackColor = false;
             this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_Click);
             // 
             // BtnOutlook
@@ -304,12 +318,13 @@
             // 
             // BtnRechazar
             // 
+            this.BtnRechazar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.BtnRechazar.Location = new System.Drawing.Point(21, 124);
             this.BtnRechazar.Name = "BtnRechazar";
             this.BtnRechazar.Size = new System.Drawing.Size(84, 38);
             this.BtnRechazar.TabIndex = 7;
             this.BtnRechazar.Text = "Rechazar";
-            this.BtnRechazar.UseVisualStyleBackColor = true;
+            this.BtnRechazar.UseVisualStyleBackColor = false;
             this.BtnRechazar.Click += new System.EventHandler(this.BtnRechazar_Click);
             // 
             // ChkIncludeReclaimed
@@ -324,22 +339,24 @@
             // 
             // BtnPagar
             // 
-            this.BtnPagar.Location = new System.Drawing.Point(124, 124);
+            this.BtnPagar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.BtnPagar.Location = new System.Drawing.Point(111, 155);
             this.BtnPagar.Name = "BtnPagar";
             this.BtnPagar.Size = new System.Drawing.Size(84, 38);
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
-            this.BtnPagar.UseVisualStyleBackColor = true;
+            this.BtnPagar.UseVisualStyleBackColor = false;
             this.BtnPagar.Click += new System.EventHandler(this.BtnPagar_Click);
             // 
             // BtnInsertRef
             // 
+            this.BtnInsertRef.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.BtnInsertRef.Location = new System.Drawing.Point(21, 63);
             this.BtnInsertRef.Name = "BtnInsertRef";
             this.BtnInsertRef.Size = new System.Drawing.Size(84, 38);
             this.BtnInsertRef.TabIndex = 8;
             this.BtnInsertRef.Text = "Insert References";
-            this.BtnInsertRef.UseVisualStyleBackColor = true;
+            this.BtnInsertRef.UseVisualStyleBackColor = false;
             this.BtnInsertRef.Click += new System.EventHandler(this.BtnInsertRef_Click);
             // 
             // GroupBox1
@@ -449,16 +466,6 @@
             this.FListPics.Images.SetKeyName(14, "");
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
-            // 
-            // BtnCenProcess
-            // 
-            this.BtnCenProcess.Location = new System.Drawing.Point(130, 63);
-            this.BtnCenProcess.Name = "BtnCenProcess";
-            this.BtnCenProcess.Size = new System.Drawing.Size(75, 38);
-            this.BtnCenProcess.TabIndex = 11;
-            this.BtnCenProcess.Text = "CEN";
-            this.BtnCenProcess.UseVisualStyleBackColor = true;
-            this.BtnCenProcess.Click += new System.EventHandler(this.BtnCenProcess_Click);
             // 
             // FormMain
             // 

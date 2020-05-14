@@ -324,10 +324,11 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-        #region Invoicing Creditor
+        #region Insert NV
 
         private void BtnInsertNv_Click(object sender, EventArgs e)
         {
+            
             if (IsRunning)
             {
                 return;
@@ -362,7 +363,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         if (item.DataEvento.ListEvenHistDoc.Count > 0)
                         {
-                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
+                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null) // Only if NC
                             {
                                 detallesFinal.Add(item);
                             }
@@ -544,7 +545,6 @@ namespace Centralizador.WinApp.GUI
                 BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");
             }
         }
-
         private void BgwInsertNv_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TssLblProgBar.Value = 0;
@@ -564,13 +564,16 @@ namespace Centralizador.WinApp.GUI
             };
             Process.Start(process);
         }
-
         private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
 
+        #endregion
+
+        #region Insert REF
+      
         private void BtnInsertRef_Click(object sender, EventArgs e)
         {
             if (IsRunning)
@@ -590,17 +593,22 @@ namespace Centralizador.WinApp.GUI
             IList<Detalle> detallesFinal = new List<Detalle>();
             foreach (Detalle item in DetallesCreditor)
             {
-                if (item.Folio > 0)
+                if (item.Folio > 0 && item.FechaRecepcion == null)
                 {
                     detallesFinal.Add(item);
                 }
             }
-            DialogResult resp = MessageBox.Show($"CEN references will be inserted{Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (resp == DialogResult.Yes)
+            if (detallesFinal.Count > 0)
             {
-                BgwInsertRef.RunWorkerAsync(detallesFinal);
+                DialogResult resp = MessageBox.Show($"CEN references will be inserted{Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (resp == DialogResult.Yes)
+                {
+                    BgwInsertRef.RunWorkerAsync(detallesFinal);
+                }
+
             }
+
         }
         private void BgwInsertRef_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -640,8 +648,9 @@ namespace Centralizador.WinApp.GUI
                 porcent = (float)(100 * c) / detallesFinal.Count;
                 BgwInsertRef.ReportProgress((int)porcent, $"Inserting REF, wait please...   ({c}/{detallesFinal.Count})");
             }
-        }
 
+
+        }
         private void BgwInsertRef_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TssLblProgBar.Value = 0;
@@ -661,13 +670,11 @@ namespace Centralizador.WinApp.GUI
             };
             Process.Start(process);
         }
-
         private void BgwInsertRef_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
-
 
         #endregion
 
@@ -709,6 +716,7 @@ namespace Centralizador.WinApp.GUI
                     bgwConvertPdf.ProgressChanged += BgwConvertPdf_ProgressChanged;
                     bgwConvertPdf.RunWorkerCompleted += BgwConvertPdf_RunWorkerCompleted;
                     ServicePdf servicePdf = new ServicePdf(lista);
+                    IsRunning = true;
                     servicePdf.ConvertToPdf(bgwConvertPdf);
                 }
             }
@@ -857,6 +865,8 @@ namespace Centralizador.WinApp.GUI
             IGridFill(DetallesCreditor);
             TssLblProgBar.Value = 0;
             IsRunning = false;
+            //BtnRechazar.Enabled = false;
+            //BtnPagar.Enabled = false;
         }
 
         #endregion
@@ -1053,7 +1063,7 @@ namespace Centralizador.WinApp.GUI
                             }
                             else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
                             {
-                                myRow.Cells["status"].Value = "Reclaimed";
+                                myRow.Cells["status"].Value = "Reclaimed";                               
                             }
                             else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
                             {
@@ -1396,6 +1406,14 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
+        #region Pagar
+        private void BtnPagar_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region Rechazar
         private void BtnRechazar_Click(object sender, EventArgs e)
         {
             if (IsRunning)
@@ -1439,11 +1457,10 @@ namespace Centralizador.WinApp.GUI
             }
 
         }
+        #endregion
 
-        private void BtnPagar_Click(object sender, EventArgs e)
-        {
+        #region Cen Process
 
-        }
         private void BgwCenProcess_DoWork(object sender, DoWorkEventArgs e)
         {
             IsRunning = true;
@@ -1454,6 +1471,10 @@ namespace Centralizador.WinApp.GUI
             float porcent = 0;
             foreach (Detalle item in DetallesCreditor)
             {
+                if (item.Folio == 0)
+                {
+                    continue;
+                }
                 if (item.FechaRecepcion != null)
                 {
                     dte = new ResultDte
@@ -1468,6 +1489,7 @@ namespace Centralizador.WinApp.GUI
                         ReceptionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(item.FechaRecepcion))
                     };
 
+                    
 
                     string docXml = null;
                     IList<ResultDte> dtes = new List<ResultDte>();
@@ -1487,11 +1509,13 @@ namespace Centralizador.WinApp.GUI
                             DTEDefTypeDocumento doc = (DTEDefTypeDocumento)item.DTEDef.Item;
                             dte = Dte.SendDte(dte, TokenCen, docXml);
                             dtes.Add(dte);
+                            StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + dte.Id + Environment.NewLine);
+                            item.Instruction.Dtes = dtes;
                         }
                         else
                         {
                             // Exists
-                            StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + "*" + dteResult.Id + Environment.NewLine);
+                            // StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + "*" + dteResult.Id + Environment.NewLine);
                         }
                     }
                     else
@@ -1517,7 +1541,6 @@ namespace Centralizador.WinApp.GUI
                 BgwCenProcess.ReportProgress((int)porcent, $"Inserting CEN, wait please. ({c}/{DetallesCreditor.Count})");
             }
         }
-
         private void BgwCenProcess_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TssLblProgBar.Value = 0;
@@ -1538,7 +1561,6 @@ namespace Centralizador.WinApp.GUI
             };
             Process.Start(process);
         }
-
         private void BgwCenProcess_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
@@ -1546,28 +1568,46 @@ namespace Centralizador.WinApp.GUI
         }
         private void BtnCenProcess_Click(object sender, EventArgs e)
         {
+            if (IsRunning)
+            {
+                return;
+            }
+            if (!IsCreditor || IGridMain.Rows.Count == 0)
+            {
+                TssLblMensaje.Text = "Plesase select Creditor!";
+                return;
+            }
+            if (CboParticipants.SelectedIndex == 0)
+            {
+                TssLblMensaje.Text = "Plesase select a Company!";
+                return;
+            }
             IList<Detalle> detallesFinal = new List<Detalle>();
             if (IsCreditor)
             {
                 foreach (Detalle item in DetallesCreditor)
                 {
-                    if (item.Instruction.Dtes == null)
+                    if (item.Folio > 0)
                     {
-                        detallesFinal.Add(item);
-                    }
-                    else
-                    {
-                        ResultDte dte = item.Instruction.Dtes.FirstOrDefault(x => x.Folio == item.Folio);
-                        if (dte == null)
+                        if (item.Instruction.Dtes == null)
                         {
                             detallesFinal.Add(item);
                         }
                         else
                         {
-                            // Exists
-                            // StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + "*" + dte.Id + Environment.NewLine);
+                            ResultDte dte = item.Instruction.Dtes.FirstOrDefault(x => x.Folio == item.Folio);
+                            if (dte == null)
+                            {
+                                detallesFinal.Add(item);
+                            }
+                            else
+                            {
+                                // Exists
+                                // StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + "*" + dte.Id + Environment.NewLine);
+                            }
                         }
                     }
+
                 }
                 if (detallesFinal.Count > 0)
                 {
@@ -1587,6 +1627,7 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
+        #endregion
     }
 }
 
