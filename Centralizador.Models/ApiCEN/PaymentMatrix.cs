@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -96,12 +96,13 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public static IList<ResultPaymentMatrix> GetPaymentMatrix(DateTime date)
+        public static async System.Threading.Tasks.Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
         {
             DateTime createdBefore = date.AddMonths(1);          
             try
-            {               
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
+            {
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}").ConfigureAwait(false);
                 if (res != null)
                 {
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -123,11 +124,12 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="window"></param>
         /// <returns></returns>
-        public static IList<ResultPaymentMatrix> GetPaymentMatrixByBillingWindowId(ResultBillingWindow window)
+        public static async System.Threading.Tasks.Task<IList<ResultPaymentMatrix>> GetPaymentMatrixByBillingWindowIdAsync(ResultBillingWindow window)
         {            
             try
-            {           
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/payment-matrices/?billing_window={window.Id}");
+            {
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/payment-matrices/?billing_window={window.Id}").ConfigureAwait(false);
                 if (res != null)
                 {
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -147,11 +149,12 @@ namespace Centralizador.Models.ApiCEN
             }         
             return null;
         }
-        public static ResultPaymentMatrix GetPaymentMatrixById(ResultInstruction instruction)
+        public static async Task<ResultPaymentMatrix> GetPaymentMatrixByIdAsync(ResultInstruction instruction)
         {        
             try
-            {                
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/payment-matrices/?id={instruction.PaymentMatrixId}");
+            {
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/payment-matrices/?id={instruction.PaymentMatrixId}").ConfigureAwait(false);
                 if (res != null)
                 {
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Net;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -124,11 +125,12 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static ResultParticipant GetParticipantById(int id)
+        public static async Task<ResultParticipant> GetParticipantByIdAsync(int id)
         {
             try
             {
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/participants/?id={id}");
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/participants/?id={id}").ConfigureAwait(false);
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -150,11 +152,12 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="rut"></param>
         /// <returns></returns>
-        public static ResultParticipant GetParticipantByRut(string rut)
+        public static async Task<ResultParticipant> GetParticipantByRutAsync(string rut)
         {
             try
             {
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/participants/?rut={rut}");
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/participants/?rut={rut}").ConfigureAwait(false);
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

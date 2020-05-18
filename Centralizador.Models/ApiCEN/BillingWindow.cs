@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -49,11 +49,12 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="matrix"></param>
         /// <returns></returns>
-        public static ResultBillingWindow GetBillingWindowById(ResultPaymentMatrix matrix) // GET
+        public static async System.Threading.Tasks.Task<ResultBillingWindow> GetBillingWindowByIdAsync(ResultPaymentMatrix matrix) // GET
         {          
             try
             {
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}").ConfigureAwait(false);
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -76,11 +77,12 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="naturalKey"></param>
         /// <returns></returns>
-        public static ResultBillingWindow GetBillingWindowByNaturalKey(string naturalKey)
+        public static async Task<ResultBillingWindow> GetBillingWindowByNaturalKeyAsync(string naturalKey)
         {
             try
             {
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?natural_key={naturalKey}");
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/billing-windows/?natural_key={naturalKey}").ConfigureAwait(false);
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

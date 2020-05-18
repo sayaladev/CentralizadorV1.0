@@ -76,7 +76,7 @@ namespace Centralizador.WinApp.GUI
             IList<ResultParticipant> participants = new List<ResultParticipant>();
             foreach (ResultParticipant item in Agent.Participants)
             {
-                participants.Add(Participant.GetParticipantById(item.ParticipantId));
+                participants.Add(Participant.GetParticipantByIdAsync(item.ParticipantId));
             }
 
             participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
@@ -92,7 +92,7 @@ namespace Centralizador.WinApp.GUI
             CboYears.SelectedItem = DateTime.Today.Year;
 
             //Biling types
-            BillingTypes = BilingType.GetBilinTypes();
+            BillingTypes = BilingType.GetBilinTypesAsync();
 
             // User email
             TssLblUserEmail.Text = "|  " + Agent.Email;
@@ -741,7 +741,7 @@ namespace Centralizador.WinApp.GUI
             {
                 return;
             }
-            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
+            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
             if (matrices != null)
             {
                 BgwCreditor.RunWorkerAsync(matrices);
@@ -764,10 +764,10 @@ namespace Centralizador.WinApp.GUI
 
             foreach (ResultPaymentMatrix m in matrices)
             {
-                ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
+                ResultBillingWindow window = BillingWindow.GetBillingWindowByIdAsync(m);
                 m.BillingWindow = window;
                 // Get instructions with matrix binding.
-                IList<ResultInstruction> lista = Instruction.GetInstructionCreditor(m, UserParticipant);
+                IList<ResultInstruction> lista = Instruction.GetInstructionCreditorAsync(m, UserParticipant).Result;
                 if (lista != null)
                 {
                     instructions.AddRange(lista);
@@ -786,7 +786,7 @@ namespace Centralizador.WinApp.GUI
                 //}
 
                 Detalle detalle = new Detalle();
-                instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
+                instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
                 //instruction.ParticipantCreditor = UserParticipant;
                 detalle.Instruction = instruction;
                 detalle.MntNeto = instruction.Amount;
@@ -828,7 +828,7 @@ namespace Centralizador.WinApp.GUI
                         }
 
                         // Get dte from CEN
-                        ResultDte dte = Dte.GetDteByFolio(detalle);
+                        ResultDte dte = Dte.GetDteByFolioAsync(detalle);
                         if (dte == null)
                         {
                             // Insert to CEN
@@ -911,11 +911,11 @@ namespace Centralizador.WinApp.GUI
             foreach (Detalle item in DetallesDebtor)
             {
                 nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
-                ResultParticipant participant = Participant.GetParticipantByRut(item.RutReceptor.ToString());
+                ResultParticipant participant = Participant.GetParticipantByRutAsync(item.RutReceptor.ToString());
                 if (participant != null)
                 {
                     item.IsParticipant = true;
-                    IList<ResultInstruction> instructions = Instruction.GetInstructionByParticipants(participant, UserParticipant);
+                    IList<ResultInstruction> instructions = Instruction.GetInstructionByParticipantsAsync(participant, UserParticipant);
                     if (instructions != null)
                     {
                         IList<ResultInstruction> i = instructions.Where(x => x.Amount == item.MntNeto).ToList();
@@ -923,8 +923,8 @@ namespace Centralizador.WinApp.GUI
                         {
                             item.IsParticipant = true;
                             item.Instruction = i[0];
-                            item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixById(i[0]);
-                            item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowById(item.Instruction.PaymentMatrix);
+                            item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixByIdAsync(i[0]);
+                            item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowByIdAsync(item.Instruction.PaymentMatrix);
                         }
                     }
                 }
@@ -962,16 +962,16 @@ namespace Centralizador.WinApp.GUI
                                 string r3 = r.RazonRef.Substring(r1.Length + r2.Length).TrimEnd();
                                 TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
                                 rznRef = ti.ToTitleCase(r2.ToLower());
-                                window = BillingWindow.GetBillingWindowByNaturalKey(r1 + rznRef);
+                                window = BillingWindow.GetBillingWindowByNaturalKeyAsync(r1 + rznRef);
                                 if (window != null)
                                 {
                                     // Get the asociated matrix  
-                                    IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                    IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
                                     ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == r1 + rznRef + r3);
                                     if (matrix != null)
                                     {
                                         // Get the instruction
-                                        ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
+                                        ResultInstruction instruction = Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant);
                                         if (instruction != null)
                                         {
                                             item.Instruction = instruction;

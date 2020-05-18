@@ -60,11 +60,12 @@ namespace Centralizador.Models.ApiCEN
         /// 
         /// </summary>
         /// <returns></returns>
-        public static ResultAgent GetAgetByEmail() // GET
+        public static async System.Threading.Tasks.Task<ResultAgent> GetAgetByEmailAsync() // GET
         {          
             try
-            {             
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}");
+            {
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}").ConfigureAwait(false);
                 if (res != null)
                 {
                     Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -85,7 +86,7 @@ namespace Centralizador.Models.ApiCEN
         /// 
         /// </summary>
         /// <returns></returns>
-        public static string GetTokenCen() // POST
+        public static async System.Threading.Tasks.Task<string> GetTokenCenAsync() // POST
         {       
             try
             {
@@ -93,9 +94,9 @@ namespace Centralizador.Models.ApiCEN
                 {
                     { "username", Properties.Settings.Default.UserCEN },
                     { "password", Properties.Settings.Default.PasswordCEN }
-                };             
-                                            
-                string res = WebClientCEN.WebClient.UploadString("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented));
+                };
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.UploadStringTaskAsync("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)).ConfigureAwait(false);
                 if (res != null)
                 {
                     dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);

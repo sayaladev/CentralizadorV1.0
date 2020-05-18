@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -91,11 +91,12 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="matrix"></param>
         /// <param name="Userparticipant"></param>
         /// <returns></returns>
-        public static IList<ResultInstruction> GetInstructionCreditor(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
+        public static async Task<IList<ResultInstruction>> GetInstructionCreditorAsync(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
         {
             try
             {
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado").ConfigureAwait(false);
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -124,11 +125,12 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="idCReditor"></param>
         /// <param name="idDebtor"></param>
         /// <returns></returns>
-        public static ResultInstruction GetInstructionDebtor(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
+        public static async Task<ResultInstruction> GetInstructionDebtorAsync(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
         {          
             try
-            {               
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
+            {
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado").ConfigureAwait(false);
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -148,11 +150,12 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        public static IList<ResultInstruction> GetInstructionByParticipants(ResultParticipant participant, ResultParticipant userPart)
+        public static async Task<IList<ResultInstruction>> GetInstructionByParticipantsAsync(ResultParticipant participant, ResultParticipant userPart)
         {       
             try
-            {               
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
+            {
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userPart.Id}&status=Publicado").ConfigureAwait(false);
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

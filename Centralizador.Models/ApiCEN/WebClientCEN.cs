@@ -12,8 +12,7 @@ namespace Centralizador.Models.ApiCEN
             WebClient = new WebClient
             {
                 BaseAddress = Properties.Settings.Default.BaseAddress
-            };
-            WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+            };           
             WebClient.Encoding = Encoding.UTF8;
             WebClient.Proxy = null;
         }

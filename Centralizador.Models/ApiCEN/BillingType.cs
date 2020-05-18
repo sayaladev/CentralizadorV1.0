@@ -50,11 +50,12 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultBilingType> Results { get; set; }
 
-        public static IList<ResultBilingType> GetBilinTypes() // GET
+        public static async System.Threading.Tasks.Task<IList<ResultBilingType>> GetBilinTypesAsync() // GET
         {         
             try
-            {    
-                string res = WebClientCEN.WebClient.DownloadString("api/v1/resources/billing-types");
+            {
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync("api/v1/resources/billing-types").ConfigureAwait(false);
                 if (res != null)
                 {
                     BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
