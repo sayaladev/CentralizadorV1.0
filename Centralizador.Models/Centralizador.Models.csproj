@@ -85,6 +85,7 @@
     <Compile Include="ApiCEN\Instruction.cs" />
     <Compile Include="ApiCEN\Participant.cs" />
     <Compile Include="ApiCEN\PaymentMatrix.cs" />
+    <Compile Include="ApiCEN\WebClientCEN.cs" />
     <Compile Include="ApiSII\Data.cs" />
     <Compile Include="ApiSII\MetaData.cs" />
     <Compile Include="ApiSII\ServiceEvento.cs" />

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
+
+using Centralizador.Models.ApiSII;
 
 using Newtonsoft.Json;
 
@@ -87,38 +90,30 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultDte> Results { get; set; }
 
-        public static IList<ResultDte> GetDteByParticipant(ResultInstruction instruction)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
+        public static ResultDte GetDteByFolio(Detalle detalle) // GET
+        {          
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/dtes/?reported_by_creditor=true&instruction={instruction.Id}&creditor={instruction.Creditor}");
+                ResultInstruction i = detalle.Instruction;
+                // &type=1 (F 33)
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/dtes/?reported_by_creditor=true&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}");
                 if (res != null)
                 {
                     Dte dte = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (dte.Results.Count > 0)
+                    if (dte.Results.Count == 1)
                     {
-                        return dte.Results;
+                        return dte.Results[0];
                     }
                 }
             }
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }           
             return null;
         }
 
-        public static ResultDte SendDte(ResultDte dte, string tokenCen, string doc)
+        public static async Task<ResultDte> SendDteAsync(ResultDte dte, string tokenCen, string doc) // POST
         {
             string fileName = dte.Folio + "_" + dte.Instruction;
             string idFile = SendFile(tokenCen, fileName, doc);
@@ -126,24 +121,19 @@ namespace Centralizador.Models.ApiCEN
             {
                 dte.EmissionFile = idFile;
 
-                WebClient wc = new WebClient
-                {
-                    BaseAddress = Properties.Settings.Default.BaseAddress
-                };
                 try
                 {
-                    string d = JsonConvert.SerializeObject(dte);   
-                    wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                    wc.Encoding = Encoding.UTF8;
-                    wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                    string d = JsonConvert.SerializeObject(dte);
+                    WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                    WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                     NameValueCollection postData = new NameValueCollection() { { "data", d } };
 
-                    byte[] res = wc.UploadValues("api/v1/operations/dtes/create/", postData);
+                    byte[] res = await WebClientCEN.WebClient.UploadValuesTaskAsync("api/v1/operations/dtes/create/", postData);
                     if (res != null)
                     {
                         string json = Encoding.UTF8.GetString(res);
                         InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                     
+
                         if (r != null)
                         {
                             return r.ResultDte;
@@ -154,32 +144,18 @@ namespace Centralizador.Models.ApiCEN
                 {
                     return null;
                 }
-                finally
-                {
-                    wc.Dispose();
-                }
-                return null;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
-        private static string SendFile(string tokenCen, string fileName, string doc)
+        private static string SendFile(string tokenCen, string fileName, string doc) // PUT
         {
-
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                wc.Encoding = Encoding.UTF8;
-                wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
-                wc.Headers.Add("Content-Disposition", "attachment; filename=" + fileName + ".xml");
-                string res = wc.UploadString("api/v1/resources/auxiliary-files/", WebRequestMethods.Http.Put, doc);
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                WebClientCEN.WebClient.Headers.Add("Content-Disposition", "attachment; filename=" + fileName + ".xml");
+                string res = WebClientCEN.WebClient.UploadString("api/v1/resources/auxiliary-files/", WebRequestMethods.Http.Put, doc);
                 if (res != null)
                 {
                     Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
@@ -189,10 +165,6 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
             }
             return null;
         }

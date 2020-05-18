@@ -50,7 +50,6 @@
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.BtnCenProcess = new System.Windows.Forms.Button();
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.BtnInsertNv = new System.Windows.Forms.Button();
             this.BtnOutlook = new System.Windows.Forms.Button();
@@ -260,7 +259,6 @@
             // groupBox2
             // 
             this.groupBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.groupBox2.Controls.Add(this.BtnCenProcess);
             this.groupBox2.Controls.Add(this.TxtDateTimeEmail);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
             this.groupBox2.Controls.Add(this.BtnOutlook);
@@ -273,18 +271,6 @@
             this.groupBox2.Size = new System.Drawing.Size(234, 264);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
-            // 
-            // BtnCenProcess
-            // 
-            this.BtnCenProcess.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.BtnCenProcess.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("BtnCenProcess.BackgroundImage")));
-            this.BtnCenProcess.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.BtnCenProcess.Location = new System.Drawing.Point(111, 63);
-            this.BtnCenProcess.Name = "BtnCenProcess";
-            this.BtnCenProcess.Size = new System.Drawing.Size(97, 56);
-            this.BtnCenProcess.TabIndex = 11;
-            this.BtnCenProcess.UseVisualStyleBackColor = false;
-            this.BtnCenProcess.Click += new System.EventHandler(this.BtnCenProcess_Click);
             // 
             // TxtDateTimeEmail
             // 
@@ -536,6 +522,5 @@
         private System.Windows.Forms.CheckBox ChkIncludeReclaimed;
         private System.Windows.Forms.Button BtnInsertNv;
         private System.Windows.Forms.Button BtnExcelConvert;
-        private System.Windows.Forms.Button BtnCenProcess;
     }
 }

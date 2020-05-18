@@ -56,17 +56,15 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultAgent> Results { get; set; }
 
-        public static ResultAgent GetAgetByEmail()
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static ResultAgent GetAgetByEmail() // GET
+        {          
             try
-            {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}");
+            {             
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}");
                 if (res != null)
                 {
                     Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -79,31 +77,25 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }        
             return null;
         }
 
-        public static string GetTokenCen()
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static string GetTokenCen() // POST
+        {       
             try
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>
                 {
                     { "username", Properties.Settings.Default.UserCEN },
                     { "password", Properties.Settings.Default.PasswordCEN }
-                };               
-
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;                
-                string res = wc.UploadString("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented));
+                };             
+                                            
+                string res = WebClientCEN.WebClient.UploadString("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented));
                 if (res != null)
                 {
                     dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
@@ -113,11 +105,7 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }        
             return null;
         }
     }

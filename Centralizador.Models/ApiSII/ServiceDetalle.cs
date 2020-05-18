@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
@@ -90,11 +89,11 @@ namespace Centralizador.Models.ApiSII
                 else
                 {
                     return null;
-                }               
+                }
             }
             catch (WebException ex)
-            { 
-                    MessageBox.Show(ex.Message, "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+            {
+                MessageBox.Show(ex.Message, "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -159,8 +158,8 @@ namespace Centralizador.Models.ApiSII
         public DTEDefType DTEDef { get; set; }
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }
-
-        public  bool  IsRefCorrect { get; set; }
+        public bool IsRefCorrect { get; set; } // Exigencias CEN si están correctas.
+       
 
     }
 

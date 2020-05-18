@@ -130,14 +130,6 @@ namespace Centralizador.WinApp.GUI
             BgwInsertRef.RunWorkerCompleted += BgwInsertRef_RunWorkerCompleted;
             BgwInsertRef.DoWork += BgwInsertRef_DoWork;
 
-            // Worker Cen
-            BgwCenProcess = new BackgroundWorker
-            {
-                WorkerReportsProgress = true
-            };
-            BgwCenProcess.ProgressChanged += BgwCenProcess_ProgressChanged;
-            BgwCenProcess.RunWorkerCompleted += BgwCenProcess_RunWorkerCompleted;
-            BgwCenProcess.DoWork += BgwCenProcess_DoWork;
 
 
             // Logging file
@@ -328,7 +320,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnInsertNv_Click(object sender, EventArgs e)
         {
-            
+
             if (IsRunning)
             {
                 return;
@@ -573,7 +565,7 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
         #region Insert REF
-      
+
         private void BtnInsertRef_Click(object sender, EventArgs e)
         {
             if (IsRunning)
@@ -788,7 +780,7 @@ namespace Centralizador.WinApp.GUI
             foreach (ResultInstruction instruction in instructions)
             {
                 // Tester
-                //if (instruction.Id != 1548789)
+                //if (instruction.Id != 1783538)
                 //{
                 //    continue;
                 //}
@@ -825,7 +817,7 @@ namespace Centralizador.WinApp.GUI
 
                     }
                     detalle.References = reference;
-                    if (reference.FechaRecepcionSii != null)
+                    if (reference.FechaRecepcionSii != null) // Enviado a Sii ok según ref Softland
                     {
                         detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
                         // Sii
@@ -836,8 +828,25 @@ namespace Centralizador.WinApp.GUI
                         }
 
                         // Get dte from CEN
-                        detalle.Instruction.Dtes = Dte.GetDteByParticipant(detalle.Instruction);
-
+                        ResultDte dte = Dte.GetDteByFolio(detalle);
+                        if (dte == null)
+                        {
+                            // Insert to CEN
+                            dte = new ResultDte
+                            {
+                                Folio = detalle.Folio,
+                                GrossAmount = detalle.MntTotal,
+                                Instruction = detalle.Instruction.Id,
+                                NetAmount = detalle.MntNeto,
+                                ReportedByCreditor = true,
+                                TypeSiiCode = 33,
+                                EmissionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaEmision)),
+                                ReceptionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaRecepcion))
+                            };
+                            string docXml = detalle.References.FileBasico;
+                            dte = Dte.SendDteAsync(dte, TokenCen, docXml).Result;
+                        }                        
+                        detalle.Instruction.Dte = dte;
                     }
                     if (reference.FechaEmision != null)
                     {
@@ -982,7 +991,7 @@ namespace Centralizador.WinApp.GUI
                 c++;
                 //item.Nro = c;
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
-                BgwDebtor.ReportProgress((int)porcent, $"Getting info from Softland...   ({c}/{DetallesDebtor.Count})");
+                BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");                
                 Thread.Sleep(100);
             }
             // Order the list
@@ -1063,7 +1072,7 @@ namespace Centralizador.WinApp.GUI
                             }
                             else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
                             {
-                                myRow.Cells["status"].Value = "Reclaimed";                               
+                                myRow.Cells["status"].Value = "Reclaimed";
                             }
                             else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
                             {
@@ -1080,24 +1089,20 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["P1"].Type = iGCellType.Check;
                         myRow.Cells["P2"].Type = iGCellType.Check;
 
-
-                        if (item.Instruction.Dtes != null)
+                        if (item.Instruction.Dte != null)
                         {
-                            ResultDte dte = item.Instruction.Dtes.FirstOrDefault(x => x.Folio == item.Folio);
-                            if (dte != null)
-                            {
-                                myRow.Cells["P1"].Value = 1;
-                                myRow.Cells["P2"].Value = 1;
-                            }
-
+                            myRow.Cells["P1"].Value = 1;
+                            myRow.Cells["P2"].Value = 1;
                         }
-
-
                     }
                     else
                     {
-                        myRow.Cells["P3"].Type = iGCellType.Check;
-                        myRow.Cells["P4"].Type = iGCellType.Check;
+                        if (item.IsParticipant)
+                        {
+                            myRow.Cells["P3"].Type = iGCellType.Check;
+                            myRow.Cells["P4"].Type = iGCellType.Check;
+                        }
+
                     }
                     // Flags
                     LetterFlag myFlag = ValidateCen(item);
@@ -1107,7 +1112,6 @@ namespace Centralizador.WinApp.GUI
                     {
                         item.IsRefCorrect = true; // True = bad ref
                     }
-
                 }
                 IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
@@ -1189,10 +1193,6 @@ namespace Centralizador.WinApp.GUI
                     if (dte.Referencia != null)
                     {
                         DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                        if (referencia == null)
-                        {
-                            return LetterFlag.Red;
-                        }
                         if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
                         {
                             return LetterFlag.Red;
@@ -1212,6 +1212,13 @@ namespace Centralizador.WinApp.GUI
                         else if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
                         {
                             return LetterFlag.Red;
+                        }
+                        else if (dte.Detalle != null && dte.Detalle.Length == 1)
+                        {
+                            if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
+                            {
+                                return LetterFlag.Red;
+                            }
                         }
                         return LetterFlag.Green;
                     }
@@ -1459,175 +1466,7 @@ namespace Centralizador.WinApp.GUI
         }
         #endregion
 
-        #region Cen Process
 
-        private void BgwCenProcess_DoWork(object sender, DoWorkEventArgs e)
-        {
-            IsRunning = true;
-            //IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
-            StringLogging.Clear();
-            ResultDte dte = null;
-            int c = 0;
-            float porcent = 0;
-            foreach (Detalle item in DetallesCreditor)
-            {
-                if (item.Folio == 0)
-                {
-                    continue;
-                }
-                if (item.FechaRecepcion != null)
-                {
-                    dte = new ResultDte
-                    {
-                        Folio = item.Folio,
-                        GrossAmount = item.MntTotal,
-                        Instruction = item.Instruction.Id,
-                        NetAmount = item.MntNeto,
-                        ReportedByCreditor = true,
-                        TypeSiiCode = 33,
-                        EmissionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(item.FechaEmision)),
-                        ReceptionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(item.FechaRecepcion))
-                    };
-
-                    
-
-                    string docXml = null;
-                    IList<ResultDte> dtes = new List<ResultDte>();
-                    if (item.References != null)
-                    {
-                        if (item.References.FileBasico != null)
-                        {
-                            docXml = item.References.FileBasico;
-                        }
-                    }
-
-                    if (item.Instruction.Dtes != null)
-                    {
-                        ResultDte dteResult = item.Instruction.Dtes.FirstOrDefault(x => x.Folio == item.Folio);
-                        if (dteResult == null && item.DTEDef != null)
-                        {
-                            DTEDefTypeDocumento doc = (DTEDefTypeDocumento)item.DTEDef.Item;
-                            dte = Dte.SendDte(dte, TokenCen, docXml);
-                            dtes.Add(dte);
-                            StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + dte.Id + Environment.NewLine);
-                            item.Instruction.Dtes = dtes;
-                        }
-                        else
-                        {
-                            // Exists
-                            // StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + "*" + dteResult.Id + Environment.NewLine);
-                        }
-                    }
-                    else
-                    {
-                        if (item.References != null)
-                        {
-                            ResultDte dteResult = Dte.SendDte(dte, TokenCen, docXml);
-                            dtes.Add(dteResult);
-                            StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + dteResult.Id + Environment.NewLine);
-                            item.Instruction.Dtes = dtes;
-                        }
-
-                    }
-
-                    if (dte == null)
-                    {
-                        // Error
-                        StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + "Error" + Environment.NewLine);
-                    }
-                }
-                c++;
-                porcent = (float)(100 * c) / DetallesCreditor.Count;
-                BgwCenProcess.ReportProgress((int)porcent, $"Inserting CEN, wait please. ({c}/{DetallesCreditor.Count})");
-            }
-        }
-        private void BgwCenProcess_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            TssLblProgBar.Value = 0;
-            IsCreditor = true;
-            IsRunning = false;
-            TssLblMensaje.Text = "Check the log file.";
-            IGridFill(DetallesCreditor);
-            string nameFile = $"{UserParticipant.Name}_InsertCen_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
-
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
-            {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
-            }
-            File.WriteAllText(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt", StringLogging.ToString());
-            ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt")
-            {
-                WindowStyle = ProcessWindowStyle.Minimized
-            };
-            Process.Start(process);
-        }
-        private void BgwCenProcess_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
-        private void BtnCenProcess_Click(object sender, EventArgs e)
-        {
-            if (IsRunning)
-            {
-                return;
-            }
-            if (!IsCreditor || IGridMain.Rows.Count == 0)
-            {
-                TssLblMensaje.Text = "Plesase select Creditor!";
-                return;
-            }
-            if (CboParticipants.SelectedIndex == 0)
-            {
-                TssLblMensaje.Text = "Plesase select a Company!";
-                return;
-            }
-            IList<Detalle> detallesFinal = new List<Detalle>();
-            if (IsCreditor)
-            {
-                foreach (Detalle item in DetallesCreditor)
-                {
-                    if (item.Folio > 0)
-                    {
-                        if (item.Instruction.Dtes == null)
-                        {
-                            detallesFinal.Add(item);
-                        }
-                        else
-                        {
-                            ResultDte dte = item.Instruction.Dtes.FirstOrDefault(x => x.Folio == item.Folio);
-                            if (dte == null)
-                            {
-                                detallesFinal.Add(item);
-                            }
-                            else
-                            {
-                                // Exists
-                                // StringLogging.Append(item.Instruction.Id + "\t" + "CEN Insert:" + "\t\t" + "*" + dte.Id + Environment.NewLine);
-                            }
-                        }
-                    }
-
-                }
-                if (detallesFinal.Count > 0)
-                {
-                    DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending instructions to send{Environment.NewLine + Environment.NewLine}Are you sure?", "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                    if (resp == DialogResult.Yes)
-                    {
-                        BgwCenProcess.RunWorkerAsync(); // no le paso la lista porque necesito usarla completa en el DO
-                    }
-                }
-            }
-            else
-            {
-                foreach (Detalle item in DetallesDebtor)
-                {
-                    // Debtor
-                }
-            }
-        }
-        #endregion
     }
 }
 

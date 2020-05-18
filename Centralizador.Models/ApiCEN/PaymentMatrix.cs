@@ -91,28 +91,22 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultPaymentMatrix> Results { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
         public static IList<ResultPaymentMatrix> GetPaymentMatrix(DateTime date)
         {
-            DateTime createdBefore = date.AddMonths(1);
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
+            DateTime createdBefore = date.AddMonths(1);          
             try
-            {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
+            {               
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
                 if (res != null)
                 {
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     if (p.Results.Count > 0)
-                    {
-                        ////Billing windows
-                        //foreach (ResultPaymentMatrix matrix in p.Results)
-                        //{
-                        //    matrix.BillingWindow = BillingWindow.GetBillingWindowById(matrix);
-                        //}
+                    {                       
                         return p.Results;
                     }
                 }
@@ -120,13 +114,8 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }         
             return null;
-
         }
 
         /// <summary>
@@ -135,16 +124,10 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="window"></param>
         /// <returns></returns>
         public static IList<ResultPaymentMatrix> GetPaymentMatrixByBillingWindowId(ResultBillingWindow window)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
+        {            
             try
-            {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/payment-matrices/?billing_window={window.Id}");
+            {           
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/payment-matrices/?billing_window={window.Id}");
                 if (res != null)
                 {
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -161,25 +144,14 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }         
             return null;
-
         }
         public static ResultPaymentMatrix GetPaymentMatrixById(ResultInstruction instruction)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
+        {        
             try
-            {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/payment-matrices/?id={instruction.PaymentMatrixId}");
+            {                
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/payment-matrices/?id={instruction.PaymentMatrixId}");
                 if (res != null)
                 {
                     PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -191,13 +163,8 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }       
             return null;
-
         }
     }
 }

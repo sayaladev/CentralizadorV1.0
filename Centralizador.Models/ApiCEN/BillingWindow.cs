@@ -44,17 +44,16 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultBillingWindow> Results { get; set; }
 
-        public static ResultBillingWindow GetBillingWindowById(ResultPaymentMatrix matrix)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="matrix"></param>
+        /// <returns></returns>
+        public static ResultBillingWindow GetBillingWindowById(ResultPaymentMatrix matrix) // GET
+        {          
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -63,19 +62,13 @@ namespace Centralizador.Models.ApiCEN
                         return b.Results[0];
 
                     }
-
                 }
             }
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }          
             return null;
-
         }
 
         /// <summary>
@@ -85,15 +78,9 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultBillingWindow GetBillingWindowByNaturalKey(string naturalKey)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/billing-windows/?natural_key={naturalKey}");
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?natural_key={naturalKey}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -106,11 +93,7 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+            }           
             return null;
         }
     }

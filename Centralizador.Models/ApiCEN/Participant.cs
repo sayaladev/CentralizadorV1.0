@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text;
 
 using Newtonsoft.Json;
 
@@ -128,15 +126,9 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultParticipant GetParticipantById(int id)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/participants/?id={id}");
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/participants/?id={id}");
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -149,10 +141,6 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
             }
             return null;
         }
@@ -164,15 +152,9 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultParticipant GetParticipantByRut(string rut)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress
-            };
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"api/v1/resources/participants/?rut={rut}");
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/participants/?rut={rut}");
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -185,10 +167,6 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }
-            finally
-            {
-                wc.Dispose();
             }
             return null;
         }
