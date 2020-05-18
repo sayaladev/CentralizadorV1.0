@@ -90,14 +90,15 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultDte> Results { get; set; }
 
-        public static async Task<ResultDte> GetDteByFolioAsync(Detalle detalle) // GET
+        public static ResultDte GetDteByFolio(Detalle detalle) // GET
         {          
             try
             {
                 ResultInstruction i = detalle.Instruction;
                 // &type=1 (F 33)
+                WebClientCEN.WebClient.Headers.Clear();
                 WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = await WebClientCEN.WebClient.DownloadStringTaskAsync($"api/v1/resources/dtes/?reported_by_creditor=true&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}").ConfigureAwait(false);
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/dtes/?reported_by_creditor=true&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}");
                 if (res != null)
                 {
                     Dte dte = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -114,10 +115,10 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        public static async Task<ResultDte> SendDteAsync(ResultDte dte, string tokenCen, string doc) // POST
+        public static ResultDte SendDte(ResultDte dte, string tokenCen, string doc) // POST
         {
             string fileName = dte.Folio + "_" + dte.Instruction;
-            string idFile = SendFileAsync(tokenCen, fileName, doc).Result;
+            string idFile = SendFile(tokenCen, fileName, doc);
             if (!string.IsNullOrEmpty(idFile))
             {
                 dte.EmissionFile = idFile;
@@ -125,11 +126,12 @@ namespace Centralizador.Models.ApiCEN
                 try
                 {
                     string d = JsonConvert.SerializeObject(dte);
+                    WebClientCEN.WebClient.Headers.Clear();
                     WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                     WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                     NameValueCollection postData = new NameValueCollection() { { "data", d } };
 
-                    byte[] res = await WebClientCEN.WebClient.UploadValuesTaskAsync("api/v1/operations/dtes/create/", postData);
+                    byte[] res = WebClientCEN.WebClient.UploadValues("api/v1/operations/dtes/create/", postData);
                     if (res != null)
                     {
                         string json = Encoding.UTF8.GetString(res);
@@ -149,14 +151,15 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        private static async Task<string> SendFileAsync(string tokenCen, string fileName, string doc) // PUT
+        private static string SendFile(string tokenCen, string fileName, string doc) // PUT
         {
             try
             {
+                WebClientCEN.WebClient.Headers.Clear();
                 WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                 WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                 WebClientCEN.WebClient.Headers.Add("Content-Disposition", "attachment; filename=" + fileName + ".xml");
-                string res = await WebClientCEN.WebClient.UploadStringTaskAsync("api/v1/resources/auxiliary-files/", WebRequestMethods.Http.Put, doc).ConfigureAwait(false);
+                string res = WebClientCEN.WebClient.UploadString("api/v1/resources/auxiliary-files/", WebRequestMethods.Http.Put, doc);
                 if (res != null)
                 {
                     Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);

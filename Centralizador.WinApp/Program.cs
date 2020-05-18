@@ -21,8 +21,8 @@ namespace Centralizador.WinApp
 
 
             string tokenSii = ServiceSoap.GETTokenFromSii();
-            string tokenCen = Agent.GetTokenCenAsync();
-            ResultAgent agent = Agent.GetAgetByEmailAsync();         
+            string tokenCen = Agent.GetTokenCen();
+            ResultAgent agent = Agent.GetAgetByEmail();         
             if (!string.IsNullOrEmpty(tokenSii) && agent != null && !string.IsNullOrEmpty(tokenCen))
             {               
                 Application.Run(new FormMain(tokenSii, agent, tokenCen));
