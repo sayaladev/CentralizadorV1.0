@@ -273,7 +273,6 @@ namespace Centralizador.Models.ApiSII
         public object DhdrCodigo { get; set; }
 
         // New properties
-
         public int Nro { get; set; }
         public ResultInstruction Instruction { get; set; }
         public Reference References { get; set; }
@@ -283,7 +282,19 @@ namespace Centralizador.Models.ApiSII
         public LetterFlag Flag { get; set; } // Exigencias CEN si están correctas.
         public StatusDetalle StatusDetalle { get; set; }
 
-
+        // Constructor
+        public Detalle(uint rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)
+        {
+            RutReceptor = rutReceptor;
+            DvReceptor = dvReceptor;
+            RznSocRecep = rznSocRecep;
+            MntNeto = mntNeto;
+            Instruction = instruction;
+            IsParticipant = isParticipant;
+        }
+        public Detalle()
+        {
+        }
     }
 
 

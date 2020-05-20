@@ -757,14 +757,9 @@ namespace Centralizador.WinApp.GUI
             List<ResultInstruction> instructions = new List<ResultInstruction>();
             int c = 0;
             float porcent = 0;
-            // Sql 
-            Conexion con = new Conexion(DataBaseName);
-
             foreach (ResultPaymentMatrix m in matrices)
             {
-                ResultBillingWindow window = BillingWindow.GetBillingWindowById(m);
-                m.BillingWindow = window;
-                // Get instructions with matrix binding.
+                m.BillingWindow = BillingWindow.GetBillingWindowById(m); ;
                 IList<ResultInstruction> lista = Instruction.GetInstructionCreditor(m, UserParticipant);
                 if (lista != null)
                 {
@@ -783,49 +778,36 @@ namespace Centralizador.WinApp.GUI
                 //    continue;
                 //}
 
-                Detalle detalle = new Detalle();
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
-                detalle.Instruction = instruction;
-                detalle.MntNeto = instruction.Amount;
-                detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
-                detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
-                detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
-                detalle.IsParticipant = true; // Always True
-
-                // Mapping references Softland
+                Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
+                // REF from Softland          
+                Conexion con = new Conexion(DataBaseName);
+                DTEDefType xmlObjeto = null;
                 IList<Reference> references = Reference.GetInfoFactura(instruction, con);
                 if (references != null)
                 {
-                    // Search reference mostly recent for number folio
                     Reference reference = references.OrderByDescending(x => x.Folio).First();
-                    // Deserialize 
-                    DTEDefType xmlObjeto = null;
                     if (reference.FileBasico != null)
                     {
                         xmlObjeto = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
                     }
-                    detalle.Folio = reference.Folio;
                     if (xmlObjeto != null)
                     {
                         detalle.DTEDef = xmlObjeto;
                         DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
                         detalle.MntIva = Convert.ToInt32(dte.Encabezado.Totales.IVA);
                         detalle.MntTotal = Convert.ToInt32(dte.Encabezado.Totales.MntTotal);
-
                     }
+                    detalle.Folio = reference.Folio;
                     detalle.References = reference;
-                    if (reference.FechaRecepcionSii != null) // Enviado a Sii ok según ref Softland
+                    if (reference.FechaRecepcionSii != null)
                     {
                         detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
-                        // Sii
-                        DataEvento evento = ServiceEvento.GetStatusDte("Creditor", TokenSii, "33", detalle, UserParticipant);
-                        if (evento != null)
-                        {
-                            detalle.DataEvento = evento;
-                        }
+                        // Events                      
+                        detalle.DataEvento = ServiceEvento.GetStatusDte("Creditor", TokenSii, "33", detalle, UserParticipant);
                         // Flags         
                         detalle.Flag = ValidateCen(detalle);
-                        // Get dte from CEN
+                        // Insert CEN
                         ResultDte doc = Dte.GetDteByFolio(detalle, true);
                         if (doc == null)
                         {
@@ -878,7 +860,7 @@ namespace Centralizador.WinApp.GUI
                 return;
             }
             DetallesDebtor = new List<Detalle>();
-            DetallesDebtor = ServiceDetalle.GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+            DetallesDebtor = GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
             string nameFile = "";
             nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
             if (DetallesDebtor != null)
@@ -893,8 +875,20 @@ namespace Centralizador.WinApp.GUI
             string nameFile = "";
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
-            {
+            {               
+                DTEDefType xmlObjeto = null;
+                DTEDefTypeDocumento dte = null;
+                DTEDefTypeDocumentoReferencia[] references = null;
+                DTEDefTypeDocumentoReferencia reference = null;
+                ResultBillingWindow window = null;
+
+                // XML file in folder
                 nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
+                if (File.Exists(nameFile))
+                {
+                    xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
+                }
+                // Participant
                 ResultParticipant participant = Participant.GetParticipantByRut(item.RutReceptor.ToString());
                 if (participant != null)
                 {
@@ -904,75 +898,66 @@ namespace Centralizador.WinApp.GUI
                     {
                         // Find Instruction by amount
                         IList<ResultInstruction> i = instructions.Where(x => x.Amount == item.MntNeto).ToList();
-                        if (i.Count == 1) // ************* Y SI SON MAS DE 1?
-                        {
+                        if (i.Count == 1) 
+                        {                           
                             item.Instruction = i[0];
                             item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixById(i[0]);
                             item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowById(item.Instruction.PaymentMatrix);
                         }
-                    }
-                }
-                // XML file in folder
-                DTEDefType xmlObjeto = null;
-                DTEDefTypeDocumento dte = null;
-                DTEDefTypeDocumentoReferencia[] references = null;
-                DTEDefTypeDocumentoReferencia reference = null;
-                ResultBillingWindow window = null;
-                if (File.Exists(nameFile))
-                {
-                    xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
-                }
-                if (xmlObjeto != null)
-                {
-                    item.DTEDef = xmlObjeto;
-                    dte = (DTEDefTypeDocumento)xmlObjeto.Item;
-                    references = dte.Referencia;
-                    if (references != null)
-                    {
-                        reference = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                        if (reference != null)
+                        else
                         {
-                            window = BillingWindow.GetBillingWindowByNaturalKey(reference);
-                            if (window != null)
+                            if (xmlObjeto != null)
                             {
-                                IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                                ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == reference.RazonRef.TrimEnd());
-                                if (matrix != null)
+                                item.DTEDef = xmlObjeto;
+                                dte = (DTEDefTypeDocumento)xmlObjeto.Item;
+                                references = dte.Referencia;
+                                if (references != null)
                                 {
-                                    item.Instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
+                                    reference = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                                    if (reference != null)
+                                    {
+                                        window = BillingWindow.GetBillingWindowByNaturalKey(reference);
+                                        if (window != null)
+                                        {
+                                            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                            ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == reference.RazonRef.TrimEnd());
+                                            if (matrix != null)
+                                            {
+                                                item.Instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                }               
+                
+               
                 // Flags         
                 item.Flag = ValidateCen(item);
                 // Events
-                DataEvento evento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
-                if (evento != null)
+                item.DataEvento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
+                // Status
+                if (item.DataEvento != null)
                 {
                     item.StatusDetalle = GetStatus(item);
-                    if (item.StatusDetalle != StatusDetalle.No && item.Instruction != null)
-                    {
-                        // Get dte from CEN
-                        ResultDte doc = Dte.GetDteByFolio(item, false);
-                        if (doc == null)
-                        {
-                            doc = Dte.SendDteDebtor(item, TokenCen);
-                        }
-                        item.Instruction.Dte = doc;
-                    }
-                    item.DataEvento = evento;
                 }
-
-
-                c++;
-                //item.Nro = c;
+                // Insert CEN
+                if (item.StatusDetalle != StatusDetalle.No && item.Instruction != null)
+                {
+                    ResultDte doc = Dte.GetDteByFolio(item, false);
+                    if (doc == null)
+                    {
+                        doc = Dte.SendDteDebtor(item, TokenCen);
+                    }                   
+                    item.Instruction.Dte = doc;
+                }
+                c++;     
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
                 BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");
                 Thread.Sleep(100);
-            }
-            // Order the list
+            }   
             DetallesDebtor = DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
         }
         private void BgwDebtor_ProgressChanged(object sender, ProgressChangedEventArgs e)

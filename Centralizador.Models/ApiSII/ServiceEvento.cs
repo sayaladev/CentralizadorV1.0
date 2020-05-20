@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Centralizador.Models.ApiCEN;
+
+using Newtonsoft.Json;
+
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Windows.Forms;
-using Centralizador.Models.ApiCEN;
-
-using Newtonsoft.Json;
-using static Centralizador.Models.ApiSII.ServiceDetalle;
 
 namespace Centralizador.Models.ApiSII
 {
@@ -84,11 +83,7 @@ namespace Centralizador.Models.ApiSII
                     {
                         return detalleLibro.DataEvento;
                     }
-                }
-                else
-                {
-                    return null;
-                }                
+                }               
             }
             catch (WebException ex)
             {
@@ -96,7 +91,6 @@ namespace Centralizador.Models.ApiSII
             }
             finally
             {
-                
                 wc.Dispose();
             }
             return null;
