@@ -180,7 +180,7 @@ namespace Centralizador.Models.ApiCEN
                 case StatusDetalle.Accepted:
                     dte.AcceptanceStatus = 1;
                     break;
-                case StatusDetalle.Reclaimed:
+                case StatusDetalle.Rejected:
                     dte.AcceptanceStatus = 2;
                     break;
                 case StatusDetalle.No:

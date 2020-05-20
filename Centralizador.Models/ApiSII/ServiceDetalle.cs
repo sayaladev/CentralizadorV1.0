@@ -191,11 +191,10 @@ namespace Centralizador.Models.ApiSII
             Complete,
             Clear
         }
-
         public enum StatusDetalle
         {
             Accepted,
-            Reclaimed,
+            Rejected,
             No
 
         }
@@ -214,7 +213,7 @@ namespace Centralizador.Models.ApiSII
                 }
                 else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
                 {
-                    return StatusDetalle.Reclaimed;
+                    return StatusDetalle.Rejected;
                 }
                 else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
                 {

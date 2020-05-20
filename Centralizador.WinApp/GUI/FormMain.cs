@@ -55,8 +55,8 @@ namespace Centralizador.WinApp.GUI
         public int Intervalo { get; set; }
         public StringBuilder StringLogging { get; set; }
         public string DataBaseName { get; set; }
-        private BackgroundWorker BgwCenProcess { get; set; }
-
+        // Button
+        private readonly IGButtonColumnManager Btn = new IGButtonColumnManager();
 
 
         #endregion
@@ -149,6 +149,8 @@ namespace Centralizador.WinApp.GUI
             Intervalo = timer.Interval;
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
 
+
+
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -166,12 +168,10 @@ namespace Centralizador.WinApp.GUI
         }
         private void FormMain_Shown(object sender, EventArgs e)
         {
-            // frozen column will display row numbers.
+            IGridMain.BeginUpdate();
+            // Frozen columns.
             IGridMain.FrozenArea.ColCount = 3;
-            //IGridMain.FrozenArea.RowCount = 0;
             IGridMain.FrozenArea.ColsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
-            //IGridMain.FrozenArea.RowsEdge = new iGPenStyle(SystemColors.ControlDark, 2, DashStyle.Solid);
-
             // Set up the deafult parameters of the frozen columns.
             IGridMain.DefaultCol.AllowMoving = false;
             IGridMain.DefaultCol.IncludeInSelect = false;
@@ -181,9 +181,18 @@ namespace Centralizador.WinApp.GUI
             // Add the first frozen column.
             IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
             // Set up the width of the second frozen column (row numbers).
-            IGridMain.DefaultCol.Width = 30;
+            IGridMain.DefaultCol.Width = 25;
             // Add the second frozen column.
             IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.None;
+
+            // General options
+            IGridMain.GroupBox.Visible = true;
+            IGridMain.RowMode = true;
+            IGridMain.SelectionMode = iGSelectionMode.One;
+            IGridMain.DefaultRow.Height = 20;
+            IGridMain.Font = new Font("Microsoft Sans Serif", 7.5f);
+            IGridMain.ImageList = FListPics;
+            IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
 
             // Add data columns.
             // Pattern headers cols.
@@ -194,17 +203,16 @@ namespace Centralizador.WinApp.GUI
             //pattern.AllowMoving = false;
             pattern.AllowGrouping = true;
 
-
             // Info cols.
             iGCellStyle cellStyleCommon = new iGCellStyle
             {
                 TextAlign = iGContentAlignment.MiddleCenter
-
             };
             IGridMain.Cols.Add("folio", "F°", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("fechaEmision", "Emission", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("rut", "RUT", 63, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("rznsocial", "Name", 300, pattern).CellStyle = new iGCellStyle() { TextAlign = iGContentAlignment.MiddleCenter, Font = new Font("Microsoft Sans Serif", 8f) };
+            //Button see xml to pdf
             IGridMain.Cols.Add("flagxml", "", 20, pattern);
             IGridMain.Cols.Add("inst", "Instructions", 47, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("codProd", "Code", 35, pattern).CellStyle = cellStyleCommon;
@@ -238,21 +246,23 @@ namespace Centralizador.WinApp.GUI
 
             // Sii info.
             IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("status", "Status", 56, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("flagstatus", "", 70, pattern); // flag         
+            IGridMain.Cols.Add("status", "Status", 50, pattern).CellStyle = cellStyleCommon;
 
-            // General options
-            IGridMain.GroupBox.Visible = true;
-            IGridMain.RowMode = true;
-            IGridMain.SelectionMode = iGSelectionMode.One;
-            IGridMain.DefaultRow.Height = 20;
-            IGridMain.Font = new Font("Microsoft Sans Serif", 7.5f);
+            // Button Reject      
+            IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern).Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;                    
+         
+         
+            //IGridMain.Cols["btnRejected"].CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
+
+            //Btn.CellButtonClick += Bcm_CellButtonClick;
+            //Btn.CellButtonVisible += Bcm_CellButtonVisible;
+            //Btn.CellButtonTooltip += Bcm_CellButtonTooltip;
+
+
+
+            // Header & Footer
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
             IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
-            IGridMain.ImageList = FListPics;
-
-
-            // Footer
             IGridMain.Footer.Visible = true;
 
             // Footer freezer section
@@ -273,8 +283,24 @@ namespace Centralizador.WinApp.GUI
             IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.OnDemand;
             IGridMain.HScrollBar.Visibility = iGScrollBarVisibility.OnDemand;
 
-
+            IGridMain.EndUpdate();
         }
+
+        private void Bcm_CellButtonTooltip(object sender, IGButtonColumnManager.IGCellButtonTooltipEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void Bcm_CellButtonVisible(object sender, IGButtonColumnManager.IGCellButtonVisibleEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
+        {
+            MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
+        }
+
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex != 0)
@@ -668,7 +694,7 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-        #region Convert Pdf
+        #region Convert PDF
 
         private void BtnPdfConvert_Click(object sender, EventArgs e)
         {
@@ -777,7 +803,6 @@ namespace Centralizador.WinApp.GUI
                 //{
                 //    continue;
                 //}
-
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
                 Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
                 // REF from Softland          
@@ -814,6 +839,8 @@ namespace Centralizador.WinApp.GUI
                             doc = Dte.SendDteCreditor(detalle, TokenCen);
                         }
                         detalle.Instruction.Dte = doc;
+                        // Status
+                        detalle.StatusDetalle = GetStatus(detalle);
                     }
                     if (reference.FechaEmision != null)
                     {
@@ -875,7 +902,7 @@ namespace Centralizador.WinApp.GUI
             string nameFile = "";
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
-            {               
+            {
                 DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
@@ -898,8 +925,8 @@ namespace Centralizador.WinApp.GUI
                     {
                         // Find Instruction by amount
                         IList<ResultInstruction> i = instructions.Where(x => x.Amount == item.MntNeto).ToList();
-                        if (i.Count == 1) 
-                        {                           
+                        if (i.Count == 1)
+                        {
                             item.Instruction = i[0];
                             item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixById(i[0]);
                             item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowById(item.Instruction.PaymentMatrix);
@@ -931,9 +958,9 @@ namespace Centralizador.WinApp.GUI
                             }
                         }
                     }
-                }               
-                
-               
+                }
+
+
                 // Flags         
                 item.Flag = ValidateCen(item);
                 // Events
@@ -950,14 +977,14 @@ namespace Centralizador.WinApp.GUI
                     if (doc == null)
                     {
                         doc = Dte.SendDteDebtor(item, TokenCen);
-                    }                   
+                    }
                     item.Instruction.Dte = doc;
                 }
-                c++;     
+                c++;
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
                 BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");
                 Thread.Sleep(100);
-            }   
+            }
             DetallesDebtor = DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
         }
         private void BgwDebtor_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -1007,7 +1034,6 @@ namespace Centralizador.WinApp.GUI
                     if (item.Folio > 0) { myRow.Cells["folio"].Value = item.Folio; }
                     if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision)); }
                     if (item.FechaRecepcion != null) { myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)); }
-                    if (item.DataEvento != null) { myRow.Cells["status"].Value = GetStatus(item); }
                     if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
                     if (IsCreditor)
                     {
@@ -1029,28 +1055,23 @@ namespace Centralizador.WinApp.GUI
                             {
                                 myRow.Cells["P3"].Value = 1;
                             }
-
                         }
-                    }
+                    }                  
+
                     // Flags                    
                     myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.Flag);
                     myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.Flag);
                     // Status
-                    myRow.Cells["flagRef"].Value = item.StatusDetalle;
-                    //switch (item.StatusDetalle)
-                    //{
-                    //    case StatusDetalle.Accepted:
-
-                    //        break;
-                    //    case StatusDetalle.Reclaimed:
-                    //        break;
-                    //    case StatusDetalle.No:
-                    //        break;
-                    //    default:
-                    //        break;
-                    //}
+                    myRow.Cells["status"].Value = item.StatusDetalle;
+                    // Button Reject   
+                    if (item.StatusDetalle != StatusDetalle.No)
+                    {
+                        myRow.Cells["btnRejected"].Enabled = iGBool.False;
+                    }
                 }
-                IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
+                // Finally
+                IGridMain.Cols["btnRejected"].ImageIndex = 6;
+                Btn.Attach(IGridMain);
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
             }
             catch (Exception)
@@ -1059,11 +1080,12 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
-                //IGridMain.ReadOnly = true;               
+            
+               
                 IGridMain.EndUpdate();
                 IGridMain.Focus();
             }
-        }
+        }      
         private void CleanControls()
         {
             TssLblMensaje.Text = "";
@@ -1113,7 +1135,6 @@ namespace Centralizador.WinApp.GUI
         }
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
-            //IGridMain.CurRow.Cells["flagRef"].Col.IncludeInSelect = false;  INTENTAR NO PINTAR LA CELDA CON PICS.
             if (IGridMain.CurRow == null)
             {
                 return;
@@ -1160,10 +1181,6 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
-        private void IGridMain_ColDividerDoubleClick(object sender, iGColDividerDoubleClickEventArgs e)
-        {
-            TssLblMensaje.Text = IGridMain.Cols[e.ColIndex].Width.ToString();
-        }
         private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
         {
             if (!IsRunning)
@@ -1180,7 +1197,10 @@ namespace Centralizador.WinApp.GUI
                 }
                 if (detalle.DTEDef != null)
                 {
+                    IGridMain.DrawAsFocused = true;
                     ServicePdf.ConvertToPdf(detalle);
+                    IGridMain.Focus();
+                    IGridMain.DrawAsFocused = false;
                 }
             }
         }
@@ -1218,6 +1238,37 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
+        private void IGridMain_CustomDrawCellEllipsisButtonForeground(object sender, iGCustomDrawEllipsisButtonEventArgs e)
+        {
+            if (e.ColIndex == 6)
+            {
+                // Determine the colors of the background
+                Color myColor1, myColor2;
+                switch (e.State)
+                {
+                    case iGControlState.Pressed:
+                        myColor1 = SystemColors.ControlDark;
+                        myColor2 = SystemColors.ControlLightLight;
+                        break;
+                    case iGControlState.Hot:
+                        myColor1 = SystemColors.ControlLightLight;
+                        myColor2 = SystemColors.ControlDark;
+                        break;
+                    default:
+                        myColor1 = SystemColors.ControlLightLight;
+                        myColor2 = SystemColors.Control;
+                        break;
+                }
+                //Draw the background
+                LinearGradientBrush myBrush = new LinearGradientBrush(e.Bounds, myColor1, myColor2, 45);
+                e.Graphics.FillRectangle(myBrush, e.Bounds);
+                e.Graphics.DrawRectangle(SystemPens.ControlDark, e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1);
+                //Notify the grid that the foreground has been drawn, and there is no need to draw it
+                //e.DoDefault = false;
+            }
+        }
+
+
         #endregion
 
         #region Outlook
@@ -1312,9 +1363,14 @@ namespace Centralizador.WinApp.GUI
             }
 
         }
+
+
+
+
         #endregion
 
-
+       
+       
     }
 }
 

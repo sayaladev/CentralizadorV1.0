@@ -53,7 +53,6 @@
             this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
             this.BtnInsertNv = new System.Windows.Forms.Button();
             this.BtnOutlook = new System.Windows.Forms.Button();
-            this.BtnRechazar = new System.Windows.Forms.Button();
             this.ChkIncludeReclaimed = new System.Windows.Forms.CheckBox();
             this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnInsertRef = new System.Windows.Forms.Button();
@@ -119,6 +118,7 @@
             // SplitContainer
             // 
             this.SplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitContainer.IsSplitterFixed = true;
             this.SplitContainer.Location = new System.Drawing.Point(0, 0);
             this.SplitContainer.Name = "SplitContainer";
             // 
@@ -135,7 +135,7 @@
             this.SplitContainer.Panel2.Controls.Add(this.groupBox2);
             this.SplitContainer.Panel2.Controls.Add(this.GroupBox1);
             this.SplitContainer.Size = new System.Drawing.Size(1350, 707);
-            this.SplitContainer.SplitterDistance = 1087;
+            this.SplitContainer.SplitterDistance = 1112;
             this.SplitContainer.TabIndex = 1;
             // 
             // FpicBoxSearch
@@ -155,11 +155,11 @@
             this.IGridMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
-            this.IGridMain.Size = new System.Drawing.Size(1087, 707);
+            this.IGridMain.Size = new System.Drawing.Size(1112, 707);
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
+            this.IGridMain.CustomDrawCellEllipsisButtonForeground += new TenTec.Windows.iGridLib.iGCustomDrawEllipsisButtonEventHandler(this.IGridMain_CustomDrawCellEllipsisButtonForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
-            this.IGridMain.ColDividerDoubleClick += new TenTec.Windows.iGridLib.iGColDividerDoubleClickEventHandler(this.IGridMain_ColDividerDoubleClick);
             this.IGridMain.CellEllipsisButtonClick += new TenTec.Windows.iGridLib.iGEllipsisButtonClickEventHandler(this.IGridMain_CellEllipsisButtonClick);
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             this.IGridMain.RequestCellToolTipText += new TenTec.Windows.iGridLib.iGRequestCellToolTipTextEventHandler(this.IGridMain_RequestCellToolTipText);
@@ -167,7 +167,7 @@
             // BtnExcelConvert
             // 
             this.BtnExcelConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnExcelConvert.Image")));
-            this.BtnExcelConvert.Location = new System.Drawing.Point(136, 647);
+            this.BtnExcelConvert.Location = new System.Drawing.Point(124, 647);
             this.BtnExcelConvert.Name = "BtnExcelConvert";
             this.BtnExcelConvert.Size = new System.Drawing.Size(73, 46);
             this.BtnExcelConvert.TabIndex = 8;
@@ -175,15 +175,17 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.TxtTpoDocRef);
             this.groupBox4.Controls.Add(this.TxtFmaPago);
             this.groupBox4.Controls.Add(this.TxtDscItem);
             this.groupBox4.Controls.Add(this.TxtRznRef);
             this.groupBox4.Controls.Add(this.TxtFolioRef);
             this.groupBox4.Controls.Add(this.TxtNmbItem);
-            this.groupBox4.Location = new System.Drawing.Point(13, 184);
+            this.groupBox4.Location = new System.Drawing.Point(2, 184);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(234, 173);
+            this.groupBox4.Size = new System.Drawing.Size(231, 173);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "INVOICE INFO:";
@@ -191,7 +193,7 @@
             // TxtTpoDocRef
             // 
             this.TxtTpoDocRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtTpoDocRef.Location = new System.Drawing.Point(6, 100);
+            this.TxtTpoDocRef.Location = new System.Drawing.Point(10, 100);
             this.TxtTpoDocRef.Name = "TxtTpoDocRef";
             this.TxtTpoDocRef.ReadOnly = true;
             this.TxtTpoDocRef.Size = new System.Drawing.Size(31, 18);
@@ -200,7 +202,7 @@
             // TxtFmaPago
             // 
             this.TxtFmaPago.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFmaPago.Location = new System.Drawing.Point(45, 100);
+            this.TxtFmaPago.Location = new System.Drawing.Point(44, 100);
             this.TxtFmaPago.Name = "TxtFmaPago";
             this.TxtFmaPago.ReadOnly = true;
             this.TxtFmaPago.Size = new System.Drawing.Size(70, 18);
@@ -210,11 +212,11 @@
             // TxtDscItem
             // 
             this.TxtDscItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDscItem.Location = new System.Drawing.Point(6, 124);
+            this.TxtDscItem.Location = new System.Drawing.Point(10, 124);
             this.TxtDscItem.Multiline = true;
             this.TxtDscItem.Name = "TxtDscItem";
             this.TxtDscItem.ReadOnly = true;
-            this.TxtDscItem.Size = new System.Drawing.Size(222, 36);
+            this.TxtDscItem.Size = new System.Drawing.Size(214, 36);
             this.TxtDscItem.TabIndex = 10;
             // 
             // TxtRznRef
@@ -229,7 +231,7 @@
             // TxtFolioRef
             // 
             this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFolioRef.Location = new System.Drawing.Point(121, 100);
+            this.TxtFolioRef.Location = new System.Drawing.Point(117, 100);
             this.TxtFolioRef.Name = "TxtFolioRef";
             this.TxtFolioRef.ReadOnly = true;
             this.TxtFolioRef.Size = new System.Drawing.Size(107, 18);
@@ -238,18 +240,18 @@
             // TxtNmbItem
             // 
             this.TxtNmbItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtNmbItem.Location = new System.Drawing.Point(6, 19);
+            this.TxtNmbItem.Location = new System.Drawing.Point(10, 19);
             this.TxtNmbItem.Multiline = true;
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
             this.TxtNmbItem.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TxtNmbItem.Size = new System.Drawing.Size(222, 51);
+            this.TxtNmbItem.Size = new System.Drawing.Size(214, 51);
             this.TxtNmbItem.TabIndex = 1;
             // 
             // BtnPdfConvert
             // 
             this.BtnPdfConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnPdfConvert.Image")));
-            this.BtnPdfConvert.Location = new System.Drawing.Point(50, 647);
+            this.BtnPdfConvert.Location = new System.Drawing.Point(38, 647);
             this.BtnPdfConvert.Name = "BtnPdfConvert";
             this.BtnPdfConvert.Size = new System.Drawing.Size(73, 46);
             this.BtnPdfConvert.TabIndex = 4;
@@ -258,17 +260,18 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
             this.groupBox2.Controls.Add(this.TxtDateTimeEmail);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
             this.groupBox2.Controls.Add(this.BtnOutlook);
-            this.groupBox2.Controls.Add(this.BtnRechazar);
             this.groupBox2.Controls.Add(this.ChkIncludeReclaimed);
             this.groupBox2.Controls.Add(this.BtnPagar);
             this.groupBox2.Controls.Add(this.BtnInsertRef);
-            this.groupBox2.Location = new System.Drawing.Point(13, 363);
+            this.groupBox2.Location = new System.Drawing.Point(2, 363);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(234, 264);
+            this.groupBox2.Size = new System.Drawing.Size(231, 264);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
@@ -302,17 +305,6 @@
             this.BtnOutlook.UseVisualStyleBackColor = true;
             this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
             // 
-            // BtnRechazar
-            // 
-            this.BtnRechazar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.BtnRechazar.Location = new System.Drawing.Point(21, 124);
-            this.BtnRechazar.Name = "BtnRechazar";
-            this.BtnRechazar.Size = new System.Drawing.Size(84, 38);
-            this.BtnRechazar.TabIndex = 7;
-            this.BtnRechazar.Text = "Rechazar";
-            this.BtnRechazar.UseVisualStyleBackColor = false;
-            this.BtnRechazar.Click += new System.EventHandler(this.BtnRechazar_Click);
-            // 
             // ChkIncludeReclaimed
             // 
             this.ChkIncludeReclaimed.AutoSize = true;
@@ -326,9 +318,9 @@
             // BtnPagar
             // 
             this.BtnPagar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.BtnPagar.Location = new System.Drawing.Point(111, 155);
+            this.BtnPagar.Location = new System.Drawing.Point(59, 144);
             this.BtnPagar.Name = "BtnPagar";
-            this.BtnPagar.Size = new System.Drawing.Size(84, 38);
+            this.BtnPagar.Size = new System.Drawing.Size(112, 38);
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = false;
@@ -337,9 +329,9 @@
             // BtnInsertRef
             // 
             this.BtnInsertRef.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.BtnInsertRef.Location = new System.Drawing.Point(21, 63);
+            this.BtnInsertRef.Location = new System.Drawing.Point(59, 82);
             this.BtnInsertRef.Name = "BtnInsertRef";
-            this.BtnInsertRef.Size = new System.Drawing.Size(84, 38);
+            this.BtnInsertRef.Size = new System.Drawing.Size(112, 38);
             this.BtnInsertRef.TabIndex = 8;
             this.BtnInsertRef.Text = "Insert References";
             this.BtnInsertRef.UseVisualStyleBackColor = false;
@@ -347,6 +339,8 @@
             // 
             // GroupBox1
             // 
+            this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.GroupBox1.Controls.Add(this.TxtCtaCteParticipant);
             this.GroupBox1.Controls.Add(this.TxtRutParticipant);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
@@ -354,7 +348,7 @@
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
             this.GroupBox1.Controls.Add(this.BtnDebtor);
-            this.GroupBox1.Location = new System.Drawing.Point(13, 12);
+            this.GroupBox1.Location = new System.Drawing.Point(0, 12);
             this.GroupBox1.Name = "GroupBox1";
             this.GroupBox1.Size = new System.Drawing.Size(234, 166);
             this.GroupBox1.TabIndex = 0;
@@ -363,7 +357,7 @@
             // TxtCtaCteParticipant
             // 
             this.TxtCtaCteParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtCtaCteParticipant.Location = new System.Drawing.Point(121, 73);
+            this.TxtCtaCteParticipant.Location = new System.Drawing.Point(118, 73);
             this.TxtCtaCteParticipant.Name = "TxtCtaCteParticipant";
             this.TxtCtaCteParticipant.ReadOnly = true;
             this.TxtCtaCteParticipant.Size = new System.Drawing.Size(106, 21);
@@ -373,7 +367,7 @@
             // TxtRutParticipant
             // 
             this.TxtRutParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRutParticipant.Location = new System.Drawing.Point(8, 73);
+            this.TxtRutParticipant.Location = new System.Drawing.Point(10, 73);
             this.TxtRutParticipant.Name = "TxtRutParticipant";
             this.TxtRutParticipant.ReadOnly = true;
             this.TxtRutParticipant.Size = new System.Drawing.Size(104, 21);
@@ -382,7 +376,7 @@
             // 
             // BtnCreditor
             // 
-            this.BtnCreditor.Location = new System.Drawing.Point(8, 99);
+            this.BtnCreditor.Location = new System.Drawing.Point(10, 99);
             this.BtnCreditor.Name = "BtnCreditor";
             this.BtnCreditor.Size = new System.Drawing.Size(97, 51);
             this.BtnCreditor.TabIndex = 4;
@@ -395,9 +389,9 @@
             this.CboParticipants.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboParticipants.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboParticipants.FormattingEnabled = true;
-            this.CboParticipants.Location = new System.Drawing.Point(8, 46);
+            this.CboParticipants.Location = new System.Drawing.Point(10, 46);
             this.CboParticipants.Name = "CboParticipants";
-            this.CboParticipants.Size = new System.Drawing.Size(220, 23);
+            this.CboParticipants.Size = new System.Drawing.Size(214, 23);
             this.CboParticipants.TabIndex = 0;
             this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
             // 
@@ -406,7 +400,7 @@
             this.CboYears.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboYears.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboYears.FormattingEnabled = true;
-            this.CboYears.Location = new System.Drawing.Point(150, 19);
+            this.CboYears.Location = new System.Drawing.Point(136, 19);
             this.CboYears.Name = "CboYears";
             this.CboYears.Size = new System.Drawing.Size(78, 23);
             this.CboYears.TabIndex = 3;
@@ -416,14 +410,14 @@
             this.CboMonths.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboMonths.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboMonths.FormattingEnabled = true;
-            this.CboMonths.Location = new System.Drawing.Point(8, 19);
+            this.CboMonths.Location = new System.Drawing.Point(20, 19);
             this.CboMonths.Name = "CboMonths";
-            this.CboMonths.Size = new System.Drawing.Size(114, 23);
+            this.CboMonths.Size = new System.Drawing.Size(107, 23);
             this.CboMonths.TabIndex = 2;
             // 
             // BtnDebtor
             // 
-            this.BtnDebtor.Location = new System.Drawing.Point(130, 99);
+            this.BtnDebtor.Location = new System.Drawing.Point(127, 99);
             this.BtnDebtor.Name = "BtnDebtor";
             this.BtnDebtor.Size = new System.Drawing.Size(97, 51);
             this.BtnDebtor.TabIndex = 5;
@@ -509,7 +503,6 @@
         private System.Windows.Forms.TextBox TxtRznRef;
         private System.Windows.Forms.TextBox TxtFolioRef;
         private System.Windows.Forms.Button BtnInsertRef;
-        private System.Windows.Forms.Button BtnRechazar;
         private System.Windows.Forms.Button BtnPagar;
         private System.Windows.Forms.TextBox TxtCtaCteParticipant;
         private System.Windows.Forms.TextBox TxtRutParticipant;
