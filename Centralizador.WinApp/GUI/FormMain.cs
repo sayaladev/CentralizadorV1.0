@@ -1,4 +1,10 @@
-﻿using System;
+﻿using Centralizador.Models.ApiCEN;
+using Centralizador.Models.ApiSII;
+using Centralizador.Models.AppFunctions;
+using Centralizador.Models.DataBase;
+using Centralizador.Models.Outlook;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,14 +18,9 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 
-using Centralizador.Models.ApiCEN;
-using Centralizador.Models.ApiSII;
-using Centralizador.Models.AppFunctions;
-using Centralizador.Models.DataBase;
-using Centralizador.Models.Outlook;
-using Centralizador.Models.registroreclamodteservice;
-
 using TenTec.Windows.iGridLib;
+
+using static Centralizador.Models.ApiSII.ServiceDetalle;
 
 using Timer = System.Windows.Forms.Timer;
 
@@ -149,9 +150,6 @@ namespace Centralizador.WinApp.GUI
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
 
         }
-
-
-
         private void Timer_Tick(object sender, EventArgs e)
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
@@ -787,13 +785,12 @@ namespace Centralizador.WinApp.GUI
 
                 Detalle detalle = new Detalle();
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
-                //instruction.ParticipantCreditor = UserParticipant;
                 detalle.Instruction = instruction;
                 detalle.MntNeto = instruction.Amount;
                 detalle.RutReceptor = instruction.ParticipantDebtor.Rut;
                 detalle.DvReceptor = instruction.ParticipantDebtor.VerificationCode;
                 detalle.RznSocRecep = instruction.ParticipantDebtor.BusinessName;
-                detalle.IsParticipant = true;
+                detalle.IsParticipant = true; // Always True
 
                 // Mapping references Softland
                 IList<Reference> references = Reference.GetInfoFactura(instruction, con);
@@ -826,27 +823,15 @@ namespace Centralizador.WinApp.GUI
                         {
                             detalle.DataEvento = evento;
                         }
-
+                        // Flags         
+                        detalle.Flag = ValidateCen(detalle);
                         // Get dte from CEN
-                        ResultDte dte = Dte.GetDteByFolio(detalle);
-                        if (dte == null)
+                        ResultDte doc = Dte.GetDteByFolio(detalle, true);
+                        if (doc == null)
                         {
-                            // Insert to CEN
-                            dte = new ResultDte
-                            {
-                                Folio = detalle.Folio,
-                                GrossAmount = detalle.MntTotal,
-                                Instruction = detalle.Instruction.Id,
-                                NetAmount = detalle.MntNeto,
-                                ReportedByCreditor = true,
-                                TypeSiiCode = 33,
-                                EmissionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaEmision)),
-                                ReceptionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaRecepcion))
-                            };
-                            string docXml = detalle.References.FileBasico;
-                            dte = Dte.SendDte(dte, TokenCen, docXml);
-                        }                        
-                        detalle.Instruction.Dte = dte;
+                            doc = Dte.SendDteCreditor(detalle, TokenCen);
+                        }
+                        detalle.Instruction.Dte = doc;
                     }
                     if (reference.FechaEmision != null)
                     {
@@ -854,7 +839,6 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
                 c++;
-                //detalle.Nro = c;
                 DetallesCreditor.Add(detalle);
                 porcent = (float)(100 * c) / instructions.Count;
                 BgwCreditor.ReportProgress((int)porcent, $"Retrieve information Creditor, wait please. ({c}/{instructions.Count})");
@@ -918,80 +902,74 @@ namespace Centralizador.WinApp.GUI
                     IList<ResultInstruction> instructions = Instruction.GetInstructionByParticipants(participant, UserParticipant);
                     if (instructions != null)
                     {
+                        // Find Instruction by amount
                         IList<ResultInstruction> i = instructions.Where(x => x.Amount == item.MntNeto).ToList();
-                        if (i.Count == 1)
+                        if (i.Count == 1) // ************* Y SI SON MAS DE 1?
                         {
-                            item.IsParticipant = true;
                             item.Instruction = i[0];
                             item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixById(i[0]);
                             item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowById(item.Instruction.PaymentMatrix);
                         }
                     }
                 }
+                // XML file in folder
+                DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
+                DTEDefTypeDocumentoReferencia reference = null;
+                ResultBillingWindow window = null;
                 if (File.Exists(nameFile))
-                {   // Deserialize  
-                    DTEDefType xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
-                    if (xmlObjeto == null)
-                    {
-                        continue;
-                    }
+                {
+                    xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
+                }
+                if (xmlObjeto != null)
+                {
                     item.DTEDef = xmlObjeto;
                     dte = (DTEDefTypeDocumento)xmlObjeto.Item;
-                    if (dte != null)
-                    {
-                        if (dte.Referencia != null)
-                        {
-                            references = dte.Referencia;
-                        }
-                    }
+                    references = dte.Referencia;
                     if (references != null)
                     {
-                        DTEDefTypeDocumentoReferencia r = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                        if (r != null)
+                        reference = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                        if (reference != null)
                         {
-                            string rznRef = "";
-                            ResultBillingWindow window = null;
-                            if (r.RazonRef != null)
+                            window = BillingWindow.GetBillingWindowByNaturalKey(reference);
+                            if (window != null)
                             {
-                                // Controlling lower & upper
-                                string r1 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']') + 1).TrimStart();
-                                string r2 = r.RazonRef.Substring(0, r.RazonRef.IndexOf(']', r.RazonRef.IndexOf(']') + 1) + 1);
-                                r2 = r2.Substring(r2.IndexOf(']') + 1);
-                                string r3 = r.RazonRef.Substring(r1.Length + r2.Length).TrimEnd();
-                                TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-                                rznRef = ti.ToTitleCase(r2.ToLower());
-                                window = BillingWindow.GetBillingWindowByNaturalKey(r1 + rznRef);
-                                if (window != null)
+                                IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
+                                ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == reference.RazonRef.TrimEnd());
+                                if (matrix != null)
                                 {
-                                    // Get the asociated matrix  
-                                    IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowId(window);
-                                    ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == r1 + rznRef + r3);
-                                    if (matrix != null)
-                                    {
-                                        // Get the instruction
-                                        ResultInstruction instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
-                                        if (instruction != null)
-                                        {
-                                            item.Instruction = instruction;
-                                        }
-                                    }
+                                    item.Instruction = Instruction.GetInstructionDebtor(matrix, participant, UserParticipant);
                                 }
                             }
                         }
                     }
                 }
-                // Sii
+                // Flags         
+                item.Flag = ValidateCen(item);
+                // Events
                 DataEvento evento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
                 if (evento != null)
                 {
+                    item.StatusDetalle = GetStatus(item);
+                    if (item.StatusDetalle != StatusDetalle.No && item.Instruction != null)
+                    {
+                        // Get dte from CEN
+                        ResultDte doc = Dte.GetDteByFolio(item, false);
+                        if (doc == null)
+                        {
+                            doc = Dte.SendDteDebtor(item, TokenCen);
+                        }
+                        item.Instruction.Dte = doc;
+                    }
                     item.DataEvento = evento;
                 }
+
+
                 c++;
                 //item.Nro = c;
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
-                BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");                
+                BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");
                 Thread.Sleep(100);
             }
             // Order the list
@@ -1023,6 +1001,7 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Rows.Clear();
                 iGRow myRow;
                 int c = 0;
+                TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
                 foreach (Detalle item in detalles)
                 {
                     myRow = IGridMain.Rows.Add();
@@ -1035,60 +1014,20 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["codProd"].Value = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     }
                     myRow.Cells["rut"].Value = item.RutReceptor + "-" + item.DvReceptor;
-                    TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
                     myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
                     myRow.Cells["neto"].Value = item.MntNeto;
                     myRow.Cells["exento"].Value = item.MntExento;
                     myRow.Cells["iva"].Value = item.MntIva;
                     myRow.Cells["total"].Value = item.MntTotal;
-                    if (item.Folio > 0)
-                    {
-                        myRow.Cells["folio"].Value = item.Folio;
-                    }
-
-
-                    if (item.FechaEmision != null)
-                    {
-                        myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision));
-                    }
-
-                    if (item.FechaRecepcion != null)
-                    {
-                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion));
-                    }
-
-                    if (item.DataEvento != null)
-                    {
-                        if (item.DataEvento.MayorOchoDias)
-                        {
-                            myRow.Cells["status"].Value = "Accepted";
-                        }
-                        if (item.DataEvento.ListEvenHistDoc.Count > 0)
-                        {
-
-                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null)
-                            {
-                                myRow.Cells["status"].Value = "Accepted";
-                            }
-                            else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
-                            {
-                                myRow.Cells["status"].Value = "Reclaimed";
-                            }
-                            else if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
-                            {
-                                myRow.Cells["status"].Value = "Accepted";
-                            }
-                        }
-                    }
-                    if (item.DTEDef != null)
-                    {
-                        myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton;
-                    }
+                    if (item.Folio > 0) { myRow.Cells["folio"].Value = item.Folio; }
+                    if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision)); }
+                    if (item.FechaRecepcion != null) { myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)); }
+                    if (item.DataEvento != null) { myRow.Cells["status"].Value = GetStatus(item); }
+                    if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
                     if (IsCreditor)
                     {
                         myRow.Cells["P1"].Type = iGCellType.Check;
                         myRow.Cells["P2"].Type = iGCellType.Check;
-
                         if (item.Instruction.Dte != null)
                         {
                             myRow.Cells["P1"].Value = 1;
@@ -1101,24 +1040,36 @@ namespace Centralizador.WinApp.GUI
                         {
                             myRow.Cells["P3"].Type = iGCellType.Check;
                             myRow.Cells["P4"].Type = iGCellType.Check;
-                        }
+                            if (item.Instruction != null && item.Instruction.Dte != null)
+                            {
+                                myRow.Cells["P3"].Value = 1;
+                            }
 
+                        }
                     }
-                    // Flags
-                    LetterFlag myFlag = ValidateCen(item);
-                    myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(myFlag);
-                    myRow.Cells["flagRef"].BackColor = GetFlagBackColor(myFlag);
-                    if (myFlag == LetterFlag.Red)
-                    {
-                        item.IsRefCorrect = true; // True = bad ref
-                    }
+                    // Flags                    
+                    myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.Flag);
+                    myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.Flag);
+                    // Status
+                    myRow.Cells["flagRef"].Value = item.StatusDetalle;
+                    //switch (item.StatusDetalle)
+                    //{
+                    //    case StatusDetalle.Accepted:
+
+                    //        break;
+                    //    case StatusDetalle.Reclaimed:
+                    //        break;
+                    //    case StatusDetalle.No:
+                    //        break;
+                    //    default:
+                    //        break;
+                    //}
                 }
                 IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
             }
             catch (Exception)
             {
-
                 throw;
             }
             finally
@@ -1138,95 +1089,7 @@ namespace Centralizador.WinApp.GUI
             TxtDscItem.Text = "";
             TxtTpoDocRef.Text = "";
         }
-        public enum LetterFlag
-        {
-            Red,
-            Blue,
-            Yellow,
-            Green,
-            Complete,
-            Clear
-        }
-        private int GetFlagImageIndex(LetterFlag flag)
-        {
-            switch (flag)
-            {
-                case LetterFlag.Red:
-                    return 11;
-                case LetterFlag.Blue:
-                    return 12;
-                case LetterFlag.Yellow:
-                    return 13;
-                case LetterFlag.Green:
-                    return 14;
-                case LetterFlag.Complete:
-                    return 15;
-                default:
-                    return 16;
-            }
-        }
-        private Color GetFlagBackColor(LetterFlag flag)
-        {
-            switch (flag)
-            {
-                case LetterFlag.Red:
-                    return Color.FromArgb(207, 93, 96);
-                case LetterFlag.Blue:
-                    return Color.FromArgb(92, 131, 180);
-                case LetterFlag.Yellow:
-                    return Color.FromArgb(255, 193, 96);
-                case LetterFlag.Green:
-                    return Color.FromArgb(139, 180, 103);
-                case LetterFlag.Complete:
-                    return Color.White;
-                default:
-                    return Color.Empty;
-            }
-        }
-        private LetterFlag ValidateCen(Detalle detalle)
-        {
-            if (detalle.IsParticipant)
-            {
-                if (detalle.DTEDef != null && detalle.Instruction != null)
-                {
-                    DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-                    if (dte.Referencia != null)
-                    {
-                        DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                        if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
-                        {
-                            return LetterFlag.Red;
-                        }
-                        else if (referencia == null)
-                        {
-                            return LetterFlag.Red;
-                        }
-                        else if (referencia.FolioRef != detalle.Instruction.PaymentMatrix.ReferenceCode)
-                        {
-                            return LetterFlag.Red;
-                        }
-                        else if (referencia.RazonRef != detalle.Instruction.PaymentMatrix.NaturalKey)
-                        {
-                            return LetterFlag.Red;
-                        }
-                        else if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
-                        {
-                            return LetterFlag.Red;
-                        }
-                        else if (dte.Detalle != null && dte.Detalle.Length == 1)
-                        {
-                            if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
-                            {
-                                return LetterFlag.Red;
-                            }
-                        }
-                        return LetterFlag.Green;
-                    }
-                }
-                return LetterFlag.Red;
-            }
-            return LetterFlag.Clear;
-        }
+
         #endregion
 
         #region IGridMain methods
@@ -1343,6 +1206,7 @@ namespace Centralizador.WinApp.GUI
                 if (e.ColIndex == 19)
                 {
                     Detalle detalle = null;
+                    StringBuilder builder = new StringBuilder();
                     if (IsCreditor)
                     {
                         detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
@@ -1355,17 +1219,16 @@ namespace Centralizador.WinApp.GUI
                     {
                         if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
                         {
+                            builder.Append("Events:" + Environment.NewLine);
                             foreach (ListEvenHistDoc item in detalle.DataEvento.ListEvenHistDoc)
                             {
-                                //DateTime fechaRecepcion = Convert.ToDateTime(item.FechaEvento, CultureInfo);
-                                //myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", fechaRecepcion);
+                                builder.Append($"{string.Format(CultureInfo, "{0:dd-MM-yyyy}", Convert.ToDateTime(item.FechaEvento))}");
+                                builder.Append($" - {item.CodEvento}: {item.DescEvento}" + Environment.NewLine);
 
-                                e.Text = $"Events:{Environment.NewLine}";
-                                e.Text += $"{string.Format(CultureInfo, "{0:dd-MM-yyyy}", Convert.ToDateTime(item.FechaEvento))} - {item.CodEvento}: {item.DescEvento}{Environment.NewLine}";
                             }
-
-
+                            e.Text = builder.ToString();
                         }
+
                     }
                 }
             }
@@ -1444,20 +1307,20 @@ namespace Centralizador.WinApp.GUI
                 {
                     if (!item.DataEvento.MayorOchoDias)
                     {
-                        if (item.IsRefCorrect)
-                        {
-                            respuestaTo result = ServiceSoap.SendActionToSii(TokenSii, item, "RCD");
-                            if (result.codResp == 0)
-                            {
-                                // Log Yes
-                                // Insert in CEN paso 3 y 4
-                            }
-                            else
-                            {
-                                // Log No
-                            }
+                        //if (item.IsRefCorrect)
+                        //{
+                        //    respuestaTo result = ServiceSoap.SendActionToSii(TokenSii, item, "RCD");
+                        //    if (result.codResp == 0)
+                        //    {
+                        //        // Log Yes
+                        //        // Insert in CEN paso 3 y 4
+                        //    }
+                        //    else
+                        //    {
+                        //        // Log No
+                        //    }
 
-                        }
+                        //}
 
                     }
                 }

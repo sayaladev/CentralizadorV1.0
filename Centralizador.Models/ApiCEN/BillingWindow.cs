@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
 {
@@ -50,7 +50,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="matrix"></param>
         /// <returns></returns>
         public static ResultBillingWindow GetBillingWindowById(ResultPaymentMatrix matrix) // GET
-        {          
+        {
             try
             {
                 WebClientCEN.WebClient.Headers.Clear();
@@ -69,7 +69,7 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }          
+            }
             return null;
         }
 
@@ -78,13 +78,21 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="naturalKey"></param>
         /// <returns></returns>
-        public static ResultBillingWindow GetBillingWindowByNaturalKey(string naturalKey)
+        public static ResultBillingWindow GetBillingWindowByNaturalKey(DTEDefTypeDocumentoReferencia referencia)
         {
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+
+            string r1 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']') + 1).TrimStart();
+            string r2 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']', referencia.RazonRef.IndexOf(']') + 1) + 1);
+            r2 = r2.Substring(r2.IndexOf(']') + 1);         
+
+            // Controlling lower & upper
+            string rznRef = ti.ToTitleCase(r2.ToLower());
             try
             {
                 WebClientCEN.WebClient.Headers.Clear();
                 WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?natural_key={naturalKey}");
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -97,7 +105,7 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }           
+            }
             return null;
         }
     }

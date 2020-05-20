@@ -1,14 +1,15 @@
 ﻿
+using Centralizador.Models.ApiSII;
+
+using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
-using Centralizador.Models.ApiSII;
-
-using Newtonsoft.Json;
+using static Centralizador.Models.ApiSII.ServiceDetalle;
 
 namespace Centralizador.Models.ApiCEN
 {
@@ -58,13 +59,13 @@ namespace Centralizador.Models.ApiCEN
         public object ReceptionErp { get; set; }
 
         [JsonProperty("acceptance_dt")]
-        public object AcceptanceDt { get; set; }
+        public string AcceptanceDt { get; set; }
 
         [JsonProperty("acceptance_erp")]
         public object AcceptanceErp { get; set; }
 
         [JsonProperty("acceptance_status")]
-        public object AcceptanceStatus { get; set; }
+        public byte AcceptanceStatus { get; set; }
 
         [JsonProperty("created_ts")]
         public DateTime CreatedTs { get; set; }
@@ -90,15 +91,15 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultDte> Results { get; set; }
 
-        public static ResultDte GetDteByFolio(Detalle detalle) // GET
-        {          
+        public static ResultDte GetDteByFolio(Detalle detalle, bool isCreditor) // GET
+        {
             try
             {
                 ResultInstruction i = detalle.Instruction;
                 // &type=1 (F 33)
                 WebClientCEN.WebClient.Headers.Clear();
                 WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/dtes/?reported_by_creditor=true&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}");
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}");
                 if (res != null)
                 {
                     Dte dte = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -111,18 +112,30 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }           
+            }
             return null;
         }
 
-        public static ResultDte SendDte(ResultDte dte, string tokenCen, string doc) // POST
+        public static ResultDte SendDteCreditor(Detalle detalle, string tokenCen) // POST
         {
-            string fileName = dte.Folio + "_" + dte.Instruction;
-            string idFile = SendFile(tokenCen, fileName, doc);
+            string fileName = detalle.Folio + "_" + detalle.Instruction;
+            string docXml = detalle.References.FileBasico;
+            string idFile = SendFile(tokenCen, fileName, docXml);
             if (!string.IsNullOrEmpty(idFile))
             {
-                dte.EmissionFile = idFile;
-
+                ResultDte dte = new ResultDte
+                {
+                    Folio = detalle.Folio,
+                    GrossAmount = detalle.MntTotal,
+                    Instruction = detalle.Instruction.Id,
+                    NetAmount = detalle.MntNeto,
+                    ReportedByCreditor = true,
+                    TypeSiiCode = 33,
+                    EmissionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaEmision)),
+                    ReceptionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaRecepcion)),
+                    EmissionFile = idFile
+            };
+          
                 try
                 {
                     string d = JsonConvert.SerializeObject(dte);
@@ -147,6 +160,66 @@ namespace Centralizador.Models.ApiCEN
                 {
                     return null;
                 }
+            }
+            return null;
+        }
+        public static ResultDte SendDteDebtor(Detalle detalle, string tokenCen) // POST
+        {
+            ResultDte dte = new ResultDte
+            {
+                Folio = detalle.Folio,
+                GrossAmount = detalle.MntTotal,
+                Instruction = detalle.Instruction.Id,
+                NetAmount = detalle.MntNeto,
+                ReportedByCreditor = false,
+                TypeSiiCode = 33,
+                AcceptanceDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaRecepcion))
+            };
+            switch (detalle.StatusDetalle)
+            {
+                case StatusDetalle.Accepted:
+                    dte.AcceptanceStatus = 1;
+                    break;
+                case StatusDetalle.Reclaimed:
+                    dte.AcceptanceStatus = 2;
+                    break;
+                case StatusDetalle.No:
+                    break;
+                default:
+                    break;
+            }
+            //switch (detalle.StatusDetalle) // Accept 1 / Reclaimed 2                       
+            //{
+            //    case LetterFlag.Green:
+            //        dte.AcceptanceStatus = 1;
+            //        break;
+            //    case LetterFlag.Red:
+            //        dte.AcceptanceStatus = 2;
+            //        break;
+            //}
+            try
+            {
+                string d = JsonConvert.SerializeObject(dte);
+                WebClientCEN.WebClient.Headers.Clear();
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                NameValueCollection postData = new NameValueCollection() { { "data", d } };
+
+                byte[] res = WebClientCEN.WebClient.UploadValues("api/v1/operations/dtes/create/", postData);
+                if (res != null)
+                {
+                    string json = Encoding.UTF8.GetString(res);
+                    InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+                    if (r != null)
+                    {
+                        return r.ResultDte;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
             }
             return null;
         }

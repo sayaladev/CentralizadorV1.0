@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Centralizador.Models.ApiCEN;
 
 using Newtonsoft.Json;
+using static Centralizador.Models.ApiSII.ServiceDetalle;
 
 namespace Centralizador.Models.ApiSII
 {

@@ -1,18 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Windows.Forms;
-
-using Centralizador.Models.ApiCEN;
+﻿using Centralizador.Models.ApiCEN;
 using Centralizador.Models.DataBase;
 
 using Newtonsoft.Json;
+
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Windows.Forms;
+using static Centralizador.Models.ApiSII.ServiceDetalle;
 
 namespace Centralizador.Models.ApiSII
 {
     public class ServiceDetalle
     {
-
         [JsonProperty("data")]
         public Data Data { get; set; }
 
@@ -24,8 +27,6 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
             Data = data;
         }
-
-
         public static IList<Detalle> GetLibro(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
         {
             string ns = "", url = "";
@@ -101,6 +102,127 @@ namespace Centralizador.Models.ApiSII
             }
             return null;
         }
+        public static int GetFlagImageIndex(LetterFlag flag)
+        {
+            switch (flag)
+            {
+                case LetterFlag.Red:
+                    return 11;
+                case LetterFlag.Blue:
+                    return 12;
+                case LetterFlag.Yellow:
+                    return 13;
+                case LetterFlag.Green:
+                    return 14;
+                case LetterFlag.Complete:
+                    return 15;
+                default:
+                    return 16;
+            }
+        }
+        public static Color GetFlagBackColor(LetterFlag flag)
+        {
+            switch (flag)
+            {
+                case LetterFlag.Red:
+                    return Color.FromArgb(207, 93, 96);
+                case LetterFlag.Blue:
+                    return Color.FromArgb(92, 131, 180);
+                case LetterFlag.Yellow:
+                    return Color.FromArgb(255, 193, 96);
+                case LetterFlag.Green:
+                    return Color.FromArgb(139, 180, 103);
+                case LetterFlag.Complete:
+                    return Color.White;
+                default:
+                    return Color.Empty;
+            }
+        }
+        public static LetterFlag ValidateCen(Detalle detalle)
+        {
+            if (detalle.IsParticipant)
+            {
+                if (detalle.DTEDef != null && detalle.Instruction != null)
+                {
+                    DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                    if (dte.Referencia != null)
+                    {
+                        DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                        if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (referencia == null)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (referencia.FolioRef != detalle.Instruction.PaymentMatrix.ReferenceCode)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (referencia.RazonRef != detalle.Instruction.PaymentMatrix.NaturalKey)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
+                        {
+                            return LetterFlag.Red;
+                        }
+                        else if (dte.Detalle != null && dte.Detalle.Length == 1)
+                        {
+                            if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
+                            {
+                                return LetterFlag.Red;
+                            }
+                        }
+                        return LetterFlag.Green;
+                    }
+                }
+                return LetterFlag.Red;
+            }
+            return LetterFlag.Clear;
+        }
+        public enum LetterFlag
+        {
+            Red,
+            Blue,
+            Yellow,
+            Green,
+            Complete,
+            Clear
+        }
+
+        public enum StatusDetalle
+        {
+            Accepted,
+            Reclaimed,
+            No
+
+        }
+
+        public static StatusDetalle GetStatus(Detalle detalle)
+        {
+            if (detalle.DataEvento.MayorOchoDias)
+            {
+                return StatusDetalle.Accepted;
+            }
+            if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
+            {
+                if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null)
+                {
+                    return StatusDetalle.Accepted;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
+                {
+                    return StatusDetalle.Reclaimed;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
+                {
+                    return StatusDetalle.Accepted;
+                }
+            }
+            return StatusDetalle.No;
+        }
     }
 
     public class Detalle
@@ -158,10 +280,12 @@ namespace Centralizador.Models.ApiSII
         public DTEDefType DTEDef { get; set; }
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }
-        public bool IsRefCorrect { get; set; } // Exigencias CEN si están correctas.
-       
+        public LetterFlag Flag { get; set; } // Exigencias CEN si están correctas.
+        public StatusDetalle StatusDetalle { get; set; }
+
 
     }
+
 
     public class DataResp
     {
