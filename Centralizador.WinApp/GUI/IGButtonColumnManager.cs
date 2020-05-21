@@ -229,7 +229,7 @@ namespace Centralizador.WinApp.GUI
 			if (IsButtonColumn(e.ColIndex) && IsCellButtonVisible(e.RowIndex, e.ColIndex))
 			{
 				iGCell myCell = fGrid.Cells[e.RowIndex, e.ColIndex];
-				myCell.ImageIndex = 6;
+				//myCell.ImageIndex = 6;
 				// Determine the button state.
 				PushButtonState myState;
 				switch (e.State)

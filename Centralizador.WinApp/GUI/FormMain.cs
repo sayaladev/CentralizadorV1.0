@@ -14,7 +14,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -156,7 +155,7 @@ namespace Centralizador.WinApp.GUI
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
             Intervalo += 60000;
-            if (Intervalo == 3600000)
+            if (Intervalo == 12720000)
             {
                 TokenSii = ServiceSoap.GETTokenFromSii();
                 if (ServiceOutlook != null)
@@ -185,14 +184,7 @@ namespace Centralizador.WinApp.GUI
             // Add the second frozen column.
             IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.None;
 
-            // General options
-            IGridMain.GroupBox.Visible = true;
-            IGridMain.RowMode = true;
-            IGridMain.SelectionMode = iGSelectionMode.One;
-            IGridMain.DefaultRow.Height = 20;
-            IGridMain.Font = new Font("Microsoft Sans Serif", 7.5f);
-            IGridMain.ImageList = FListPics;
-            IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
+
 
             // Add data columns.
             // Pattern headers cols.
@@ -249,16 +241,23 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Cols.Add("status", "Status", 50, pattern).CellStyle = cellStyleCommon;
 
             // Button Reject      
-            IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern).Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;                    
-         
-         
+            //IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern).Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
+            //Btn.Attach(IGridMain);
+
             //IGridMain.Cols["btnRejected"].CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
 
-            //Btn.CellButtonClick += Bcm_CellButtonClick;
+            Btn.CellButtonClick += Bcm_CellButtonClick;
             //Btn.CellButtonVisible += Bcm_CellButtonVisible;
             //Btn.CellButtonTooltip += Bcm_CellButtonTooltip;
 
-
+            // General options
+            IGridMain.GroupBox.Visible = true;
+            IGridMain.RowMode = true;
+            IGridMain.SelectionMode = iGSelectionMode.One;
+            IGridMain.DefaultRow.Height = 20;
+            IGridMain.Font = new Font("Microsoft Sans Serif", 7.5f);
+            IGridMain.ImageList = FListPics;
+            IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
 
             // Header & Footer
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
@@ -286,20 +285,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.EndUpdate();
         }
 
-        private void Bcm_CellButtonTooltip(object sender, IGButtonColumnManager.IGCellButtonTooltipEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
 
-        private void Bcm_CellButtonVisible(object sender, IGButtonColumnManager.IGCellButtonVisibleEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-
-        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
-        {
-            MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
-        }
 
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
@@ -914,6 +900,7 @@ namespace Centralizador.WinApp.GUI
                 if (File.Exists(nameFile))
                 {
                     xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
+                    item.DTEDef = xmlObjeto;
                 }
                 // Participant
                 ResultParticipant participant = Participant.GetParticipantByRut(item.RutReceptor.ToString());
@@ -934,8 +921,7 @@ namespace Centralizador.WinApp.GUI
                         else
                         {
                             if (xmlObjeto != null)
-                            {
-                                item.DTEDef = xmlObjeto;
+                            {                               
                                 dte = (DTEDefTypeDocumento)xmlObjeto.Item;
                                 references = dte.Referencia;
                                 if (references != null)
@@ -983,9 +969,10 @@ namespace Centralizador.WinApp.GUI
                 c++;
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
                 BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");
-                Thread.Sleep(100);
+                //Thread.Sleep(100);
             }
             DetallesDebtor = DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
+            //e.Result = true;
         }
         private void BgwDebtor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -1056,23 +1043,19 @@ namespace Centralizador.WinApp.GUI
                                 myRow.Cells["P3"].Value = 1;
                             }
                         }
-                    }                  
+                    }
 
                     // Flags                    
                     myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.Flag);
                     myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.Flag);
                     // Status
                     myRow.Cells["status"].Value = item.StatusDetalle;
-                    // Button Reject   
-                    if (item.StatusDetalle != StatusDetalle.No)
-                    {
-                        myRow.Cells["btnRejected"].Enabled = iGBool.False;
-                    }
+                   
                 }
                 // Finally
-                IGridMain.Cols["btnRejected"].ImageIndex = 6;
-                Btn.Attach(IGridMain);
+                //IGridMain.Cols["btnRejected"].ImageIndex = 6;
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
+
             }
             catch (Exception)
             {
@@ -1080,12 +1063,11 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
-            
-               
+
                 IGridMain.EndUpdate();
                 IGridMain.Focus();
             }
-        }      
+        }
         private void CleanControls()
         {
             TssLblMensaje.Text = "";
@@ -1267,7 +1249,10 @@ namespace Centralizador.WinApp.GUI
                 //e.DoDefault = false;
             }
         }
-
+        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
+        {
+            MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
+        }
 
         #endregion
 
@@ -1319,58 +1304,9 @@ namespace Centralizador.WinApp.GUI
         }
         #endregion
 
-        #region Rechazar
-        private void BtnRechazar_Click(object sender, EventArgs e)
-        {
-            if (IsRunning)
-            {
-                return;
-            }
-            if (IsCreditor || IGridMain.Rows.Count == 0)
-            {
-                TssLblMensaje.Text = "Plesase select Debtor!";
-                return;
-            }
-            if (CboParticipants.SelectedIndex == 0)
-            {
-                TssLblMensaje.Text = "Plesase select a Company!";
-                return;
-            }
-
-            foreach (Detalle item in DetallesDebtor)
-            {
-                if (item.DataEvento != null)
-                {
-                    if (!item.DataEvento.MayorOchoDias)
-                    {
-                        //if (item.IsRefCorrect)
-                        //{
-                        //    respuestaTo result = ServiceSoap.SendActionToSii(TokenSii, item, "RCD");
-                        //    if (result.codResp == 0)
-                        //    {
-                        //        // Log Yes
-                        //        // Insert in CEN paso 3 y 4
-                        //    }
-                        //    else
-                        //    {
-                        //        // Log No
-                        //    }
-
-                        //}
-
-                    }
-                }
-            }
-
-        }
 
 
 
-
-        #endregion
-
-       
-       
     }
 }
 

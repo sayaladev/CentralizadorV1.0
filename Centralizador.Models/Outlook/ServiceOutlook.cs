@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Centralizador.Models.AppFunctions;
+using Centralizador.Models.registroreclamodteservice;
+
+using EAGetMail;
+
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
-
-using Centralizador.Models.AppFunctions;
-using Centralizador.Models.registroreclamodteservice;
-
-using EAGetMail;
 
 namespace Centralizador.Models.Outlook
 {
@@ -28,7 +28,6 @@ namespace Centralizador.Models.Outlook
         {
             BackgroundWorker bgw = sender as BackgroundWorker;
             int c = 0;
-            float porcent = 0;
             MailServer oServer = new MailServer("outlook.office365.com", Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword, ServerProtocol.Imap4)
             {
                 SSLConnection = true,
@@ -40,14 +39,9 @@ namespace Centralizador.Models.Outlook
                 bgw.ReportProgress(0, "Trying to connect to the mail server...");
                 oClient.Connect(oServer);
                 oClient.GetMailInfosParam.Reset();
-                //oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.NewOnly;
-                //oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.DateRange;
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
-                //oClient.GetMailInfosParam.DateRange.SINCE = Properties.Settings.Default.DateTimeEmail;
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
                 MailInfo[] infos = oClient.GetMailInfos();
-                // MailInfo[] infoss = oClient.SearchMail($"ALL SINCE {Properties.Settings.Default.DateTimeEmail}");
-                //Properties.Settings.Default.Save();
                 string pathTemp = Directory.GetCurrentDirectory() + @"\temp";
                 if (!Directory.Exists(pathTemp))
                 {
@@ -59,6 +53,10 @@ namespace Centralizador.Models.Outlook
                     MailInfo info = infos[i];
                     Mail oMail = new Mail("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
                     oMail = oClient.GetMail(info);
+                    if (oMail.From.Address == Properties.Settings.Default.UserEmail)
+                    {
+                        continue;
+                    }
                     Attachment[] atts = oMail.Attachments;
                     foreach (Attachment att in atts)
                     {
@@ -68,7 +66,6 @@ namespace Centralizador.Models.Outlook
                             try
                             {
                                 XDocument xmlDocument;
-                                //XDocument xmlDocument = XDocument.Load(pathTemp + @"\" + att.Name);
                                 using (StreamReader oReader = new StreamReader(pathTemp + @"\" + att.Name, Encoding.GetEncoding("ISO-8859-1")))
                                 {
                                     xmlDocument = XDocument.Load(oReader);
@@ -92,7 +89,7 @@ namespace Centralizador.Models.Outlook
                     Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
                     Properties.Settings.Default.UIDRange = info.UIDL;
                     c++;
-                    porcent = (float)(100 * c) / infos.Length;
+                    float porcent = (float)(100 * c) / infos.Length;
                     bgw.ReportProgress((int)porcent, $"Dowloading email from server... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})");
                 }
             }
@@ -161,7 +158,7 @@ namespace Centralizador.Models.Outlook
                 Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder);
             }
             File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
-        }     
+        }
     }
 }
 
