@@ -1,10 +1,4 @@
-﻿using Centralizador.Models.ApiCEN;
-using Centralizador.Models.ApiSII;
-using Centralizador.Models.AppFunctions;
-using Centralizador.Models.DataBase;
-using Centralizador.Models.Outlook;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,11 +11,15 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
+using Centralizador.Models.ApiCEN;
+using Centralizador.Models.ApiSII;
+using Centralizador.Models.AppFunctions;
+using Centralizador.Models.DataBase;
+using Centralizador.Models.Outlook;
+
 using TenTec.Windows.iGridLib;
 
 using static Centralizador.Models.ApiSII.ServiceDetalle;
-
-using Timer = System.Windows.Forms.Timer;
 
 namespace Centralizador.WinApp.GUI
 {
@@ -138,33 +136,37 @@ namespace Centralizador.WinApp.GUI
             // Date Time Outlook
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
 
-            // Timer 1 hour = 3600 seconds (1000 = 1 second)            
-            Timer timer = new Timer
-            {
-                Enabled = true,
-                Interval = 60000
-            };
-            timer.Tick += Timer_Tick;
-            Intervalo = timer.Interval;
-            TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
+            // Timer Second (every minute)
+            System.Timers.Timer timerMinute = new System.Timers.Timer(1000);
+            timerMinute.Elapsed += TimerMinute_Elapsed;
+            timerMinute.Enabled = true;
+            timerMinute.AutoReset = true;
+
+            // Timer Hour (every hour)
+            System.Timers.Timer timerHour = new System.Timers.Timer(3600000);
+            timerHour.Elapsed += TimerHour_Elapsed;
+            timerHour.Enabled = true;
+            timerHour.AutoReset = true;
 
 
 
         }
-        private void Timer_Tick(object sender, EventArgs e)
+
+        private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            TokenSii = ServiceSoap.GETTokenFromSii();
+            if (ServiceOutlook != null)
+            {
+                ServiceOutlook.TokenSii = TokenSii;
+            }
+        }
+
+        private void TimerMinute_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
-            Intervalo += 60000;
-            if (Intervalo == 12720000)
-            {
-                TokenSii = ServiceSoap.GETTokenFromSii();
-                if (ServiceOutlook != null)
-                {
-                    ServiceOutlook.TokenSii = TokenSii;
-                }
-            }
-
         }
+
+
         private void FormMain_Shown(object sender, EventArgs e)
         {
             IGridMain.BeginUpdate();
@@ -240,7 +242,10 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("status", "Status", 50, pattern).CellStyle = cellStyleCommon;
 
-            // Button Reject      
+            // Button Reject
+            iGCol col = IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern);
+            col.Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
+            col.CellStyle = new iGCellStyle();
             //IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern).Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
             //Btn.Attach(IGridMain);
 
@@ -822,7 +827,7 @@ namespace Centralizador.WinApp.GUI
                         ResultDte doc = Dte.GetDteByFolio(detalle, true);
                         if (doc == null)
                         {
-                            doc = Dte.SendDteCreditor(detalle, TokenCen);
+                            //doc = Dte.SendDteCreditor(detalle, TokenCen);
                         }
                         detalle.Instruction.Dte = doc;
                         // Status
@@ -921,7 +926,7 @@ namespace Centralizador.WinApp.GUI
                         else
                         {
                             if (xmlObjeto != null)
-                            {                               
+                            {
                                 dte = (DTEDefTypeDocumento)xmlObjeto.Item;
                                 references = dte.Referencia;
                                 if (references != null)
@@ -1049,11 +1054,28 @@ namespace Centralizador.WinApp.GUI
                     myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.Flag);
                     myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.Flag);
                     // Status
-                    myRow.Cells["status"].Value = item.StatusDetalle;
-                   
+                    if (item.StatusDetalle != StatusDetalle.No )
+                    {
+                        myRow.Cells["status"].Value = item.StatusDetalle;
+                        myRow.Cells["btnRejected"].Enabled = iGBool.False;
+                    }
+                    else
+                    {
+                        // Image button
+                        if (item.Flag != LetterFlag.Green)
+                        {
+                            myRow.Cells["btnRejected"].ImageIndex = 6;
+                            myRow.Cells["btnRejected"].Enabled = iGBool.True;
+                        }
+                        else
+                        {
+                            myRow.Cells["btnRejected"].Enabled = iGBool.False;
+                        }
+                    }
+
                 }
                 // Finally
-                //IGridMain.Cols["btnRejected"].ImageIndex = 6;
+                Btn.Attach(IGridMain);
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
 
             }

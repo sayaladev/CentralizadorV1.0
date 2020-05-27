@@ -36,7 +36,7 @@ namespace Centralizador.Models.Outlook
             MailClient oClient = new MailClient("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
             try
             {
-                bgw.ReportProgress(0, "Trying to connect to the mail server...");
+                bgw.ReportProgress(0, "Connecting to the mail server...");
                 oClient.Connect(oServer);
                 oClient.GetMailInfosParam.Reset();
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
@@ -90,7 +90,7 @@ namespace Centralizador.Models.Outlook
                     Properties.Settings.Default.UIDRange = info.UIDL;
                     c++;
                     float porcent = (float)(100 * c) / infos.Length;
-                    bgw.ReportProgress((int)porcent, $"Dowloading email from server... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})");
+                    bgw.ReportProgress((int)porcent, $"Dowloading messages from the email server... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})");
                 }
             }
             catch (Exception)
