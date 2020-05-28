@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -67,7 +66,7 @@ namespace Centralizador.Models.ApiCEN
         public ResultParticipant ParticipantCreditor { get; set; }
         public ResultPaymentMatrix PaymentMatrix { get; set; }
         public ResultDte Dte { get; set; }
-        
+
 
     }
 
@@ -105,9 +104,9 @@ namespace Centralizador.Models.ApiCEN
                     if (instruction.Results.Count > 0)
                     {
                         foreach (ResultInstruction item in instruction.Results)
-                        {
-                            item.ParticipantCreditor = Userparticipant;
-                            item.PaymentMatrix = matrix;
+                        {                         
+                                item.ParticipantCreditor = Userparticipant;
+                                item.PaymentMatrix = matrix;                          
                         }
                         return instruction.Results;
                     }
@@ -128,7 +127,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="idDebtor"></param>
         /// <returns></returns>
         public static ResultInstruction GetInstructionDebtor(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
-        {          
+        {
             try
             {
                 WebClientCEN.WebClient.Headers.Clear();
@@ -149,12 +148,12 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }          
+            }
             return null;
         }
 
         public static IList<ResultInstruction> GetInstructionByParticipants(ResultParticipant participant, ResultParticipant userPart)
-        {       
+        {
             try
             {
                 WebClientCEN.WebClient.Headers.Clear();
@@ -174,7 +173,7 @@ namespace Centralizador.Models.ApiCEN
             catch (Exception)
             {
                 return null;
-            }        
+            }
             return null;
         }
     }

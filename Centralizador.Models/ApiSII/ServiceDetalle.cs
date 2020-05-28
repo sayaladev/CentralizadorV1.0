@@ -200,11 +200,7 @@ namespace Centralizador.Models.ApiSII
         }
 
         public static StatusDetalle GetStatus(Detalle detalle)
-        {
-            if (detalle.DataEvento.MayorOchoDias)
-            {
-                return StatusDetalle.Accepted;
-            }
+        {            
             if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
             {
                 if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null)
@@ -216,6 +212,21 @@ namespace Centralizador.Models.ApiSII
                     return StatusDetalle.Rejected;
                 }
                 else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
+                {
+                    return StatusDetalle.Accepted;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ERM") != null) // Acuse de  Recibo de Mercaderías y Servicios Ley 19.983
+                {
+                    return StatusDetalle.Accepted;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ENC") != null) // Recepción de NC Distinta de Anulación
+                {
+                    return StatusDetalle.Accepted;
+                }
+            }
+            else
+            {
+                if (detalle.DataEvento.MayorOchoDias)
                 {
                     return StatusDetalle.Accepted;
                 }

@@ -52,7 +52,7 @@ namespace Centralizador.WinApp.GUI
         public int Intervalo { get; set; }
         public StringBuilder StringLogging { get; set; }
         public string DataBaseName { get; set; }
-        // Button
+        // Button Class
         private readonly IGButtonColumnManager Btn = new IGButtonColumnManager();
 
 
@@ -151,7 +151,6 @@ namespace Centralizador.WinApp.GUI
 
 
         }
-
         private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             TokenSii = ServiceSoap.GETTokenFromSii();
@@ -160,13 +159,10 @@ namespace Centralizador.WinApp.GUI
                 ServiceOutlook.TokenSii = TokenSii;
             }
         }
-
         private void TimerMinute_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
         }
-
-
         private void FormMain_Shown(object sender, EventArgs e)
         {
             IGridMain.BeginUpdate();
@@ -226,8 +222,7 @@ namespace Centralizador.WinApp.GUI
             iGCellStyle cellStyleMoney = new iGCellStyle
             {
                 TextAlign = iGContentAlignment.MiddleCenter,
-                FormatString = "{0:#,##}",
-                SingleClickEdit = iGBool.True
+                FormatString = "{0:#,##}"
             };
             IGridMain.Cols.Add("neto", "Net $", 64, pattern).CellStyle = cellStyleMoney;
             IGridMain.Cols["neto"].AllowGrouping = false;
@@ -238,20 +233,16 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Cols.Add("total", "Total $", 64, pattern).CellStyle = cellStyleMoney;
             IGridMain.Cols["total"].AllowGrouping = false;
 
-            // Sii info.
+            // Sii info
             IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("status", "Status", 50, pattern).CellStyle = cellStyleCommon;
 
             // Button Reject
             iGCol col = IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern);
             col.Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
-            col.CellStyle = new iGCellStyle();
-            //IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern).Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
-            //Btn.Attach(IGridMain);
-
-            //IGridMain.Cols["btnRejected"].CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-
+            col.CellStyle = new iGCellStyle();      
             Btn.CellButtonClick += Bcm_CellButtonClick;
+            Btn.Attach(IGridMain);
             //Btn.CellButtonVisible += Bcm_CellButtonVisible;
             //Btn.CellButtonTooltip += Bcm_CellButtonTooltip;
 
@@ -284,14 +275,11 @@ namespace Centralizador.WinApp.GUI
             // Scroll
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Near, iGActions.GoFirstRow, "Go to first row");
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.GoLastRow, "Go to last row");
-            IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.OnDemand;
-            IGridMain.HScrollBar.Visibility = iGScrollBarVisibility.OnDemand;
+            IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.Always;
+            IGridMain.HScrollBar.Visibility = iGScrollBarVisibility.Hide;
 
             IGridMain.EndUpdate();
         }
-
-
-
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex != 0)
@@ -328,6 +316,69 @@ namespace Centralizador.WinApp.GUI
             }
             TssLblMensaje.Text = "";
         }
+        private void BtnHiperLink_Click(object sender, EventArgs e)
+        {
+            if (IGridMain.CurRow == null)
+            {
+                return;
+            }
+            Detalle detalle = null;
+            if (IsCreditor)
+            {
+                detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+            }
+            else
+            {
+                detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+            }
+            if (detalle != null)
+            {
+                Process.Start($"https://ppagos-sen.coordinadorelectrico.cl/pagos/instrucciones/{detalle.Instruction.Id}/");
+            }
+
+        }
+        private void BtnHiperLink_MouseHover(object sender, EventArgs e)
+        {
+            try
+            {
+                if (IGridMain.CurRow == null)
+                {
+                    return;
+                }
+                Detalle detalle = null;
+                if (IsCreditor)
+                {
+                    detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                }
+                else
+                {
+                    detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                }
+                if (detalle != null && detalle.Instruction != null)
+                {
+                    ToolTip tip = new ToolTip();
+                    StringBuilder builder = new StringBuilder();
+                    builder.Append($"Publication date: {Convert.ToDateTime(detalle.Instruction.PaymentMatrix.PublishDate):dd-MM-yyyy}" + Environment.NewLine);
+                    builder.Append($"Max billing: {Convert.ToDateTime(detalle.Instruction.PaymentMatrix.BillingDate):dd-MM-yyyy}");
+                    if (detalle.Instruction.MaxPaymentDate != null)
+                    {
+                        builder.Append($" / Max payment: {Convert.ToDateTime(detalle.Instruction.MaxPaymentDate):dd-MM-yyyy}");
+                    }
+                    builder.Append(Environment.NewLine + $"Payment matrix: {detalle.Instruction.PaymentMatrix.NaturalKey}" + Environment.NewLine);
+                    builder.Append($"Reference code: {detalle.Instruction.PaymentMatrix.ReferenceCode}" + Environment.NewLine);
+                    tip.ToolTipTitle = "Instruction Information";
+                    tip.IsBalloon = true;
+                    tip.InitialDelay = 100;
+                    tip.AutoPopDelay = 20000;
+                    tip.SetToolTip(sender as Button, builder.ToString());
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
 
         #endregion
 
@@ -338,6 +389,7 @@ namespace Centralizador.WinApp.GUI
 
             if (IsRunning)
             {
+                TssLblMensaje.Text = "Bussy!";
                 return;
             }
             if (!IsCreditor || IGridMain.Rows.Count == 0)
@@ -377,7 +429,7 @@ namespace Centralizador.WinApp.GUI
                         }
                     }
                 }
-                if (item.Folio == 0)
+                if (item.Folio == 0 && item.MntNeto > 9) // only up then CLP $10
                 {
                     detallesFinal.Add(item);
                 }
@@ -585,6 +637,7 @@ namespace Centralizador.WinApp.GUI
         {
             if (IsRunning)
             {
+                TssLblMensaje.Text = "Bussy!";
                 return;
             }
             if (!IsCreditor || IGridMain.Rows.Count == 0)
@@ -754,6 +807,7 @@ namespace Centralizador.WinApp.GUI
             }
             else if (IsRunning)
             {
+                TssLblMensaje.Text = "Bussy!";
                 return;
             }
             IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrix(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
@@ -763,7 +817,7 @@ namespace Centralizador.WinApp.GUI
             }
             else
             {
-                TssLblMensaje.Text = $"There are no published instructions:  {CboMonths.SelectedItem}-{CboYears.SelectedItem}";
+                TssLblMensaje.Text = $"There are no published instructions for:  {CboMonths.SelectedItem}-{CboYears.SelectedItem}.";
             }
         }
         private void BgwCreditor_DoWork(object sender, DoWorkEventArgs e)
@@ -790,16 +844,18 @@ namespace Centralizador.WinApp.GUI
             foreach (ResultInstruction instruction in instructions)
             {
                 // Tester
-                //if (instruction.Id != 1783538)
-                //{
-                //    continue;
-                //}
+                if (c == 3)
+                {
+                    continue;
+                }
+
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
                 Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
                 // REF from Softland          
                 Conexion con = new Conexion(DataBaseName);
                 DTEDefType xmlObjeto = null;
                 IList<Reference> references = Reference.GetInfoFactura(instruction, con);
+                detalle.StatusDetalle = StatusDetalle.No;
                 if (references != null)
                 {
                     Reference reference = references.OrderByDescending(x => x.Folio).First();
@@ -827,6 +883,7 @@ namespace Centralizador.WinApp.GUI
                         ResultDte doc = Dte.GetDteByFolio(detalle, true);
                         if (doc == null)
                         {
+                            // TESTER ***************************************************************************************************
                             //doc = Dte.SendDteCreditor(detalle, TokenCen);
                         }
                         detalle.Instruction.Dte = doc;
@@ -858,8 +915,10 @@ namespace Centralizador.WinApp.GUI
             IGridFill(DetallesCreditor);
             TssLblProgBar.Value = 0;
             IsRunning = false;
-            //BtnRechazar.Enabled = false;
-            //BtnPagar.Enabled = false;
+            // Buttons
+            BtnPagar.Enabled = false;
+            BtnInsertNv.Enabled = true;
+            BtnInsertRef.Enabled = true;
         }
 
         #endregion
@@ -875,6 +934,7 @@ namespace Centralizador.WinApp.GUI
             }
             else if (IsRunning)
             {
+                TssLblMensaje.Text = "Bussy!";
                 return;
             }
             DetallesDebtor = new List<Detalle>();
@@ -894,6 +954,11 @@ namespace Centralizador.WinApp.GUI
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
             {
+                // Tester
+                if (item.Folio != 22200695)
+                {
+                    continue;
+                }
                 DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
@@ -967,7 +1032,8 @@ namespace Centralizador.WinApp.GUI
                     ResultDte doc = Dte.GetDteByFolio(item, false);
                     if (doc == null)
                     {
-                        doc = Dte.SendDteDebtor(item, TokenCen);
+                        // TESTER ***************************************************************************************************
+                        //doc = Dte.SendDteDebtor(item, TokenCen);
                     }
                     item.Instruction.Dte = doc;
                 }
@@ -991,6 +1057,10 @@ namespace Centralizador.WinApp.GUI
             IsCreditor = false;
             IsRunning = false;
             IGridFill(DetallesDebtor);
+            // Buttons
+            BtnPagar.Enabled = true;
+            BtnInsertNv.Enabled = false;
+            BtnInsertRef.Enabled = false;
         }
 
         #endregion
@@ -1054,7 +1124,7 @@ namespace Centralizador.WinApp.GUI
                     myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.Flag);
                     myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.Flag);
                     // Status
-                    if (item.StatusDetalle != StatusDetalle.No )
+                    if (item.StatusDetalle != StatusDetalle.No)
                     {
                         myRow.Cells["status"].Value = item.StatusDetalle;
                         myRow.Cells["btnRejected"].Enabled = iGBool.False;
@@ -1062,7 +1132,7 @@ namespace Centralizador.WinApp.GUI
                     else
                     {
                         // Image button
-                        if (item.Flag != LetterFlag.Green)
+                        if (item.Flag != LetterFlag.Green && IsCreditor == false)
                         {
                             myRow.Cells["btnRejected"].ImageIndex = 6;
                             myRow.Cells["btnRejected"].Enabled = iGBool.True;
@@ -1075,7 +1145,8 @@ namespace Centralizador.WinApp.GUI
 
                 }
                 // Finally
-                Btn.Attach(IGridMain);
+             
+           
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
 
             }
@@ -1163,6 +1234,7 @@ namespace Centralizador.WinApp.GUI
                     foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
                     {
                         TxtNmbItem.Text += "+ :" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
+                        TxtDscItem.Text = dte.Detalle[0].DscItem;
                     }
                     if (dte.Referencia != null)
                     {
@@ -1231,7 +1303,7 @@ namespace Centralizador.WinApp.GUI
                             builder.Append("Events:" + Environment.NewLine);
                             foreach (ListEvenHistDoc item in detalle.DataEvento.ListEvenHistDoc)
                             {
-                                builder.Append($"{string.Format(CultureInfo, "{0:dd-MM-yyyy}", Convert.ToDateTime(item.FechaEvento))}");
+                                builder.Append($"{Convert.ToDateTime(item.FechaEvento):dd-MM-yyyy}");
                                 builder.Append($" - {item.CodEvento}: {item.DescEvento}" + Environment.NewLine);
 
                             }
@@ -1281,22 +1353,22 @@ namespace Centralizador.WinApp.GUI
         #region Outlook
 
         private void BtnOutlook_Click(object sender, EventArgs e)
-        {
-            ServiceOutlook = new ServiceOutlook
-            {
-                TokenSii = TokenSii
-            };
-            BackgroundWorker bgwReadEmail = new BackgroundWorker
-            {
-                WorkerReportsProgress = true
-            };
-            bgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
-            bgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
-            if (!IsRunning)
-            {
+        {           
+            //if (!IsRunning)
+            //{
+                ServiceOutlook = new ServiceOutlook
+                {
+                    TokenSii = TokenSii
+                };
+                BackgroundWorker bgwReadEmail = new BackgroundWorker
+                {
+                    WorkerReportsProgress = true
+                };
+                bgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
+                bgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
                 IsRunning = true;
                 ServiceOutlook.GetXmlFromEmail(bgwReadEmail);
-            }
+            //}
         }
         private void BgwReadEmail_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -1309,7 +1381,7 @@ namespace Centralizador.WinApp.GUI
             BtnOutlook.Enabled = true;
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", e.Result);
             TssLblMensaje.Text = "Complete!";
-            IsRunning = false;
+            //IsRunning = false;
             IGridMain.Focus();
         }
 
@@ -1323,12 +1395,14 @@ namespace Centralizador.WinApp.GUI
         private void BtnPagar_Click(object sender, EventArgs e)
         {
 
+
         }
+
+
+
         #endregion
 
-
-
-
+       
     }
 }
 
