@@ -21,7 +21,7 @@ namespace Centralizador.Models.DataBase
                 conexion.Query = "SELECT * FROM softland.cwtcomu";
 
                 DataTable dataTable = new DataTable();
-                dataTable = Conexion.ExecuteReader(conexion);
+                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
                 if (dataTable != null)
                 {
                     foreach (DataRow item in dataTable.Rows)

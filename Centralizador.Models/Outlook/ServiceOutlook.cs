@@ -117,6 +117,8 @@ namespace Centralizador.Models.Outlook
                 // Only process TipoDTE 33 & 34.
                 if (document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item33 || document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item34)
                 {
+                    // Remove zeros left 
+                    document.Encabezado.IdDoc.Folio = document.Encabezado.IdDoc.Folio.TrimStart(new char[] { '0' });
                     try
                     {
                         using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
@@ -124,17 +126,20 @@ namespace Centralizador.Models.Outlook
                             response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
                             emisor.GetValue(1).ToString(),
                             Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
-                            document.Encabezado.IdDoc.Folio);
+                            document.Encabezado.IdDoc.Folio); 
                         }
                     }
                     catch (Exception)
                     {
                         return false;
                     }
+                   
+                 
+                    //dte.Item = document;
                     if (response.Length != 0)
                     {
                         DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
-                        nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
+                        nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;                 
                         nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
                         Save(nameFolder, nameFile, dte);
                         return true;

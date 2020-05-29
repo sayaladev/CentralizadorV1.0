@@ -38,7 +38,8 @@ namespace Centralizador.Models.DataBase
                 query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = l.XMLSET) 'FileEnviado', ");
                 query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico' ");
                 query.Append("FROM softland.IW_GSaEn_RefDTE r ");
-                query.Append("FULL OUTER JOIN softland.iw_gsaen g ");
+                //query.Append("FULL OUTER JOIN softland.iw_gsaen g ");
+                query.Append("INNER JOIN softland.iw_gsaen g ");
                 query.Append("  ON r.NroInt = g.NroInt ");
                 query.Append("  AND r.Tipo = 'F' ");
                 query.Append($"  AND (r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' ");
@@ -55,7 +56,7 @@ namespace Centralizador.Models.DataBase
 
                 conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
-                dataTable = Conexion.ExecuteReader(conexion);
+                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
                 if (dataTable != null)
                 {
                     foreach (DataRow item in dataTable.Rows)

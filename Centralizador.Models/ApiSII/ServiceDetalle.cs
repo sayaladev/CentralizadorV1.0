@@ -200,14 +200,15 @@ namespace Centralizador.Models.ApiSII
         }
 
         public static StatusDetalle GetStatus(Detalle detalle)
-        {            
-            if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
+        {
+            // http://www.sii.cl/factura_electronica/Webservice_Registro_Reclamo_DTE_V1.2.pdf
+            if (detalle.DataEvento!= null && detalle.DataEvento.ListEvenHistDoc.Count > 0)
             {
-                if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null)
+                if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null) // Acepta Contenido del Documento
                 {
                     return StatusDetalle.Accepted;
                 }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null)
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null) // Reclamo al Contenido del Documento
                 {
                     return StatusDetalle.Rejected;
                 }
@@ -219,14 +220,22 @@ namespace Centralizador.Models.ApiSII
                 {
                     return StatusDetalle.Accepted;
                 }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ENC") != null) // Recepción de NC Distinta de Anulación
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ENC") != null) // Recepción de NC, distinta de anulación, que referencia al documento.
                 {
                     return StatusDetalle.Accepted;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RFT") != null) // Receclamo por falta total de mercaderías
+                {
+                    return StatusDetalle.Rejected;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null) // Recepción de NC de anulación que referencia al documento.
+                {
+                    return StatusDetalle.Rejected;
                 }
             }
             else
             {
-                if (detalle.DataEvento.MayorOchoDias)
+                if (detalle.DataEvento!= null && detalle.DataEvento.MayorOchoDias)
                 {
                     return StatusDetalle.Accepted;
                 }

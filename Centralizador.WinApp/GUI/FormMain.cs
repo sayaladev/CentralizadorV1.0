@@ -49,9 +49,10 @@ namespace Centralizador.WinApp.GUI
         private bool IsCreditor { get; set; }
         public bool IsRunning { get; set; }
         public ServiceOutlook ServiceOutlook { get; set; }
-        public int Intervalo { get; set; }
         public StringBuilder StringLogging { get; set; }
         public string DataBaseName { get; set; }
+        public BackgroundWorker BgwReadEmail { get; private set; }
+
         // Button Class
         private readonly IGButtonColumnManager Btn = new IGButtonColumnManager();
 
@@ -128,7 +129,13 @@ namespace Centralizador.WinApp.GUI
             BgwInsertRef.RunWorkerCompleted += BgwInsertRef_RunWorkerCompleted;
             BgwInsertRef.DoWork += BgwInsertRef_DoWork;
 
-
+            //
+            BgwReadEmail = new BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
+            BgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
+            BgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
 
             // Logging file
             StringLogging = new StringBuilder();
@@ -181,10 +188,9 @@ namespace Centralizador.WinApp.GUI
             IGridMain.DefaultCol.Width = 25;
             // Add the second frozen column.
             IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.None;
-
-
-
+            
             // Add data columns.
+
             // Pattern headers cols.
             iGColPattern pattern = new iGColPattern();
             pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
@@ -240,7 +246,7 @@ namespace Centralizador.WinApp.GUI
             // Button Reject
             iGCol col = IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern);
             col.Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
-            col.CellStyle = new iGCellStyle();      
+            col.CellStyle = new iGCellStyle();
             Btn.CellButtonClick += Bcm_CellButtonClick;
             Btn.Attach(IGridMain);
             //Btn.CellButtonVisible += Bcm_CellButtonVisible;
@@ -254,25 +260,30 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Font = new Font("Microsoft Sans Serif", 7.5f);
             IGridMain.ImageList = FListPics;
             IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
+            IGridMain.UseXPStyles = false;
+            IGridMain.Appearance = iGControlPaintAppearance.StyleFlat;
 
-            // Header & Footer
+            // Header
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
             IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
-            IGridMain.Footer.Visible = true;
 
             // Footer freezer section
+            
+            IGridMain.Footer.Visible = true;
+            IGridMain.Footer.Rows.Count = 2;
             IGridMain.Footer.Cells[0, 0].SpanCols = 3;
             IGridMain.Footer.Cells[0, 3].SpanCols = 7;
+
             IGridMain.Footer.Cells[0, "neto"].AggregateFunction = iGAggregateFunction.Sum;
             IGridMain.Footer.Cells[0, "exento"].AggregateFunction = iGAggregateFunction.Sum;
             IGridMain.Footer.Cells[0, "iva"].AggregateFunction = iGAggregateFunction.Sum;
             IGridMain.Footer.Cells[0, "total"].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, "neto"].TextAlign = iGContentAlignment.MiddleRight;
-            IGridMain.Footer.Cells[0, "exento"].TextAlign = iGContentAlignment.MiddleRight;
-            IGridMain.Footer.Cells[0, "iva"].TextAlign = iGContentAlignment.MiddleRight;
-            IGridMain.Footer.Cells[0, "total"].TextAlign = iGContentAlignment.MiddleRight;
+            //IGridMain.Footer.Cells[0, "neto"].TextAlign = iGContentAlignment.MiddleRight;
+            //IGridMain.Footer.Cells[0, "exento"].TextAlign = iGContentAlignment.MiddleRight;
+            //IGridMain.Footer.Cells[0, "iva"].TextAlign = iGContentAlignment.MiddleRight;
+            //IGridMain.Footer.Cells[0, "total"].TextAlign = iGContentAlignment.MiddleRight;
 
-            // Scroll
+            // Scroll          
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Near, iGActions.GoFirstRow, "Go to first row");
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.GoLastRow, "Go to last row");
             IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.Always;
@@ -422,7 +433,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         if (item.DataEvento.ListEvenHistDoc.Count > 0)
                         {
-                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null) // Only if NC
+                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null) // // Recepción de NC de anulación que referencia al documento.
                             {
                                 detallesFinal.Add(item);
                             }
@@ -844,10 +855,14 @@ namespace Centralizador.WinApp.GUI
             foreach (ResultInstruction instruction in instructions)
             {
                 // Tester
-                if (c == 3)
+                if (c == 2)
                 {
                     continue;
                 }
+                //if (instruction.Id != 1816729)
+                //{
+                //    continue;
+                //}
 
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
                 Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
@@ -888,7 +903,11 @@ namespace Centralizador.WinApp.GUI
                         }
                         detalle.Instruction.Dte = doc;
                         // Status
-                        detalle.StatusDetalle = GetStatus(detalle);
+                        if (detalle.DataEvento != null)
+                        {
+                            detalle.StatusDetalle = GetStatus(detalle);
+                        }
+
                     }
                     if (reference.FechaEmision != null)
                     {
@@ -955,10 +974,10 @@ namespace Centralizador.WinApp.GUI
             foreach (Detalle item in DetallesDebtor)
             {
                 // Tester
-                if (item.Folio != 22200695)
-                {
-                    continue;
-                }
+                //if (item.Folio != 22200695)
+                //{
+                //    continue;
+                //}
                 DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
@@ -1145,8 +1164,8 @@ namespace Centralizador.WinApp.GUI
 
                 }
                 // Finally
-             
-           
+
+
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
 
             }
@@ -1345,7 +1364,10 @@ namespace Centralizador.WinApp.GUI
         }
         private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
+            DialogResult result = MessageBox.Show("Test");
+
             MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
+
         }
 
         #endregion
@@ -1353,22 +1375,16 @@ namespace Centralizador.WinApp.GUI
         #region Outlook
 
         private void BtnOutlook_Click(object sender, EventArgs e)
-        {           
-            //if (!IsRunning)
-            //{
+        {
+            if (!BgwReadEmail.IsBusy)
+            {
                 ServiceOutlook = new ServiceOutlook
                 {
                     TokenSii = TokenSii
                 };
-                BackgroundWorker bgwReadEmail = new BackgroundWorker
-                {
-                    WorkerReportsProgress = true
-                };
-                bgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
-                bgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
-                IsRunning = true;
-                ServiceOutlook.GetXmlFromEmail(bgwReadEmail);
-            //}
+
+                ServiceOutlook.GetXmlFromEmail(BgwReadEmail);
+            }
         }
         private void BgwReadEmail_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -1381,7 +1397,6 @@ namespace Centralizador.WinApp.GUI
             BtnOutlook.Enabled = true;
             TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", e.Result);
             TssLblMensaje.Text = "Complete!";
-            //IsRunning = false;
             IGridMain.Focus();
         }
 
@@ -1400,9 +1415,10 @@ namespace Centralizador.WinApp.GUI
 
 
 
+
         #endregion
 
-       
+      
     }
 }
 

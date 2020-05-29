@@ -21,7 +21,7 @@ namespace Centralizador.Models.DataBase
         }
 
 
-        public static DataTable ExecuteReader(Conexion conn)
+        public static async System.Threading.Tasks.Task<DataTable> ExecuteReaderAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
@@ -35,7 +35,7 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
-                    SqlDataReader = cmd.ExecuteReader();
+                    SqlDataReader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
                     if (SqlDataReader.HasRows)
                     {
                         DataTable dataTable = new DataTable();
