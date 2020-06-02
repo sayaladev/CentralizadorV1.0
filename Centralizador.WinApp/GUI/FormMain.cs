@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -188,7 +189,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.DefaultCol.Width = 25;
             // Add the second frozen column.
             IGridMain.Cols.Add().CellStyle.CustomDrawFlags = iGCustomDrawFlags.None;
-            
+
             // Add data columns.
 
             // Pattern headers cols.
@@ -268,20 +269,29 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
 
             // Footer freezer section
-            
             IGridMain.Footer.Visible = true;
             IGridMain.Footer.Rows.Count = 2;
             IGridMain.Footer.Cells[0, 0].SpanCols = 3;
-            IGridMain.Footer.Cells[0, 3].SpanCols = 7;
+            IGridMain.Footer.Cells[1, 0].SpanCols = 3;
+            IGridMain.Footer.Cells[0, 3].SpanCols = 11;
+            IGridMain.Footer.Cells[1, 3].SpanCols = 11;
+            IGridMain.Footer.Cells[0, 18].SpanCols = 3;
+            IGridMain.Footer.Cells[1, 18].SpanCols = 3;
+            IGridMain.Footer.Cells[1, "neto"].AggregateFunction = iGAggregateFunction.Sum;
+            IGridMain.Footer.Cells[1, "exento"].AggregateFunction = iGAggregateFunction.Sum;
+            IGridMain.Footer.Cells[1, "iva"].AggregateFunction = iGAggregateFunction.Sum;
+            IGridMain.Footer.Cells[1, "total"].AggregateFunction = iGAggregateFunction.Sum;
+            iGFooterCellStyle style = new iGFooterCellStyle
+            {
+                TextAlign = iGContentAlignment.MiddleRight
+            };
+            iGFooterCell fooUp = IGridMain.Footer.Cells[0, "fechaEmision"];
+            fooUp.Style = style;
+            fooUp.Value = "Rejected invoices:";
+            iGFooterCell fooDown = IGridMain.Footer.Cells[1, "fechaEmision"];
+            fooDown.Value = "Totals:";
+            fooDown.Style = style;
 
-            IGridMain.Footer.Cells[0, "neto"].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, "exento"].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, "iva"].AggregateFunction = iGAggregateFunction.Sum;
-            IGridMain.Footer.Cells[0, "total"].AggregateFunction = iGAggregateFunction.Sum;
-            //IGridMain.Footer.Cells[0, "neto"].TextAlign = iGContentAlignment.MiddleRight;
-            //IGridMain.Footer.Cells[0, "exento"].TextAlign = iGContentAlignment.MiddleRight;
-            //IGridMain.Footer.Cells[0, "iva"].TextAlign = iGContentAlignment.MiddleRight;
-            //IGridMain.Footer.Cells[0, "total"].TextAlign = iGContentAlignment.MiddleRight;
 
             // Scroll          
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Near, iGActions.GoFirstRow, "Go to first row");
@@ -476,6 +486,13 @@ namespace Centralizador.WinApp.GUI
 
             foreach (Detalle item in detallesFinal)
             {
+
+                // Tester 
+                //if (item.Instruction.Id != 1827770)
+                //{
+                //    continue;
+                //}
+
                 Comuna comuna = null;
                 string acteco = null;
                 // Get F° NV if exists
@@ -509,26 +526,57 @@ namespace Centralizador.WinApp.GUI
                         IList<Comuna> comunas = Comuna.GetComunas(con);
                         if (comunas != null)
                         {
-                            foreach (Comuna com in comunas)
+                            //foreach (Comuna com in comunas)
+                            //{
+                            //    if (item.Instruction.ParticipantDebtor.CommercialAddress.Contains(com.ComDes))
+                            //    {
+                             //      comuna = com;
+                            //        break;
+                            //    }
+                            //}
+
+                            Regex regex = new Regex(@"\b[\s,\.-:;]*");                        
+                            string phrase = item.Instruction.ParticipantDebtor.CommercialAddress;
+                            IEnumerable<string> words = regex.Split(phrase).Where(x => !string.IsNullOrEmpty(x));
+                            //comunas.Clear();
+                            IList<Comuna> coms =new List<Comuna>();
+                            foreach (string w in words)
                             {
-                                if (item.Instruction.ParticipantDebtor.CommercialAddress.Contains(com.ComDes))
+                                Comuna r = comunas.FirstOrDefault(x => x.ComDes == w);
+                                if (r != null)
                                 {
-                                    comuna = com;
-                                    break;
+                                    coms.Add(r);
                                 }
                             }
+                            if (coms.Count == 1)
+                            {
+                                comuna = coms[0];
+                            }
+                            else
+                            {
+                                comuna = coms[1];
+                            }
                         }
-                        // Get acteco
-                        IList<Actividade> actividades = Acteco.GetActecoCode(item.Instruction.ParticipantDebtor);
-                        if (actividades != null)
+                        
+
+                        // Get acteco herokuapp
+                        //IList<Actividade> actividades = Acteco.GetActecoCode(item.Instruction.ParticipantDebtor);
+                        //if (actividades != null)
+                        //{
+                        //    acteco = actividades[0].Giro.Substring(0, 60);
+                        //    // Insert acteco
+                        //    Acteco.InsertActeco(acteco, con);
+                        //}
+
+                        // Get acteco from CEN
+                        if (item.Instruction.ParticipantDebtor.CommercialBusiness != null)
                         {
-                            acteco = actividades[0].Giro.Substring(0, 60);
-                            // Insert acteco
+                            acteco = item.Instruction.ParticipantDebtor.CommercialBusiness;
                             Acteco.InsertActeco(acteco, con);
                         }
                         else
                         {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Error API: " + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Error API acteco: " + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                         }
                         // Insert aux
                         result = Auxiliar.InsertAuxiliar(item.Instruction, acteco, comuna, con);
@@ -537,6 +585,9 @@ namespace Centralizador.WinApp.GUI
                             case 0:
                                 break;
                             case 1:
+
+                                break;
+                            case 2:
                                 StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                                 break;
                             case -1:
@@ -855,10 +906,10 @@ namespace Centralizador.WinApp.GUI
             foreach (ResultInstruction instruction in instructions)
             {
                 // Tester
-                if (c == 2)
-                {
-                    continue;
-                }
+                //if (c == 2)
+                //{
+                //    continue;
+                //}
                 //if (instruction.Id != 1816729)
                 //{
                 //    continue;
@@ -1094,6 +1145,8 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Rows.Clear();
                 iGRow myRow;
                 int c = 0;
+                int rejectedN = 0;
+                int rejectedV = 0;
                 TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
                 foreach (Detalle item in detalles)
                 {
@@ -1112,7 +1165,15 @@ namespace Centralizador.WinApp.GUI
                     myRow.Cells["exento"].Value = item.MntExento;
                     myRow.Cells["iva"].Value = item.MntIva;
                     myRow.Cells["total"].Value = item.MntTotal;
-                    if (item.Folio > 0) { myRow.Cells["folio"].Value = item.Folio; }
+                    if (item.Folio > 0)
+                    {
+                        myRow.Cells["folio"].Value = item.Folio;
+                    }
+                    else
+                    {
+                        rejectedN++;
+                        rejectedV += item.MntNeto;
+                    }
                     if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision)); }
                     if (item.FechaRecepcion != null) { myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)); }
                     if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
@@ -1147,6 +1208,10 @@ namespace Centralizador.WinApp.GUI
                     {
                         myRow.Cells["status"].Value = item.StatusDetalle;
                         myRow.Cells["btnRejected"].Enabled = iGBool.False;
+                        if (item.StatusDetalle == StatusDetalle.Rejected)
+                        {
+                            rejectedV += item.MntNeto;
+                        }
                     }
                     else
                     {
@@ -1163,7 +1228,9 @@ namespace Centralizador.WinApp.GUI
                     }
 
                 }
-                // Finally
+                // Footer Rejected
+                IGridMain.Footer.Cells[0, "neto"].Value = rejectedV;
+                //************** REVISAR ESTE EVENTO fGrid_IncludeRowInTotalsCalculation
 
 
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
@@ -1418,7 +1485,7 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-      
+
     }
 }
 

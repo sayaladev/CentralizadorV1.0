@@ -117,7 +117,7 @@ namespace Centralizador.Models.Outlook
                 // Only process TipoDTE 33 & 34.
                 if (document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item33 || document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item34)
                 {
-                    // Remove zeros left 
+                    // Remove zeros at left 
                     document.Encabezado.IdDoc.Folio = document.Encabezado.IdDoc.Folio.TrimStart(new char[] { '0' });
                     try
                     {
@@ -132,10 +132,8 @@ namespace Centralizador.Models.Outlook
                     catch (Exception)
                     {
                         return false;
-                    }
-                   
-                 
-                    //dte.Item = document;
+                    }                                   
+                
                     if (response.Length != 0)
                     {
                         DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
@@ -146,11 +144,11 @@ namespace Centralizador.Models.Outlook
                     }
                     else
                     {
-                        // Errors.
-                        nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
+                        // Errors. // dejar carpeta folder en 2020/5
+                        nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month;
                         nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
                         Save(nameFolder + @"\Errors\", nameFile, dte);
-                        return true;
+                        return false;
                     }
                 }
             }
