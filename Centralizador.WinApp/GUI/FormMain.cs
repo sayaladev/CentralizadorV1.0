@@ -17,6 +17,7 @@ using Centralizador.Models.ApiSII;
 using Centralizador.Models.AppFunctions;
 using Centralizador.Models.DataBase;
 using Centralizador.Models.Outlook;
+using Centralizador.Models.registroreclamodteservice;
 
 using TenTec.Windows.iGridLib;
 
@@ -486,7 +487,6 @@ namespace Centralizador.WinApp.GUI
 
             foreach (Detalle item in detallesFinal)
             {
-
                 // Tester 
                 //if (item.Instruction.Id != 1827770)
                 //{
@@ -530,16 +530,14 @@ namespace Centralizador.WinApp.GUI
                             //{
                             //    if (item.Instruction.ParticipantDebtor.CommercialAddress.Contains(com.ComDes))
                             //    {
-                             //      comuna = com;
+                            //      comuna = com;
                             //        break;
                             //    }
                             //}
 
-                            Regex regex = new Regex(@"\b[\s,\.-:;]*");                        
-                            string phrase = item.Instruction.ParticipantDebtor.CommercialAddress;
-                            IEnumerable<string> words = regex.Split(phrase).Where(x => !string.IsNullOrEmpty(x));
-                            //comunas.Clear();
-                            IList<Comuna> coms =new List<Comuna>();
+                            Regex regex = new Regex(@"\b[\s,\.-:;]*");
+                            IEnumerable<string> words = regex.Split(item.Instruction.ParticipantDebtor.CommercialAddress).Where(x => !string.IsNullOrEmpty(x));
+                            IList<Comuna> coms = new List<Comuna>();
                             foreach (string w in words)
                             {
                                 Comuna r = comunas.FirstOrDefault(x => x.ComDes == w);
@@ -557,7 +555,7 @@ namespace Centralizador.WinApp.GUI
                                 comuna = coms[1];
                             }
                         }
-                        
+
 
                         // Get acteco herokuapp
                         //IList<Actividade> actividades = Acteco.GetActecoCode(item.Instruction.ParticipantDebtor);
@@ -1025,7 +1023,7 @@ namespace Centralizador.WinApp.GUI
             foreach (Detalle item in DetallesDebtor)
             {
                 // Tester
-                //if (item.Folio != 22200695)
+                //if (item.Folio != 468)
                 //{
                 //    continue;
                 //}
@@ -1429,11 +1427,73 @@ namespace Centralizador.WinApp.GUI
                 //e.DoDefault = false;
             }
         }
-        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
+        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e) // Rejected button
         {
-            DialogResult result = MessageBox.Show("Test");
+            if (IsCreditor)
+            {
+                return;
+            }
+            else
+            {
+                Detalle detalle = null;
+                if (IsCreditor)
+                {
+                    detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                }
+                else
+                {
+                    detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                }
+                StringBuilder builder = new StringBuilder();
+                builder.Append($"Invoice F°: {detalle.Folio}");
+                builder.Append(Environment.NewLine);
+                builder.Append($"Amount $: {detalle.MntNeto}");
+                builder.Append(Environment.NewLine);
+                builder.Append($"Remaining time to reject: {detalle.DataEvento.DiferenciaFecha} days");
+                builder.Append(Environment.NewLine);
+                builder.Append(Environment.NewLine);
+                builder.Append("Are you sure?");
 
-            MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
+
+                DialogResult result = MessageBox.Show(builder.ToString(), "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    // Reject in Sii
+                    // ACD: Acepta Contenido del Documento
+                    // RCD: Reclamo al Contenido del Documento
+                    // ERM: Otorga Recibo de Mercaderías o Servicios
+                    // RFP: Reclamo por Falta Parcial de Mercaderías
+                    // RFT: Reclamo por Falta Total de Mercaderías
+                    respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
+
+                    switch (resp.codResp)
+                    {
+                        case 0: // Acción Completada OK.
+                                // Reject in CEN
+                            detalle.StatusDetalle = StatusDetalle.Rejected;
+                            ResultDte doc = Dte.SendDteDebtor(detalle, TokenCen);
+                            detalle.Instruction.Dte = doc;
+                            IGridMain.CurRow.Cells["P3"].Value = 1;
+                            //IGridFill(DetallesDebtor);
+                   
+
+                            // Send email 
+                            break;
+                        case 7: // Evento registrado previamente
+                            break;
+
+                        default:
+                            break;
+                    }
+               
+             
+                  
+
+
+                }
+                // MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
+            }
+
 
         }
 
@@ -1484,7 +1544,6 @@ namespace Centralizador.WinApp.GUI
 
 
         #endregion
-
 
     }
 }
