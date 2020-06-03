@@ -11,9 +11,14 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
+
 namespace Centralizador.Models.Outlook
 {
-    public class ServiceOutlook
+    /// <summary>
+    /// Get EMail with "EAGetMail" Tool.
+    /// https://www.emailarchitect.net/eagetmail/sdk/
+    /// </summary>
+    public class ServiceGetMail
     {
         public string TokenSii { get; set; }
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");

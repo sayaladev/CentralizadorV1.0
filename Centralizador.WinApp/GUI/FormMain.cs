@@ -50,7 +50,7 @@ namespace Centralizador.WinApp.GUI
         public ResultAgent Agent { get; set; }
         private bool IsCreditor { get; set; }
         public bool IsRunning { get; set; }
-        public ServiceOutlook ServiceOutlook { get; set; }
+        public ServiceGetMail ServiceOutlook { get; set; }
         public StringBuilder StringLogging { get; set; }
         public string DataBaseName { get; set; }
         public BackgroundWorker BgwReadEmail { get; private set; }
@@ -1478,6 +1478,8 @@ namespace Centralizador.WinApp.GUI
                    
 
                             // Send email 
+
+
                             break;
                         case 7: // Evento registrado previamente
                             break;
@@ -1505,7 +1507,7 @@ namespace Centralizador.WinApp.GUI
         {
             if (!BgwReadEmail.IsBusy)
             {
-                ServiceOutlook = new ServiceOutlook
+                ServiceOutlook = new ServiceGetMail
                 {
                     TokenSii = TokenSii
                 };
