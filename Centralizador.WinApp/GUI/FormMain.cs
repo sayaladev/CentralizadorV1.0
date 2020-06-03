@@ -1023,10 +1023,10 @@ namespace Centralizador.WinApp.GUI
             foreach (Detalle item in DetallesDebtor)
             {
                 // Tester
-                //if (item.Folio != 468)
-                //{
-                //    continue;
-                //}
+                if (item.Folio != 4671)
+                {
+                    continue;
+                }
                 DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
@@ -1205,7 +1205,8 @@ namespace Centralizador.WinApp.GUI
                     if (item.StatusDetalle != StatusDetalle.No)
                     {
                         myRow.Cells["status"].Value = item.StatusDetalle;
-                        myRow.Cells["btnRejected"].Enabled = iGBool.False;
+
+                        //myRow.Cells["btnRejected"].Enabled = iGBool.False;
                         if (item.StatusDetalle == StatusDetalle.Rejected)
                         {
                             rejectedV += item.MntNeto;
@@ -1444,54 +1445,57 @@ namespace Centralizador.WinApp.GUI
                 {
                     detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
-                StringBuilder builder = new StringBuilder();
-                builder.Append($"Invoice F°: {detalle.Folio}");
-                builder.Append(Environment.NewLine);
-                builder.Append($"Amount $: {detalle.MntNeto}");
-                builder.Append(Environment.NewLine);
-                builder.Append($"Remaining time to reject: {detalle.DataEvento.DiferenciaFecha} days");
-                builder.Append(Environment.NewLine);
-                builder.Append(Environment.NewLine);
-                builder.Append("Are you sure?");
+                //if (detalle.StatusDetalle == StatusDetalle.No)
+                //{
+                    StringBuilder builder = new StringBuilder();
+                    builder.Append($"Invoice F°: {detalle.Folio}");
+                    builder.Append(Environment.NewLine);      
+                    builder.Append($"Amount $: {detalle.MntNeto:#,##}");
+                    builder.Append(Environment.NewLine);
+                    builder.Append($"Remaining time to reject: {detalle.DataEvento.DiferenciaFecha} days");
+                    builder.Append(Environment.NewLine);
+                    builder.Append(Environment.NewLine);
+                    builder.Append("Are you sure?");
 
 
-                DialogResult result = MessageBox.Show(builder.ToString(), "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    // Reject in Sii
-                    // ACD: Acepta Contenido del Documento
-                    // RCD: Reclamo al Contenido del Documento
-                    // ERM: Otorga Recibo de Mercaderías o Servicios
-                    // RFP: Reclamo por Falta Parcial de Mercaderías
-                    // RFT: Reclamo por Falta Total de Mercaderías
-                    respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
-
-                    switch (resp.codResp)
+                    DialogResult result = MessageBox.Show(builder.ToString(), "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes)
                     {
-                        case 0: // Acción Completada OK.
-                                // Reject in CEN
-                            detalle.StatusDetalle = StatusDetalle.Rejected;
-                            ResultDte doc = Dte.SendDteDebtor(detalle, TokenCen);
-                            detalle.Instruction.Dte = doc;
-                            IGridMain.CurRow.Cells["P3"].Value = 1;
-                            //IGridFill(DetallesDebtor);
-                   
-
-                            // Send email 
-
-
-                            break;
-                        case 7: // Evento registrado previamente
-                            break;
-
-                        default:
-                            break;
-                    }
-               
-             
-                  
+                        // Reject in Sii
+                        // ACD: Acepta Contenido del Documento
+                        // RCD: Reclamo al Contenido del Documento
+                        // ERM: Otorga Recibo de Mercaderías o Servicios
+                        // RFP: Reclamo por Falta Parcial de Mercaderías
+                        // RFT: Reclamo por Falta Total de Mercaderías
+                        respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
+                        detalle.StatusDetalle = StatusDetalle.Rejected;
+                        switch (resp.codResp)
+                        {
+                            case 0: // Acción Completada OK.
+                                if (detalle.IsParticipant)
+                                {
+                                    // Reject in CEN                                
+                                    ResultDte doc = Dte.SendDteDebtor(detalle, TokenCen);
+                                    detalle.Instruction.Dte = doc;
+                                    IGridMain.CurRow.Cells["P3"].Value = 1;
+                                    //IGridFill(DetallesDebtor);
 
 
+                                    // Send email
+                                    ServiceSendMail.SendEmail(detalle);
+                                }
+
+
+                                break;
+                            case 7: // Evento registrado previamente
+                                    // Tester
+                                ServiceSendMail.SendEmail(detalle);
+                                break;
+
+                            default:
+                                break;
+                        }
+                    //}
                 }
                 // MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
             }

@@ -1,9 +1,4 @@
-﻿using Centralizador.Models.AppFunctions;
-using Centralizador.Models.registroreclamodteservice;
-
-using EAGetMail;
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -11,12 +6,24 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
+using Centralizador.Models.AppFunctions;
+using Centralizador.Models.registroreclamodteservice;
+
+using EAGetMail;
+
 
 namespace Centralizador.Models.Outlook
 {
     /// <summary>
     /// Get EMail with "EAGetMail" Tool.
     /// https://www.emailarchitect.net/eagetmail/sdk/
+    /// 
+    /// Config IMAP
+    /// Nombre de servidor: outlook.office365.com
+    /// Puerto: 993
+    /// Método de cifrado: TLS
+    /// 
+    /// 
     /// </summary>
     public class ServiceGetMail
     {
@@ -131,18 +138,18 @@ namespace Centralizador.Models.Outlook
                             response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
                             emisor.GetValue(1).ToString(),
                             Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
-                            document.Encabezado.IdDoc.Folio); 
+                            document.Encabezado.IdDoc.Folio);
                         }
                     }
                     catch (Exception)
                     {
                         return false;
-                    }                                   
-                
+                    }
+
                     if (response.Length != 0)
                     {
                         DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
-                        nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;                 
+                        nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
                         nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
                         Save(nameFolder, nameFile, dte);
                         return true;

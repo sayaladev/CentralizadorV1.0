@@ -50,8 +50,11 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EAGetMail, Version=5.1.0.5, Culture=neutral, PublicKeyToken=e10a0812eb29cf94, processorArchitecture=MSIL">
-      <HintPath>..\packages\EAGetMail.5.1.0.5\lib\net461\EAGetMail.dll</HintPath>
+    <Reference Include="EAGetMail, Version=5.2.0.1, Culture=neutral, PublicKeyToken=e10a0812eb29cf94, processorArchitecture=MSIL">
+      <HintPath>..\packages\EAGetMail.5.2.0.1\lib\net461\EAGetMail.dll</HintPath>
+    </Reference>
+    <Reference Include="EASendMail, Version=7.7.0.1, Culture=neutral, PublicKeyToken=88adb80ecd66540b, processorArchitecture=MSIL">
+      <HintPath>..\packages\EASendMail.7.7.0.1\lib\net461\EASendMail.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
