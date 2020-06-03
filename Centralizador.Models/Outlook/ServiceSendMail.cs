@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
 using System.Text;
 
 using Centralizador.Models.ApiSII;
@@ -19,10 +20,14 @@ namespace Centralizador.Models.Outlook
     /// </summary>
     public class ServiceSendMail
     {
+        public static void SendEmailToParticipant(BackgroundWorker BgwSendEmail, Detalle detalle) {
+            BgwSendEmail.DoWork += BgwSendEmail_DoWork;
+            BgwSendEmail.RunWorkerAsync(detalle);
+        }
 
-
-        public static void SendEmail(Detalle detalle)
+        private static void BgwSendEmail_DoWork(object sender, DoWorkEventArgs e)
         {
+            Detalle detalle = e.Argument as Detalle;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             string name = ti.ToTitleCase(detalle.RznSocRecep.ToLower());
             StringBuilder builder = new StringBuilder();
@@ -30,7 +35,7 @@ namespace Centralizador.Models.Outlook
             string rutDebtor = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detalle.Instruction.ParticipantDebtor.Rut).Replace(',', '.');
 
             builder.AppendFormat("<p>Se&ntilde;ores: <span style=\"text-decoration: underline;\">{0}</span>&nbsp;</p>\r\n<p>Rut: {1}-{2}</p>\r\n" +
-                "<p>&nbsp;</p>\r\n<p>La empresa \"{3}\" Rut: \"{4}-{5}\" " +
+                "<p>&nbsp;</p>\r\n<p>La empresa \"{3}\" Rut: {4}-{5} " +
                 "informa que la factura que se individualiza a continuaci&oacute;n fue rechazada por el motivo que se se&ntilde;ala:</p>\r\n<p>&nbsp;</p>\r\n" +
                 "<p>Folio: {6}</p>\r\n" +
                 "<p>Fecha: {7}</p>\r\n" +
@@ -40,7 +45,7 @@ namespace Centralizador.Models.Outlook
                 "<p>&nbsp;</p>\r\n<p>Para mayor informaci&oacute;n sobre las exigencias del CEN:" +
                 "<a href=\"https://drive.google.com/drive/folders/10CYJU7VaG1JRvPiKvqPiNpOEoLDBkz1z\">https://drive.google.com/drive/folders/10CYJU7VaG1JRvPiKvqPiNpOEoLDBkz1z</a>&nbsp;" +
                 "</p>\r\n<hr />\r\n<p><strong><span style=\"color: #0000ff;\">" +
-                "Una herramienta Centralizador.</span></strong></p>", name, rutCreditor, detalle.DvReceptor, detalle.Instruction.ParticipantDebtor.BusinessName, rutDebtor, detalle.Instruction.ParticipantDebtor.VerificationCode, detalle.Folio, detalle.FechaEmision, detalle.MntNeto);
+                "Una herramienta Centralizador.</span></strong></p>", name, rutCreditor, detalle.DvReceptor, detalle.Instruction.ParticipantDebtor.BusinessName, rutDebtor, detalle.Instruction.ParticipantDebtor.VerificationCode, detalle.Folio, detalle.FechaEmision, detalle.MntNeto.ToString("#,##"));
 
             try
             {
@@ -79,17 +84,22 @@ namespace Centralizador.Models.Outlook
 
                 //Console.WriteLine("start to send email ...");
 
+                // SYNC
                 SmtpClient oSmtp = new SmtpClient();
                 oSmtp.SendMail(oServer, oMail);
 
+
+
                 //Console.WriteLine("email was sent successfully!");
+       
             }
             catch (System.Exception)
             {
                 throw;
             }
-
         }
+
+       
     }
 }
 

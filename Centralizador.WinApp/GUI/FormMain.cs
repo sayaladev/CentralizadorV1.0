@@ -54,6 +54,7 @@ namespace Centralizador.WinApp.GUI
         public StringBuilder StringLogging { get; set; }
         public string DataBaseName { get; set; }
         public BackgroundWorker BgwReadEmail { get; private set; }
+        public BackgroundWorker BgwSendEmail { get; private set; }
 
         // Button Class
         private readonly IGButtonColumnManager Btn = new IGButtonColumnManager();
@@ -131,13 +132,18 @@ namespace Centralizador.WinApp.GUI
             BgwInsertRef.RunWorkerCompleted += BgwInsertRef_RunWorkerCompleted;
             BgwInsertRef.DoWork += BgwInsertRef_DoWork;
 
-            //
+            // Worker read email
             BgwReadEmail = new BackgroundWorker
             {
                 WorkerReportsProgress = true
             };
             BgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
             BgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
+
+            // Worker send email
+            BgwSendEmail = new BackgroundWorker();          
+            BgwSendEmail.RunWorkerCompleted += BgwSendEmail_RunWorkerCompleted;
+
 
             // Logging file
             StringLogging = new StringBuilder();
@@ -1023,10 +1029,10 @@ namespace Centralizador.WinApp.GUI
             foreach (Detalle item in DetallesDebtor)
             {
                 // Tester
-                if (item.Folio != 4671)
-                {
-                    continue;
-                }
+                //if (item.Folio != 4522)
+                //{
+                //    continue;
+                //}
                 DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
@@ -1055,6 +1061,7 @@ namespace Centralizador.WinApp.GUI
                             item.Instruction = i[0];
                             item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixById(i[0]);
                             item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowById(item.Instruction.PaymentMatrix);
+                           
                         }
                         else
                         {
@@ -1081,6 +1088,12 @@ namespace Centralizador.WinApp.GUI
                                 }
                             }
                         }
+                        if (item.Instruction != null)
+                        {
+                            item.Instruction.ParticipantCreditor = participant;
+                            item.Instruction.ParticipantDebtor = UserParticipant;
+                        }
+          
                     }
                 }
 
@@ -1428,7 +1441,9 @@ namespace Centralizador.WinApp.GUI
                 //e.DoDefault = false;
             }
         }
-        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e) // Rejected button
+
+        #region Rejected Button   
+        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
             if (IsCreditor)
             {
@@ -1436,6 +1451,7 @@ namespace Centralizador.WinApp.GUI
             }
             else
             {
+                TssLblMensaje.Text = null;
                 Detalle detalle = null;
                 if (IsCreditor)
                 {
@@ -1447,54 +1463,69 @@ namespace Centralizador.WinApp.GUI
                 }
                 //if (detalle.StatusDetalle == StatusDetalle.No)
                 //{
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append($"Invoice F°: {detalle.Folio}");
-                    builder.Append(Environment.NewLine);      
-                    builder.Append($"Amount $: {detalle.MntNeto:#,##}");
-                    builder.Append(Environment.NewLine);
-                    builder.Append($"Remaining time to reject: {detalle.DataEvento.DiferenciaFecha} days");
-                    builder.Append(Environment.NewLine);
-                    builder.Append(Environment.NewLine);
-                    builder.Append("Are you sure?");
+                StringBuilder builder = new StringBuilder();
+                builder.Append($"Invoice F°: {detalle.Folio}");
+                builder.Append(Environment.NewLine);
+                builder.Append($"Amount $: {detalle.MntNeto:#,##}");
+                builder.Append(Environment.NewLine);
+                builder.Append($"Remaining time to reject: {detalle.DataEvento.DiferenciaFecha} days");
+                builder.Append(Environment.NewLine);
+                builder.Append(Environment.NewLine);
+                builder.Append("Are you sure?");
 
 
-                    DialogResult result = MessageBox.Show(builder.ToString(), "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (result == DialogResult.Yes)
+                DialogResult result = MessageBox.Show(builder.ToString(), "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    // Reject in Sii
+                    // ACD: Acepta Contenido del Documento
+                    // RCD: Reclamo al Contenido del Documento
+                    // ERM: Otorga Recibo de Mercaderías o Servicios
+                    // RFP: Reclamo por Falta Parcial de Mercaderías
+                    // RFT: Reclamo por Falta Total de Mercaderías
+                    respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
+                    detalle.StatusDetalle = StatusDetalle.Rejected;
+                    switch (resp.codResp)
                     {
-                        // Reject in Sii
-                        // ACD: Acepta Contenido del Documento
-                        // RCD: Reclamo al Contenido del Documento
-                        // ERM: Otorga Recibo de Mercaderías o Servicios
-                        // RFP: Reclamo por Falta Parcial de Mercaderías
-                        // RFT: Reclamo por Falta Total de Mercaderías
-                        respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
-                        detalle.StatusDetalle = StatusDetalle.Rejected;
-                        switch (resp.codResp)
-                        {
-                            case 0: // Acción Completada OK.
-                                if (detalle.IsParticipant)
-                                {
-                                    // Reject in CEN                                
-                                    ResultDte doc = Dte.SendDteDebtor(detalle, TokenCen);
-                                    detalle.Instruction.Dte = doc;
-                                    IGridMain.CurRow.Cells["P3"].Value = 1;
-                                    //IGridFill(DetallesDebtor);
+                        case 0: // Acción Completada OK.
+                            if (detalle.IsParticipant && detalle.Instruction != null)
+                            {
+                                // Reject in CEN                                
+                                ResultDte doc = Dte.SendDteDebtor(detalle, TokenCen);
+                                detalle.Instruction.Dte = doc;
+                                IGridMain.CurRow.Cells["P3"].Value = 1;
+                                //IGridFill(DetallesDebtor);
 
 
-                                    // Send email
-                                    ServiceSendMail.SendEmail(detalle);
-                                }
+                                // Send email
+                                ServiceSendMail.SendEmailToParticipant(BgwSendEmail, detalle);
+                            }
 
 
-                                break;
-                            case 7: // Evento registrado previamente
-                                    // Tester
-                                ServiceSendMail.SendEmail(detalle);
-                                break;
+                            break;
+                        case 7: // Evento registrado previamente
+                                // Tester
+                            if (detalle.IsParticipant && detalle.Instruction != null)
+                            {
+                                ServiceSendMail.SendEmailToParticipant(BgwSendEmail, detalle);
+                            }
 
-                            default:
-                                break;
-                        }
+                            break;
+                        case 8: // Pasados 8 días después de la recepción no es posible registrar reclamos o eventos.
+                            // Tester
+                            if (detalle.IsParticipant && detalle.Instruction != null)
+                            {
+                                ServiceSendMail.SendEmailToParticipant(BgwSendEmail, detalle);
+                            }
+                            else
+                            {
+                                TssLblMensaje.Text = "Impossible to send Email.";
+                            }
+
+                            break;
+                        default:
+                            break;
+                    }
                     //}
                 }
                 // MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
@@ -1502,6 +1533,14 @@ namespace Centralizador.WinApp.GUI
 
 
         }
+        private void BgwSendEmail_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            MessageBox.Show("Exito");
+        }
+
+
+
+        #endregion
 
         #endregion
 
