@@ -54,7 +54,8 @@ namespace Centralizador.WinApp.GUI
         public StringBuilder StringLogging { get; set; }
         public string DataBaseName { get; set; }
         public BackgroundWorker BgwReadEmail { get; private set; }
-        public BackgroundWorker BgwSendEmail { get; private set; }
+       
+        public ServiceSendMail Mail { get; private set; }
 
         // Button Class
         private readonly IGButtonColumnManager Btn = new IGButtonColumnManager();
@@ -140,10 +141,7 @@ namespace Centralizador.WinApp.GUI
             BgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
             BgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
 
-            // Worker send email
-            BgwSendEmail = new BackgroundWorker();          
-            BgwSendEmail.RunWorkerCompleted += BgwSendEmail_RunWorkerCompleted;
-
+      
 
             // Logging file
             StringLogging = new StringBuilder();
@@ -1029,10 +1027,10 @@ namespace Centralizador.WinApp.GUI
             foreach (Detalle item in DetallesDebtor)
             {
                 // Tester
-                //if (item.Folio != 4522)
-                //{
-                //    continue;
-                //}
+                if (item.Folio != 452)
+                {
+                    continue;
+                }
                 DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
@@ -1061,7 +1059,7 @@ namespace Centralizador.WinApp.GUI
                             item.Instruction = i[0];
                             item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixById(i[0]);
                             item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowById(item.Instruction.PaymentMatrix);
-                           
+
                         }
                         else
                         {
@@ -1093,7 +1091,7 @@ namespace Centralizador.WinApp.GUI
                             item.Instruction.ParticipantCreditor = participant;
                             item.Instruction.ParticipantDebtor = UserParticipant;
                         }
-          
+
                     }
                 }
 
@@ -1219,7 +1217,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         myRow.Cells["status"].Value = item.StatusDetalle;
 
-                        //myRow.Cells["btnRejected"].Enabled = iGBool.False;
+                        myRow.Cells["btnRejected"].Enabled = iGBool.False;
                         if (item.StatusDetalle == StatusDetalle.Rejected)
                         {
                             rejectedV += item.MntNeto;
@@ -1477,68 +1475,62 @@ namespace Centralizador.WinApp.GUI
                 DialogResult result = MessageBox.Show(builder.ToString(), "Centralizador", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
+                    if (Mail == null)
+                    {
+                        Mail = new ServiceSendMail(1) // Parameter!!! *********************************
+                        {
+                            UserParticipant = UserParticipant
+                        };
+                    }
                     // Reject in Sii
                     // ACD: Acepta Contenido del Documento
                     // RCD: Reclamo al Contenido del Documento
                     // ERM: Otorga Recibo de Mercaderías o Servicios
                     // RFP: Reclamo por Falta Parcial de Mercaderías
                     // RFT: Reclamo por Falta Total de Mercaderías
-                    respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
-                    detalle.StatusDetalle = StatusDetalle.Rejected;
-                    switch (resp.codResp)
+                    //respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
+                    respuestaTo resp = new respuestaTo
                     {
-                        case 0: // Acción Completada OK.
-                            if (detalle.IsParticipant && detalle.Instruction != null)
-                            {
+                        codResp = 0
+                    };
+                    detalle.StatusDetalle = StatusDetalle.Rejected;
+                    if (detalle.IsParticipant && detalle.Instruction != null)
+                    {
+                        switch (resp.codResp)
+                        {
+                            case 0: // Acción Completada OK. 
+
+                                // Send email
+                                Mail.SendEmailToParticipant(detalle);
+
+
                                 // Reject in CEN                                
                                 ResultDte doc = Dte.SendDteDebtor(detalle, TokenCen);
                                 detalle.Instruction.Dte = doc;
                                 IGridMain.CurRow.Cells["P3"].Value = 1;
-                                //IGridFill(DetallesDebtor);
 
 
-                                // Send email
-                                ServiceSendMail.SendEmailToParticipant(BgwSendEmail, detalle);
-                            }
 
-
-                            break;
-                        case 7: // Evento registrado previamente
-                                // Tester
-                            if (detalle.IsParticipant && detalle.Instruction != null)
-                            {
-                                ServiceSendMail.SendEmailToParticipant(BgwSendEmail, detalle);
-                            }
-
-                            break;
-                        case 8: // Pasados 8 días después de la recepción no es posible registrar reclamos o eventos.
-                            // Tester
-                            if (detalle.IsParticipant && detalle.Instruction != null)
-                            {
-                                ServiceSendMail.SendEmailToParticipant(BgwSendEmail, detalle);
-                            }
-                            else
-                            {
-                                TssLblMensaje.Text = "Impossible to send Email.";
-                            }
-
-                            break;
-                        default:
-                            break;
+                                break;
+                            case 7: // Evento registrado previamente
+                                break;
+                            case 8: // Pasados 8 días después de la recepción no es posible registrar reclamos o eventos.
+                                break;
+                            default:
+                                break;
+                        }
+                        //IGridFill(DetallesDebtor); 
                     }
-                    //}
+                    else
+                    {
+                        TssLblMensaje.Text = "Impossible to send Email.";
+                    }
                 }
                 // MessageBox.Show(string.Format("Button cell ({0}, {1}) clicked!", e.RowIndex, e.ColIndex));
+                //}
             }
-
-
         }
-        private void BgwSendEmail_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            MessageBox.Show("Exito");
-        }
-
-
+       
 
         #endregion
 
