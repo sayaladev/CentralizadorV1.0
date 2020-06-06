@@ -78,7 +78,7 @@ namespace Centralizador.Models.ApiCEN
         public string BankAccount { get; set; }
 
         [JsonProperty("bank")]
-        public string Bank { get; set; }
+        public int Bank { get; set; }
 
         [JsonProperty("commercial_address")]
         public string CommercialAddress { get; set; }

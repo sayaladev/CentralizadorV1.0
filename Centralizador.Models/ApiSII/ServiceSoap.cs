@@ -13,8 +13,6 @@ namespace Centralizador.Models.ApiSII
 {
     public class ServiceSoap
     {
-        public string Seed { get; set; }
-
         public static string GETTokenFromSii()
         {
             // Get digital cert  
@@ -118,7 +116,6 @@ namespace Centralizador.Models.ApiSII
                 return null;
             }
         }
-
         public static respuestaTo SendActionToSii(string token, Detalle detalle, string accionDoc)
         {
             try
@@ -126,9 +123,7 @@ namespace Centralizador.Models.ApiSII
                 using (RegistroReclamoDteServiceEndpointService proxy = new RegistroReclamoDteServiceEndpointService(token))
                 {
                     respuestaTo response = proxy.ingresarAceptacionReclamoDoc(detalle.RutReceptor.ToString(), detalle.DvReceptor, "33", detalle.Folio.ToString(), accionDoc);
-
                     return response;
-
                 }
             }
             catch (System.Exception)

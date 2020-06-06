@@ -50,7 +50,7 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultBilingType> Results { get; set; }
 
-        public static IList<ResultBilingType> GetBilinTypesAsync() // GET
+        public static IList<ResultBilingType> GetBilinTypes() // GET
         {         
             try
             {

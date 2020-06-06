@@ -25,18 +25,23 @@ namespace Centralizador.Models.Outlook
     /// 
     /// 
     /// </summary>
-    public class ServiceGetMail
+    public class ServiceReadMail
     {
         public string TokenSii { get; set; }
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
 
-        public void GetXmlFromEmail(BackgroundWorker bgw)
+        public ServiceReadMail(string tokenSii)
         {
-            bgw.DoWork += Bgw_DoWork;
-            bgw.RunWorkerAsync();
+            TokenSii = tokenSii;
         }
 
-        private void Bgw_DoWork(object sender, DoWorkEventArgs e)
+        public void GetXmlFromEmail(BackgroundWorker BgwReadEmail)
+        {
+            BgwReadEmail.DoWork += BgwReadEmail_DoWork;
+            BgwReadEmail.RunWorkerAsync();
+        }
+
+        private void BgwReadEmail_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker bgw = sender as BackgroundWorker;
             int c = 0;
@@ -84,16 +89,27 @@ namespace Centralizador.Models.Outlook
                                 }
                                 if (xmlDocument.Root.Name.LocalName == "EnvioDTE")
                                 {
-                                    if (!SaveFiles(pathTemp + @"\" + att.Name))
+                                    int res = SaveFiles(pathTemp + @"\" + att.Name);
+                                    switch (res)
                                     {
-                                        MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                        return;
-                                    }
+                                        case 0: // Success
+                                            continue;                                            
+                                        case 1: // Error in Sii (exit funcion)
+                                            MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            return;                                          
+                                        case 2: // Error in serialization
+                                            continue;                                            
+                                        case 3: // Error in query in Sii: folio wrong example.
+                                            break;
+
+                                        default:
+                                            break;
+                                    }                                
                                 }
                             }
                             catch (System.Xml.XmlException)
                             {
-                                //throw;
+                                throw;
                             }
                         }
                     }
@@ -115,56 +131,65 @@ namespace Centralizador.Models.Outlook
                 Properties.Settings.Default.Save();
             }
         }
-        private bool SaveFiles(string path)
+        private int SaveFiles(string path)
         {
             string response = "";
             string nameFolder;
             string nameFile;
             // Deserialize
             EnvioDTE xmlObjeto = ServicePdf.TransformXmlEnvioDTEToObject(path);
-            foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
+            if (xmlObjeto != null)
             {
-                DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
-                string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
-                // Only process TipoDTE 33 & 34.
-                if (document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item33 || document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item34)
+                foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
                 {
-                    // Remove zeros at left 
-                    document.Encabezado.IdDoc.Folio = document.Encabezado.IdDoc.Folio.TrimStart(new char[] { '0' });
-                    try
+                    DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
+                    string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
+                    // Only process TipoDTE 33 & 34.
+                    if (document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item33 || document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item34)
                     {
-                        using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
+                        // Remove zeros at left 
+                        document.Encabezado.IdDoc.Folio = document.Encabezado.IdDoc.Folio.TrimStart(new char[] { '0' });
+                        try
                         {
-                            response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
-                            emisor.GetValue(1).ToString(),
-                            Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
-                            document.Encabezado.IdDoc.Folio);
+                            using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
+                            {
+                                response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
+                                emisor.GetValue(1).ToString(),
+                                Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
+                                document.Encabezado.IdDoc.Folio);
+                            }
                         }
-                    }
-                    catch (Exception)
-                    {
-                        return false;
-                    }
+                        catch (Exception)
+                        {
+                            // Error in Sii
+                            return 1;
+                        }
 
-                    if (response.Length != 0)
-                    {
-                        DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
-                        nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
-                        nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
-                        Save(nameFolder, nameFile, dte);
-                        return true;
-                    }
-                    else
-                    {
-                        // Errors. // dejar carpeta folder en 2020/5
-                        nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month;
-                        nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
-                        Save(nameFolder + @"\Errors\", nameFile, dte);
-                        return false;
+                        if (response.Length != 0)
+                        {
+                            DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
+                            nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
+                            nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
+                            Save(nameFolder, nameFile, dte);
+                            return 0;
+                        }
+                        else
+                        {
+                            // Errors. // dejar carpeta folder en 2020/5
+                            nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month;
+                            nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
+                            Save(nameFolder + @"\Errors\", nameFile, dte);
+                            return 3;
+                        }
                     }
                 }
             }
-            return true;
+            else
+            {        
+                // Serialialization failed
+                return 2;           
+            }           
+            return 0;
         }
         private void Save(string nameFolder, string nameFile, DTEDefType dte)
         {

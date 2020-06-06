@@ -40,6 +40,8 @@
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
             this.iGrid1DefaultCellStyle = new TenTec.Windows.iGridLib.iGCellStyle(true);
             this.iGrid1DefaultColHdrStyle = new TenTec.Windows.iGridLib.iGColHdrStyle(true);
+            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
+            this.BtnOutlook = new System.Windows.Forms.Button();
             this.BtnExcelConvert = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
@@ -50,9 +52,9 @@
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.TxtDateTimeEmail = new System.Windows.Forms.TextBox();
+            this.ChkIncludeCEN = new System.Windows.Forms.CheckBox();
+            this.BtnHiperLink = new System.Windows.Forms.Button();
             this.BtnInsertNv = new System.Windows.Forms.Button();
-            this.BtnOutlook = new System.Windows.Forms.Button();
             this.ChkIncludeReclaimed = new System.Windows.Forms.CheckBox();
             this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnInsertRef = new System.Windows.Forms.Button();
@@ -65,7 +67,7 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
-            this.BtnHiperLink = new System.Windows.Forms.Button();
+            this.ChkIncludeAll = new System.Windows.Forms.CheckBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -166,6 +168,25 @@
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             this.IGridMain.RequestCellToolTipText += new TenTec.Windows.iGridLib.iGRequestCellToolTipTextEventHandler(this.IGridMain_RequestCellToolTipText);
             // 
+            // TxtDateTimeEmail
+            // 
+            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtDateTimeEmail.Location = new System.Drawing.Point(82, 605);
+            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
+            this.TxtDateTimeEmail.ReadOnly = true;
+            this.TxtDateTimeEmail.Size = new System.Drawing.Size(120, 20);
+            this.TxtDateTimeEmail.TabIndex = 2;
+            // 
+            // BtnOutlook
+            // 
+            this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
+            this.BtnOutlook.Location = new System.Drawing.Point(12, 591);
+            this.BtnOutlook.Name = "BtnOutlook";
+            this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
+            this.BtnOutlook.TabIndex = 1;
+            this.BtnOutlook.UseVisualStyleBackColor = true;
+            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
+            // 
             // BtnExcelConvert
             // 
             this.BtnExcelConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnExcelConvert.Image")));
@@ -207,7 +228,7 @@
             this.TxtFmaPago.Location = new System.Drawing.Point(44, 100);
             this.TxtFmaPago.Name = "TxtFmaPago";
             this.TxtFmaPago.ReadOnly = true;
-            this.TxtFmaPago.Size = new System.Drawing.Size(52, 18);
+            this.TxtFmaPago.Size = new System.Drawing.Size(42, 18);
             this.TxtFmaPago.TabIndex = 9;
             this.TxtFmaPago.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -233,10 +254,10 @@
             // TxtFolioRef
             // 
             this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFolioRef.Location = new System.Drawing.Point(102, 100);
+            this.TxtFolioRef.Location = new System.Drawing.Point(92, 100);
             this.TxtFolioRef.Name = "TxtFolioRef";
             this.TxtFolioRef.ReadOnly = true;
-            this.TxtFolioRef.Size = new System.Drawing.Size(100, 18);
+            this.TxtFolioRef.Size = new System.Drawing.Size(110, 18);
             this.TxtFolioRef.TabIndex = 7;
             // 
             // TxtNmbItem
@@ -265,6 +286,8 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            this.groupBox2.Controls.Add(this.ChkIncludeAll);
+            this.groupBox2.Controls.Add(this.ChkIncludeCEN);
             this.groupBox2.Controls.Add(this.BtnHiperLink);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
             this.groupBox2.Controls.Add(this.ChkIncludeReclaimed);
@@ -276,14 +299,28 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
-            // TxtDateTimeEmail
+            // ChkIncludeCEN
             // 
-            this.TxtDateTimeEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDateTimeEmail.Location = new System.Drawing.Point(82, 605);
-            this.TxtDateTimeEmail.Name = "TxtDateTimeEmail";
-            this.TxtDateTimeEmail.ReadOnly = true;
-            this.TxtDateTimeEmail.Size = new System.Drawing.Size(122, 20);
-            this.TxtDateTimeEmail.TabIndex = 2;
+            this.ChkIncludeCEN.AutoSize = true;
+            this.ChkIncludeCEN.Location = new System.Drawing.Point(118, 107);
+            this.ChkIncludeCEN.Name = "ChkIncludeCEN";
+            this.ChkIncludeCEN.Size = new System.Drawing.Size(72, 17);
+            this.ChkIncludeCEN.TabIndex = 12;
+            this.ChkIncludeCEN.Text = "Only CEN";
+            this.ChkIncludeCEN.UseVisualStyleBackColor = true;
+            // 
+            // BtnHiperLink
+            // 
+            this.BtnHiperLink.BackColor = System.Drawing.Color.Green;
+            this.BtnHiperLink.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("BtnHiperLink.BackgroundImage")));
+            this.BtnHiperLink.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.BtnHiperLink.Location = new System.Drawing.Point(40, 151);
+            this.BtnHiperLink.Name = "BtnHiperLink";
+            this.BtnHiperLink.Size = new System.Drawing.Size(125, 51);
+            this.BtnHiperLink.TabIndex = 11;
+            this.BtnHiperLink.UseVisualStyleBackColor = false;
+            this.BtnHiperLink.Click += new System.EventHandler(this.BtnHiperLink_Click);
+            this.BtnHiperLink.MouseHover += new System.EventHandler(this.BtnHiperLink_MouseHover);
             // 
             // BtnInsertNv
             // 
@@ -295,16 +332,6 @@
             this.BtnInsertNv.Text = "Insert NV";
             this.BtnInsertNv.UseVisualStyleBackColor = false;
             this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_Click);
-            // 
-            // BtnOutlook
-            // 
-            this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
-            this.BtnOutlook.Location = new System.Drawing.Point(12, 591);
-            this.BtnOutlook.Name = "BtnOutlook";
-            this.BtnOutlook.Size = new System.Drawing.Size(56, 46);
-            this.BtnOutlook.TabIndex = 1;
-            this.BtnOutlook.UseVisualStyleBackColor = true;
-            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
             // 
             // ChkIncludeReclaimed
             // 
@@ -319,9 +346,9 @@
             // BtnPagar
             // 
             this.BtnPagar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.BtnPagar.Location = new System.Drawing.Point(29, 107);
+            this.BtnPagar.Location = new System.Drawing.Point(21, 107);
             this.BtnPagar.Name = "BtnPagar";
-            this.BtnPagar.Size = new System.Drawing.Size(154, 38);
+            this.BtnPagar.Size = new System.Drawing.Size(89, 38);
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pagar";
             this.BtnPagar.UseVisualStyleBackColor = false;
@@ -330,7 +357,7 @@
             // BtnInsertRef
             // 
             this.BtnInsertRef.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.BtnInsertRef.Location = new System.Drawing.Point(29, 63);
+            this.BtnInsertRef.Location = new System.Drawing.Point(21, 63);
             this.BtnInsertRef.Name = "BtnInsertRef";
             this.BtnInsertRef.Size = new System.Drawing.Size(154, 38);
             this.BtnInsertRef.TabIndex = 8;
@@ -448,18 +475,15 @@
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
             // 
-            // BtnHiperLink
+            // ChkIncludeAll
             // 
-            this.BtnHiperLink.BackColor = System.Drawing.Color.Green;
-            this.BtnHiperLink.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("BtnHiperLink.BackgroundImage")));
-            this.BtnHiperLink.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.BtnHiperLink.Location = new System.Drawing.Point(40, 151);
-            this.BtnHiperLink.Name = "BtnHiperLink";
-            this.BtnHiperLink.Size = new System.Drawing.Size(125, 51);
-            this.BtnHiperLink.TabIndex = 11;
-            this.BtnHiperLink.UseVisualStyleBackColor = false;
-            this.BtnHiperLink.Click += new System.EventHandler(this.BtnHiperLink_Click);
-            this.BtnHiperLink.MouseHover += new System.EventHandler(this.BtnHiperLink_MouseHover);
+            this.ChkIncludeAll.AutoSize = true;
+            this.ChkIncludeAll.Location = new System.Drawing.Point(117, 128);
+            this.ChkIncludeAll.Name = "ChkIncludeAll";
+            this.ChkIncludeAll.Size = new System.Drawing.Size(37, 17);
+            this.ChkIncludeAll.TabIndex = 13;
+            this.ChkIncludeAll.Text = "All";
+            this.ChkIncludeAll.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -471,6 +495,7 @@
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FormMain";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.StatusStrip.ResumeLayout(false);
@@ -531,5 +556,7 @@
         private System.Windows.Forms.Button BtnInsertNv;
         private System.Windows.Forms.Button BtnExcelConvert;
         private System.Windows.Forms.Button BtnHiperLink;
+        private System.Windows.Forms.CheckBox ChkIncludeCEN;
+        private System.Windows.Forms.CheckBox ChkIncludeAll;
     }
 }
