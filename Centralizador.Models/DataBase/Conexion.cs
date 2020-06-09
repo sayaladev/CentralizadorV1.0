@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace Centralizador.Models.DataBase
 {
@@ -22,7 +23,7 @@ namespace Centralizador.Models.DataBase
         }
 
 
-        public static async System.Threading.Tasks.Task<DataTable> ExecuteReaderAsync(Conexion conn)
+        public static async Task<DataTable> ExecuteReaderAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
@@ -56,7 +57,7 @@ namespace Centralizador.Models.DataBase
             }
             return null;
         }
-        public static int ExecuteNonQuery(Conexion conn)
+        public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
@@ -70,7 +71,7 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
-                    return cmd.ExecuteNonQuery();
+                    return await cmd.ExecuteNonQueryAsync();
                 }
                 catch (Exception)
                 {
@@ -85,7 +86,7 @@ namespace Centralizador.Models.DataBase
         }
 
 
-        public static object ExecuteScalar(Conexion conn)
+        public static async Task<object> ExecuteScalarAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
@@ -99,7 +100,7 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
-                    object obj = cmd.ExecuteScalar();
+                    object obj = await cmd.ExecuteScalarAsync();
                     if (obj != null && DBNull.Value != obj)
                     {
                         return obj;

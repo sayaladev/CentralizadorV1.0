@@ -94,13 +94,17 @@ namespace Centralizador.Models.ApiCEN
 
         public static ResultDte GetDteByFolio(Detalle detalle, bool isCreditor) // GET
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
                 ResultInstruction i = detalle.Instruction;
-                // &type=1 (F 33)
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}");
+                // &type=1 (F 33)       
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}");
                 if (res != null)
                 {
                     Dte dte = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -119,6 +123,11 @@ namespace Centralizador.Models.ApiCEN
 
         public static ResultDte SendDteCreditor(Detalle detalle, string tokenCen) // POST
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             string fileName = detalle.Folio + "_" + detalle.Instruction;
             string docXml = detalle.References.FileBasico;
             string idFile = SendFile(tokenCen, fileName, docXml);
@@ -139,13 +148,12 @@ namespace Centralizador.Models.ApiCEN
           
                 try
                 {
-                    string d = JsonConvert.SerializeObject(dte);
-                    WebClientCEN.WebClient.Headers.Clear();
-                    WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                    WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                    string d = JsonConvert.SerializeObject(dte);             
+                    //wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                    wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                     NameValueCollection postData = new NameValueCollection() { { "data", d } };
 
-                    byte[] res = WebClientCEN.WebClient.UploadValues("api/v1/operations/dtes/create/", postData);
+                    byte[] res = wc.UploadValues("api/v1/operations/dtes/create/", postData);
                     if (res != null)
                     {
                         string json = Encoding.UTF8.GetString(res);
@@ -166,6 +174,11 @@ namespace Centralizador.Models.ApiCEN
         }
         public static ResultDte SendDteDebtor(Detalle detalle, string tokenCen) // POST
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             ResultDte dte = new ResultDte
             {
                 Folio = detalle.Folio,
@@ -201,12 +214,11 @@ namespace Centralizador.Models.ApiCEN
             try
             {
                 string d = JsonConvert.SerializeObject(dte);
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                 NameValueCollection postData = new NameValueCollection() { { "data", d } };
 
-                byte[] res = WebClientCEN.WebClient.UploadValues("api/v1/operations/dtes/create/", postData);
+                byte[] res = wc.UploadValues("api/v1/operations/dtes/create/", postData);
                 if (res != null)
                 {
                     string json = Encoding.UTF8.GetString(res);
@@ -227,13 +239,17 @@ namespace Centralizador.Models.ApiCEN
 
         private static string SendFile(string tokenCen, string fileName, string doc) // PUT
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
-                WebClientCEN.WebClient.Headers.Add("Content-Disposition", "attachment; filename=" + fileName + ".xml");
-                string res = WebClientCEN.WebClient.UploadString("api/v1/resources/auxiliary-files/", WebRequestMethods.Http.Put, doc);
+                wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                wc.Headers.Add("Content-Disposition", "attachment; filename=" + fileName + ".xml");
+                string res = wc.UploadString("api/v1/resources/auxiliary-files/", WebRequestMethods.Http.Put, doc);
                 if (res != null)
                 {
                     Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);

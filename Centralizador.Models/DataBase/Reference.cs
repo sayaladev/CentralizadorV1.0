@@ -128,9 +128,11 @@ namespace Centralizador.Models.DataBase
             {
                 StringBuilder query = new StringBuilder();              
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
-                //string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
-                //string time = string.Format(cultureInfo, "{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
-                string time = string.Format(cultureInfo, "{0:g}", instruction.PaymentMatrix.PublishDate);
+                // PRUEBAS
+                //string time = string.Format(cultureInfo, "{0:g}", instruction.PaymentMatrix.PublishDate); No funciona
+
+                //PRODUCTIVO
+                string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", instruction.PaymentMatrix.PublishDate); // Sí funciona!
                 query.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} ");
                 query.Append("  AND Tipo = 'F' ");
                 query.Append("  AND CodRefSII = 'SEN') ");
@@ -144,10 +146,11 @@ namespace Centralizador.Models.DataBase
                 query.Append("END ");
 
                 conexion.Query = query.ToString();
-                return Convert.ToInt32(Conexion.ExecuteNonQuery(conexion)); // Return 1 if ok!
+                return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
             }
             catch (Exception)
             {
+                System.Windows.Forms.MessageBox.Show("Test");
                 return 99;
             }
         }

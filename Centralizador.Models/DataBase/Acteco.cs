@@ -77,7 +77,7 @@ namespace Centralizador.Models.DataBase
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
                 query.Append($"'{descripcion}') END");
                 conexion.Query = query.ToString();
-                return Conexion.ExecuteNonQuery(conexion);
+                return Conexion.ExecuteNonQueryAsync(conexion).Result;
             }
             catch (Exception)
             {

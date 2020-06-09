@@ -61,12 +61,16 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <returns></returns>
         public static ResultAgent GetAgetByEmail(string userCEN) // GET
-        {          
+        {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8               
+            };
             try
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/agents/?email={userCEN}");
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/agents/?email={userCEN}");
                 if (res != null)
                 {
                     Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -88,7 +92,12 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <returns></returns>
         public static string GetTokenCen(string userCEN, string passwordCEN) // POST
-        {       
+        {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>
@@ -96,10 +105,8 @@ namespace Centralizador.Models.ApiCEN
                     { "username", userCEN },
                     { "password", passwordCEN }
                 };
-
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.UploadString("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented));
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.UploadString("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented));
                 if (res != null)
                 {
                     dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);

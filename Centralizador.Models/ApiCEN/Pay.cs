@@ -58,15 +58,19 @@ namespace Centralizador.Models.ApiCEN
 
         public static ResultPay SendPay(ResultPay pay, string tokenCen)
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
                 string d = JsonConvert.SerializeObject(pay);
-                WebClientCEN.WebClient.Headers.Clear();
-                //WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                //wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                 NameValueCollection postData = new NameValueCollection() { { "data", d } };
 
-                byte[] res = WebClientCEN.WebClient.UploadValues("api/v1/operations/payments/create/", postData);
+                byte[] res = wc.UploadValues("api/v1/operations/payments/create/", postData);
                 if (res != null)
                 {
                     string json = Encoding.UTF8.GetString(res);

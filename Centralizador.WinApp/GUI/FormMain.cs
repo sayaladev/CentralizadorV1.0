@@ -170,9 +170,6 @@ namespace Centralizador.WinApp.GUI
             timerHour.Enabled = true;
             timerHour.AutoReset = true;
 
-            //WebClien
-            WebClientCEN webClientCEN = new WebClientCEN(Properties.Settings.Default.BaseAddress);
-
         }
         private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -300,11 +297,12 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Footer.Cells[1, "total"].AggregateFunction = iGAggregateFunction.Sum;
             iGFooterCellStyle style = new iGFooterCellStyle
             {
-                TextAlign = iGContentAlignment.MiddleRight
+                TextAlign = iGContentAlignment.MiddleRight,
+                Font = new Font("Calibri", 8.5f, FontStyle.Bold)
             };
             iGFooterCell fooUp = IGridMain.Footer.Cells[0, "fechaEmision"];
             fooUp.Style = style;
-            fooUp.Value = "Rejected invoices:";
+            fooUp.Value = "Invoices rejected & waiting:";
             iGFooterCell fooDown = IGridMain.Footer.Cells[1, "fechaEmision"];
             fooDown.Value = "Totals:";
             fooDown.Style = style;
@@ -511,20 +509,17 @@ namespace Centralizador.WinApp.GUI
             // Sql 
             Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.ServerName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
             int foliosDisp = NotaVenta.CheckFolios(con);
-
             foreach (Detalle item in detallesFinal)
             {
                 if (c == foliosDisp)
                 {
                     continue;
                 }
-
                 // Tester 
-                //if (item.Instruction.Id != 1783538)
+                //if (item.Instruction.Id != 1825458)
                 //{
                 //    continue;
                 //}
-
                 Comuna comuna = null;
                 string acteco = null;
                 // Get F° NV if exists
@@ -536,7 +531,7 @@ namespace Centralizador.WinApp.GUI
                         AuxCsv a = values.FirstOrDefault(x => x.Rut == item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode);
                         if (a != null)
                         {
-                            // Update dte & name aux from all instructions 
+                            // Info from CSV file
                             string name = ti.ToTitleCase(a.Name.ToLower());
                             item.Instruction.ParticipantDebtor.BusinessName = name;
                             item.Instruction.ParticipantDebtor.DteReceptionEmail = a.Email;
@@ -550,7 +545,7 @@ namespace Centralizador.WinApp.GUI
                         continue;
                     }
 
-                    // Crear auxiliares nuevos
+                    // Not exists Auxiliar : Create
                     Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction, con);
                     if (auxiliar == null)
                     {
@@ -558,21 +553,13 @@ namespace Centralizador.WinApp.GUI
                         IList<Comuna> comunas = Comuna.GetComunas(con);
                         if (comunas != null)
                         {
-                            //foreach (Comuna com in comunas)
-                            //{
-                            //    if (item.Instruction.ParticipantDebtor.CommercialAddress.Contains(com.ComDes))
-                            //    {
-                            //      comuna = com;
-                            //        break;
-                            //    }
-                            //}
-
                             Regex regex = new Regex(@"\b[\s,\.-:;]*");
                             IEnumerable<string> words = regex.Split(item.Instruction.ParticipantDebtor.CommercialAddress).Where(x => !string.IsNullOrEmpty(x));
                             IList<Comuna> coms = new List<Comuna>();
                             foreach (string w in words)
                             {
-                                Comuna r = comunas.FirstOrDefault(x => x.ComDes == w);
+                                // Comuna según info de CEN
+                                Comuna r = comunas.FirstOrDefault(x => x.ComDes.Contains(w));
                                 if (r != null)
                                 {
                                     coms.Add(r);
@@ -587,22 +574,21 @@ namespace Centralizador.WinApp.GUI
                                 comuna = coms[1];
                             }
                         }
-
-
-                        // Get acteco herokuapp
-                        //IList<Actividade> actividades = Acteco.GetActecoCode(item.Instruction.ParticipantDebtor);
-                        //if (actividades != null)
-                        //{
-                        //    acteco = actividades[0].Giro.Substring(0, 60);
-                        //    // Insert acteco
-                        //    Acteco.InsertActeco(acteco, con);
-                        //}
-
                         // Get acteco from CEN
                         if (item.Instruction.ParticipantDebtor.CommercialBusiness != null)
                         {
-                            acteco = item.Instruction.ParticipantDebtor.CommercialBusiness;
-                            Acteco.InsertActeco(acteco, con);
+                            if (item.Instruction.ParticipantDebtor.CommercialBusiness.Length > 60)
+                            {
+                                acteco = item.Instruction.ParticipantDebtor.CommercialBusiness.Substring(0, 60);
+                                Acteco.InsertActeco(acteco, con);
+                            }
+                            else
+                            {
+                                acteco = item.Instruction.ParticipantDebtor.CommercialBusiness;
+                                Acteco.InsertActeco(acteco, con);
+                            }                
+
+                           
                         }
                         else
                         {
@@ -615,7 +601,6 @@ namespace Centralizador.WinApp.GUI
                             case 0:
                                 break;
                             case 1:
-
                                 break;
                             case 2:
                                 StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
@@ -623,33 +608,33 @@ namespace Centralizador.WinApp.GUI
                             case -1:
                                 break;
                             case 99:
-                                StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Error" + Environment.NewLine);
-                                break;
+                                StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Error: " + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
+                                break;                         
                         }
                     }
+                    // Yes exists Aux : Update
                     else
                     {
                         if (string.IsNullOrEmpty(auxiliar.ComAux))
                         {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: ComAux" + Environment.NewLine);
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: ComAux" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                             continue;
                         }
                         if (string.IsNullOrEmpty(auxiliar.DirAux))
                         {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: DirAux" + Environment.NewLine);
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: DirAux" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                             continue;
                         }
                         if (string.IsNullOrEmpty(auxiliar.GirAux))
                         {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: GirAux" + Environment.NewLine);
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: GirAux" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                             continue;
                         }
                         if (string.IsNullOrEmpty(auxiliar.RutAux))
                         {
-                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: RutAux" + Environment.NewLine);
+                            StringLogging.Append(item.Instruction.Id + "\t" + "Auxiliar Update:" + "\t" + "Error: RutAux" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                             continue;
                         }
-
                         // Update Aux
                         result = Auxiliar.UpdateAuxiliar(item.Instruction, con);
                         switch (result)
@@ -668,24 +653,28 @@ namespace Centralizador.WinApp.GUI
                     }
 
                     // Insert NV
-                    int lastF = NotaVenta.GetLastNv(con);
-                    string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                    result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
-                    switch (result)
-                    {
-                        case 1:
-                            StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
-                            break;
-                        case 0:
-                            break;
-                        case -1:
-                            // StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
-                            break;
-                        case 99: // Error
-                            StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "Error" + Environment.NewLine);
+                    //if (acteco != null && comuna != null)
+                    //{
+                        int lastF = NotaVenta.GetLastNv(con);
+                        string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                        result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
+                        switch (result)
+                        {
+                            case 1:
+                                StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
+                                break;
+                            case 0:
+                                break;
+                            case -1:
+                                // StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + (lastF + 1) + Environment.NewLine);
+                                break;
+                            case 99: // Error
+                                StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "Error" + item.Instruction.ParticipantDebtor.Rut + Environment.NewLine);
                             break;
 
-                    }
+                        }
+                   // }
+                    
                 }
                 else
                 {
@@ -789,7 +778,7 @@ namespace Centralizador.WinApp.GUI
                         switch (result)
                         {
                             case 2: // Success
-                                StringLogging.Append(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: "+ item.Folio + Environment.NewLine);
+                                StringLogging.Append(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: " + item.Folio + Environment.NewLine);
                                 break;
                             case 0:
                                 break;
@@ -951,7 +940,7 @@ namespace Centralizador.WinApp.GUI
                 //{
                 //    continue;
                 //}
-                //if (instruction.Id != 1776873)
+                //if (instruction.Id != 1825458)
                 //{
                 //    continue;
                 //}
@@ -964,12 +953,12 @@ namespace Centralizador.WinApp.GUI
                 IList<Reference> references = Reference.GetInfoFactura(instruction, con);
                 detalle.StatusDetalle = StatusDetalle.No;
                 if (references != null)
-                {                    
-           
+                {
+
                     Reference reference = references.OrderByDescending(x => x.Folio).First();
                     // Fecha de emisión factura vs fecha publicación de la instrucción
                     int compare = DateTime.Compare(reference.FechaEmision, instruction.PaymentMatrix.PublishDate);
-                    if (compare > 0 )
+                    if (compare > 0)
                     {
                         detalle.FechaEmision = reference.FechaEmision.ToString();
                         detalle.References = reference;
@@ -1018,10 +1007,10 @@ namespace Centralizador.WinApp.GUI
                 {
                     BgwCreditor.ReportProgress((int)porcent, $"Retrieve information Creditor, wait please. ({c}/{instructions.Count})");
                 }
-             
+
                 DetallesCreditor.Add(detalle);
-      
-  
+
+
             }
             // Order the list
             //DetallesCreditor = DetallesCreditor.OrderBy(x => x.Folio).ToList();
@@ -1165,7 +1154,6 @@ namespace Centralizador.WinApp.GUI
                     ResultDte doc = Dte.GetDteByFolio(item, false);
                     if (doc == null)
                     {
-                        // TESTER ***************************************************************************************************
                         doc = Dte.SendDteDebtor(item, TokenCen);
                     }
                     item.Instruction.Dte = doc;
@@ -1173,7 +1161,6 @@ namespace Centralizador.WinApp.GUI
                 c++;
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
                 BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");
-                //Thread.Sleep(100);
             }
             DetallesDebtor = DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
             //e.Result = true;
@@ -1211,8 +1198,11 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Rows.Clear();
                 iGRow myRow;
                 int c = 0;
-                int rejectedN = 0;
-                int rejectedV = 0;
+
+                int rejectedNeto = 0;
+                int rejectedExento = 0;
+                int rejectedIva = 0;
+                int rejectedTotal = 0;
                 TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
                 foreach (Detalle item in detalles)
                 {
@@ -1237,8 +1227,12 @@ namespace Centralizador.WinApp.GUI
                     }
                     else
                     {
-                        rejectedN++;
-                        rejectedV += item.MntNeto;
+                        // Waiting for invoice
+                        rejectedNeto += item.MntNeto;
+                        rejectedExento += item.MntExento;
+                        rejectedIva += item.MntIva;
+                        rejectedTotal += item.MntTotal;
+
                     }
                     if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision)); }
                     if (item.FechaRecepcion != null) { myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)); }
@@ -1259,7 +1253,7 @@ namespace Centralizador.WinApp.GUI
                         {
                             myRow.Cells["P3"].Type = iGCellType.Check;
                             myRow.Cells["P4"].Type = iGCellType.Check;
-                            if (item.Instruction != null && item.Instruction.Dte != null)
+                            if (item.Instruction != null && (item.Instruction.StatusBilled == Instruction.StatusBilled.ConRetraso || item.Instruction.StatusBilled == Instruction.StatusBilled.Facturado))
                             {
                                 myRow.Cells["P3"].Value = 1;
                             }
@@ -1280,7 +1274,11 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["btnRejected"].Enabled = iGBool.False;
                         if (item.StatusDetalle == StatusDetalle.Rejected)
                         {
-                            rejectedV += item.MntNeto;
+                            // Rejected
+                            rejectedNeto += item.MntNeto;
+                            rejectedExento += item.MntExento;
+                            rejectedIva += item.MntIva;
+                            rejectedTotal += item.MntTotal;
                         }
                     }
                     else
@@ -1299,8 +1297,10 @@ namespace Centralizador.WinApp.GUI
 
                 }
                 // Footer Rejected
-                IGridMain.Footer.Cells[0, "neto"].Value = rejectedV;
-                //************** REVISAR ESTE EVENTO fGrid_IncludeRowInTotalsCalculation
+                IGridMain.Footer.Cells[0, "neto"].Value = rejectedNeto;
+                IGridMain.Footer.Cells[0, "exento"].Value = rejectedExento;
+                IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
+                IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
 
 
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
@@ -1690,7 +1690,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnExcelConvert_Click(object sender, EventArgs e)
         {
-         
+
             if (!IsRunning && DetallesCreditor != null || DetallesDebtor != null)
             {
                 if (IsCreditor && DetallesCreditor.Count > 0)
@@ -1707,6 +1707,11 @@ namespace Centralizador.WinApp.GUI
 
 
         }
+
+        //private void IGridMain_IncludeRowInTotalsCalculation(object sender, iGIncludeRowInTotalsCalculationEventArgs e)
+        //{
+
+        //}
     }
 }
 

@@ -19,7 +19,7 @@ namespace Centralizador.WinApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-
+            //************FALTA PREVENIR ABRIR + DE 1 VEZ LA APP
             string tokenSii = ServiceSoap.GETTokenFromSii(Properties.Settings.Default.SerialDigitalCert);
             string tokenCen = Agent.GetTokenCen(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN);
             ResultAgent agent = Agent.GetAgetByEmail(Properties.Settings.Default.UserCEN);         

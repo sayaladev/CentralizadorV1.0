@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-
+using System.Text;
+using Centralizador.Models.DataBase;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -102,7 +103,7 @@ namespace Centralizador.Models.ApiCEN
         public DateTime UpdatedTs { get; set; }
 
         // New properties
-        public string Comuna { get; set; }
+        //public Comuna Comuna { get; set; }
     }
 
     public class Participant
@@ -127,11 +128,16 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultParticipant GetParticipantById(int id) // GET
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/participants/?id={id}");
+
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/participants/?id={id}");
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -155,11 +161,15 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultParticipant GetParticipantByRut(string rut)
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/participants/?rut={rut}");
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/participants/?rut={rut}");
                 if (res != null)
                 {
                     Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

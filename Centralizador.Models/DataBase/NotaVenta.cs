@@ -16,10 +16,10 @@ namespace Centralizador.Models.DataBase
             {
 
                 conexion.Query = "select MAX(NVNumero) from softland.nw_nventa";
-              
-                if (Conexion.ExecuteScalar(conexion) != null)
+                object result = Conexion.ExecuteScalarAsync(conexion).Result;
+                if (result != null)
                 {
-                    return Convert.ToInt32(Conexion.ExecuteScalar(conexion));
+                    return Convert.ToInt32(result);
                 }
                 else
                 {
@@ -64,19 +64,19 @@ namespace Centralizador.Models.DataBase
                 query.Append($"'{instruction.ParticipantDebtor.Rut}','1','.','{time}','{time}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
                 query.Append($"'Centralizador',1,'01','A','{time}') ");
                 conexion.Query = query.ToString();
-                if (Convert.ToInt32(Conexion.ExecuteNonQuery(conexion)) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
+                if (Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
                 {
                     query.Clear();
                     query.Append("INSERT INTO softland.nw_detnv (NVNumero,nvLinea,nvFecCompr,CodProd,nvCant,nvPrecio,nvSubTotal,nvTotLinea,CodUMed,CantUVta,nvEquiv)VALUES(");
                     query.Append($"{folioNV},1,'{time}','{codProd}',1,{neto},{neto},{neto},'UN',1,1)");
                     conexion.Query = query.ToString();
-                    if (Convert.ToInt32(Conexion.ExecuteNonQuery(conexion)) == 1) // 1 : Softland execute only this query
+                    if (Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result) == 1) // 1 : Softland execute only this query
                     {
                         query.Clear();
                         query.Append("INSERT INTO softland.NW_Impto (nvNumero, CodImpto, ValPctIni, AfectoImpto, Impto)  VALUES ( ");
                         query.Append($"{folioNV},'IVA',19,{neto},{iva})");
                         conexion.Query = query.ToString();
-                        return Convert.ToInt32(Conexion.ExecuteNonQuery(conexion)); // Return 1 if ok!
+                        return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
                     }
                 }
                 return 0;
@@ -107,7 +107,7 @@ namespace Centralizador.Models.DataBase
                 query.Append("AND f.folio IS NULL ");
 
                 conexion.Query = query.ToString();
-                return Convert.ToInt32(Conexion.ExecuteScalar(conexion));
+                return Convert.ToInt32(Conexion.ExecuteScalarAsync(conexion).Result);
             }
             catch (Exception)
             {

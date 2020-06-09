@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -93,11 +93,16 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static IList<ResultInstruction> GetInstructionCreditor(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
+         
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -128,11 +133,15 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultInstruction GetInstructionDebtor(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
         {
-            try
+            WebClient wc = new WebClient
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
+            try
+            {       
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -154,11 +163,16 @@ namespace Centralizador.Models.ApiCEN
 
         public static IList<ResultInstruction> GetInstructionByParticipants(ResultParticipant participant, ResultParticipant userPart)
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
+         
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
                 if (res != null)
                 {
                     Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

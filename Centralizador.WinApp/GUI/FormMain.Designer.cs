@@ -38,8 +38,9 @@
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.FpicBoxSearch = new System.Windows.Forms.PictureBox();
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
-            this.BtnOutlook = new System.Windows.Forms.Button();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.BtnExcelConvert = new System.Windows.Forms.Button();
+            this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
@@ -47,24 +48,23 @@
             this.TxtRznRef = new System.Windows.Forms.TextBox();
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
-            this.BtnPdfConvert = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ChkIncludeCEN = new System.Windows.Forms.CheckBox();
-            this.BtnHiperLink = new System.Windows.Forms.Button();
             this.BtnInsertNv = new System.Windows.Forms.Button();
             this.ChkIncludeReclaimed = new System.Windows.Forms.CheckBox();
             this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnInsertRef = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
             this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
+            this.BtnOutlook = new System.Windows.Forms.Button();
             this.TxtRutParticipant = new System.Windows.Forms.TextBox();
+            this.BtnHiperLink = new System.Windows.Forms.Button();
             this.BtnCreditor = new System.Windows.Forms.Button();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.BtnDebtor = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -72,10 +72,10 @@
             this.SplitContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).BeginInit();
+            this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox1.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // StatusStrip
@@ -159,7 +159,7 @@
             this.IGridMain.SelCellsBackColor = System.Drawing.SystemColors.ControlLight;
             this.IGridMain.SelCellsForeColor = System.Drawing.Color.Black;
             this.IGridMain.Size = new System.Drawing.Size(1128, 707);
-            this.IGridMain.TabIndex = 0;
+            this.IGridMain.TabIndex = 0;        
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.CustomDrawCellEllipsisButtonForeground += new TenTec.Windows.iGridLib.iGCustomDrawEllipsisButtonEventHandler(this.IGridMain_CustomDrawCellEllipsisButtonForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
@@ -167,18 +167,18 @@
             this.IGridMain.CurRowChanged += new System.EventHandler(this.IGridMain_CurRowChanged);
             this.IGridMain.RequestCellToolTipText += new TenTec.Windows.iGridLib.iGRequestCellToolTipTextEventHandler(this.IGridMain_RequestCellToolTipText);
             // 
-            // BtnOutlook
+            // groupBox3
             // 
-            this.BtnOutlook.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
-            this.BtnOutlook.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnOutlook.Location = new System.Drawing.Point(35, 212);
-            this.BtnOutlook.Name = "BtnOutlook";
-            this.BtnOutlook.Size = new System.Drawing.Size(143, 46);
-            this.BtnOutlook.TabIndex = 1;
-            this.BtnOutlook.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.BtnOutlook.UseVisualStyleBackColor = true;
-            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
+            this.groupBox3.Controls.Add(this.BtnExcelConvert);
+            this.groupBox3.Controls.Add(this.BtnPdfConvert);
+            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)(((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic) 
+                | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox3.Location = new System.Drawing.Point(22, 622);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(174, 75);
+            this.groupBox3.TabIndex = 9;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Export To:";
             // 
             // BtnExcelConvert
             // 
@@ -190,6 +190,17 @@
             this.BtnExcelConvert.TabIndex = 8;
             this.BtnExcelConvert.UseVisualStyleBackColor = false;
             this.BtnExcelConvert.Click += new System.EventHandler(this.BtnExcelConvert_Click);
+            // 
+            // BtnPdfConvert
+            // 
+            this.BtnPdfConvert.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnPdfConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnPdfConvert.Image")));
+            this.BtnPdfConvert.Location = new System.Drawing.Point(20, 19);
+            this.BtnPdfConvert.Name = "BtnPdfConvert";
+            this.BtnPdfConvert.Size = new System.Drawing.Size(56, 46);
+            this.BtnPdfConvert.TabIndex = 4;
+            this.BtnPdfConvert.UseVisualStyleBackColor = false;
+            this.BtnPdfConvert.Click += new System.EventHandler(this.BtnPdfConvert_Click);
             // 
             // groupBox4
             // 
@@ -269,17 +280,6 @@
             this.TxtNmbItem.Size = new System.Drawing.Size(192, 51);
             this.TxtNmbItem.TabIndex = 1;
             // 
-            // BtnPdfConvert
-            // 
-            this.BtnPdfConvert.BackColor = System.Drawing.SystemColors.Control;
-            this.BtnPdfConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnPdfConvert.Image")));
-            this.BtnPdfConvert.Location = new System.Drawing.Point(20, 19);
-            this.BtnPdfConvert.Name = "BtnPdfConvert";
-            this.BtnPdfConvert.Size = new System.Drawing.Size(56, 46);
-            this.BtnPdfConvert.TabIndex = 4;
-            this.BtnPdfConvert.UseVisualStyleBackColor = false;
-            this.BtnPdfConvert.Click += new System.EventHandler(this.BtnPdfConvert_Click);
-            // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -305,19 +305,6 @@
             this.ChkIncludeCEN.TabIndex = 12;
             this.ChkIncludeCEN.Text = "Only CEN";
             this.ChkIncludeCEN.UseVisualStyleBackColor = true;
-            // 
-            // BtnHiperLink
-            // 
-            this.BtnHiperLink.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.BtnHiperLink.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("BtnHiperLink.BackgroundImage")));
-            this.BtnHiperLink.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.BtnHiperLink.Location = new System.Drawing.Point(55, 156);
-            this.BtnHiperLink.Name = "BtnHiperLink";
-            this.BtnHiperLink.Size = new System.Drawing.Size(102, 51);
-            this.BtnHiperLink.TabIndex = 11;
-            this.BtnHiperLink.UseVisualStyleBackColor = false;
-            this.BtnHiperLink.Click += new System.EventHandler(this.BtnHiperLink_Click);
-            this.BtnHiperLink.MouseHover += new System.EventHandler(this.BtnHiperLink_MouseHover);
             // 
             // BtnInsertNv
             // 
@@ -400,6 +387,19 @@
             this.TxtCtaCteParticipant.TabIndex = 10;
             this.TxtCtaCteParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // BtnOutlook
+            // 
+            this.BtnOutlook.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
+            this.BtnOutlook.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.BtnOutlook.Location = new System.Drawing.Point(35, 212);
+            this.BtnOutlook.Name = "BtnOutlook";
+            this.BtnOutlook.Size = new System.Drawing.Size(143, 46);
+            this.BtnOutlook.TabIndex = 1;
+            this.BtnOutlook.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnOutlook.UseVisualStyleBackColor = true;
+            this.BtnOutlook.Click += new System.EventHandler(this.BtnOutlook_Click);
+            // 
             // TxtRutParticipant
             // 
             this.TxtRutParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -409,6 +409,19 @@
             this.TxtRutParticipant.Size = new System.Drawing.Size(94, 21);
             this.TxtRutParticipant.TabIndex = 9;
             this.TxtRutParticipant.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // BtnHiperLink
+            // 
+            this.BtnHiperLink.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
+            this.BtnHiperLink.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("BtnHiperLink.BackgroundImage")));
+            this.BtnHiperLink.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.BtnHiperLink.Location = new System.Drawing.Point(55, 156);
+            this.BtnHiperLink.Name = "BtnHiperLink";
+            this.BtnHiperLink.Size = new System.Drawing.Size(102, 51);
+            this.BtnHiperLink.TabIndex = 11;
+            this.BtnHiperLink.UseVisualStyleBackColor = false;
+            this.BtnHiperLink.Click += new System.EventHandler(this.BtnHiperLink_Click);
+            this.BtnHiperLink.MouseHover += new System.EventHandler(this.BtnHiperLink_MouseHover);
             // 
             // BtnCreditor
             // 
@@ -495,19 +508,6 @@
             this.FListPics.Images.SetKeyName(15, "");
             this.FListPics.Images.SetKeyName(16, "");
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.BtnExcelConvert);
-            this.groupBox3.Controls.Add(this.BtnPdfConvert);
-            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)(((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic) 
-                | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox3.Location = new System.Drawing.Point(22, 622);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(174, 75);
-            this.groupBox3.TabIndex = 9;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Export To:";
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -530,13 +530,13 @@
             this.SplitContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.FpicBoxSearch)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IGridMain)).EndInit();
+            this.groupBox3.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.GroupBox1.ResumeLayout(false);
             this.GroupBox1.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

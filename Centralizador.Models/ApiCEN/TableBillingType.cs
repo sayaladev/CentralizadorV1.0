@@ -51,12 +51,16 @@ namespace Centralizador.Models.ApiCEN
         public IList<ResultBilingType> Results { get; set; }
 
         public static IList<ResultBilingType> GetBilinTypes() // GET
-        {         
-            try
+        {
+            WebClient wc = new WebClient
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res =  WebClientCEN.WebClient.DownloadString("api/v1/resources/billing-types");
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
+            try
+            {      
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res =  wc.DownloadString("api/v1/resources/billing-types");
                 if (res != null)
                 {
                     BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

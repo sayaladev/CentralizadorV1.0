@@ -21,7 +21,10 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-
+                if (acteco == null)
+                {
+                    return 99;
+                }
                 string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
              
                 StringBuilder query = new StringBuilder();
@@ -35,7 +38,7 @@ namespace Centralizador.Models.DataBase
                 query.Append($"'{instruction.ParticipantDebtor.CommercialAddress}','S', 'S','N', 'N', 'S','{instruction.ParticipantDebtor.DteReceptionEmail}' ");
                 query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}) END");
                 conexion.Query = query.ToString();
-                return Conexion.ExecuteNonQuery(conexion);
+                return Conexion.ExecuteNonQueryAsync(conexion).Result;
             }
             catch (Exception)
             {
@@ -103,7 +106,7 @@ namespace Centralizador.Models.DataBase
                 query.Append($"UPDATE softland.cwtauxi SET NomAux='{instruction.ParticipantDebtor.BusinessName}', NoFAux='{instruction.ParticipantDebtor.Name}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 conexion.Query = query.ToString();
-                return Conexion.ExecuteNonQuery(conexion);
+                return Conexion.ExecuteNonQueryAsync(conexion).Result;
             }
             catch (Exception)
             {

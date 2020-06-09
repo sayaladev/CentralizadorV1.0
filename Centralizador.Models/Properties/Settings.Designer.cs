@@ -95,5 +95,17 @@ namespace Centralizador.Models.Properties {
                 this["UIDRange"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinadorelectrico.cl/")]
+        public string BaseAddress {
+            get {
+                return ((string)(this["BaseAddress"]));
+            }
+            set {
+                this["BaseAddress"] = value;
+            }
+        }
     }
 }

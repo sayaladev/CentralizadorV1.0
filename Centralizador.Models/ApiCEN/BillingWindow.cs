@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
+using System.Text;
+
+using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
 {
@@ -51,11 +52,15 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultBillingWindow GetBillingWindowById(ResultPaymentMatrix matrix) // GET
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             try
             {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -80,19 +85,22 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultBillingWindow GetBillingWindowByNaturalKey(DTEDefTypeDocumentoReferencia referencia)
         {
+            WebClient wc = new WebClient
+            {
+                BaseAddress = Properties.Settings.Default.BaseAddress,
+                Encoding = Encoding.UTF8
+            };
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-
             string r1 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']') + 1).TrimStart();
             string r2 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']', referencia.RazonRef.IndexOf(']') + 1) + 1);
-            r2 = r2.Substring(r2.IndexOf(']') + 1);         
+            r2 = r2.Substring(r2.IndexOf(']') + 1);
 
             // Controlling lower & upper
             string rznRef = ti.ToTitleCase(r2.ToLower());
             try
-            {
-                WebClientCEN.WebClient.Headers.Clear();
-                WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
+            {           
+                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                string res = wc.DownloadString($"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
                 if (res != null)
                 {
                     BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
