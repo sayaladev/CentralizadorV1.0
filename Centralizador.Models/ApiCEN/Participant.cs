@@ -60,7 +60,7 @@ namespace Centralizador.Models.ApiCEN
         public string Name { get; set; }
 
         [JsonProperty("rut")]
-        public uint Rut { get; set; }
+        public string Rut { get; set; }
 
         [JsonProperty("verification_code")]
         public string VerificationCode { get; set; }

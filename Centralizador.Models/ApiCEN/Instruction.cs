@@ -35,7 +35,7 @@ namespace Centralizador.Models.ApiCEN
         public string Status { get; set; }
 
         [JsonProperty("status_billed")]
-        public int StatusBilled { get; set; }
+        public Instruction.StatusBilled StatusBilled { get; set; }
 
         [JsonProperty("status_paid")]
         public int StatusPaid { get; set; }
@@ -175,6 +175,16 @@ namespace Centralizador.Models.ApiCEN
                 return null;
             }
             return null;
+        }
+
+        public enum StatusBilled
+        {
+            // 1 No Facturado y cuando hay más de 1 dte informado
+            // 2 Facturado
+            // 3 Facturado con retraso
+            NoFacturado = 1,
+            Facturado = 2,
+            ConRetraso = 3
         }
     }
 }

@@ -204,6 +204,10 @@ namespace Centralizador.Models.Outlook
             }
             File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
         }
+
+        public static DateTime GetLastDateTime() {
+            return Properties.Settings.Default.DateTimeEmail;
+        }
     }
 }
 

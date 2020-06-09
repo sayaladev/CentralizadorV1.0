@@ -156,7 +156,7 @@ namespace Centralizador.WinApp.GUI
             StringLogging = new StringBuilder();
 
             // Date Time Outlook
-            BtnOutlook.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
+            BtnOutlook.Text = string.Format(CultureInfo, "{0:g}", ServiceReadMail.GetLastDateTime());
 
             // Timer Second (every minute)
             System.Timers.Timer timerMinute = new System.Timers.Timer(1000);
@@ -170,12 +170,13 @@ namespace Centralizador.WinApp.GUI
             timerHour.Enabled = true;
             timerHour.AutoReset = true;
 
-
+            //WebClien
+            WebClientCEN webClientCEN = new WebClientCEN(Properties.Settings.Default.BaseAddress);
 
         }
         private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            TokenSii = ServiceSoap.GETTokenFromSii();
+            TokenSii = ServiceSoap.GETTokenFromSii(Properties.Settings.Default.SerialDigitalCert);
             if (ServiceOutlook != null)
             {
                 ServiceOutlook.TokenSii = TokenSii;
@@ -324,7 +325,7 @@ namespace Centralizador.WinApp.GUI
                 DataBaseName = "";
                 UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
 
-                XmlDocument document = Models.Properties.Settings.Default.DBSoftland;
+                XmlDocument document = Properties.Settings.Default.DBSoftland;
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == UserParticipant.Id.ToString())
@@ -361,7 +362,7 @@ namespace Centralizador.WinApp.GUI
                 return;
             }
             Detalle detalle = null;
-            if (IsCreditor)
+            if (IsCreditor && !IsRunning)
             {
                 detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
             }
@@ -384,7 +385,7 @@ namespace Centralizador.WinApp.GUI
                     return;
                 }
                 Detalle detalle = null;
-                if (IsCreditor)
+                if (IsCreditor && !IsRunning)
                 {
                     detalle = DetallesCreditor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
@@ -486,6 +487,10 @@ namespace Centralizador.WinApp.GUI
                     BgwInsertNv.RunWorkerAsync(detallesFinal);
                 }
             }
+            else
+            {
+                TssLblMensaje.Text = "All payment instructions are billed, cannot insert NV.";
+            }
         }
         private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -515,7 +520,7 @@ namespace Centralizador.WinApp.GUI
                 }
 
                 // Tester 
-                //if (item.Instruction.Id != 1827770)
+                //if (item.Instruction.Id != 1783538)
                 //{
                 //    continue;
                 //}
@@ -686,9 +691,9 @@ namespace Centralizador.WinApp.GUI
                 {
                     StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "*" + (F) + Environment.NewLine);
                 }
-                c++;      
+                c++;
                 porcent = (float)(100 * c) / detallesFinal.Count;
-                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");               
+                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");
             }
 
         }
@@ -757,6 +762,10 @@ namespace Centralizador.WinApp.GUI
                 }
 
             }
+            else
+            {
+                TssLblMensaje.Text = "No invoices.";
+            }
 
         }
         private void BgwInsertRef_DoWork(object sender, DoWorkEventArgs e)
@@ -779,13 +788,13 @@ namespace Centralizador.WinApp.GUI
                         int result = Reference.InsertReference(item.Instruction, item.References.NroInt, con);
                         switch (result)
                         {
-                            case 1:
-                                StringLogging.Append(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + item.Folio + Environment.NewLine);
+                            case 2: // Success
+                                StringLogging.Append(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: "+ item.Folio + Environment.NewLine);
                                 break;
                             case 0:
                                 break;
                             case -1: // ya existe
-                                StringLogging.Append(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "*" + item.Folio + Environment.NewLine);
+                                StringLogging.Append(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: *" + item.Folio + Environment.NewLine);
                                 break;
                             case 99: // Error
                                 StringLogging.Append(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Error" + Environment.NewLine);
@@ -807,17 +816,20 @@ namespace Centralizador.WinApp.GUI
             IsRunning = false;
             TssLblMensaje.Text = "Check the log file.";
             string nameFile = $"{UserParticipant.Name}_InsertRef_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
-
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+            if (StringLogging.Length > 0)
             {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+                if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+                {
+                    Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+                }
+                File.WriteAllText(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt", StringLogging.ToString());
+                ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt")
+                {
+                    WindowStyle = ProcessWindowStyle.Minimized
+                };
+                Process.Start(process);
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt", StringLogging.ToString());
-            ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt")
-            {
-                WindowStyle = ProcessWindowStyle.Minimized
-            };
-            Process.Start(process);
+
         }
         private void BgwInsertRef_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -932,71 +944,84 @@ namespace Centralizador.WinApp.GUI
             c = 0;
             foreach (ResultInstruction instruction in instructions)
             {
+                c++;
+                porcent = (float)(100 * c) / instructions.Count;
                 // Tester
                 //if (c == 2)
                 //{
                 //    continue;
                 //}
-                if (instruction.Id != 1811317)
-                {
-                    continue;
-                }
+                //if (instruction.Id != 1776873)
+                //{
+                //    continue;
+                //}
+
 
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
                 Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
                 // REF from Softland          
                 Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.ServerName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-                DTEDefType xmlObjeto = null;
                 IList<Reference> references = Reference.GetInfoFactura(instruction, con);
                 detalle.StatusDetalle = StatusDetalle.No;
                 if (references != null)
-                {
-                    //*************************************REVISAR PORQUE DESCOMENTÉ Reference Class
+                {                    
+           
                     Reference reference = references.OrderByDescending(x => x.Folio).First();
-                    if (reference.FileBasico != null)
-                    {
-                        xmlObjeto = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
-                    }
-                    if (xmlObjeto != null)
-                    {
-                        detalle.DTEDef = xmlObjeto;
-                        DTEDefTypeDocumento dte = (DTEDefTypeDocumento)xmlObjeto.Item;
-                        detalle.MntIva = Convert.ToInt32(dte.Encabezado.Totales.IVA);
-                        detalle.MntTotal = Convert.ToInt32(dte.Encabezado.Totales.MntTotal);
-                    }
-                    detalle.Folio = reference.Folio;
-                    detalle.References = reference;
-                    if (reference.FechaRecepcionSii != null)
-                    {
-                        detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
-                        // Events                      
-                        detalle.DataEvento = ServiceEvento.GetStatusDte("Creditor", TokenSii, "33", detalle, UserParticipant);
-                        // Flags         
-                        detalle.Flag = ValidateCen(detalle);
-                        // Insert CEN
-                        ResultDte doc = Dte.GetDteByFolio(detalle, true);
-                        if (doc == null)
-                        {
-                            // TESTER ***************************************************************************************************
-                            doc = Dte.SendDteCreditor(detalle, TokenCen);
-                        }
-                        detalle.Instruction.Dte = doc;
-                        // Status
-                        if (detalle.DataEvento != null)
-                        {
-                            detalle.StatusDetalle = GetStatus(detalle);
-                        }
-
-                    }
-                    if (reference.FechaEmision != null)
+                    // Fecha de emisión factura vs fecha publicación de la instrucción
+                    int compare = DateTime.Compare(reference.FechaEmision, instruction.PaymentMatrix.PublishDate);
+                    if (compare > 0 )
                     {
                         detalle.FechaEmision = reference.FechaEmision.ToString();
+                        detalle.References = reference;
+                        detalle.Folio = reference.Folio;
+                        detalle.MntNeto = reference.NetoAfecto;
+                        detalle.MntIva = reference.Iva;
+                        detalle.MntTotal = reference.Total;
+
+                        if (reference.FileEnviado == null)
+                        {
+                            // Facturado pero no enviado a Sii o
+                            // Facturado pero sin Ref insertadas
+
+                        }
+                        else
+                        {
+                            // Facturado y enviado al Sii
+                            detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
+                            // Attach object dte
+                            detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
+                            // Flags         
+                            detalle.Flag = ValidateCen(detalle);
+                            // Events Sii                       
+                            detalle.DataEvento = ServiceEvento.GetStatusDte("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert);
+                            // Status
+                            detalle.StatusDetalle = GetStatus(detalle);
+                            // Insert CEN, only Accepted.
+                            if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
+                            {
+                                // 1 No Facturado y cuando hay más de 1 dte informado
+                                // 2 Facturado
+                                // 3 Facturado con retraso
+                                detalle.Instruction.Dte = Dte.SendDteCreditor(detalle, TokenCen);
+                            }
+                        }
+                        BgwCreditor.ReportProgress((int)porcent, $"Retrieve information of invoices, wait please. ({c}/{instructions.Count})");
+                    }
+                    else
+                    {
+                        // Existen F que están aceptadas pero emitidas a diferente RUT, caso Guacolda.
+                        // -1 La fecha de la publicación es mayor que la fecha de la ref encontrada. NO VALE!
+                        //BgwCreditor.ReportProgress((int)porcent, $"The Invoice Emission is wrong, please edit. ({c}/{instructions.Count})");
                     }
                 }
-                c++;
+                else
+                {
+                    BgwCreditor.ReportProgress((int)porcent, $"Retrieve information Creditor, wait please. ({c}/{instructions.Count})");
+                }
+             
                 DetallesCreditor.Add(detalle);
-                porcent = (float)(100 * c) / instructions.Count;
-                BgwCreditor.ReportProgress((int)porcent, $"Retrieve information Creditor, wait please. ({c}/{instructions.Count})");
+      
+  
             }
             // Order the list
             //DetallesCreditor = DetallesCreditor.OrderBy(x => x.Folio).ToList();
@@ -1127,8 +1152,8 @@ namespace Centralizador.WinApp.GUI
 
                 // Flags         
                 item.Flag = ValidateCen(item);
-                // Events
-                item.DataEvento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant);
+                // Events Sii
+                item.DataEvento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert);
                 // Status
                 if (item.DataEvento != null)
                 {
@@ -1222,7 +1247,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         myRow.Cells["P1"].Type = iGCellType.Check;
                         myRow.Cells["P2"].Type = iGCellType.Check;
-                        if (item.Instruction.Dte != null)
+                        if (item.Instruction != null && item.Instruction.StatusBilled == Instruction.StatusBilled.Facturado)
                         {
                             myRow.Cells["P1"].Value = 1;
                             myRow.Cells["P2"].Value = 1;
@@ -1665,6 +1690,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnExcelConvert_Click(object sender, EventArgs e)
         {
+         
             if (!IsRunning && DetallesCreditor != null || DetallesDebtor != null)
             {
                 if (IsCreditor && DetallesCreditor.Count > 0)

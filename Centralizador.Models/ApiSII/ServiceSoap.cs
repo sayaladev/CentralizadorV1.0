@@ -13,7 +13,7 @@ namespace Centralizador.Models.ApiSII
 {
     public class ServiceSoap
     {
-        public static string GETTokenFromSii()
+        public static string GETTokenFromSii(string serialDigitalCert)
         {
             // Get digital cert  
             X509Certificate2 cert = null;
@@ -21,7 +21,7 @@ namespace Centralizador.Models.ApiSII
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
             foreach (X509Certificate2 item in store.Certificates)
             {
-                if (item.SerialNumber == Properties.Settings.Default.SerialDigitalCert)
+                if (item.SerialNumber == serialDigitalCert)
                 {
                     cert = item;
                 }

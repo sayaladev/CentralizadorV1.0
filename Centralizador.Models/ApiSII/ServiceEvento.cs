@@ -24,7 +24,7 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
         }
 
-        public static DataEvento GetStatusDte(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant)
+        public static DataEvento GetStatusDte(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant, string serialDigitalCert)
         {
             // Get digital cert  
             X509Certificate2 cert = null;
@@ -32,7 +32,7 @@ namespace Centralizador.Models.ApiSII
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
             foreach (X509Certificate2 item in store.Certificates)
             {
-                if (item.SerialNumber == Properties.Settings.Default.SerialDigitalCert)
+                if (item.SerialNumber == serialDigitalCert)
                 {
                     cert = item;
                 }

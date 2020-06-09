@@ -20,9 +20,9 @@ namespace Centralizador.WinApp
             Application.SetCompatibleTextRenderingDefault(false);
 
 
-            string tokenSii = ServiceSoap.GETTokenFromSii();
-            string tokenCen = Agent.GetTokenCen();
-            ResultAgent agent = Agent.GetAgetByEmail();         
+            string tokenSii = ServiceSoap.GETTokenFromSii(Properties.Settings.Default.SerialDigitalCert);
+            string tokenCen = Agent.GetTokenCen(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN);
+            ResultAgent agent = Agent.GetAgetByEmail(Properties.Settings.Default.UserCEN);         
             if (!string.IsNullOrEmpty(tokenSii) && agent != null && !string.IsNullOrEmpty(tokenCen))
             {               
                 Application.Run(new FormMain(tokenSii, agent, tokenCen));

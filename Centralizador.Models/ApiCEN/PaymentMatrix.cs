@@ -45,7 +45,7 @@ namespace Centralizador.Models.ApiCEN
         public string MatrixFile { get; set; }
 
         [JsonProperty("publish_date")]
-        public string PublishDate { get; set; }
+        public DateTime PublishDate { get; set; }
 
         [JsonProperty("payment_days")]
         public int PaymentDays { get; set; }

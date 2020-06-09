@@ -3,15 +3,15 @@ using System.Text;
 
 namespace Centralizador.Models.ApiCEN
 {
-    public static class WebClientCEN
+    public class WebClientCEN
     {
         public static WebClient WebClient { get; set; }
 
-        static WebClientCEN()
+        public WebClientCEN(string baseAdress)
         {
             WebClient = new WebClient
             {
-                BaseAddress = Properties.Settings.Default.BaseAddress
+                BaseAddress = baseAdress
             };           
             WebClient.Encoding = Encoding.UTF8;
             WebClient.Proxy = null;

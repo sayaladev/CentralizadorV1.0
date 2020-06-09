@@ -12,21 +12,20 @@ namespace Centralizador.Models.DataBase
     {
         public int Folio { get; set; }
         public int NroInt { get; set; }
-
         public string FileEnviado { get; set; }
-
         public string FileBasico { get; set; }
-
-        public DateTime? FechaEmision { get; set; }
-
-        public DateTime? FechaRecepcionSii { get; set; }
-
+        public DateTime FechaEmision { get; set; }
+        public DateTime FechaRecepcionSii { get; set; }
+        public int NetoAfecto { get; set; }
+        public int Iva { get; set; }
+        public int Total { get; set; }
+        public string Rut { get; set; }
         public static IList<Reference> GetInfoFactura(ResultInstruction instruction, Conexion conexion)
         {
             try
             {
 
-                IList<Reference> softland = new List<Reference>();      
+                IList<Reference> softland = new List<Reference>();
                 StringBuilder query = new StringBuilder();
 
 
@@ -36,7 +35,11 @@ namespace Centralizador.Models.DataBase
                 query.Append("  l.Fecha 'RecepcionSii', ");
                 query.Append("  g.Fecha, ");
                 query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = l.XMLSET) 'FileEnviado', ");
-                query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico' ");
+                query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico', ");
+                query.Append("  g.NetoAfecto, ");
+                query.Append("  g.IVA, ");
+                query.Append("  g.Total, ");
+                query.Append("  g.CodAux ");
                 query.Append("FROM softland.IW_GSaEn_RefDTE r ");
                 query.Append("FULL OUTER JOIN softland.iw_gsaen g ");
                 //query.Append("INNER JOIN softland.iw_gsaen g ");
@@ -87,6 +90,22 @@ namespace Centralizador.Models.DataBase
                         {
                             reference.FileBasico = item["FileBasico"].ToString();
                         }
+                        if (item["NetoAfecto"] != DBNull.Value)
+                        {
+                            reference.NetoAfecto = Convert.ToInt32(item["NetoAfecto"]);
+                        }
+                        if (item["IVA"] != DBNull.Value)
+                        {
+                            reference.Iva = Convert.ToInt32(item["IVA"]);
+                        }
+                        if (item["Total"] != DBNull.Value)
+                        {
+                            reference.Total = Convert.ToInt32(item["Total"]);
+                        }
+                        if (item["CodAux"] != DBNull.Value)
+                        {
+                            reference.Rut = item["CodAux"].ToString();
+                        }
                         softland.Add(reference);
                     }
                     return softland;
@@ -107,17 +126,24 @@ namespace Centralizador.Models.DataBase
 
             try
             {
-             
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new StringBuilder();              
+                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+                //string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
                 //string time = string.Format(cultureInfo, "{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
-                query.Append($"IF NOT EXISTS(SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} AND Tipo = 'F' AND CodRefSII = 'SEN') BEGIN ");
-                query.Append("INSERT INTO softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) VALUES ");
-                query.Append($"('F', {nroInt}, 2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{instruction.PaymentMatrix.PublishDate}', '{instruction.PaymentMatrix.NaturalKey}') END ");
+                string time = string.Format(cultureInfo, "{0:g}", instruction.PaymentMatrix.PublishDate);
+                query.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} ");
+                query.Append("  AND Tipo = 'F' ");
+                query.Append("  AND CodRefSII = 'SEN') ");
                 query.Append("BEGIN ");
-                query.Append($"UPDATE softland.iw_gmovi set DetProd = '{instruction.PaymentMatrix.NaturalKey}' where NroInt = {nroInt} and Tipo = 'F' ");
-                query.Append("END");
-                conexion.Query = query.ToString();
+                query.Append("  INSERT INTO softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) ");
+                query.Append($"  VALUES ('F', {nroInt}, 2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{time}', '{instruction.PaymentMatrix.NaturalKey}') ");
+                query.Append("  UPDATE softland.iw_gmovi ");
+                query.Append($" SET DetProd = '{instruction.PaymentMatrix.NaturalKey}' ");
+                query.Append($" WHERE NroInt = {nroInt} ");
+                query.Append("  AND Tipo = 'F' ");
+                query.Append("END ");
 
+                conexion.Query = query.ToString();
                 return Convert.ToInt32(Conexion.ExecuteNonQuery(conexion)); // Return 1 if ok!
             }
             catch (Exception)

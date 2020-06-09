@@ -49,5 +49,70 @@ namespace Centralizador.WinApp.Properties {
                 return ((string)(this["ServerName"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<DatosEmpresas>
+  <Empresa id=""189"">SANFRANCISCO</Empresa>
+  <Empresa id=""190"">QUINTA</Empresa>
+  <Empresa id=""194"">VALLE</Empresa>
+  <Empresa id=""364"">OCOA</Empresa>
+  <Empresa id=""415"">ST4</Empresa>
+  <Empresa id=""427"">ST10</Empresa>
+  <Empresa id=""428"">TRICAHUESOLAR</Empresa>
+  <Empresa id=""469"">ST11</Empresa>
+  <Empresa id=""470"">PILPILEN</Empresa>
+</DatosEmpresas>")]
+        public global::System.Xml.XmlDocument DBSoftland {
+            get {
+                return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0138BF")]
+        public string SerialDigitalCert {
+            get {
+                return ((string)(this["SerialDigitalCert"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinadorelectrico.cl/")]
+        public string BaseAddress {
+            get {
+                return ((string)(this["BaseAddress"]));
+            }
+            set {
+                this["BaseAddress"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("german.gomez@cvegroup.com")]
+        public string UserCEN {
+            get {
+                return ((string)(this["UserCEN"]));
+            }
+            set {
+                this["UserCEN"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("cvepagos2017")]
+        public string PasswordCEN {
+            get {
+                return ((string)(this["PasswordCEN"]));
+            }
+            set {
+                this["PasswordCEN"] = value;
+            }
+        }
     }
 }

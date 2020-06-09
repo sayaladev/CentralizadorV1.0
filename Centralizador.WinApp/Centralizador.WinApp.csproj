@@ -84,9 +84,6 @@
     <Reference Include="TenTec.Windows.iGridLib.iGrid.v6.0, Version=6.0.37.0, Culture=neutral, PublicKeyToken=9d47002745f2416c, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Centralizador.Models\Properties\Settings.Designer.cs">
-      <Link>link\Settings.Designer.cs</Link>
-    </Compile>
     <Compile Include="GUI\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>

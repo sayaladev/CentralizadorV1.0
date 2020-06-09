@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 
 using static Centralizador.Models.ApiSII.ServiceDetalle;
@@ -245,6 +246,8 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
         }
+
+      
     }
     public class InsertDTe
     {

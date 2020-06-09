@@ -60,13 +60,13 @@ namespace Centralizador.Models.ApiCEN
         /// 
         /// </summary>
         /// <returns></returns>
-        public static ResultAgent GetAgetByEmail() // GET
+        public static ResultAgent GetAgetByEmail(string userCEN) // GET
         {          
             try
             {
                 WebClientCEN.WebClient.Headers.Clear();
                 WebClientCEN.WebClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}");
+                string res = WebClientCEN.WebClient.DownloadString($"api/v1/resources/agents/?email={userCEN}");
                 if (res != null)
                 {
                     Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -87,14 +87,14 @@ namespace Centralizador.Models.ApiCEN
         /// 
         /// </summary>
         /// <returns></returns>
-        public static string GetTokenCen() // POST
+        public static string GetTokenCen(string userCEN, string passwordCEN) // POST
         {       
             try
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>
                 {
-                    { "username", Properties.Settings.Default.UserCEN },
-                    { "password", Properties.Settings.Default.PasswordCEN }
+                    { "username", userCEN },
+                    { "password", passwordCEN }
                 };
 
                 WebClientCEN.WebClient.Headers.Clear();

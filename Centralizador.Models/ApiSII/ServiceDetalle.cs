@@ -247,7 +247,7 @@ namespace Centralizador.Models.ApiSII
     public class Detalle
     {
         [JsonProperty("rutReceptor")]
-        public uint RutReceptor { get; set; }
+        public string RutReceptor { get; set; }
 
         [JsonProperty("dvReceptor")]
         public string DvReceptor { get; set; }
@@ -302,7 +302,7 @@ namespace Centralizador.Models.ApiSII
         public StatusDetalle StatusDetalle { get; set; }
 
         // Constructor
-        public Detalle(uint rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)
+        public Detalle(string rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)
         {
             RutReceptor = rutReceptor;
             DvReceptor = dvReceptor;

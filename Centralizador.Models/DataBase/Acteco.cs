@@ -36,11 +36,11 @@ namespace Centralizador.Models.DataBase
         [JsonProperty("actividades")]
         public IList<Actividade> Actividades { get; set; }
 
-        public static IList<Actividade> GetActecoCode(ResultParticipant participant)
+        public static IList<Actividade> GetActecoCode(ResultParticipant participant, string baseAddress)
         {
             WebClient wc = new WebClient
             {
-                BaseAddress = Properties.Settings.Default.BaseAddress
+                BaseAddress = baseAddress
             };
             try
             {
