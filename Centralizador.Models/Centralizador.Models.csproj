@@ -91,6 +91,7 @@
   <ItemGroup>
     <Compile Include="ApiCEN\Agent.cs" />
     <Compile Include="ApiCEN\AuxiliaryData.cs" />
+    <Compile Include="ApiCEN\Pay.cs" />
     <Compile Include="ApiCEN\TableBillingType.cs" />
     <Compile Include="ApiCEN\BillingWindow.cs" />
     <Compile Include="ApiCEN\Dte.cs" />
@@ -126,6 +127,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="Web References\CrSeed\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

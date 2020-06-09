@@ -109,7 +109,7 @@ namespace Centralizador.Models.Outlook
                             }
                             catch (System.Xml.XmlException)
                             {
-                                throw;
+                                // Nothing for error in "xmlDocument = XDocument.Load(oReader);"
                             }
                         }
                     }
@@ -128,8 +128,13 @@ namespace Centralizador.Models.Outlook
             finally
             {
                 oClient.Close();
-                Properties.Settings.Default.Save();
+                SaveParam();
             }
+        }
+
+        public static void SaveParam()
+        {
+            Properties.Settings.Default.Save();
         }
         private int SaveFiles(string path)
         {

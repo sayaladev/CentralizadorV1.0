@@ -38,8 +38,8 @@ namespace Centralizador.Models.DataBase
                 query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = l.XMLSET) 'FileEnviado', ");
                 query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico' ");
                 query.Append("FROM softland.IW_GSaEn_RefDTE r ");
-                //query.Append("FULL OUTER JOIN softland.iw_gsaen g ");
-                query.Append("INNER JOIN softland.iw_gsaen g ");
+                query.Append("FULL OUTER JOIN softland.iw_gsaen g ");
+                //query.Append("INNER JOIN softland.iw_gsaen g ");
                 query.Append("  ON r.NroInt = g.NroInt ");
                 query.Append("  AND r.Tipo = 'F' ");
                 query.Append($"  AND (r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' ");
@@ -107,13 +107,15 @@ namespace Centralizador.Models.DataBase
 
             try
             {
-
-                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+             
                 StringBuilder query = new StringBuilder();
-                string time = string.Format(cultureInfo, "{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
-                query.Append($"IF NOT EXISTS(SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt ={nroInt} AND Tipo = 'F' AND CodRefSII = 'SEN') BEGIN ");
+                //string time = string.Format(cultureInfo, "{0:g}", Convert.ToDateTime(instruction.PaymentMatrix.PublishDate));
+                query.Append($"IF NOT EXISTS(SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} AND Tipo = 'F' AND CodRefSII = 'SEN') BEGIN ");
                 query.Append("INSERT INTO softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) VALUES ");
-                query.Append($"('F', {nroInt},2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{time}', '{instruction.PaymentMatrix.NaturalKey}') END");
+                query.Append($"('F', {nroInt}, 2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{instruction.PaymentMatrix.PublishDate}', '{instruction.PaymentMatrix.NaturalKey}') END ");
+                query.Append("BEGIN ");
+                query.Append($"UPDATE softland.iw_gmovi set DetProd = '{instruction.PaymentMatrix.NaturalKey}' where NroInt = {nroInt} and Tipo = 'F' ");
+                query.Append("END");
                 conexion.Query = query.ToString();
 
                 return Convert.ToInt32(Conexion.ExecuteNonQuery(conexion)); // Return 1 if ok!

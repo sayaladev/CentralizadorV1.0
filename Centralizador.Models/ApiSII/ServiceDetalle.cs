@@ -313,6 +313,7 @@ namespace Centralizador.Models.ApiSII
         }
         public Detalle()
         {
+
         }
     }
 

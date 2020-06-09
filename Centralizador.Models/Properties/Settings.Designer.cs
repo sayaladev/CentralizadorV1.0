@@ -142,40 +142,13 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("45000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("46000")]
         public string UIDRange {
             get {
                 return ((string)(this["UIDRange"]));
             }
             set {
                 this["UIDRange"] = value;
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("sa")]
-        public string DBUser {
-            get {
-                return ((string)(this["DBUser"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("123456")]
-        public string DBPassword {
-            get {
-                return ((string)(this["DBPassword"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DEVELOPER")]
-        public string ServerName {
-            get {
-                return ((string)(this["ServerName"]));
             }
         }
     }

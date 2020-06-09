@@ -156,7 +156,7 @@ namespace Centralizador.WinApp.GUI
             StringLogging = new StringBuilder();
 
             // Date Time Outlook
-            TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
+            BtnOutlook.Text = string.Format(CultureInfo, "{0:g}", Models.Properties.Settings.Default.DateTimeEmail);
 
             // Timer Second (every minute)
             System.Timers.Timer timerMinute = new System.Timers.Timer(1000);
@@ -213,6 +213,7 @@ namespace Centralizador.WinApp.GUI
             pattern.AllowSizing = false;
             //pattern.AllowMoving = false;
             pattern.AllowGrouping = true;
+
 
             // Info cols.
             iGCellStyle cellStyleCommon = new iGCellStyle
@@ -281,6 +282,7 @@ namespace Centralizador.WinApp.GUI
             // Header
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
             IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
+
 
             // Footer freezer section
             IGridMain.Footer.Visible = true;
@@ -367,7 +369,7 @@ namespace Centralizador.WinApp.GUI
             {
                 detalle = DetallesDebtor.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
             }
-            if (detalle != null)
+            if (detalle != null && detalle.Instruction != null)
             {
                 Process.Start($"https://ppagos-sen.coordinadorelectrico.cl/pagos/instrucciones/{detalle.Instruction.Id}/");
             }
@@ -418,6 +420,7 @@ namespace Centralizador.WinApp.GUI
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {   // Send email                                      
             ServiceSendMail.BatchSendMail();
+            ServiceReadMail.SaveParam();
         }
 
         #endregion
@@ -501,10 +504,16 @@ namespace Centralizador.WinApp.GUI
             List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
 
             // Sql 
-            Conexion con = new Conexion(DataBaseName);
+            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.ServerName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+            int foliosDisp = NotaVenta.CheckFolios(con);
 
             foreach (Detalle item in detallesFinal)
             {
+                if (c == foliosDisp)
+                {
+                    continue;
+                }
+
                 // Tester 
                 //if (item.Instruction.Id != 1827770)
                 //{
@@ -677,10 +686,11 @@ namespace Centralizador.WinApp.GUI
                 {
                     StringLogging.Append(item.Instruction.Id + "\t" + "NV Insert:" + "\t\t" + "*" + (F) + Environment.NewLine);
                 }
-                c++;
+                c++;      
                 porcent = (float)(100 * c) / detallesFinal.Count;
-                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");
+                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");               
             }
+
         }
         private void BgwInsertNv_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -713,6 +723,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnInsertRef_Click(object sender, EventArgs e)
         {
+
             if (IsRunning)
             {
                 TssLblMensaje.Text = "Bussy!";
@@ -756,7 +767,7 @@ namespace Centralizador.WinApp.GUI
             IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
             StringLogging.Clear();
             // Sql 
-            Conexion con = new Conexion(DataBaseName);
+            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.ServerName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
 
             foreach (Detalle item in detallesFinal)
             {
@@ -926,20 +937,21 @@ namespace Centralizador.WinApp.GUI
                 //{
                 //    continue;
                 //}
-                //if (instruction.Id != 1816729)
-                //{
-                //    continue;
-                //}
+                if (instruction.Id != 1811317)
+                {
+                    continue;
+                }
 
                 instruction.ParticipantDebtor = Participant.GetParticipantById(instruction.Debtor);
                 Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
                 // REF from Softland          
-                Conexion con = new Conexion(DataBaseName);
+                Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.ServerName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
                 DTEDefType xmlObjeto = null;
                 IList<Reference> references = Reference.GetInfoFactura(instruction, con);
                 detalle.StatusDetalle = StatusDetalle.No;
                 if (references != null)
                 {
+                    //*************************************REVISAR PORQUE DESCOMENTÉ Reference Class
                     Reference reference = references.OrderByDescending(x => x.Folio).First();
                     if (reference.FileBasico != null)
                     {
@@ -966,7 +978,7 @@ namespace Centralizador.WinApp.GUI
                         if (doc == null)
                         {
                             // TESTER ***************************************************************************************************
-                            //doc = Dte.SendDteCreditor(detalle, TokenCen);
+                            doc = Dte.SendDteCreditor(detalle, TokenCen);
                         }
                         detalle.Instruction.Dte = doc;
                         // Status
@@ -1007,6 +1019,7 @@ namespace Centralizador.WinApp.GUI
             BtnInsertRef.Enabled = true;
             // Send email                                      
             ServiceSendMail.BatchSendMail();
+            IGridMain.BackgroundImage = null;
         }
 
         #endregion
@@ -1128,7 +1141,7 @@ namespace Centralizador.WinApp.GUI
                     if (doc == null)
                     {
                         // TESTER ***************************************************************************************************
-                        //doc = Dte.SendDteDebtor(item, TokenCen);
+                        doc = Dte.SendDteDebtor(item, TokenCen);
                     }
                     item.Instruction.Dte = doc;
                 }
@@ -1158,6 +1171,7 @@ namespace Centralizador.WinApp.GUI
             BtnInsertRef.Enabled = false;
             // Send email                                      
             ServiceSendMail.BatchSendMail();
+            IGridMain.BackgroundImage = null;
         }
 
         #endregion
@@ -1571,9 +1585,11 @@ namespace Centralizador.WinApp.GUI
         {
             TssLblProgBar.Value = 0;
             BtnOutlook.Enabled = true;
-            TxtDateTimeEmail.Text = string.Format(CultureInfo, "{0:g}", e.Result);
+            BtnOutlook.Text = string.Format(CultureInfo, "{0:g}", e.Result);
             TssLblMensaje.Text = "Complete!";
             IGridMain.Focus();
+
+
         }
 
         #endregion
@@ -1588,25 +1604,35 @@ namespace Centralizador.WinApp.GUI
                 {
                     foreach (Detalle item in DetallesDebtor) // Only Participants
                     {
-                        if (item.IsParticipant && item.Instruction != null && !item.Instruction.IsPaid && item.StatusDetalle == StatusDetalle.Accepted)
+                        if (item.Instruction != null && item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted)
                         {
                             detallesFinal.Add(item);
                         }
                     }
-                    ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant);
-                    serviceExcel.CreateNomina(BgwPay);
+                    if (detallesFinal.Count > 0)
+                    {
+                        ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
+                        serviceExcel.CreateNomina(BgwPay);
+                    }
                 }
                 else
                 {
                     foreach (Detalle item in DetallesDebtor)
                     {
-                        if (item.Instruction != null && !item.Instruction.IsPaid && item.StatusDetalle == StatusDetalle.Accepted)
+                        if (item.StatusDetalle == StatusDetalle.Accepted)
                         {
                             detallesFinal.Add(item);
                         }
                     }
-                    ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant);
-                    serviceExcel.CreateNomina(BgwPay);
+                    if (detallesFinal.Count > 0)
+                    {
+                        ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
+                        serviceExcel.CreateNomina(BgwPay);
+                    }
+                }
+                if (detallesFinal.Count == 0)
+                {
+                    TssLblMensaje.Text = "Cannot make payments.";
                 }
             }
         }
@@ -1634,9 +1660,27 @@ namespace Centralizador.WinApp.GUI
         }
 
 
+
         #endregion
 
-        
+        private void BtnExcelConvert_Click(object sender, EventArgs e)
+        {
+            if (!IsRunning && DetallesCreditor != null || DetallesDebtor != null)
+            {
+                if (IsCreditor && DetallesCreditor.Count > 0)
+                {
+                    ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
+                    serviceExcel.ExportToExcel(DetallesCreditor, true);
+                }
+                else if (!IsRunning && !IsCreditor && DetallesDebtor.Count > 0)
+                {
+                    ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
+                    serviceExcel.ExportToExcel(DetallesDebtor, false);
+                }
+            }
+
+
+        }
     }
 }
 

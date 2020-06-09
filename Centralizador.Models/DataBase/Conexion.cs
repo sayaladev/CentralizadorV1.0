@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
 
 namespace Centralizador.Models.DataBase
 {
@@ -10,13 +11,13 @@ namespace Centralizador.Models.DataBase
         public string Query { get; set; }
         private static SqlDataReader SqlDataReader { get; set; }
 
-        public Conexion(string dataBaseName)
+        public Conexion(string dataBaseName, string serverName, string dbUser, string dbPassword)
         {
-            Cnn += $"Data Source={Properties.Settings.Default.ServerName};";
+            Cnn += $"Data Source={serverName};";
             Cnn += $"Initial Catalog={dataBaseName};";
             Cnn += $"Persist Security Info=True;";
-            Cnn += $"User ID={Properties.Settings.Default.DBUser};";
-            Cnn += $"Password={Properties.Settings.Default.DBPassword}";
+            Cnn += $"User ID={dbUser};";
+            Cnn += $"Password={dbPassword}";
 
         }
 
@@ -82,6 +83,8 @@ namespace Centralizador.Models.DataBase
                 }
             }
         }
+
+
         public static object ExecuteScalar(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))

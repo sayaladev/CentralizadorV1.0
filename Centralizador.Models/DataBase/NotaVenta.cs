@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Globalization;
 using System.Text;
 
@@ -29,6 +30,20 @@ namespace Centralizador.Models.DataBase
             {
                 throw;
             }
+        }
+
+        public static int CheckFolios(Conexion conexion) {
+
+            conexion.Query = "EXEC [softland].[DTE_FoliosDisp] @Tipo = N'F', @SubTipo = N'T'";
+            DataTable dataTable = new DataTable();
+            dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+            if (dataTable != null)
+            {
+                return dataTable.Rows.Count;
+            }
+
+            return 0;
+
         }
 
         public static int InsertNv(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
