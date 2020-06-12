@@ -25,33 +25,6 @@ namespace Centralizador.WinApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("sa")]
-        public string DBUser {
-            get {
-                return ((string)(this["DBUser"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("123456")]
-        public string DBPassword {
-            get {
-                return ((string)(this["DBPassword"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DEVELOPER")]
-        public string ServerName {
-            get {
-                return ((string)(this["ServerName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <DatosEmpresas>
   <Empresa id=""189"">SANFRANCISCO</Empresa>
@@ -94,6 +67,24 @@ namespace Centralizador.WinApp.Properties {
         public string PasswordCEN {
             get {
                 return ((string)(this["PasswordCEN"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("softland")]
+        public string DBUser {
+            get {
+                return ((string)(this["DBUser"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("softland")]
+        public string DBPassword {
+            get {
+                return ((string)(this["DBPassword"]));
             }
         }
     }

@@ -168,13 +168,14 @@ namespace Centralizador.Models.ApiSII
                         {
                             return LetterFlag.Red;
                         }
-                        else if (dte.Detalle != null && dte.Detalle.Length == 1)
+                        else if (dte.Detalle == null || dte.Detalle.Length != 1)
                         {
-                            if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
-                            {
-                                return LetterFlag.Red;
-                            }
+                            //if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
+                            //{
+                               return LetterFlag.Red;
+                            //}
                         }
+
                         return LetterFlag.Green;
                     }
                 }

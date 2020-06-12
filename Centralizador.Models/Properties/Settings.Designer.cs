@@ -107,5 +107,14 @@ namespace Centralizador.Models.Properties {
                 this["BaseAddress"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10.13.0.114\\SQL2014")]
+        public string ServerName {
+            get {
+                return ((string)(this["ServerName"]));
+            }
+        }
     }
 }

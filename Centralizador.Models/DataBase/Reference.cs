@@ -60,63 +60,73 @@ namespace Centralizador.Models.DataBase
                 conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
-                if (dataTable != null)
+                if (dataTable == null)
                 {
-                    foreach (DataRow item in dataTable.Rows)
-                    {
-
-                        Reference reference = new Reference();
-                        if (item["Folio"] != DBNull.Value)
-                        {
-                            reference.Folio = Convert.ToInt32(item["Folio"]);
-                        }
-                        if (item["NroInt"] != DBNull.Value)
-                        {
-                            reference.NroInt = Convert.ToInt32(item["NroInt"]);
-                        }
-                        if (item["RecepcionSii"] != DBNull.Value)
-                        {
-                            reference.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
-                        }
-                        if (item["Fecha"] != DBNull.Value)
-                        {
-                            reference.FechaEmision = Convert.ToDateTime(item["Fecha"]);
-                        }
-                        if (item["FileEnviado"] != DBNull.Value)
-                        {
-                            reference.FileEnviado = item["FileEnviado"].ToString();
-                        }
-                        if (item["FileBasico"] != DBNull.Value)
-                        {
-                            reference.FileBasico = item["FileBasico"].ToString();
-                        }
-                        if (item["NetoAfecto"] != DBNull.Value)
-                        {
-                            reference.NetoAfecto = Convert.ToInt32(item["NetoAfecto"]);
-                        }
-                        if (item["IVA"] != DBNull.Value)
-                        {
-                            reference.Iva = Convert.ToInt32(item["IVA"]);
-                        }
-                        if (item["Total"] != DBNull.Value)
-                        {
-                            reference.Total = Convert.ToInt32(item["Total"]);
-                        }
-                        if (item["CodAux"] != DBNull.Value)
-                        {
-                            reference.Rut = item["CodAux"].ToString();
-                        }
-                        softland.Add(reference);
-                    }
-                    return softland;
+                    // Error Exception
+                    return null;
                 }
-                return null;
+                else
+                {
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        foreach (DataRow item in dataTable.Rows)
+                        {
 
+                            Reference reference = new Reference();
+                            if (item["Folio"] != DBNull.Value)
+                            {
+                                reference.Folio = Convert.ToInt32(item["Folio"]);
+                            }
+                            if (item["NroInt"] != DBNull.Value)
+                            {
+                                reference.NroInt = Convert.ToInt32(item["NroInt"]);
+                            }
+                            if (item["RecepcionSii"] != DBNull.Value)
+                            {
+                                reference.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
+                            }
+                            if (item["Fecha"] != DBNull.Value)
+                            {
+                                reference.FechaEmision = Convert.ToDateTime(item["Fecha"]);
+                            }
+                            if (item["FileEnviado"] != DBNull.Value)
+                            {
+                                reference.FileEnviado = item["FileEnviado"].ToString();
+                            }
+                            if (item["FileBasico"] != DBNull.Value)
+                            {
+                                reference.FileBasico = item["FileBasico"].ToString();
+                            }
+                            if (item["NetoAfecto"] != DBNull.Value)
+                            {
+                                reference.NetoAfecto = Convert.ToInt32(item["NetoAfecto"]);
+                            }
+                            if (item["IVA"] != DBNull.Value)
+                            {
+                                reference.Iva = Convert.ToInt32(item["IVA"]);
+                            }
+                            if (item["Total"] != DBNull.Value)
+                            {
+                                reference.Total = Convert.ToInt32(item["Total"]);
+                            }
+                            if (item["CodAux"] != DBNull.Value)
+                            {
+                                reference.Rut = item["CodAux"].ToString();
+                            }
+                            softland.Add(reference);
+                        }
+                        return softland;
+                    }
+                    else
+                    {
+                        return softland;
+                    }
+                } 
             }
             catch (Exception)
             {
-
-                throw;
+                // Error Exception
+                return null;
             }
         }
 

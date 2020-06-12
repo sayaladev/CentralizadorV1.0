@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
 using System.Threading.Tasks;
 
 namespace Centralizador.Models.DataBase
@@ -12,10 +11,20 @@ namespace Centralizador.Models.DataBase
         public string Query { get; set; }
         private static SqlDataReader SqlDataReader { get; set; }
 
-        public Conexion(string dataBaseName, string serverName, string dbUser, string dbPassword)
+        public Conexion(string dataBaseName,string dbUser, string dbPassword)
         {
+            // change user name 
+            string serverName;
+            if (Environment.MachineName == "DEVELOPER")
+            {
+                serverName = "DEVELOPER";
+            }
+            else
+            {
+                serverName = Properties.Settings.Default.ServerName;
+            }
             Cnn += $"Data Source={serverName};";
-            Cnn += $"Initial Catalog={dataBaseName};";
+            Cnn += $"Initial Catalog={dataBaseName};"; // null?
             Cnn += $"Persist Security Info=True;";
             Cnn += $"User ID={dbUser};";
             Cnn += $"Password={dbPassword}";
@@ -30,32 +39,22 @@ namespace Centralizador.Models.DataBase
                 try
                 {
                     cnn.Open();
-                    SqlCommand cmd = new SqlCommand
+                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn ))
                     {
-                        CommandTimeout = 900000,
-                        Connection = cnn,
-                        CommandText = conn.Query,
-                        CommandType = CommandType.Text
-                    };
-                    SqlDataReader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
-                    if (SqlDataReader.HasRows)
-                    {
-                        DataTable dataTable = new DataTable();
-                        dataTable.Load(SqlDataReader);
-                        return dataTable;
-                    }
+                        using (SqlDataReader)
+                        {
+                            SqlDataReader = await cmd.ExecuteReaderAsync();
+                            DataTable dataTable = new DataTable();
+                            dataTable.Load(SqlDataReader);
+                            return dataTable;
+                        }                       
+                    }  
                 }
                 catch (Exception)
                 {
-                    throw;
-                }
-                finally
-                {
-                    SqlDataReader.Close();
-                    cnn.Close();
+                    return null; // Error server
                 }
             }
-            return null;
         }
         public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
         {
@@ -71,16 +70,12 @@ namespace Centralizador.Models.DataBase
                         CommandText = conn.Query,
                         CommandType = CommandType.Text
                     };
+                    SqlDataReader.Close();   
                     return await cmd.ExecuteNonQueryAsync();
                 }
                 catch (Exception)
                 {
-                    throw;
-                }
-                finally
-                {
-                    SqlDataReader.Close();
-                    cnn.Close();
+                    return 99; // Error
                 }
             }
         }
@@ -103,21 +98,18 @@ namespace Centralizador.Models.DataBase
                     object obj = await cmd.ExecuteScalarAsync();
                     if (obj != null && DBNull.Value != obj)
                     {
+                        SqlDataReader.Close();   
                         return obj;
                     }
                     else
                     {
+                        SqlDataReader.Close();      
                         return null;
                     }
                 }
                 catch (Exception)
                 {
-                    return null;
-                }
-                finally
-                {
-                    SqlDataReader.Close();
-                    cnn.Close();
+                    return 99; // Error
                 }
             }
         }

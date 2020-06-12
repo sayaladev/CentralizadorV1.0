@@ -26,5 +26,8 @@
     <Setting Name="BaseAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://ppagos-sen.coordinadorelectrico.cl/</Value>
     </Setting>
+    <Setting Name="ServerName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">10.13.0.114\SQL2014</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
