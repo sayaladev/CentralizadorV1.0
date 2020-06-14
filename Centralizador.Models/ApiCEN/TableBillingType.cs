@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -50,23 +50,26 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultBilingType> Results { get; set; }
 
-        public static IList<ResultBilingType> GetBilinTypes() // GET
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<IList<ResultBilingType>> GetBilinTypesAsync() 
+        {           
             try
-            {      
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res =  wc.DownloadString("api/v1/resources/billing-types");
-                if (res != null)
+            {
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (bilingType.Results.Count > 0)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-types");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    if (res != null)
                     {
-                        return bilingType.Results;
+                        BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (bilingType.Results.Count > 0)
+                        {
+                            return bilingType.Results;
+                        }
                     }
                 }
             }

@@ -99,9 +99,9 @@ namespace Centralizador.Models.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinadorelectrico.cl/")]
-        public string BaseAddress {
+        public global::System.Uri BaseAddress {
             get {
-                return ((string)(this["BaseAddress"]));
+                return ((global::System.Uri)(this["BaseAddress"]));
             }
             set {
                 this["BaseAddress"] = value;

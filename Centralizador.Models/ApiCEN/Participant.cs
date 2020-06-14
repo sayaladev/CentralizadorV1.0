@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Policy;
 using System.Text;
-using Centralizador.Models.DataBase;
+using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -96,14 +98,13 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("bills_contact")]
         public BillsContact BillsContact { get; set; }
 
-        [JsonProperty("created_ts")]
+        [JsonIgnore]
         public DateTime CreatedTs { get; set; }
 
-        [JsonProperty("updated_ts")]
+        [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
 
-        // New properties
-        //public Comuna Comuna { get; set; }
+
     }
 
     public class Participant
@@ -122,28 +123,26 @@ namespace Centralizador.Models.ApiCEN
         public IList<ResultParticipant> Results { get; set; }
 
         /// <summary>
-        /// Method return 1 participant.
+        /// Get 1 'Participante' from CEN API
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static ResultParticipant GetParticipantById(int id) // GET
+        public static ResultParticipant GetParticipantByIdAsync(int id)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
             try
             {
-
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/participants/?id={id}");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (p.Results.Count == 1)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/participants/?id={id}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = wc.DownloadString(uri);  // GET
+                    if (res != null)
                     {
-                        return p.Results[0];
+                        Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (p.Results.Count == 1)
+                        {
+                            return p.Results[0];
+                        }
                     }
                 }
             }
@@ -155,27 +154,26 @@ namespace Centralizador.Models.ApiCEN
         }
 
         /// <summary>
-        /// Method return 1 participant.
+        /// 
         /// </summary>
         /// <param name="rut"></param>
         /// <returns></returns>
-        public static ResultParticipant GetParticipantByRut(string rut)
+        public static async Task<ResultParticipant> GetParticipantByRutAsync(string rut)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/participants/?rut={rut}");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (p.Results.Count == 1)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/participants/?rut={rut}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    if (res != null)
                     {
-                        return p.Results[0];
+                        Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (p.Results.Count == 1)
+                        {
+                            return p.Results[0];
+                        }
                     }
                 }
             }

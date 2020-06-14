@@ -57,7 +57,7 @@ namespace Centralizador.Models.DataBase
                 query.Append($"SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
-                dataTable = (DataTable) Conexion.ExecuteReaderAsync(conexion).Result;
+                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
                 if (dataTable != null && dataTable.Rows.Count == 1)
                 {
                     Auxiliar auxiliar = new Auxiliar();

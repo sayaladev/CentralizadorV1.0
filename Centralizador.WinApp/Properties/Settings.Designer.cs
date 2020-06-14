@@ -72,7 +72,7 @@ namespace Centralizador.WinApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("softland")]
+        [global::System.Configuration.DefaultSettingValueAttribute("sa")]
         public string DBUser {
             get {
                 return ((string)(this["DBUser"]));
@@ -81,7 +81,7 @@ namespace Centralizador.WinApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("softland")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Softland358")]
         public string DBPassword {
             get {
                 return ((string)(this["DBPassword"]));

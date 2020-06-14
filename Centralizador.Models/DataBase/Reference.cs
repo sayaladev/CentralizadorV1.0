@@ -137,9 +137,7 @@ namespace Centralizador.Models.DataBase
             try
             {
                 StringBuilder query = new StringBuilder();              
-                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
-                // PRUEBAS
-                //string time = string.Format(cultureInfo, "{0:g}", instruction.PaymentMatrix.PublishDate); No funciona
+                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");    
 
                 //PRODUCTIVO
                 string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", instruction.PaymentMatrix.PublishDate); // Sí funciona!

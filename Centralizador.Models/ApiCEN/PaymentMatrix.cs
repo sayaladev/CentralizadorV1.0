@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -17,10 +18,10 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("auxiliary_data")]
         public AuxiliaryData AuxiliaryData { get; set; }
 
-        [JsonProperty("created_ts")]
+        [JsonIgnore]
         public DateTime CreatedTs { get; set; }
 
-        [JsonProperty("updated_ts")]
+        [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
 
         [JsonProperty("payment_type")]
@@ -96,95 +97,97 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public static IList<ResultPaymentMatrix> GetPaymentMatrix(DateTime date)
+        public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
-            DateTime createdBefore = date.AddMonths(1);          
+            DateTime createdBefore = date.AddMonths(1);
             try
             {
-
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (p.Results.Count > 0)
-                    {                       
-                        return p.Results;
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    if (res != null)
+                    {
+                        PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (p.Results.Count > 0)
+                        {
+                            return p.Results;
+                        }
                     }
                 }
             }
             catch (Exception)
             {
                 return null;
-            }         
+            }
             return null;
         }
 
         /// <summary>
-        /// Method return list of Matrix with the Billing Window binding.
+        /// 
         /// </summary>
         /// <param name="window"></param>
         /// <returns></returns>
-        public static IList<ResultPaymentMatrix> GetPaymentMatrixByBillingWindowId(ResultBillingWindow window)
+        public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixByBillingWindowIdAsync(ResultBillingWindow window)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
             try
             {
-
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/payment-matrices/?billing_window={window.Id}");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (p.Results.Count > 0)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?billing_window={window.Id}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    if (res != null)
                     {
-                        foreach (ResultPaymentMatrix item in p.Results)
+                        PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (p.Results.Count > 0)
                         {
-                            item.BillingWindow = window;
+                            foreach (ResultPaymentMatrix item in p.Results)
+                            {
+                                item.BillingWindow = window;
+                            }
+                            return p.Results;
                         }
-                        return p.Results;
                     }
                 }
             }
             catch (Exception)
             {
                 return null;
-            }         
+            }
             return null;
         }
-        public static ResultPaymentMatrix GetPaymentMatrixById(ResultInstruction instruction)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
+      
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="instruction"></param>
+        /// <returns></returns>
+        public static async Task<ResultPaymentMatrix> GetPaymentMatrixByIdAsync(ResultInstruction instruction)
+        {  
             try
             {
-
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/payment-matrices/?id={instruction.PaymentMatrixId}");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (p.Results.Count == 1) {
-                        return p.Results[0];
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?id={instruction.PaymentMatrixId}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    if (res != null)
+                    {
+                        PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (p.Results.Count == 1)
+                        {
+                            return p.Results[0];
+                        }
                     }
                 }
             }
             catch (Exception)
             {
                 return null;
-            }       
+            }
             return null;
         }
     }

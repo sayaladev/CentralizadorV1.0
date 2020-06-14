@@ -7,7 +7,7 @@
     <ProjectGuid>{830E7CEA-25D3-4FD1-A1FE-13F9FC577D61}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Centralizador.WinApp</RootNamespace>
-    <AssemblyName>Centralizador.WinApp</AssemblyName>
+    <AssemblyName>Centralizador</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -23,7 +23,9 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>16</ApplicationRevision>
+    <ProductName>Centralizador</ProductName>
+    <PublisherName>sayaladev%40outlook.com</PublisherName>
+    <ApplicationRevision>19</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>

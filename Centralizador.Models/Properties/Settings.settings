@@ -23,7 +23,7 @@
     <Setting Name="UIDRange" Type="System.String" Scope="User">
       <Value Profile="(Default)">46000</Value>
     </Setting>
-    <Setting Name="BaseAddress" Type="System.String" Scope="User">
+    <Setting Name="BaseAddress" Type="System.Uri" Scope="User">
       <Value Profile="(Default)">https://ppagos-sen.coordinadorelectrico.cl/</Value>
     </Setting>
     <Setting Name="ServerName" Type="System.String" Scope="Application">

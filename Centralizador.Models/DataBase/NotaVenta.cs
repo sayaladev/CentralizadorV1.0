@@ -35,7 +35,7 @@ namespace Centralizador.Models.DataBase
         public static int CheckFolios(Conexion conexion) {
 
             conexion.Query = "EXEC [softland].[DTE_FoliosDisp] @Tipo = N'F', @SubTipo = N'T'";
-            DataTable dataTable = (DataTable)Conexion.ExecuteReaderAsync(conexion).Result;    
+            DataTable dataTable = Conexion.ExecuteReaderAsync(conexion).Result;    
             if (dataTable != null)
             {
                 return dataTable.Rows.Count;

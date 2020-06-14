@@ -160,7 +160,7 @@ namespace Centralizador.Models.ApiSII
                         {
                             return LetterFlag.Red;
                         }
-                        else if (referencia.RazonRef != detalle.Instruction.PaymentMatrix.NaturalKey)
+                        else if (string.Compare(referencia.RazonRef,detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
                         {
                             return LetterFlag.Red;
                         }
@@ -196,7 +196,8 @@ namespace Centralizador.Models.ApiSII
         {
             Accepted,
             Rejected,
-            No
+            No,
+            Factoring
 
         }
 
@@ -232,6 +233,10 @@ namespace Centralizador.Models.ApiSII
                 else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null) // Recepción de NC de anulación que referencia al documento.
                 {
                     return StatusDetalle.Rejected;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "CED") != null) // DTE Cedido.
+                {
+                    return StatusDetalle.Factoring;
                 }
             }
             else

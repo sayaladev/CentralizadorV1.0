@@ -23,12 +23,14 @@ namespace Centralizador.Models.DataBase
             {
                 serverName = Properties.Settings.Default.ServerName;
             }
-            Cnn += $"Data Source={serverName};";
-            Cnn += $"Initial Catalog={dataBaseName};"; // null?
-            Cnn += $"Persist Security Info=True;";
-            Cnn += $"User ID={dbUser};";
-            Cnn += $"Password={dbPassword}";
-
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder
+            {
+                DataSource = serverName,
+                InitialCatalog = dataBaseName,
+                UserID = dbUser,
+                Password = dbPassword         
+            };
+            Cnn = builder.ToString();
         }
 
 
@@ -50,8 +52,10 @@ namespace Centralizador.Models.DataBase
                         }                       
                     }  
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    //Tester
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
                     return null; // Error server
                 }
             }
@@ -63,18 +67,19 @@ namespace Centralizador.Models.DataBase
                 try
                 {
                     cnn.Open();
-                    SqlCommand cmd = new SqlCommand
+                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
-                        CommandTimeout = 900000,
-                        Connection = cnn,
-                        CommandText = conn.Query,
-                        CommandType = CommandType.Text
-                    };
-                    SqlDataReader.Close();   
-                    return await cmd.ExecuteNonQueryAsync();
+                        using (SqlDataReader)
+                        {
+                            SqlDataReader.Close();
+                            return await cmd.ExecuteNonQueryAsync();
+                        }
+                    } 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    //Tester
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
                     return 99; // Error
                 }
             }
@@ -88,27 +93,28 @@ namespace Centralizador.Models.DataBase
                 try
                 {
                     cnn.Open();
-                    SqlCommand cmd = new SqlCommand
+                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
-                        CommandTimeout = 900000,
-                        Connection = cnn,
-                        CommandText = conn.Query,
-                        CommandType = CommandType.Text
-                    };
-                    object obj = await cmd.ExecuteScalarAsync();
-                    if (obj != null && DBNull.Value != obj)
-                    {
-                        SqlDataReader.Close();   
-                        return obj;
-                    }
-                    else
-                    {
-                        SqlDataReader.Close();      
-                        return null;
+                        using (SqlDataReader)
+                        {
+                            object obj = await cmd.ExecuteScalarAsync();
+                            if (obj != null && DBNull.Value != obj)
+                            {
+                                SqlDataReader.Close();
+                                return obj;
+                            }
+                            else
+                            {
+                                SqlDataReader.Close();
+                                return null;
+                            }
+                        }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    //Tester
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
                     return 99; // Error
                 }
             }

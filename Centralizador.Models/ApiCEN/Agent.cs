@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
@@ -34,10 +35,10 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("participants")]
         public IList<ResultParticipant> Participants { get; set; }
 
-        [JsonProperty("created_ts")]
+        [JsonIgnore]
         public DateTime CreatedTs { get; set; }
 
-        [JsonProperty("updated_ts")]
+        [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
     }
 
@@ -56,70 +57,71 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultAgent> Results { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public static ResultAgent GetAgetByEmail(string userCEN) // GET
+
+      /// <summary>
+      /// Get 1 'Agente' from CEN API.
+      /// </summary>
+      /// <param name="userCEN"></param>
+      /// <returns></returns>
+        public static ResultAgent GetAgetByEmailAsync(string userCEN) 
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8               
-            };
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/agents/?email={userCEN}");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (agent.Results.Count == 1)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={userCEN}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res =  wc.DownloadString(uri); // GET
+                    if (res != null)
                     {
-                        return agent.Results[0];
-                    }
+                        Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (agent.Results.Count == 1)
+                        {
+                            return agent.Results[0];
+                        }
+                    }                  
                 }
             }
             catch (Exception)
             {
                 return null;
-            }        
+            }
             return null;
         }
 
         /// <summary>
-        /// 
+        /// Get 1 Token from CEN API.
         /// </summary>
+        /// <param name="userCEN"></param>
+        /// <param name="passwordCEN"></param>
         /// <returns></returns>
-        public static string GetTokenCen(string userCEN, string passwordCEN) // POST
+        public static string GetTokenCenAsync(string userCEN, string passwordCEN) 
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
-            try
-            {
-                Dictionary<string, string> dic = new Dictionary<string, string>
+            Dictionary<string, string> dic = new Dictionary<string, string>
                 {
                     { "username", userCEN },
                     { "password", passwordCEN }
                 };
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.UploadString("api/token-auth/", WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented));
-                if (res != null)
+            try
+            {
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
-                    return dic["token"];
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/token-auth/");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = wc.UploadString(uri, WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)); // POST
+                    if (res != null)
+                    {
+                        dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
+                        return dic["token"];
+                    }               
                 }
             }
             catch (Exception)
             {
                 return null;
-            }        
+            }
             return null;
         }
     }
-
 
 }

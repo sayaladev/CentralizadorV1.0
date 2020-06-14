@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
@@ -23,10 +24,10 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("periods")]
         public IList<string> Periods { get; set; }
 
-        [JsonProperty("created_ts")]
+        [JsonIgnore]
         public DateTime CreatedTs { get; set; }
 
-        [JsonProperty("updated_ts")]
+        [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
     }
 
@@ -46,28 +47,27 @@ namespace Centralizador.Models.ApiCEN
         public IList<ResultBillingWindow> Results { get; set; }
 
         /// <summary>
-        /// 
+        /// Get 1 'Ventana de Facturación' from CEN API
         /// </summary>
         /// <param name="matrix"></param>
         /// <returns></returns>
-        public static ResultBillingWindow GetBillingWindowById(ResultPaymentMatrix matrix) // GET
+        public static async Task<ResultBillingWindow> GetBillingWindowByIdAsync(ResultPaymentMatrix matrix) 
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
             try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (b.Results.Count == 1)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    if (res != null)
                     {
-                        return b.Results[0];
+                        BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (b.Results.Count == 1)
+                        {
+                            return b.Results[0];
 
+                        }
                     }
                 }
             }
@@ -78,18 +78,14 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
+
         /// <summary>
-        /// Method return 1 Billing Window.
+        /// Get 1 'Ventana de Facturación' from CEN API
         /// </summary>
-        /// <param name="naturalKey"></param>
+        /// <param name="referencia"></param>
         /// <returns></returns>
         public static ResultBillingWindow GetBillingWindowByNaturalKey(DTEDefTypeDocumentoReferencia referencia)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             string r1 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']') + 1).TrimStart();
             string r2 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']', referencia.RazonRef.IndexOf(']') + 1) + 1);
@@ -98,15 +94,19 @@ namespace Centralizador.Models.ApiCEN
             // Controlling lower & upper
             string rznRef = ti.ToTitleCase(r2.ToLower());
             try
-            {           
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
-                if (res != null)
+            {
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (b.Results.Count == 1)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = wc.DownloadString(uri);
+                    if (res != null)
                     {
-                        return b.Results[0];
+                        BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (b.Results.Count == 1)
+                        {
+                            return b.Results[0];
+                        }
                     }
                 }
             }

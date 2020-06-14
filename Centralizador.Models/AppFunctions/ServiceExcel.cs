@@ -60,8 +60,9 @@ namespace Centralizador.Models.AppFunctions
 
             foreach (Detalle item in detalles)
             {
-                DataRow row = table.NewRow();   
-                row[0] = c++;
+                DataRow row = table.NewRow();
+                c++;
+                row[0] = c;
                 row[1] = item.Folio;
                 row[2] = item.FechaEmision;
                 row[3] = item.RutReceptor;
@@ -235,8 +236,11 @@ namespace Centralizador.Models.AppFunctions
                             Dtes = new List<long>() { item.Instruction.Dte.Id },
                             TransactionType = 3
                         };
-                        Pay.SendPay(pay, TokenCen);
+                        ResultPay resultPay =  Pay.SendPayAsync(pay, TokenCen).Result;
+                        if (resultPay == null)
+                        {
 
+                        }
                         item.Instruction.StatusPaid = 2;
                         item.Instruction.IsPaid = true;
                     }

@@ -49,6 +49,7 @@
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.ChkIncludeCEN = new System.Windows.Forms.CheckBox();
             this.BtnInsertNv = new System.Windows.Forms.Button();
             this.ChkIncludeReclaimed = new System.Windows.Forms.CheckBox();
@@ -140,7 +141,7 @@
             // FpicBoxSearch
             // 
             this.FpicBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("FpicBoxSearch.Image")));
-            this.FpicBoxSearch.Location = new System.Drawing.Point(692, 394);
+            this.FpicBoxSearch.Location = new System.Drawing.Point(12, 679);
             this.FpicBoxSearch.Name = "FpicBoxSearch";
             this.FpicBoxSearch.Size = new System.Drawing.Size(36, 25);
             this.FpicBoxSearch.TabIndex = 3;
@@ -152,14 +153,19 @@
             this.IGridMain.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("IGridMain.BackgroundImage")));
             this.IGridMain.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.IGridMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.IGridMain.Header.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(204)))), ((int)(((byte)(194)))), ((int)(((byte)(59)))));
+            this.IGridMain.Header.BackColor = System.Drawing.SystemColors.Info;
+            this.IGridMain.Header.DrawSystem = false;
+            this.IGridMain.Header.Height = 15;
+            this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
+            this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
+            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 2, System.Drawing.Drawing2D.DashStyle.Solid);
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
             this.IGridMain.SelCellsBackColor = System.Drawing.SystemColors.ControlLight;
             this.IGridMain.SelCellsForeColor = System.Drawing.Color.Black;
             this.IGridMain.Size = new System.Drawing.Size(1128, 707);
-            this.IGridMain.TabIndex = 0;        
+            this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.CustomDrawCellEllipsisButtonForeground += new TenTec.Windows.iGridLib.iGCustomDrawEllipsisButtonEventHandler(this.IGridMain_CustomDrawCellEllipsisButtonForeground);
             this.IGridMain.ColHdrMouseDown += new TenTec.Windows.iGridLib.iGColHdrMouseDownEventHandler(this.IGridMain_ColHdrMouseDown);
@@ -285,6 +291,7 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.BackColor = System.Drawing.SystemColors.Control;
+            this.groupBox2.Controls.Add(this.checkBox1);
             this.groupBox2.Controls.Add(this.ChkIncludeCEN);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
             this.groupBox2.Controls.Add(this.ChkIncludeReclaimed);
@@ -296,10 +303,20 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(116, 119);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(65, 17);
+            this.checkBox1.TabIndex = 13;
+            this.checkBox1.Text = "No CEN";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // ChkIncludeCEN
             // 
             this.ChkIncludeCEN.AutoSize = true;
-            this.ChkIncludeCEN.Location = new System.Drawing.Point(118, 110);
+            this.ChkIncludeCEN.Location = new System.Drawing.Point(116, 98);
             this.ChkIncludeCEN.Name = "ChkIncludeCEN";
             this.ChkIncludeCEN.Size = new System.Drawing.Size(72, 17);
             this.ChkIncludeCEN.TabIndex = 12;
@@ -310,18 +327,18 @@
             // 
             this.BtnInsertNv.BackColor = System.Drawing.SystemColors.Control;
             this.BtnInsertNv.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnInsertNv.Location = new System.Drawing.Point(20, 10);
+            this.BtnInsertNv.Location = new System.Drawing.Point(19, 10);
             this.BtnInsertNv.Name = "BtnInsertNv";
             this.BtnInsertNv.Size = new System.Drawing.Size(84, 38);
             this.BtnInsertNv.TabIndex = 10;
-            this.BtnInsertNv.Text = "Insert NV";
+            this.BtnInsertNv.Text = "NV";
             this.BtnInsertNv.UseVisualStyleBackColor = false;
             this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_Click);
             // 
             // ChkIncludeReclaimed
             // 
             this.ChkIncludeReclaimed.AutoSize = true;
-            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(118, 22);
+            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(117, 22);
             this.ChkIncludeReclaimed.Name = "ChkIncludeReclaimed";
             this.ChkIncludeReclaimed.Size = new System.Drawing.Size(76, 17);
             this.ChkIncludeReclaimed.TabIndex = 9;
@@ -334,7 +351,7 @@
             this.BtnPagar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnPagar.Image = ((System.Drawing.Image)(resources.GetObject("BtnPagar.Image")));
             this.BtnPagar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnPagar.Location = new System.Drawing.Point(44, 98);
+            this.BtnPagar.Location = new System.Drawing.Point(33, 98);
             this.BtnPagar.Name = "BtnPagar";
             this.BtnPagar.Size = new System.Drawing.Size(66, 38);
             this.BtnPagar.TabIndex = 6;
@@ -349,11 +366,11 @@
             this.BtnInsertRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnInsertRef.Image = ((System.Drawing.Image)(resources.GetObject("BtnInsertRef.Image")));
             this.BtnInsertRef.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnInsertRef.Location = new System.Drawing.Point(29, 54);
+            this.BtnInsertRef.Location = new System.Drawing.Point(42, 54);
             this.BtnInsertRef.Name = "BtnInsertRef";
-            this.BtnInsertRef.Size = new System.Drawing.Size(154, 38);
+            this.BtnInsertRef.Size = new System.Drawing.Size(129, 38);
             this.BtnInsertRef.TabIndex = 8;
-            this.BtnInsertRef.Text = "Insert References";
+            this.BtnInsertRef.Text = "<References>";
             this.BtnInsertRef.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.BtnInsertRef.UseVisualStyleBackColor = false;
             this.BtnInsertRef.Click += new System.EventHandler(this.BtnInsertRef_Click);
@@ -392,9 +409,9 @@
             this.BtnOutlook.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
             this.BtnOutlook.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnOutlook.Location = new System.Drawing.Point(35, 212);
+            this.BtnOutlook.Location = new System.Drawing.Point(30, 212);
             this.BtnOutlook.Name = "BtnOutlook";
-            this.BtnOutlook.Size = new System.Drawing.Size(143, 46);
+            this.BtnOutlook.Size = new System.Drawing.Size(152, 46);
             this.BtnOutlook.TabIndex = 1;
             this.BtnOutlook.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.BtnOutlook.UseVisualStyleBackColor = true;
@@ -440,6 +457,7 @@
             // 
             // CboParticipants
             // 
+            this.CboParticipants.BackColor = System.Drawing.SystemColors.Info;
             this.CboParticipants.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboParticipants.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboParticipants.FormattingEnabled = true;
@@ -451,7 +469,7 @@
             // 
             // CboYears
             // 
-            this.CboYears.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(204)))), ((int)(((byte)(194)))), ((int)(((byte)(59)))));
+            this.CboYears.BackColor = System.Drawing.SystemColors.Info;
             this.CboYears.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboYears.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboYears.FormattingEnabled = true;
@@ -462,7 +480,7 @@
             // 
             // CboMonths
             // 
-            this.CboMonths.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(204)))), ((int)(((byte)(194)))), ((int)(((byte)(59)))));
+            this.CboMonths.BackColor = System.Drawing.SystemColors.Info;
             this.CboMonths.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CboMonths.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CboMonths.FormattingEnabled = true;
@@ -518,7 +536,6 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Centralizador v1.0";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
@@ -579,5 +596,6 @@
         private System.Windows.Forms.Button BtnHiperLink;
         private System.Windows.Forms.CheckBox ChkIncludeCEN;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

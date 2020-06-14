@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -39,7 +40,7 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("dtes")]
         public List<long> Dtes { get; set; }
 
-       
+
     }
     public class Pay
     {
@@ -56,29 +57,32 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("result")]
         public ResultPay Result { get; set; }
 
-        public static ResultPay SendPay(ResultPay pay, string tokenCen)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pay"></param>
+        /// <param name="tokenCen"></param>
+        /// <returns></returns>
+        public static async Task<ResultPay> SendPayAsync(ResultPay pay, string tokenCen)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
             try
             {
-                string d = JsonConvert.SerializeObject(pay);
-                //wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
-                NameValueCollection postData = new NameValueCollection() { { "data", d } };
-
-                byte[] res = wc.UploadValues("api/v1/operations/payments/create/", postData);
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    string json = Encoding.UTF8.GetString(res);
-                    Pay p = JsonConvert.DeserializeObject<Pay>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
-                    if (p != null)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/operations/payments/create/");
+                    string d = JsonConvert.SerializeObject(pay);
+                    wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
+                    NameValueCollection postData = new NameValueCollection() { { "data", d } };
+                    byte[] res = await wc.UploadValuesTaskAsync(uri, WebRequestMethods.Http.Post, postData); // POST
+                    if (res != null)
                     {
-                        return p.Result;
+                        string json = Encoding.UTF8.GetString(res);
+                        Pay p = JsonConvert.DeserializeObject<Pay>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+                        if (p != null)
+                        {
+                            return p.Result;
+                        }
                     }
                 }
             }
@@ -87,8 +91,6 @@ namespace Centralizador.Models.ApiCEN
                 return null;
             }
             return null;
-
         }
-
     }
 }

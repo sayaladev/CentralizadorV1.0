@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -55,10 +57,10 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("auxiliary_data")]
         public AuxiliaryData AuxiliaryData { get; set; }
 
-        [JsonProperty("created_ts")]
+        [JsonIgnore]
         public DateTime CreatedTs { get; set; }
 
-        [JsonProperty("updated_ts")]
+        [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
 
         //Mapping (new properties)    
@@ -86,34 +88,68 @@ namespace Centralizador.Models.ApiCEN
         public IList<ResultInstruction> Results { get; set; }
 
         /// <summary>
-        /// Method return list of instructions with the matrix + user participant binding.
+        /// 
         /// </summary>
         /// <param name="matrix"></param>
         /// <param name="Userparticipant"></param>
         /// <returns></returns>
-        public static IList<ResultInstruction> GetInstructionCreditor(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
+        public static async Task<IList<ResultInstruction>> GetInstructionCreditorAsync(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
         {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
             try
             {
-         
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
-                if (res != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (instruction.Results.Count > 0)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri);
+                    if (res != null)
                     {
-                        foreach (ResultInstruction item in instruction.Results)
-                        {                         
+                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (instruction.Results.Count > 0)
+                        {
+                            foreach (ResultInstruction item in instruction.Results)
+                            {
                                 item.ParticipantCreditor = Userparticipant;
-                                item.PaymentMatrix = matrix;                          
+                                item.PaymentMatrix = matrix;
+                            }
                         }
                         return instruction.Results;
+                    }                 
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="idMatrix"></param>
+        /// <param name="idCReditor"></param>
+        /// <param name="idDebtor"></param>
+        /// <returns></returns>
+        public static async Task<ResultInstruction> GetInstructionDebtorAsync(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
+        {       
+            try
+            {
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                {
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri);
+                    if (res != null)
+                    {
+                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (instruction.Results.Count == 1)
+                        {
+                            instruction.Results[0].PaymentMatrix = matrix;
+                            instruction.Results[0].ParticipantCreditor = participant;
+                            instruction.Results[0].ParticipantDebtor = userPart;
+                            return instruction.Results[0];
+                        }
                     }
                 }
             }
@@ -125,32 +161,29 @@ namespace Centralizador.Models.ApiCEN
         }
 
         /// <summary>
-        /// Method return 1 instruction with the matrix + participants binding.
+        /// Get 1 'Instrucción de pago' from CEN API
         /// </summary>
-        /// <param name="idMatrix"></param>
-        /// <param name="idCReditor"></param>
-        /// <param name="idDebtor"></param>
+        /// <param name="participant"></param>
+        /// <param name="userPart"></param>
         /// <returns></returns>
-        public static ResultInstruction GetInstructionDebtor(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
+        public static async Task<IList<ResultInstruction>> GetInstructionByParticipantsAsync(ResultParticipant participant, ResultParticipant userPart)
+        {         
             try
-            {       
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
-                if (res != null)
+            {
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (instruction.Results.Count == 1)
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri);
+                    if (res != null)
                     {
-                        instruction.Results[0].PaymentMatrix = matrix;
-                        instruction.Results[0].ParticipantCreditor = participant;
-                        instruction.Results[0].ParticipantDebtor = userPart;
-                        return instruction.Results[0];
+                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (instruction.Results.Count > 0)
+                        {
+                            instruction.Results[0].ParticipantCreditor = participant;
+                            instruction.Results[0].ParticipantDebtor = userPart;
+                            return instruction.Results;
+                        }
                     }
                 }
             }
@@ -161,36 +194,9 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        public static IList<ResultInstruction> GetInstructionByParticipants(ResultParticipant participant, ResultParticipant userPart)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = Properties.Settings.Default.BaseAddress,
-                Encoding = Encoding.UTF8
-            };
-            try
-            {
-         
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                string res = wc.DownloadString($"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
-                if (res != null)
-                {
-                    Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (instruction.Results.Count > 0)
-                    {
-                        instruction.Results[0].ParticipantCreditor = participant;
-                        instruction.Results[0].ParticipantDebtor = userPart;
-                        return instruction.Results;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            return null;
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public enum StatusBilled
         {
             // 1 No Facturado y cuando hay más de 1 dte informado
