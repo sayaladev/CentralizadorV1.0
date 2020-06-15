@@ -12,6 +12,7 @@ namespace Centralizador.Models.DataBase
 
         public static int GetLastNv(Conexion conexion)
         {
+            int count = 0;
             try
             {
 
@@ -19,30 +20,35 @@ namespace Centralizador.Models.DataBase
                 object result = Conexion.ExecuteScalarAsync(conexion).Result;
                 if (result != null)
                 {
-                    return Convert.ToInt32(result);
-                }
-                else
+                    count = Convert.ToInt32(result);
+                }             
+            }
+            catch (Exception)
+            {
+                // Error Exception
+                return 99;
+            }
+            return count;
+        }
+
+        public static int CheckFolios(Conexion conexion)
+        {
+            int count = 0;
+            try
+            {
+                conexion.Query = "EXEC [softland].[DTE_FoliosDisp] @Tipo = N'F', @SubTipo = N'T'";
+                DataTable dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+                if (dataTable != null)
                 {
-                    return 0;
+                    count = dataTable.Rows.Count;
                 }
             }
             catch (Exception)
             {
-                throw;
+                // Error Exception
+                return 99;
             }
-        }
-
-        public static int CheckFolios(Conexion conexion) {
-
-            conexion.Query = "EXEC [softland].[DTE_FoliosDisp] @Tipo = N'F', @SubTipo = N'T'";
-            DataTable dataTable = Conexion.ExecuteReaderAsync(conexion).Result;    
-            if (dataTable != null)
-            {
-                return dataTable.Rows.Count;
-            }
-
-            return 0;
-
+            return count;
         }
 
         public static int InsertNv(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
@@ -91,7 +97,6 @@ namespace Centralizador.Models.DataBase
             try
             {
                 StringBuilder query = new StringBuilder();
-
                 query.Append("SELECT DISTINCT TOP (1) ");
                 query.Append("  nv.NVNumero ");
                 query.Append("FROM softland.nw_nventa nv ");
@@ -104,13 +109,12 @@ namespace Centralizador.Models.DataBase
                 query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
                 query.Append("AND f.folio IS NULL ");
-
                 conexion.Query = query.ToString();
                 return Convert.ToInt32(Conexion.ExecuteScalarAsync(conexion).Result);
             }
             catch (Exception)
             {
-                throw;
+                return 99;
             }
         }
     }

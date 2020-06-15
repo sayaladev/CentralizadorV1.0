@@ -2,6 +2,7 @@
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 
 using Centralizador.Models.ApiCEN;
@@ -21,14 +22,12 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                if (acteco == null)
+                if (acteco == null || comuna == null )
                 {
                     return 99;
                 }
-                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
-             
+                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');             
                 StringBuilder query = new StringBuilder();
-
                 query.Append($"IF (NOT EXISTS(SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}')) BEGIN ");
                 query.Append("INSERT INTO softland.CWTAUXI (CodAux, NomAux, NoFAux, RutAux, ActAux, GirAux, PaiAux, Comaux, ");
                 query.Append("DirAux, ClaCli, ClaPro, Bloqueado, BloqueadoPro, EsReceptorDTE ,eMailDTE, Usuario, Proceso, Sistema, Region) ");
@@ -48,19 +47,20 @@ namespace Centralizador.Models.DataBase
 
         public static Auxiliar GetAuxiliar(ResultInstruction instruction, Conexion conexion)
         {
+            Auxiliar auxiliar = new Auxiliar();
             try
             {
-
                 StringBuilder query = new StringBuilder();
-
-
                 query.Append($"SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
-                if (dataTable != null && dataTable.Rows.Count == 1)
+                if (dataTable == null )
                 {
-                    Auxiliar auxiliar = new Auxiliar();
+                    return null;
+                }
+                if (dataTable.Rows.Count == 1)
+                {             
                     if (dataTable.Rows[0]["CodAux"] != DBNull.Value)
                     {
                         auxiliar.CodAux = dataTable.Rows[0]["CodAux"].ToString();
@@ -84,21 +84,18 @@ namespace Centralizador.Models.DataBase
                     if (dataTable.Rows[0]["ComAux"] != DBNull.Value)
                     {
                         auxiliar.ComAux = dataTable.Rows[0]["ComAux"].ToString();
-                    }
-
-                    return auxiliar;
+                    }               
                 }
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
-            return null;
+            return auxiliar;
         }
 
         public static int UpdateAuxiliar(ResultInstruction instruction, Conexion conexion)
         {
-
             try
             {
                 StringBuilder query = new StringBuilder();

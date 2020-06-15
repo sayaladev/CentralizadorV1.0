@@ -88,7 +88,7 @@ namespace Centralizador.Models.ApiSII
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     wc.Encoding = Encoding.UTF8;
                     wc.Headers[HttpRequestHeader.Cookie] = $"TOKEN={token}";
-                    string result = await wc.UploadStringTaskAsync(url, "POST", jSon).ConfigureAwait(false);
+                    string result = await wc.UploadStringTaskAsync(url, WebRequestMethods.Http.Post, jSon).ConfigureAwait(false);
                     if (result != null)
                     {
                         ResultEvent detalleLibro = JsonConvert.DeserializeObject<ResultEvent>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

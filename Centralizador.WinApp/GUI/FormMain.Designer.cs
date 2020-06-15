@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -49,7 +48,7 @@
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.ChkNoIncludeCEN = new System.Windows.Forms.CheckBox();
             this.ChkIncludeCEN = new System.Windows.Forms.CheckBox();
             this.BtnInsertNv = new System.Windows.Forms.Button();
             this.ChkIncludeReclaimed = new System.Windows.Forms.CheckBox();
@@ -155,10 +154,10 @@
             this.IGridMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IGridMain.Header.BackColor = System.Drawing.SystemColors.Info;
             this.IGridMain.Header.DrawSystem = false;
-            this.IGridMain.Header.Height = 17;
+            this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
+            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -280,43 +279,45 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.BackColor = System.Drawing.SystemColors.Control;
-            this.groupBox2.Controls.Add(this.checkBox1);
+            this.groupBox2.Controls.Add(this.ChkNoIncludeCEN);
             this.groupBox2.Controls.Add(this.ChkIncludeCEN);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
             this.groupBox2.Controls.Add(this.ChkIncludeReclaimed);
             this.groupBox2.Controls.Add(this.BtnPagar);
             this.groupBox2.Controls.Add(this.BtnInsertRef);
-            this.groupBox2.Location = new System.Drawing.Point(2, 463);
+            this.groupBox2.Location = new System.Drawing.Point(2, 437);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(212, 150);
+            this.groupBox2.Size = new System.Drawing.Size(212, 176);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
-            // checkBox1
+            // ChkNoIncludeCEN
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(116, 119);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(65, 17);
-            this.checkBox1.TabIndex = 13;
-            this.checkBox1.Text = "No CEN";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.ChkNoIncludeCEN.AutoSize = true;
+            this.ChkNoIncludeCEN.Location = new System.Drawing.Point(114, 132);
+            this.ChkNoIncludeCEN.Name = "ChkNoIncludeCEN";
+            this.ChkNoIncludeCEN.Size = new System.Drawing.Size(65, 17);
+            this.ChkNoIncludeCEN.TabIndex = 13;
+            this.ChkNoIncludeCEN.Text = "No CEN";
+            this.ChkNoIncludeCEN.UseVisualStyleBackColor = true;
+            this.ChkNoIncludeCEN.CheckedChanged += new System.EventHandler(this.ChkNoIncludeCEN_CheckedChanged);
             // 
             // ChkIncludeCEN
             // 
             this.ChkIncludeCEN.AutoSize = true;
-            this.ChkIncludeCEN.Location = new System.Drawing.Point(116, 98);
+            this.ChkIncludeCEN.Location = new System.Drawing.Point(114, 111);
             this.ChkIncludeCEN.Name = "ChkIncludeCEN";
             this.ChkIncludeCEN.Size = new System.Drawing.Size(72, 17);
             this.ChkIncludeCEN.TabIndex = 12;
             this.ChkIncludeCEN.Text = "Only CEN";
             this.ChkIncludeCEN.UseVisualStyleBackColor = true;
+            this.ChkIncludeCEN.CheckedChanged += new System.EventHandler(this.ChkIncludeCEN_CheckedChanged);
             // 
             // BtnInsertNv
             // 
             this.BtnInsertNv.BackColor = System.Drawing.SystemColors.Control;
             this.BtnInsertNv.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnInsertNv.Location = new System.Drawing.Point(19, 10);
+            this.BtnInsertNv.Location = new System.Drawing.Point(20, 19);
             this.BtnInsertNv.Name = "BtnInsertNv";
             this.BtnInsertNv.Size = new System.Drawing.Size(84, 38);
             this.BtnInsertNv.TabIndex = 10;
@@ -327,7 +328,7 @@
             // ChkIncludeReclaimed
             // 
             this.ChkIncludeReclaimed.AutoSize = true;
-            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(117, 22);
+            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(118, 31);
             this.ChkIncludeReclaimed.Name = "ChkIncludeReclaimed";
             this.ChkIncludeReclaimed.Size = new System.Drawing.Size(76, 17);
             this.ChkIncludeReclaimed.TabIndex = 9;
@@ -340,7 +341,7 @@
             this.BtnPagar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnPagar.Image = ((System.Drawing.Image)(resources.GetObject("BtnPagar.Image")));
             this.BtnPagar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnPagar.Location = new System.Drawing.Point(33, 98);
+            this.BtnPagar.Location = new System.Drawing.Point(31, 111);
             this.BtnPagar.Name = "BtnPagar";
             this.BtnPagar.Size = new System.Drawing.Size(66, 38);
             this.BtnPagar.TabIndex = 6;
@@ -355,7 +356,7 @@
             this.BtnInsertRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnInsertRef.Image = ((System.Drawing.Image)(resources.GetObject("BtnInsertRef.Image")));
             this.BtnInsertRef.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnInsertRef.Location = new System.Drawing.Point(42, 54);
+            this.BtnInsertRef.Location = new System.Drawing.Point(40, 67);
             this.BtnInsertRef.Name = "BtnInsertRef";
             this.BtnInsertRef.Size = new System.Drawing.Size(129, 38);
             this.BtnInsertRef.TabIndex = 8;
@@ -584,6 +585,6 @@
         private System.Windows.Forms.Button BtnHiperLink;
         private System.Windows.Forms.CheckBox ChkIncludeCEN;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox ChkNoIncludeCEN;
     }
 }

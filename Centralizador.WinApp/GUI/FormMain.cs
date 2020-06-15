@@ -210,62 +210,8 @@ namespace Centralizador.WinApp.GUI
             pattern.ColHdrStyle.TextAlign = iGContentAlignment.MiddleCenter;
             pattern.ColHdrStyle.Font = new Font("Calibri", 8.5f, FontStyle.Bold);
             pattern.AllowSizing = false;
-            //pattern.AllowMoving = false;
+            //pattern.AllowMoving = true;
             pattern.AllowGrouping = true;
-
-
-            // Info cols.
-            iGCellStyle cellStyleCommon = new iGCellStyle
-            {
-                TextAlign = iGContentAlignment.MiddleCenter
-            };
-            IGridMain.Cols.Add("folio", "F°", 60, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("fechaEmision", "Emission", 60, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("rut", "RUT", 63, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("rznsocial", "Name", 300, pattern).CellStyle = new iGCellStyle() { TextAlign = iGContentAlignment.MiddleCenter, Font = new Font("Microsoft Sans Serif", 8f) };
-            //Button see xml to pdf
-            IGridMain.Cols.Add("flagxml", "", 20, pattern);
-            IGridMain.Cols.Add("inst", "Instructions", 47, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("codProd", "Code", 35, pattern).CellStyle = cellStyleCommon;
-
-            // Info checkboxes
-            iGCellStyle cellStyleChk = new iGCellStyle
-            {
-                ImageAlign = iGContentAlignment.MiddleCenter
-            };
-            IGridMain.Cols.Add("flagRef", "", 17, pattern);
-            IGridMain.Cols.Add("P1", "", 16, pattern).CellStyle = cellStyleChk;
-            IGridMain.Cols.Add("P2", "", 16, pattern).CellStyle = cellStyleChk;
-            IGridMain.Cols.Add("P3", "", 16, pattern).CellStyle = cellStyleChk;
-            IGridMain.Cols.Add("P4", "", 16, pattern).CellStyle = cellStyleChk;
-
-            // Money cols
-            iGCellStyle cellStyleMoney = new iGCellStyle
-            {
-                TextAlign = iGContentAlignment.MiddleCenter,
-                FormatString = "{0:#,##}"
-            };
-            IGridMain.Cols.Add("neto", "Net $", 64, pattern).CellStyle = cellStyleMoney;
-            IGridMain.Cols["neto"].AllowGrouping = false;
-            IGridMain.Cols.Add("exento", "Exent $", 64, pattern).CellStyle = cellStyleMoney;
-            IGridMain.Cols["exento"].AllowGrouping = false;
-            IGridMain.Cols.Add("iva", "Tax $", 64, pattern).CellStyle = cellStyleMoney;
-            IGridMain.Cols["iva"].AllowGrouping = false;
-            IGridMain.Cols.Add("total", "Total $", 64, pattern).CellStyle = cellStyleMoney;
-            IGridMain.Cols["total"].AllowGrouping = false;
-
-            // Sii info
-            IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("status", "Status", 50, pattern).CellStyle = cellStyleCommon;
-
-            // Button Reject
-            iGCol col = IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern);
-            col.Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
-            col.CellStyle = new iGCellStyle();
-            Btn.CellButtonClick += Bcm_CellButtonClick;
-            Btn.Attach(IGridMain);
-            //Btn.CellButtonVisible += Bcm_CellButtonVisible;
-            //Btn.CellButtonTooltip += Bcm_CellButtonTooltip;
 
             // General options
             IGridMain.GroupBox.Visible = true;
@@ -277,6 +223,62 @@ namespace Centralizador.WinApp.GUI
             IGridMain.EllipsisButtonGlyph = FpicBoxSearch.Image;
             IGridMain.UseXPStyles = false;
             IGridMain.Appearance = iGControlPaintAppearance.StyleFlat;
+
+            // Info cols.
+            iGCellStyle cellStyleCommon = new iGCellStyle
+            {
+                TextAlign = iGContentAlignment.MiddleCenter,
+                ImageAlign = iGContentAlignment.MiddleCenter
+            };
+            IGridMain.Cols.Add("folio", "F°", 60, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("fechaEmision", "Emission", 60, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("rut", "RUT", 63, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("rznsocial", "Name", 300, pattern).CellStyle = new iGCellStyle() { TextAlign = iGContentAlignment.MiddleCenter, Font = new Font("Microsoft Sans Serif", 8f) };
+            //Button see xml to pdf
+            IGridMain.Cols.Add("flagxml", "", 20, pattern);
+            IGridMain.Cols.Add("inst", "Instructions", 47, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("codProd", "Code", 35, pattern).CellStyle = cellStyleCommon;
+
+            // Colour flag
+            IGridMain.Cols.Add("flagRef", "", 17, pattern);
+
+            // Info checkboxes
+            IGridMain.Cols.Add("P1", "", 16, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("P2", "", 16, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("P3", "", 16, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("P4", "", 16, pattern).CellStyle = cellStyleCommon;
+
+            // Money cols
+            iGCellStyle cellStyleMoney = new iGCellStyle
+            {
+                TextAlign = iGContentAlignment.MiddleCenter,
+                FormatString = "{0:#,##}"
+            };
+            IGridMain.Cols.Add("neto", "Net $", 64, pattern).CellStyle = cellStyleMoney;
+            IGridMain.Cols["neto"].AllowGrouping = true;
+            IGridMain.Cols.Add("exento", "Exent $", 64, pattern).CellStyle = cellStyleMoney;
+            IGridMain.Cols["exento"].AllowGrouping = false;
+            IGridMain.Cols.Add("iva", "Tax $", 64, pattern).CellStyle = cellStyleMoney;
+            IGridMain.Cols["iva"].AllowGrouping = false;
+            IGridMain.Cols.Add("total", "Total $", 64, pattern).CellStyle = cellStyleMoney;
+            IGridMain.Cols["total"].AllowGrouping = false;
+
+            // Sii info
+            IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols["fechaEnvio"].AllowGrouping = true;
+            IGridMain.Cols.Add("status", "Status", 50, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols["status"].AllowGrouping = true;
+
+            // Button Reject
+            iGCol col = IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern);
+            col.Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
+            col.CellStyle = new iGCellStyle();
+            Btn.CellButtonClick += Bcm_CellButtonClick;
+            Btn.Attach(IGridMain);
+            //Btn.CellButtonVisible += Bcm_CellButtonVisible;
+            //Btn.CellButtonTooltip += Bcm_CellButtonTooltip;
+
+
 
             // Header
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
@@ -319,7 +321,6 @@ namespace Centralizador.WinApp.GUI
 
             IGridMain.EndUpdate();
         }
-
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex != 0)
@@ -528,6 +529,11 @@ namespace Centralizador.WinApp.GUI
                 string acteco = null;
                 // Get F° NV if exists
                 int F = NotaVenta.GetNv(item.Instruction, con);
+                if (F == 99)
+                {
+                    ShowMsgSoftland();
+                    return;
+                }
                 if (F == 0)
                 {
                     try
@@ -548,35 +554,41 @@ namespace Centralizador.WinApp.GUI
                         StringLogging.AppendLine(item.Instruction.Id + "\t" + "Update email" + "\t\t" + "Error in CSV file.");
                         continue;
                     }
-
-                    // Not exists Auxiliar : Create
                     Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction, con);
                     if (auxiliar == null)
                     {
+                        ShowMsgSoftland();
+                        return;
+                    }
+                    // Not exists Auxiliar : Create
+                    if (auxiliar.RutAux == "")
+                    {
                         // Get comunas                      
                         IList<Comuna> comunas = Comuna.GetComunas(con);
-                        if (comunas != null)
+                        if (comunas == null)
                         {
-                            Regex regex = new Regex(@"\b[\s,\.-:;]*");
-                            IEnumerable<string> words = regex.Split(item.Instruction.ParticipantDebtor.CommercialAddress).Where(x => !string.IsNullOrEmpty(x));
-                            IList<Comuna> coms = new List<Comuna>();
-                            foreach (string w in words)
+                            ShowMsgSoftland();
+                            return;
+                        }
+                        Regex regex = new Regex(@"\b[\s,\.-:;]*");
+                        IEnumerable<string> words = regex.Split(item.Instruction.ParticipantDebtor.CommercialAddress).Where(x => !string.IsNullOrEmpty(x));
+                        IList<Comuna> coms = new List<Comuna>();
+                        foreach (string w in words)
+                        {
+                            // Comuna según info de CEN
+                            Comuna r = comunas.FirstOrDefault(x => x.ComDes.Contains(w));
+                            if (r != null)
                             {
-                                // Comuna según info de CEN
-                                Comuna r = comunas.FirstOrDefault(x => x.ComDes.Contains(w));
-                                if (r != null)
-                                {
-                                    coms.Add(r);
-                                }
+                                coms.Add(r);
                             }
-                            if (coms.Count == 1)
-                            {
-                                comuna = coms[0];
-                            }
-                            else
-                            {
-                                comuna = coms[1];
-                            }
+                        }
+                        if (coms.Count == 1)
+                        {
+                            comuna = coms[0];
+                        }
+                        else
+                        {
+                            comuna = coms[1];
                         }
                         // Get acteco from CEN
                         if (item.Instruction.ParticipantDebtor.CommercialBusiness != null)
@@ -584,15 +596,27 @@ namespace Centralizador.WinApp.GUI
                             if (item.Instruction.ParticipantDebtor.CommercialBusiness.Length > 60)
                             {
                                 acteco = item.Instruction.ParticipantDebtor.CommercialBusiness.Substring(0, 60);
-                                Acteco.InsertActeco(acteco, con);
                             }
                             else
                             {
                                 acteco = item.Instruction.ParticipantDebtor.CommercialBusiness;
-                                Acteco.InsertActeco(acteco, con);
                             }
-
-
+                            result = Acteco.InsertActeco(acteco, con);
+                            switch (result)
+                            {
+                                case 0:
+                                    break;
+                                case 2:
+                                    break;
+                                case 1:
+                                    StringLogging.AppendLine(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + acteco);
+                                    break;
+                                case -1:
+                                    break;
+                                case 99:
+                                    StringLogging.AppendLine(item.Instruction.Id + "\t" + "Auxiliar Insert:" + "\t" + "Error Softland: Acteco" + item.Instruction.ParticipantDebtor.Rut);
+                                    break;
+                            }
                         }
                         else
                         {
@@ -656,10 +680,13 @@ namespace Centralizador.WinApp.GUI
                         }
                     }
 
-                    // Insert NV
-                    //if (acteco != null && comuna != null)
-                    //{
+                    // Insert NV               
                     int lastF = NotaVenta.GetLastNv(con);
+                    if (lastF == 99)
+                    {
+                        ShowMsgSoftland();
+                        return;
+                    }
                     string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     result = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
                     switch (result)
@@ -677,8 +704,6 @@ namespace Centralizador.WinApp.GUI
                             break;
 
                     }
-                    // }
-
                 }
                 else
                 {
@@ -785,13 +810,14 @@ namespace Centralizador.WinApp.GUI
                                 StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: " + item.Folio);
                                 break;
                             case 0:
+                                StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Error");
                                 break;
                             case -1: // ya existe
                                 StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: *" + item.Folio);
                                 break;
                             case 99: // Error
-                                StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Error");
-                                break;
+                                ShowMsgSoftland();
+                                return;
                         }
                     }
                 }
@@ -1221,8 +1247,14 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
         #region Common functions
-        public static void ShowMsgCEN() { MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error); }
-        public static void ShowMsgSoftland() { MessageBox.Show("There was an error connecting to the server Softland.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        public static void ShowMsgCEN()
+        {
+            MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        public static void ShowMsgSoftland()
+        {
+            MessageBox.Show("There was an error connecting to the server Softland.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
         public static void ShowMsgSII() { MessageBox.Show("There was an error connecting to SII.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error); }
         public string AssemblyVersion
         {
@@ -1439,7 +1471,7 @@ namespace Centralizador.WinApp.GUI
         private void IGridMain_ColHdrMouseDown(object sender, iGColHdrMouseDownEventArgs e)
         {
             // Prohibit sorting by the hot and current row indicator columns and by the row number column.
-            if (e.ColIndex == 0 || e.ColIndex == 6 || e.ColIndex == 7 || e.ColIndex == 10)
+            if (e.ColIndex == 0 || e.ColIndex == 7)
             {
                 e.DoDefault = false;
             }
@@ -1572,8 +1604,6 @@ namespace Centralizador.WinApp.GUI
                 //e.DoDefault = false;
             }
         }
-
-        #region Rejected Button   
         private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
             if (IsCreditor)
@@ -1607,7 +1637,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         if (Mail == null)
                         {
-                            Mail = new ServiceSendMail(3, UserParticipant); // Parameter!!! *********************************
+                            Mail = new ServiceSendMail(3, UserParticipant); // 3 Threads
 
                         }
                         // Reject in Sii
@@ -1659,10 +1689,22 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
-
-
-        #endregion
-
+        private void ChkIncludeCEN_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox chk = sender as CheckBox;
+            if (chk.Checked)
+            {
+                ChkNoIncludeCEN.Checked = false;
+            }
+        }
+        private void ChkNoIncludeCEN_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox chk = sender as CheckBox;
+            if (chk.Checked)
+            {
+                ChkIncludeCEN.Checked = false;
+            }
+        }
         #endregion
 
         #region Outlook
@@ -1714,22 +1756,23 @@ namespace Centralizador.WinApp.GUI
                         serviceExcel.CreateNomina(BgwPay);
                     }
                 }
-                else
+                else if (ChkNoIncludeCEN.CheckState == CheckState.Checked)
                 {
-                    foreach (Detalle item in DetallesDebtor)
+                    foreach (Detalle item in DetallesDebtor) // Only NO Participants
                     {
-                        if (item.StatusDetalle == StatusDetalle.Accepted)
+                        if (item.Instruction != null && !item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted)
                         {
                             detallesFinal.Add(item);
                         }
                     }
-                    if (detallesFinal.Count > 0)
-                    {
-                        ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
-                        serviceExcel.CreateNomina(BgwPay);
-                    }
                 }
-                if (detallesFinal.Count == 0)
+
+                if (detallesFinal.Count > 0)
+                {
+                    ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
+                    serviceExcel.CreateNomina(BgwPay);
+                }
+                else if (detallesFinal.Count == 0)
                 {
                     TssLblMensaje.Text = "Cannot make payments.";
                 }
@@ -1760,9 +1803,10 @@ namespace Centralizador.WinApp.GUI
 
 
 
+
+
+
         #endregion
-
-
 
 
     }

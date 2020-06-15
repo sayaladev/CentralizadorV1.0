@@ -21,13 +21,12 @@ namespace Centralizador.Models.DataBase
         public int Total { get; set; }
         public string Rut { get; set; }
         public static IList<Reference> GetInfoFactura(ResultInstruction instruction, Conexion conexion)
-        {
+        {    
             try
             {
 
                 IList<Reference> softland = new List<Reference>();
                 StringBuilder query = new StringBuilder();
-
 
                 query.Append("SELECT ");
                 query.Append("  g.Folio, ");
@@ -133,13 +132,13 @@ namespace Centralizador.Models.DataBase
 
         public static int InsertReference(ResultInstruction instruction, int nroInt, Conexion conexion)
         {
-
+            int count;
             try
             {
                 StringBuilder query = new StringBuilder();              
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");    
 
-                //PRODUCTIVO
+                
                 string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", instruction.PaymentMatrix.PublishDate); // Sí funciona!
                 query.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} ");
                 query.Append("  AND Tipo = 'F' ");
@@ -154,13 +153,14 @@ namespace Centralizador.Models.DataBase
                 query.Append("END ");
 
                 conexion.Query = query.ToString();
-                return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
+                count = Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
             }
             catch (Exception)
             {
                 // Error Exception
                 return 99;
             }
+            return count;
         }
     }
 }

@@ -96,11 +96,7 @@ namespace Centralizador.WinApp.GUI
 				if (IsButtonColumn(col.Index))
 				{
 					col.CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-				}
-				//if (col.Index == 20)
-				//{
-				//	//col.CellStyle.CustomDrawFlags = iGCustomDrawFlags.Foreground;
-				//}
+				}			
 			}
 		}
 

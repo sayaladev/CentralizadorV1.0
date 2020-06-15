@@ -41,7 +41,6 @@ namespace Centralizador.Models.DataBase
             try
             {     
                 StringBuilder query = new StringBuilder();
-
                 query.Append($"IF (NOT EXISTS (SELECT * FROM softland.cwtgiro WHERE GirDes = '{descripcion}')) BEGIN ");
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
                 query.Append($"'{descripcion}') END");
@@ -50,9 +49,8 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                throw;
+                return 99;
             }
-
         }
 
     }

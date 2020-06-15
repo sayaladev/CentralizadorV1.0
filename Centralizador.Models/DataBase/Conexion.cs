@@ -11,7 +11,7 @@ namespace Centralizador.Models.DataBase
         public string Query { get; set; }
         private static SqlDataReader SqlDataReader { get; set; }
 
-        public Conexion(string dataBaseName,string dbUser, string dbPassword)
+        public Conexion(string dataBaseName, string dbUser, string dbPassword)
         {
             // change user name 
             string serverName;
@@ -28,7 +28,7 @@ namespace Centralizador.Models.DataBase
                 DataSource = serverName,
                 InitialCatalog = dataBaseName,
                 UserID = dbUser,
-                Password = dbPassword         
+                Password = dbPassword
             };
             Cnn = builder.ToString();
         }
@@ -36,27 +36,30 @@ namespace Centralizador.Models.DataBase
 
         public static async Task<DataTable> ExecuteReaderAsync(Conexion conn)
         {
+            DataTable table = new DataTable();
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
                 try
                 {
                     cnn.Open();
-                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn ))
+                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
                         using (SqlDataReader)
                         {
                             SqlDataReader = await cmd.ExecuteReaderAsync();
                             DataTable dataTable = new DataTable();
                             dataTable.Load(SqlDataReader);
-                            return dataTable;
-                        }                       
-                    }  
+                            table = dataTable;
+                        }
+                    }
                 }
-                catch (Exception ex)
-                {                   
-                    return null; // Error server
+                catch (Exception)
+                {
+                    // Error Exception
+                    return null;
                 }
             }
+            return table;
         }
         public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
         {
@@ -72,11 +75,12 @@ namespace Centralizador.Models.DataBase
                             SqlDataReader.Close();
                             return await cmd.ExecuteNonQueryAsync();
                         }
-                    } 
+                    }
                 }
-                catch (Exception ex)
-                {               
-                    return 99; // Error
+                catch (Exception)
+                {
+                    // Error Exception
+                    return 99;
                 }
             }
         }
@@ -107,10 +111,10 @@ namespace Centralizador.Models.DataBase
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-              
-                    return 99; // Error
+                    // Error Exception
+                    return 99;
                 }
             }
         }
