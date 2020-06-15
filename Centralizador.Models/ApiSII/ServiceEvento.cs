@@ -1,13 +1,13 @@
-﻿using Centralizador.Models.ApiCEN;
-
-using Newtonsoft.Json;
-
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+
+using Centralizador.Models.ApiCEN;
+
+using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiSII
 {
@@ -25,8 +25,19 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tipoUser"></param>
+        /// <param name="token"></param>
+        /// <param name="tipoDoc"></param>
+        /// <param name="detalle"></param>
+        /// <param name="userParticipant"></param>
+        /// <param name="serialDigitalCert"></param>
+        /// <returns></returns>
         public static async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant, string serialDigitalCert)
         {
+            DataEvento evento = new DataEvento();
             // Get digital cert  
             X509Certificate2 cert = null;
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
@@ -69,32 +80,30 @@ namespace Centralizador.Models.ApiSII
 
             string url = "https://www4.sii.cl/registrorechazodtej6ui/services/data/facadeService/validarAccesoReceptor";
             ServiceEvento serviceEvento = new ServiceEvento(data, metaData);
-            WebClient wc = new WebClient();
             try
             {
-                string jSon = JsonConvert.SerializeObject(serviceEvento, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                wc.Headers[HttpRequestHeader.Cookie] = $"TOKEN={token}";
-                string result = await wc.UploadStringTaskAsync(url, "POST", jSon).ConfigureAwait(false);
-                if (result != null)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    ResultEvent detalleLibro = JsonConvert.DeserializeObject<ResultEvent>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (detalleLibro.MetaData.Errors == null)
+                    string jSon = JsonConvert.SerializeObject(serviceEvento, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    wc.Encoding = Encoding.UTF8;
+                    wc.Headers[HttpRequestHeader.Cookie] = $"TOKEN={token}";
+                    string result = await wc.UploadStringTaskAsync(url, "POST", jSon).ConfigureAwait(false);
+                    if (result != null)
                     {
-                        return detalleLibro.DataEvento;
+                        ResultEvent detalleLibro = JsonConvert.DeserializeObject<ResultEvent>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (detalleLibro.MetaData.Errors == null)
+                        {
+                            evento = detalleLibro.DataEvento;
+                        }
                     }
-                }               
+                }
             }
-            catch (WebException ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message, Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
-            finally
-            {
-                wc.Dispose();
-            }
-            return null;
+            return evento;
         }
     }
 

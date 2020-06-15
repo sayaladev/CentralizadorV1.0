@@ -5,7 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-
+using System.Windows.Forms;
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 
@@ -222,7 +222,7 @@ namespace Centralizador.Models.AppFunctions
                         }
                     }
                     table.Rows.Add(row);
-                    // Insert pay to CEN                 
+                    // Insert pay to CEN            
                     if (item.Instruction != null && item.Instruction.Dte != null && !item.Instruction.IsPaid)
                     {
                         ResultPay pay = new ResultPay
@@ -236,21 +236,21 @@ namespace Centralizador.Models.AppFunctions
                             Dtes = new List<long>() { item.Instruction.Dte.Id },
                             TransactionType = 3
                         };
-                        ResultPay resultPay =  Pay.SendPayAsync(pay, TokenCen).Result;
+                        ResultPay resultPay =  Pay.SendPayAsync(pay, TokenCen).Result;                   
                         if (resultPay == null)
                         {
-
+                            // Error Exception
+                            MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);                    
+                            return;
                         }
                         item.Instruction.StatusPaid = 2;
                         item.Instruction.IsPaid = true;
                     }
-
                     // Insert Softland
-
                 }
                 catch (Exception)
-                {
-                    throw;
+                {                 
+                   
                 }
                 c++;
                 float porcent = (float)(100 * c) / Detalles.Count;

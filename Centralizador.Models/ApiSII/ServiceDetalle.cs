@@ -31,6 +31,7 @@ namespace Centralizador.Models.ApiSII
         }
         public static async Task<IList<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
         {
+            IList<Detalle> detallesDebtor = new List<Detalle>();
             string ns = "", url = "", op = "";
             switch (tipoUser)
             {
@@ -67,8 +68,7 @@ namespace Centralizador.Models.ApiSII
                 string jSon = JsonConvert.SerializeObject(apiDetalleLibroReq, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {                   
-                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    wc.Encoding = Encoding.UTF8;
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";            
                     wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={userParticipant.Rut}; DV_NS={userParticipant.VerificationCode};TOKEN={token}";
                     string result = await wc.UploadStringTaskAsync(url, WebRequestMethods.Http.Post, jSon).ConfigureAwait(false);
                     if (result != null)
@@ -80,9 +80,10 @@ namespace Centralizador.Models.ApiSII
                                 MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return null;
                             case 0:
-                                return detalleLibro.DataResp.Detalles;
+                                detallesDebtor = detalleLibro.DataResp.Detalles;
+                                break;
                             case 99:
-                                MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
                             case 1:
                                 MessageBox.Show("This option only maintains the detail of the last six months", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Stop);
@@ -92,11 +93,11 @@ namespace Centralizador.Models.ApiSII
                 }
 
             }
-            catch (WebException ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message, Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }            
-            return null;
+            return detallesDebtor;
         }
         public static int GetFlagImageIndex(LetterFlag flag)
         {

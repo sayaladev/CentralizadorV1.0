@@ -99,6 +99,7 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
         {
+            IList<ResultPaymentMatrix> matrices = new List<ResultPaymentMatrix>();
             DateTime createdBefore = date.AddMonths(1);
             try
             {
@@ -110,18 +111,16 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (p.Results.Count > 0)
-                        {
-                            return p.Results;
-                        }
+                        matrices = p.Results;
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return matrices;
         }
 
         /// <summary>
@@ -131,6 +130,7 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixByBillingWindowIdAsync(ResultBillingWindow window)
         {
+            IList<ResultPaymentMatrix> matrices = new List<ResultPaymentMatrix>();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -141,54 +141,21 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (p.Results.Count > 0)
+                        foreach (ResultPaymentMatrix item in p.Results)
                         {
-                            foreach (ResultPaymentMatrix item in p.Results)
-                            {
-                                item.BillingWindow = window;
-                            }
-                            return p.Results;
+                            item.BillingWindow = window;
                         }
+                        matrices = p.Results;
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return matrices;
         }
-      
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="instruction"></param>
-        /// <returns></returns>
-        public static async Task<ResultPaymentMatrix> GetPaymentMatrixByIdAsync(ResultInstruction instruction)
-        {  
-            try
-            {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
-                {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?id={instruction.PaymentMatrixId}");
-                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri); // GET
-                    if (res != null)
-                    {
-                        PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (p.Results.Count == 1)
-                        {
-                            return p.Results[0];
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            return null;
-        }
     }
 }

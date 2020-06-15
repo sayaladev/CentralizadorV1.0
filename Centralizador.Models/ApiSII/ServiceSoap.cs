@@ -118,18 +118,21 @@ namespace Centralizador.Models.ApiSII
         }
         public static respuestaTo SendActionToSii(string token, Detalle detalle, string accionDoc)
         {
+            respuestaTo respuesta = new respuestaTo();
             try
             {
                 using (RegistroReclamoDteServiceEndpointService proxy = new RegistroReclamoDteServiceEndpointService(token))
                 {
                     respuestaTo response = proxy.ingresarAceptacionReclamoDoc(detalle.RutReceptor.ToString(), detalle.DvReceptor, "33", detalle.Folio.ToString(), accionDoc);
-                    return response;
+                    respuesta = response;
                 }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-                throw;
+                // Error Exception
+                return null;
             }
+            return respuesta;
         }
     }
 

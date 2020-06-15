@@ -5,12 +5,6 @@
     <Setting Name="SerialDigitalCert" Type="System.String" Scope="Application">
       <Value Profile="(Default)">0138BF</Value>
     </Setting>
-    <Setting Name="UserCEN" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">german.gomez@cvegroup.com</Value>
-    </Setting>
-    <Setting Name="PasswordCEN" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">cvepagos2017</Value>
-    </Setting>
     <Setting Name="DBUser" Type="System.String" Scope="Application">
       <Value Profile="(Default)">sa</Value>
     </Setting>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -129,6 +128,7 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<ResultParticipant> GetParticipantByIdAsync(int id)
         {
+            ResultParticipant participant = new ResultParticipant();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -139,18 +139,16 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (p.Results.Count == 1)
-                        {
-                            return p.Results[0];
-                        }
+                        participant = p.Results[0];
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return participant;
         }
 
         /// <summary>
@@ -160,6 +158,7 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<ResultParticipant> GetParticipantByRutAsync(string rut)
         {
+            ResultParticipant participant = new ResultParticipant();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -170,41 +169,47 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (p.Results.Count == 1)
-                        {
-                            return p.Results[0];
-                        }
+                        participant = p.Results[0];
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return participant;
         }
 
 
-        public static IList<ResultParticipant> GetParticipants(string UserCEN)
+        public static IList<ResultParticipant> GetParticipants()
         {
-            IList<ResultParticipant> participants = new List<ResultParticipant>();
-            ResultAgent agent = Agent.GetAgetByEmailAsync(UserCEN).Result;
-            foreach (ResultParticipant item in agent.Participants)
+            IList<ResultParticipant> participants = new List<ResultParticipant>();           
+            ResultAgent agent = Agent.GetAgetByEmailAsync().Result;
+            if (agent != null)
             {
-               participants.Add(GetParticipantByIdAsync(item.ParticipantId).Result);
+                foreach (ResultParticipant item in agent.Participants)
+                {
+                    ResultParticipant participant = GetParticipantByIdAsync(item.ParticipantId).Result;
+                    if (participant != null)
+                    {
+                        participants.Add(participant);
+                    }
+                    else
+                    {
+                        // Error Exception
+                        return null;
+                    }
+                }
+                // Add Cve 76.532.358-4  
+                participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
+                participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
             }
-
-            // Insert Cve 76.532.358-4  
-            participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
-            participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
-
-
-            if (participants == null)
+            else
             {
+                // Error Exception
                 return null;
-            }        
-
-
+            }
             return participants;
         }
     }

@@ -64,7 +64,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="tokenCen"></param>
         /// <returns></returns>
         public static async Task<ResultPay> SendPayAsync(ResultPay pay, string tokenCen)
-        {
+        {       
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -81,7 +81,7 @@ namespace Centralizador.Models.ApiCEN
 
                         if (p != null)
                         {
-                            return p.Result;
+                            pay = p.Result;
                         }
                     }
                 }
@@ -90,7 +90,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 return null;
             }
-            return null;
+            return pay;
         }
     }
 }

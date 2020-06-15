@@ -58,13 +58,15 @@ namespace Centralizador.Models.ApiCEN
         public IList<ResultAgent> Results { get; set; }
 
 
-      /// <summary>
-      /// Get 1 'Agente' from CEN API.
-      /// </summary>
-      /// <param name="userCEN"></param>
-      /// <returns></returns>
-        public static async Task<ResultAgent> GetAgetByEmailAsync(string userCEN) 
+        /// <summary>
+        /// Get 1 'Agente' from CEN API.
+        /// </summary>
+        /// <param name="userCEN"></param>
+        /// <returns></returns>
+        public static async Task<ResultAgent> GetAgetByEmailAsync()
         {
+            string userCEN = Properties.Settings.Default.UserCEN;
+            ResultAgent resultAgent = new ResultAgent();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -77,16 +79,17 @@ namespace Centralizador.Models.ApiCEN
                         Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                         if (agent.Results.Count == 1)
                         {
-                            return agent.Results[0];
+                            resultAgent = agent.Results[0];                   
                         }
-                    }                  
+                    }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return resultAgent;
         }
 
         /// <summary>
@@ -95,12 +98,13 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="userCEN"></param>
         /// <param name="passwordCEN"></param>
         /// <returns></returns>
-        public static async Task<string> GetTokenCenAsync(string userCEN, string passwordCEN) 
+        public static async Task<string> GetTokenCenAsync()
         {
+            string token = "";
             Dictionary<string, string> dic = new Dictionary<string, string>
                 {
-                    { "username", userCEN },
-                    { "password", passwordCEN }
+                    { "username", Properties.Settings.Default.UserCEN  },
+                    { "password", Properties.Settings.Default.PasswordCEN }
                 };
             try
             {
@@ -112,18 +116,23 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
-                        return dic["token"];
-                    }               
+                        token = dic["token"];
+                    }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return token;
         }
 
-       
+        /// <summary>
+        /// Get UserCEN from Configuration settings
+        /// </summary>
+        public static string GetUserCEN => Properties.Settings.Default.UserCEN;
+
     }
 
 }

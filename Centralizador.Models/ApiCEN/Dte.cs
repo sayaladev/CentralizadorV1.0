@@ -92,50 +92,24 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultDte> Results { get; set; }
 
-        /// <summary>
-        /// Get 1 DTe from CEN API
-        /// </summary>
-        /// <param name="detalle"></param>
-        /// <param name="isCreditor"></param>
-        /// <returns></returns>
-        public static async Task<ResultDte> GetDteByFolioAsync(Detalle detalle, bool isCreditor)
-        {
-            try
-            {
-                ResultInstruction i = detalle.Instruction;
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
-                {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&instruction={i.Id}&creditor={i.Creditor}&folio={detalle.Folio}");
-                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri); // GET
-                    if (res != null)
-                    {
-                        Dte dte = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (dte.Results.Count == 1)
-                        {
-                            return dte.Results[0];
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            return null;
-        }
-
+     
         /// <summary>
         /// Send 1 Dte to CEN API (Creditor)
         /// </summary>
         /// <param name="detalle"></param>
         /// <param name="tokenCen"></param>
         /// <returns></returns>
-        public static async Task<ResultDte> SendDteCreditorAsync(Detalle detalle, string tokenCen) 
+        public static async Task<ResultDte> SendDteCreditorAsync(Detalle detalle, string tokenCen)
         {
             string fileName = detalle.Folio + "_" + detalle.Instruction;
             string docXml = detalle.References.FileBasico;
             string idFile = SendFileAsync(tokenCen, fileName, docXml).Result;
+            if (idFile == null)
+            {
+                // Error Exception
+                return null;
+            }
+            ResultDte resultDte = new ResultDte();
             if (!string.IsNullOrEmpty(idFile))
             {
                 ResultDte dte = new ResultDte
@@ -150,7 +124,6 @@ namespace Centralizador.Models.ApiCEN
                     ReceptionDt = string.Format("{0:yyyy-MM-dd}", Convert.ToDateTime(detalle.FechaRecepcion)),
                     EmissionFile = idFile
                 };
-
                 try
                 {
                     using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -166,17 +139,18 @@ namespace Centralizador.Models.ApiCEN
                             InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                             if (r != null)
                             {
-                                return r.ResultDte;
+                                resultDte = r.ResultDte;
                             }
                         }
                     }
                 }
                 catch (Exception)
                 {
+                    // Error Exception
                     return null;
                 }
             }
-            return null;
+            return resultDte;
         }
 
         /// <summary>
@@ -185,8 +159,9 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="detalle"></param>
         /// <param name="tokenCen"></param>
         /// <returns></returns>
-        public static async Task<ResultDte> SendDteDebtorAsync(Detalle detalle, string tokenCen) 
+        public static async Task<ResultDte> SendDteDebtorAsync(Detalle detalle, string tokenCen)
         {
+            ResultDte resultDte = new ResultDte();
             ResultDte dte = new ResultDte
             {
                 Folio = detalle.Folio,
@@ -225,19 +200,19 @@ namespace Centralizador.Models.ApiCEN
                     {
                         string json = Encoding.UTF8.GetString(res);
                         InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
                         if (r != null)
                         {
-                            return r.ResultDte;
+                            resultDte = r.ResultDte;
                         }
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return resultDte;
         }
 
         /// <summary>
@@ -247,8 +222,9 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="fileName"></param>
         /// <param name="doc"></param>
         /// <returns></returns>
-        private static async Task<string> SendFileAsync(string tokenCen, string fileName, string doc) 
+        private static async Task<string> SendFileAsync(string tokenCen, string fileName, string doc)
         {
+            string fileId = "";
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -261,15 +237,16 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
-                        return dic["invoice_file_id"];
+                        fileId = dic["invoice_file_id"];
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return fileId;
         }
     }
 

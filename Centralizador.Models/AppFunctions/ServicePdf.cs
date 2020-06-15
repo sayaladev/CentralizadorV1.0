@@ -53,7 +53,7 @@ namespace Centralizador.Models.AppFunctions
 
         }
 
-        public static  RespuestaDTE TransformXmlRespuestaDTEToObject(string pathFile)
+        public static RespuestaDTE TransformXmlRespuestaDTEToObject(string pathFile)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Centralizador.Models.AppFunctions
                     return document;
                 }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -164,13 +164,7 @@ namespace Centralizador.Models.AppFunctions
         }
         public sealed class Utf8StringWriter : StringWriter
         {
-            public override Encoding Encoding
-            {
-                get
-                {
-                    return Encoding.UTF8;
-                }
-            }
+            public override Encoding Encoding => Encoding.UTF8;
         }
 
         /// <summary>
@@ -213,7 +207,7 @@ namespace Centralizador.Models.AppFunctions
             catch (Exception)
             {
                 throw;
-            }          
+            }
         }
         public void ConvertToPdf(BackgroundWorker bgw)
         {
@@ -225,14 +219,14 @@ namespace Centralizador.Models.AppFunctions
                 dialog.Reset();
                 dialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 if (dialog.ShowDialog() == DialogResult.OK)
-                {                    
+                {
                     bgw.RunWorkerAsync(dialog);
                 }
             }
-           
+
         }
         private void Bgw_DoWork(object sender, DoWorkEventArgs e)
-        {            
+        {
             FolderBrowserDialog dialog = e.Argument as FolderBrowserDialog;
             BackgroundWorker bgw = sender as BackgroundWorker;
             IPdfDocument document;

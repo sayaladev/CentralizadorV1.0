@@ -54,7 +54,7 @@ namespace Centralizador.WinApp.GUI
         // Init
         public string TokenSii { get; set; }
         public string TokenCen { get; set; }
-        public string UserCEN { get; set; }
+
 
 
         private bool IsCreditor { get; set; }
@@ -81,7 +81,7 @@ namespace Centralizador.WinApp.GUI
         }
         private void FormMain_Load(object sender, EventArgs e)
         {
-         
+
             // Load                   
             VersionApp = AssemblyVersion;
             Text = VersionApp;
@@ -101,7 +101,7 @@ namespace Centralizador.WinApp.GUI
 
 
             // User email
-            TssLblUserEmail.Text = "|  " + UserCEN;
+            TssLblUserEmail.Text = "|  " + Agent.GetUserCEN;
 
             // Worker Debtor
             BgwDebtor = new BackgroundWorker
@@ -907,7 +907,12 @@ namespace Centralizador.WinApp.GUI
                 return;
             }
             IList<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-            if (matrices != null)
+            if (matrices == null)
+            {
+                ShowMsgCEN();
+                return;
+            }
+            if (matrices.Count > 0)
             {
                 BgwCreditor.RunWorkerAsync(matrices);
             }
@@ -927,95 +932,106 @@ namespace Centralizador.WinApp.GUI
             con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
             foreach (ResultPaymentMatrix m in matrices)
             {
-
-                m.BillingWindow = BillingWindow.GetBillingWindowByIdAsync(m).Result; ;
+                ResultBillingWindow window = BillingWindow.GetBillingWindowByIdAsync(m).Result;
+                if (window == null)
+                {
+                    ShowMsgCEN();
+                    return;
+                }
+                m.BillingWindow = window;
                 IList<ResultInstruction> lista = Instruction.GetInstructionCreditorAsync(m, UserParticipant).Result;
                 if (lista == null)
                 {
-                    // Error Exception
-                    MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowMsgCEN();
                     return;
                 }
-                else
+                if (lista.Count > 0)
                 {
-                    if (lista.Count > 0)
+                    int d = 0;
+                    foreach (ResultInstruction instruction in lista)
                     {
-                        int d = 0;
-                        foreach (ResultInstruction instruction in lista)
+                        ResultParticipant participant = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
+                        if (participant == null)
                         {
-                            //if (d == 3)
-                            //{
-                            //    continue;
-                            //}
-                            instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
-                            Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
-                            // REF from Softland 
-                            IList<Reference> references = Reference.GetInfoFactura(instruction, con);
-                            detalle.StatusDetalle = StatusDetalle.No;
-                            if (references == null)
+                            ShowMsgCEN();
+                            return;
+                        }
+                        instruction.ParticipantDebtor = participant;
+                        Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
+                        // REF from Softland 
+                        IList<Reference> references = Reference.GetInfoFactura(instruction, con);
+                        detalle.StatusDetalle = StatusDetalle.No;
+                        if (references == null)
+                        {
+                            ShowMsgSoftland();
+                            return;
+                        }
+                        if (references.Count > 0)
+                        {
+                            Reference reference = references.OrderByDescending(x => x.Folio).First();
+                            // Compare DateTime
+                            int compare = DateTime.Compare(reference.FechaEmision, instruction.PaymentMatrix.PublishDate);
+                            if (compare > 0)
                             {
-                                // Error Exception
-                                MessageBox.Show("There was an error connecting to the server Softland.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
+                                detalle.FechaEmision = reference.FechaEmision.ToString();
+                                detalle.References = reference;
+                                detalle.Folio = reference.Folio;
+                                detalle.MntNeto = reference.NetoAfecto;
+                                detalle.MntIva = reference.Iva;
+                                detalle.MntTotal = reference.Total;
+
+                                if (reference.FileEnviado != null)
+                                {
+                                    // Facturado y enviado al Sii
+                                    detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
+                                    // Attach object dte
+                                    detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
+                                    // Flags         
+                                    detalle.Flag = ValidateCen(detalle);
+                                    // Events Sii
+                                    DataEvento evento = ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
+                                    if (evento == null)
+                                    {
+                                        ShowMsgSII();
+                                        return;
+                                    }
+                                    detalle.DataEvento = evento;
+                                    // Status
+                                    detalle.StatusDetalle = GetStatus(detalle);
+                                    // Insert CEN, only Accepted.
+                                    if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
+                                    {
+                                        // 1 No Facturado y cuando hay más de 1 dte informado
+                                        // 2 Facturado
+                                        // 3 Facturado con retraso
+                                        ResultDte resultDte = Dte.SendDteCreditorAsync(detalle, TokenCen).Result;
+                                        if (resultDte == null)
+                                        {
+                                            ShowMsgCEN();
+                                            return;
+                                        }
+                                        detalle.Instruction.Dte = resultDte;
+                                    }
+                                }
+                                //else
+                                //{
+                                //    // Facturado pero no enviado a Sii o
+                                //    // Facturado pero sin Ref insertadas
+                                //}
+                                // BgwCreditor.ReportProgress((int)porcent, $"Retrieve information of invoices, wait please. ({c}/{instructions.Count})");
                             }
                             else
                             {
-                                if (references.Count > 0)
-                                {
-                                    Reference reference = references.OrderByDescending(x => x.Folio).First();
-                                    // Compare DateTime
-                                    int compare = DateTime.Compare(reference.FechaEmision, instruction.PaymentMatrix.PublishDate);
-                                    if (compare > 0)
-                                    {
-                                        detalle.FechaEmision = reference.FechaEmision.ToString();
-                                        detalle.References = reference;
-                                        detalle.Folio = reference.Folio;
-                                        detalle.MntNeto = reference.NetoAfecto;
-                                        detalle.MntIva = reference.Iva;
-                                        detalle.MntTotal = reference.Total;
-
-                                        if (reference.FileEnviado != null)
-                                        {
-                                            // Facturado y enviado al Sii
-                                            detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
-                                            // Attach object dte
-                                            detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
-                                            // Flags         
-                                            detalle.Flag = ValidateCen(detalle);
-                                            // Events Sii                       
-                                            detalle.DataEvento = ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
-                                            // Status
-                                            detalle.StatusDetalle = GetStatus(detalle);
-                                            // Insert CEN, only Accepted.
-                                            if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
-                                            {
-                                                // 1 No Facturado y cuando hay más de 1 dte informado
-                                                // 2 Facturado
-                                                // 3 Facturado con retraso
-                                                detalle.Instruction.Dte = Dte.SendDteCreditorAsync(detalle, TokenCen).Result;
-                                            }
-                                        }
-                                        //else
-                                        //{
-                                        //    // Facturado pero no enviado a Sii o
-                                        //    // Facturado pero sin Ref insertadas
-                                        //}
-                                        // BgwCreditor.ReportProgress((int)porcent, $"Retrieve information of invoices, wait please. ({c}/{instructions.Count})");
-                                    }
-                                    else
-                                    {
-                                        // -1 
-                                        // Existen F que están aceptadas pero emitidas a diferente RUT, caso Guacolda.
-                                        // -1 La fecha de la publicación es mayor que la fecha de la ref encontrada. 
-                                        // BgwCreditor.ReportProgress((int)porcent, $"Retrieve information Creditor, wait please. ({c}/{instructions.Count})");
-                                    }
-                                }
+                                // -1 
+                                // Existen F que están aceptadas pero emitidas a diferente RUT, caso Guacolda.
+                                // -1 La fecha de la publicación es mayor que la fecha de la ref encontrada. 
+                                // BgwCreditor.ReportProgress((int)porcent, $"Retrieve information Creditor, wait please. ({c}/{instructions.Count})");
                             }
-                            DetallesCreditor.Add(detalle);
-                            d++;
-                            porcent = (float)(100 * d) / lista.Count;
-                            BgwCreditor.ReportProgress((int)porcent, $"Searching 'Pay Instructions' from CEN, wait please.  ({c}/{matrices.Count}) / ({d}/{lista.Count})");
                         }
+                        DetallesCreditor.Add(detalle);
+                        d++;
+                        porcent = (float)(100 * d) / lista.Count;
+                        BgwCreditor.ReportProgress((int)porcent, $"Searching 'Pay Instructions' from CEN, wait please.  ({c}/{matrices.Count}) / ({d}/{lista.Count})");
                     }
                 }
                 c++;
@@ -1060,12 +1076,17 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Bussy!";
                 return;
             }
-            DetallesDebtor = new List<Detalle>();
-            DetallesDebtor = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
-            string nameFile = "";
-            nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
-            if (DetallesDebtor != null)
+            IList<Detalle> detallesDebtor = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+            if (detallesDebtor == null)
             {
+                ShowMsgSII();
+                return;
+            }
+            if (detallesDebtor.Count > 0)
+            {
+                DetallesDebtor = detallesDebtor;
+                string nameFile = "";
+                nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
                 BgwDebtor.RunWorkerAsync(nameFile);
             }
         }
@@ -1077,92 +1098,98 @@ namespace Centralizador.WinApp.GUI
             int c = 0;
             foreach (Detalle item in DetallesDebtor)
             {
-                //   Tester
-                //if (item.Folio != 1559)
-                //{
-                //    continue;
-                //}
                 DTEDefType xmlObjeto = null;
                 DTEDefTypeDocumento dte = null;
                 DTEDefTypeDocumentoReferencia[] references = null;
                 DTEDefTypeDocumentoReferencia reference = null;
-                ResultBillingWindow window = null;
+                ResultParticipant participant = null;
 
                 // Get XML file in folder
                 nameFile = nameFilePath + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
                 if (File.Exists(nameFile))
                 {
                     xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile);
-                    item.DTEDef = xmlObjeto;
                 }
                 // Get Participant
-                ResultParticipant participant = Participant.GetParticipantByRutAsync(item.RutReceptor.ToString()).Result;
+                participant = Participant.GetParticipantByRutAsync(item.RutReceptor.ToString()).Result;
                 if (participant != null && participant.Rut != "96800570") // Exclude to: Enel Distribución Chile S.A.
                 {
                     item.IsParticipant = true;
-                    IList<ResultInstruction> instructions = Instruction.GetInstructionByParticipantsAsync(participant, UserParticipant).Result;
-                    if (instructions != null)
+                }
+                // Exists XML file
+                if (xmlObjeto != null)
+                {
+                    item.DTEDef = xmlObjeto;
+                    dte = (DTEDefTypeDocumento)xmlObjeto.Item;
+                    references = dte.Referencia;
+                    if (references != null)
                     {
-                        // Find Instruction by amount
-                        IList<ResultInstruction> i = instructions.Where(x => x.Amount == item.MntNeto).ToList();
-                        if (i.Count == 1)
+                        reference = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                        if (reference != null)
                         {
-                            item.Instruction = i[0];
-                            item.Instruction.PaymentMatrix = PaymentMatrix.GetPaymentMatrixByIdAsync(i[0]).Result;
-                            item.Instruction.PaymentMatrix.BillingWindow = BillingWindow.GetBillingWindowByIdAsync(item.Instruction.PaymentMatrix).Result;
-                        }
-                        else
-                        {
-                            if (xmlObjeto != null)
+                            // Get Window
+                            ResultBillingWindow window = BillingWindow.GetBillingWindowByNaturalKey(reference);
+                            if (window == null)
                             {
-                                dte = (DTEDefTypeDocumento)xmlObjeto.Item;
-                                references = dte.Referencia;
-                                if (references != null)
-                                {
-                                    reference = references.FirstOrDefault(x => x.TpoDocRef == "SEN");
-                                    if (reference != null)
-                                    {
-                                        window = BillingWindow.GetBillingWindowByNaturalKey(reference);
-                                        if (window != null)
-                                        {
-                                            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window).Result;
-                                            ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == reference.RazonRef.TrimEnd());
-                                            if (matrix != null)
-                                            {
-                                                item.Instruction = Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant).Result;
-                                            }
-                                        }
-                                    }
-                                }
+                                ShowMsgCEN();
+                                return;
                             }
-                        }
-                        if (item.Instruction != null)
-                        {
+                            // Get Matrix
+                            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window).Result;
+                            if (matrices == null)
+                            {
+                                ShowMsgCEN();
+                                return;
+                            }
+                            ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey == reference.RazonRef.TrimEnd());
+                            if (matrix == null)
+                            {
+                                ShowMsgCEN();
+                                return;
+                            }
+                            ResultInstruction instruction = Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant).Result;
+                            if (instruction == null)
+                            {
+                                ShowMsgCEN();
+                                return;
+                            }
+                            item.Instruction = instruction;
                             item.Instruction.ParticipantCreditor = participant;
                             item.Instruction.ParticipantDebtor = UserParticipant;
                         }
-
                     }
                 }
-
                 // Flags       
                 item.Flag = ValidateCen(item);
-                // Events Sii
-                item.DataEvento = ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
+                // Events Sii  
+                DataEvento evento = ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
+                if (evento == null)
+                {
+                    ShowMsgSII();
+                    return;
+                }
+                item.DataEvento = evento;
                 // Status
                 if (item.DataEvento != null)
                 {
                     item.StatusDetalle = GetStatus(item);
                 }
-                // Insert CEN
-                if (item.StatusDetalle != StatusDetalle.No && item.Instruction != null)
+                // Insert CEN, only Accepted.
+                if (item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null && item.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
                 {
-                    ResultDte doc = Dte.GetDteByFolioAsync(item, false).Result;
-                    if (doc == null)
+                    // 1 No Facturado y cuando hay más de 1 dte informado
+                    // 2 Facturado
+                    // 3 Facturado con retraso
+                    ResultDte resultDte = Dte.SendDteDebtorAsync(item, TokenCen).Result;
+                    if (resultDte == null)
                     {
-                        doc = Dte.SendDteDebtorAsync(item, TokenCen).Result;
+                        ShowMsgCEN();
+                        return;
                     }
-                    item.Instruction.Dte = doc;
+                    else
+                    {
+                        item.Instruction.Dte = resultDte;
+                    }
                 }
                 c++;
                 float porcent = (float)(100 * c) / DetallesDebtor.Count;
@@ -1194,6 +1221,9 @@ namespace Centralizador.WinApp.GUI
         #endregion
 
         #region Common functions
+        public static void ShowMsgCEN() { MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        public static void ShowMsgSoftland() { MessageBox.Show("There was an error connecting to the server Softland.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        public static void ShowMsgSII() { MessageBox.Show("There was an error connecting to SII.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error); }
         public string AssemblyVersion
         {
             get
@@ -1587,11 +1617,11 @@ namespace Centralizador.WinApp.GUI
                         // RFP: Reclamo por Falta Parcial de Mercaderías
                         // RFT: Reclamo por Falta Total de Mercaderías
                         respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
-                        // Tester
-                        //respuestaTo resp = new respuestaTo
-                        //{
-                        //    codResp = 0
-                        //};
+                        if (resp == null)
+                        {
+                            ShowMsgSII();
+                            return;
+                        }
                         detalle.StatusDetalle = StatusDetalle.Rejected;
                         if (detalle.IsParticipant && detalle.Instruction != null)
                         {
@@ -1603,9 +1633,13 @@ namespace Centralizador.WinApp.GUI
                                     Mail.SendEmailToParticipant(detalle);
                                     // Reject in CEN                                
                                     ResultDte doc = Dte.SendDteDebtorAsync(detalle, TokenCen).Result;
+                                    if (doc == null)
+                                    {
+                                        ShowMsgCEN();
+                                        return;
+                                    }
                                     detalle.Instruction.Dte = doc;
                                     IGridMain.CurRow.Cells["P3"].Value = 1;
-
                                     break;
                                 case 7: // Evento registrado previamente
                                     break;

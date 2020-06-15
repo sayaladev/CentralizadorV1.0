@@ -51,8 +51,9 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="matrix"></param>
         /// <returns></returns>
-        public static async Task<ResultBillingWindow> GetBillingWindowByIdAsync(ResultPaymentMatrix matrix) 
+        public static async Task<ResultBillingWindow> GetBillingWindowByIdAsync(ResultPaymentMatrix matrix)
         {
+            ResultBillingWindow resultBilling = new ResultBillingWindow();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -63,19 +64,16 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (b.Results.Count == 1)
-                        {
-                            return b.Results[0];
-
-                        }
+                        resultBilling = b.Results[0];
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return resultBilling;
         }
 
 
@@ -86,6 +84,7 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static ResultBillingWindow GetBillingWindowByNaturalKey(DTEDefTypeDocumentoReferencia referencia)
         {
+            ResultBillingWindow resultBillingWindow = new  ResultBillingWindow();
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             string r1 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']') + 1).TrimStart();
             string r2 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']', referencia.RazonRef.IndexOf(']') + 1) + 1);
@@ -103,18 +102,16 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (b.Results.Count == 1)
-                        {
-                            return b.Results[0];
-                        }
+                        resultBillingWindow = b.Results[0];
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return resultBillingWindow;
         }
     }
 }

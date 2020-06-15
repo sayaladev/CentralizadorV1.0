@@ -55,7 +55,8 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <returns></returns>
         public static async Task<IList<ResultBilingType>> GetBilinTypesAsync() 
-        {           
+        {
+            IList<ResultBilingType> billingTypes = new List<ResultBilingType>();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -65,19 +66,17 @@ namespace Centralizador.Models.ApiCEN
                     string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false); // GET
                     if (res != null)
                     {
-                        BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (bilingType.Results.Count > 0)
-                        {
-                            return bilingType.Results;
-                        }
+                        BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });                     
+                            billingTypes = bilingType.Results;                        
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }           
-            return null;
+            return billingTypes;
         }
     }
 

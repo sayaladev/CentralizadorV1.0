@@ -95,6 +95,7 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<IList<ResultInstruction>> GetInstructionCreditorAsync(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
         {
+            IList<ResultInstruction> resultInstructions = new List<ResultInstruction>();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -113,15 +114,16 @@ namespace Centralizador.Models.ApiCEN
                                 item.PaymentMatrix = matrix;
                             }
                         }
-                        return instruction.Results;
+                        resultInstructions = instruction.Results;
                     }                 
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return resultInstructions;
         }
 
         /// <summary>
@@ -132,7 +134,8 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="idDebtor"></param>
         /// <returns></returns>
         public static async Task<ResultInstruction> GetInstructionDebtorAsync(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
-        {       
+        {
+            ResultInstruction resultInstruction = new ResultInstruction();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -142,57 +145,23 @@ namespace Centralizador.Models.ApiCEN
                     string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false);
                     if (res != null)
                     {
-                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (instruction.Results.Count == 1)
-                        {
+                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });                      
                             instruction.Results[0].PaymentMatrix = matrix;
                             instruction.Results[0].ParticipantCreditor = participant;
                             instruction.Results[0].ParticipantDebtor = userPart;
-                            return instruction.Results[0];
-                        }
+                            resultInstruction = instruction.Results[0];                        
                     }
                 }
             }
             catch (Exception)
             {
+                // Error Exception
                 return null;
             }
-            return null;
+            return resultInstruction;
         }
 
-        /// <summary>
-        /// Get 1 'Instrucción de pago' from CEN API
-        /// </summary>
-        /// <param name="participant"></param>
-        /// <param name="userPart"></param>
-        /// <returns></returns>
-        public static async Task<IList<ResultInstruction>> GetInstructionByParticipantsAsync(ResultParticipant participant, ResultParticipant userPart)
-        {         
-            try
-            {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
-                {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
-                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri);
-                    if (res != null)
-                    {
-                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (instruction.Results.Count > 0)
-                        {
-                            instruction.Results[0].ParticipantCreditor = participant;
-                            instruction.Results[0].ParticipantDebtor = userPart;
-                            return instruction.Results;
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            return null;
-        }
+       
 
         /// <summary>
         /// 
