@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Centralizador.Models.ApiSII
@@ -24,7 +25,7 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
         }
 
-        public static DataEvento GetStatusDte(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant, string serialDigitalCert)
+        public static async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant, string serialDigitalCert)
         {
             // Get digital cert  
             X509Certificate2 cert = null;
@@ -75,7 +76,7 @@ namespace Centralizador.Models.ApiSII
                 wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                 wc.Encoding = Encoding.UTF8;
                 wc.Headers[HttpRequestHeader.Cookie] = $"TOKEN={token}";
-                string result = wc.UploadString(url, "POST", jSon);
+                string result = await wc.UploadStringTaskAsync(url, "POST", jSon).ConfigureAwait(false);
                 if (result != null)
                 {
                     ResultEvent detalleLibro = JsonConvert.DeserializeObject<ResultEvent>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -87,7 +88,7 @@ namespace Centralizador.Models.ApiSII
             }
             catch (WebException ex)
             {
-                MessageBox.Show(ex.Message, "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {

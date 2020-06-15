@@ -7,7 +7,7 @@
     <ProjectGuid>{830E7CEA-25D3-4FD1-A1FE-13F9FC577D61}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Centralizador.WinApp</RootNamespace>
-    <AssemblyName>Centralizador</AssemblyName>
+    <AssemblyName>Centralizador.WinApp</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -95,7 +95,6 @@
     <Compile Include="GUI\IGButtonColumnManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
     <EmbeddedResource Include="GUI\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
       <SubType>Designer</SubType>

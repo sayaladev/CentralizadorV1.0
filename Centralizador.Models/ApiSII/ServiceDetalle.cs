@@ -1,15 +1,17 @@
-﻿using Centralizador.Models.ApiCEN;
-using Centralizador.Models.DataBase;
-
-using Newtonsoft.Json;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using Centralizador.Models.ApiCEN;
+using Centralizador.Models.DataBase;
+
+using Newtonsoft.Json;
+
 using static Centralizador.Models.ApiSII.ServiceDetalle;
 
 namespace Centralizador.Models.ApiSII
@@ -27,10 +29,9 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
             Data = data;
         }
-        public static IList<Detalle> GetLibro(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
+        public static async Task<IList<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
         {
-            string ns = "", url = "";
-            string op = "";
+            string ns = "", url = "", op = "";
             switch (tipoUser)
             {
                 case "Debtor":
@@ -61,45 +62,40 @@ namespace Centralizador.Models.ApiSII
                 RefNCD = "0"
             };
             ServiceDetalle apiDetalleLibroReq = new ServiceDetalle(metaData, data);
-            WebClient wc = new WebClient();
             try
             {
                 string jSon = JsonConvert.SerializeObject(apiDetalleLibroReq, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={userParticipant.Rut}; DV_NS={userParticipant.VerificationCode};TOKEN={token}";
-                string result = wc.UploadString(url, "POST", jSon);
-                if (result != null)
-                {
-                    DetalleLibro detalleLibro = JsonConvert.DeserializeObject<DetalleLibro>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    switch (detalleLibro.RespEstado.CodRespuesta)
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                {                   
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    wc.Encoding = Encoding.UTF8;
+                    wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={userParticipant.Rut}; DV_NS={userParticipant.VerificationCode};TOKEN={token}";
+                    string result = await wc.UploadStringTaskAsync(url, WebRequestMethods.Http.Post, jSon).ConfigureAwait(false);
+                    if (result != null)
                     {
-                        case 2:
-                            MessageBox.Show($"There are no documents registered for the period {periodo}.", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return null;
-                        case 0:
-                            return detalleLibro.DataResp.Detalles;
-                        case 99:
-                            MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            break;
-                        case 1:
-                            MessageBox.Show("This option only maintains the detail of the last six months", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                            break;
+                        DetalleLibro detalleLibro = JsonConvert.DeserializeObject<DetalleLibro>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        switch (detalleLibro.RespEstado.CodRespuesta)
+                        {
+                            case 2:
+                                MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                return null;
+                            case 0:
+                                return detalleLibro.DataResp.Detalles;
+                            case 99:
+                                MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                break;
+                            case 1:
+                                MessageBox.Show("This option only maintains the detail of the last six months", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                                break;
+                        }
                     }
                 }
-                else
-                {
-                    return null;
-                }
+
             }
             catch (WebException ex)
             {
-                MessageBox.Show(ex.Message, "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                wc.Dispose();
-            }
+                MessageBox.Show(ex.Message, Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }            
             return null;
         }
         public static int GetFlagImageIndex(LetterFlag flag)
@@ -160,7 +156,7 @@ namespace Centralizador.Models.ApiSII
                         {
                             return LetterFlag.Red;
                         }
-                        else if (string.Compare(referencia.RazonRef,detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
+                        else if (string.Compare(referencia.RazonRef, detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
                         {
                             return LetterFlag.Red;
                         }
@@ -172,7 +168,7 @@ namespace Centralizador.Models.ApiSII
                         {
                             //if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
                             //{
-                               return LetterFlag.Red;
+                            return LetterFlag.Red;
                             //}
                         }
 
@@ -204,7 +200,7 @@ namespace Centralizador.Models.ApiSII
         public static StatusDetalle GetStatus(Detalle detalle)
         {
             // http://www.sii.cl/factura_electronica/Webservice_Registro_Reclamo_DTE_V1.2.pdf
-            if (detalle.DataEvento!= null && detalle.DataEvento.ListEvenHistDoc.Count > 0)
+            if (detalle.DataEvento != null && detalle.DataEvento.ListEvenHistDoc.Count > 0)
             {
                 if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null) // Acepta Contenido del Documento
                 {
@@ -241,7 +237,7 @@ namespace Centralizador.Models.ApiSII
             }
             else
             {
-                if (detalle.DataEvento!= null && detalle.DataEvento.MayorOchoDias)
+                if (detalle.DataEvento != null && detalle.DataEvento.MayorOchoDias)
                 {
                     return StatusDetalle.Accepted;
                 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
@@ -65,9 +66,8 @@ namespace Centralizador.Models.ApiSII
                     }
                 }
             }
-            catch (System.Exception)
-            {
-                //MessageBox.Show($"This certificate is not valid:{Environment.NewLine} {cert.FriendlyName} ");
+            catch (Exception)
+            {                
                 return null;
             }
         }

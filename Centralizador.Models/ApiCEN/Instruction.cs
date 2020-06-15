@@ -139,7 +139,7 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri);
+                    string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false);
                     if (res != null)
                     {
                         Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

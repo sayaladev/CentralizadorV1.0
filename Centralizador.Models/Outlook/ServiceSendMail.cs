@@ -134,7 +134,6 @@ namespace Centralizador.Models.Outlook
                 {
                     builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;DscItem&gt;{detalle.Instruction.PaymentMatrix.ReferenceCode}&lt;/DscItem&gt;" + "<br/>");
                 }
-
                 if (dte.Referencia == null || referencia == null)
                 {
                     builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;TpoDocRef&gt; SEN &lt;/TpoDocRef&gt;" + "<br/>");

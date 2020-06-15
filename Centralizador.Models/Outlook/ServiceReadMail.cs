@@ -95,7 +95,7 @@ namespace Centralizador.Models.Outlook
                                         case 0: // Success
                                             continue;                                            
                                         case 1: // Error in Sii (exit funcion)
-                                            MessageBox.Show("Sii: Application with Momentary Suspension", "Centralizador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            MessageBox.Show("Sii: Application with Momentary Suspension", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                             return;                                          
                                         case 2: // Error in serialization
                                             continue;                                            

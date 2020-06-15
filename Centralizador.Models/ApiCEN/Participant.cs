@@ -127,7 +127,7 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static ResultParticipant GetParticipantByIdAsync(int id)
+        public static async Task<ResultParticipant> GetParticipantByIdAsync(int id)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/participants/?id={id}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = wc.DownloadString(uri);  // GET
+                    string res = await wc.DownloadStringTaskAsync(uri);  // GET
                     if (res != null)
                     {
                         Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -182,6 +182,30 @@ namespace Centralizador.Models.ApiCEN
                 return null;
             }
             return null;
+        }
+
+
+        public static IList<ResultParticipant> GetParticipants(string UserCEN)
+        {
+            IList<ResultParticipant> participants = new List<ResultParticipant>();
+            ResultAgent agent = Agent.GetAgetByEmailAsync(UserCEN).Result;
+            foreach (ResultParticipant item in agent.Participants)
+            {
+               participants.Add(GetParticipantByIdAsync(item.ParticipantId).Result);
+            }
+
+            // Insert Cve 76.532.358-4  
+            participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
+            participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
+
+
+            if (participants == null)
+            {
+                return null;
+            }        
+
+
+            return participants;
         }
     }
 

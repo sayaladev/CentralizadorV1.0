@@ -63,7 +63,7 @@ namespace Centralizador.Models.ApiCEN
       /// </summary>
       /// <param name="userCEN"></param>
       /// <returns></returns>
-        public static ResultAgent GetAgetByEmailAsync(string userCEN) 
+        public static async Task<ResultAgent> GetAgetByEmailAsync(string userCEN) 
         {
             try
             {
@@ -71,7 +71,7 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={userCEN}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res =  wc.DownloadString(uri); // GET
+                    string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false); // GET
                     if (res != null)
                     {
                         Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -95,7 +95,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="userCEN"></param>
         /// <param name="passwordCEN"></param>
         /// <returns></returns>
-        public static string GetTokenCenAsync(string userCEN, string passwordCEN) 
+        public static async Task<string> GetTokenCenAsync(string userCEN, string passwordCEN) 
         {
             Dictionary<string, string> dic = new Dictionary<string, string>
                 {
@@ -108,7 +108,7 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/token-auth/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = wc.UploadString(uri, WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)); // POST
+                    string res = await wc.UploadStringTaskAsync(uri, WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)).ConfigureAwait(false); // POST
                     if (res != null)
                     {
                         dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
@@ -122,6 +122,8 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
         }
+
+       
     }
 
 }

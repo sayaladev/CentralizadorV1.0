@@ -158,7 +158,7 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                System.Windows.Forms.MessageBox.Show("Test");
+                // Error Exception
                 return 99;
             }
         }

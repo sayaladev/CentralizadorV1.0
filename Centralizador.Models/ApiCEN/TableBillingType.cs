@@ -62,7 +62,7 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-types");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false); // GET
                     if (res != null)
                     {
                         BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

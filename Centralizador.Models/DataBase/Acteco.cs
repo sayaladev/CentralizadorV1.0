@@ -36,37 +36,6 @@ namespace Centralizador.Models.DataBase
         [JsonProperty("actividades")]
         public IList<Actividade> Actividades { get; set; }
 
-        public static IList<Actividade> GetActecoCode(ResultParticipant participant, string baseAddress)
-        {
-            WebClient wc = new WebClient
-            {
-                BaseAddress = baseAddress
-            };
-            try
-            {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                wc.Encoding = Encoding.UTF8;
-                string res = wc.DownloadString($"https://siichile.herokuapp.com/consulta?rut={participant.Rut}-{participant.VerificationCode}");
-                if (res != null)
-                {
-                    Acteco herokuapp = JsonConvert.DeserializeObject<Acteco>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    if (herokuapp.Actividades.Count > 0)
-                    {
-                        return herokuapp.Actividades;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            finally
-            {
-                wc.Dispose();
-            }
-            return null;
-        }
-
         public static int InsertActeco(string descripcion, Conexion conexion)
         {
             try

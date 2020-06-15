@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
+            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -44,7 +45,6 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.TxtTpoDocRef = new System.Windows.Forms.TextBox();
             this.TxtFmaPago = new System.Windows.Forms.TextBox();
-            this.TxtDscItem = new System.Windows.Forms.TextBox();
             this.TxtRznRef = new System.Windows.Forms.TextBox();
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
@@ -155,10 +155,10 @@
             this.IGridMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IGridMain.Header.BackColor = System.Drawing.SystemColors.Info;
             this.IGridMain.Header.DrawSystem = false;
-            this.IGridMain.Header.Height = 15;
+            this.IGridMain.Header.Height = 17;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 2, System.Drawing.Drawing2D.DashStyle.Solid);
+            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -215,7 +215,6 @@
             this.groupBox4.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("groupBox4.BackgroundImage")));
             this.groupBox4.Controls.Add(this.TxtTpoDocRef);
             this.groupBox4.Controls.Add(this.TxtFmaPago);
-            this.groupBox4.Controls.Add(this.TxtDscItem);
             this.groupBox4.Controls.Add(this.TxtRznRef);
             this.groupBox4.Controls.Add(this.TxtFolioRef);
             this.groupBox4.Controls.Add(this.TxtNmbItem);
@@ -223,7 +222,7 @@
                 | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox4.Location = new System.Drawing.Point(2, 281);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(212, 166);
+            this.groupBox4.Size = new System.Drawing.Size(212, 150);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
@@ -231,7 +230,7 @@
             // TxtTpoDocRef
             // 
             this.TxtTpoDocRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtTpoDocRef.Location = new System.Drawing.Point(10, 100);
+            this.TxtTpoDocRef.Location = new System.Drawing.Point(10, 107);
             this.TxtTpoDocRef.Name = "TxtTpoDocRef";
             this.TxtTpoDocRef.ReadOnly = true;
             this.TxtTpoDocRef.Size = new System.Drawing.Size(31, 18);
@@ -240,27 +239,17 @@
             // TxtFmaPago
             // 
             this.TxtFmaPago.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFmaPago.Location = new System.Drawing.Point(44, 100);
+            this.TxtFmaPago.Location = new System.Drawing.Point(44, 107);
             this.TxtFmaPago.Name = "TxtFmaPago";
             this.TxtFmaPago.ReadOnly = true;
             this.TxtFmaPago.Size = new System.Drawing.Size(42, 18);
             this.TxtFmaPago.TabIndex = 9;
             this.TxtFmaPago.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // TxtDscItem
-            // 
-            this.TxtDscItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtDscItem.Location = new System.Drawing.Point(10, 124);
-            this.TxtDscItem.Multiline = true;
-            this.TxtDscItem.Name = "TxtDscItem";
-            this.TxtDscItem.ReadOnly = true;
-            this.TxtDscItem.Size = new System.Drawing.Size(192, 28);
-            this.TxtDscItem.TabIndex = 10;
-            // 
             // TxtRznRef
             // 
             this.TxtRznRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtRznRef.Location = new System.Drawing.Point(10, 76);
+            this.TxtRznRef.Location = new System.Drawing.Point(24, 83);
             this.TxtRznRef.Name = "TxtRznRef";
             this.TxtRznRef.ReadOnly = true;
             this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
@@ -269,7 +258,7 @@
             // TxtFolioRef
             // 
             this.TxtFolioRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtFolioRef.Location = new System.Drawing.Point(92, 100);
+            this.TxtFolioRef.Location = new System.Drawing.Point(92, 107);
             this.TxtFolioRef.Name = "TxtFolioRef";
             this.TxtFolioRef.ReadOnly = true;
             this.TxtFolioRef.Size = new System.Drawing.Size(110, 18);
@@ -278,7 +267,7 @@
             // TxtNmbItem
             // 
             this.TxtNmbItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtNmbItem.Location = new System.Drawing.Point(10, 19);
+            this.TxtNmbItem.Location = new System.Drawing.Point(10, 26);
             this.TxtNmbItem.Multiline = true;
             this.TxtNmbItem.Name = "TxtNmbItem";
             this.TxtNmbItem.ReadOnly = true;
@@ -588,7 +577,6 @@
         private System.Windows.Forms.TextBox TxtFmaPago;
         private System.Windows.Forms.PictureBox FpicBoxSearch;
         private System.Windows.Forms.ImageList FListPics;
-        private System.Windows.Forms.TextBox TxtDscItem;
         private System.Windows.Forms.TextBox TxtTpoDocRef;
         private System.Windows.Forms.CheckBox ChkIncludeReclaimed;
         private System.Windows.Forms.Button BtnInsertNv;

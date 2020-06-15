@@ -48,10 +48,15 @@ namespace Centralizador.WinApp.GUI
         private string VersionApp { get; set; }
         private ResultParticipant UserParticipant { get; set; }
         private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
-        private IEnumerable<ResultBilingType> BillingTypes { get; set; }
+        public IEnumerable<ResultBilingType> BillingTypes { get; set; }
+        public IList<ResultParticipant> Participants { get; set; }
+
+        // Init
         public string TokenSii { get; set; }
         public string TokenCen { get; set; }
-        public ResultAgent Agent { get; set; }
+        public string UserCEN { get; set; }
+
+
         private bool IsCreditor { get; set; }
         public bool IsRunning { get; set; }
         public ServiceReadMail ServiceOutlook { get; set; }
@@ -60,7 +65,7 @@ namespace Centralizador.WinApp.GUI
         public BackgroundWorker BgwReadEmail { get; private set; }
         public BackgroundWorker BgwPay { get; private set; }
 
-        public ServiceSendMail Mail { get; private set; }   
+        public ServiceSendMail Mail { get; private set; }
 
         // Button Class
         private readonly IGButtonColumnManager Btn = new IGButtonColumnManager();
@@ -70,31 +75,20 @@ namespace Centralizador.WinApp.GUI
 
         #region FormMain methods
 
-        public FormMain(string tokenSii, ResultAgent agent, string tokenCen)
+        public FormMain()
         {
             InitializeComponent();
-            TokenSii = tokenSii;
-            Agent = agent;
-            TokenCen = tokenCen;
-
         }
         private void FormMain_Load(object sender, EventArgs e)
         {
+         
             // Load                   
             VersionApp = AssemblyVersion;
             Text = VersionApp;
 
             //Load ComboBox participants
-            IList<ResultParticipant> participants = new List<ResultParticipant>();
-            foreach (ResultParticipant item in Agent.Participants)
-            {
-                participants.Add(Participant.GetParticipantByIdAsync(item.ParticipantId));
-            }
-            // Cve 76.532.358-4   
-            participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
-            participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
             CboParticipants.DisplayMember = "Name";
-            CboParticipants.DataSource = participants;
+            CboParticipants.DataSource = Participants;
             CboParticipants.SelectedIndex = 0;
 
             //Load ComboBox months
@@ -104,11 +98,10 @@ namespace Centralizador.WinApp.GUI
             CboYears.DataSource = Enumerable.Range(2019, 2).ToList();
             CboYears.SelectedItem = DateTime.Today.Year;
 
-            //Biling types
-            BillingTypes = BilingType.GetBilinTypesAsync().Result;
+
 
             // User email
-            TssLblUserEmail.Text = "|  " + Agent.Email;
+            TssLblUserEmail.Text = "|  " + UserCEN;
 
             // Worker Debtor
             BgwDebtor = new BackgroundWorker
@@ -326,7 +319,7 @@ namespace Centralizador.WinApp.GUI
 
             IGridMain.EndUpdate();
         }
-       
+
         private void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex != 0)
@@ -343,7 +336,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 if (string.IsNullOrEmpty(DataBaseName))
                 {
-                    MessageBox.Show("This company does not have an associated database in the config file (Xml)", VersionApp, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("This company does not have an associated database in the config file (Xml)", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     CboParticipants.SelectedIndex = 0;
                     TxtCtaCteParticipant.Text = "";
                     TxtRutParticipant.Text = "";
@@ -461,7 +454,7 @@ namespace Centralizador.WinApp.GUI
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
             if (!File.Exists(path))
             {
-                MessageBox.Show($"The file '{file}' NOT found, please download...", VersionApp, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"The file '{file}' NOT found, please download...", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
                 return;
             }
@@ -489,7 +482,7 @@ namespace Centralizador.WinApp.GUI
             }
             if (detallesFinal.Count > 0)
             {
-                DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?", VersionApp, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?", Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resp == DialogResult.Yes)
                 {
@@ -754,7 +747,7 @@ namespace Centralizador.WinApp.GUI
             }
             if (detallesFinal.Count > 0)
             {
-                DialogResult resp = MessageBox.Show($"CEN references will be inserted{Environment.NewLine + Environment.NewLine}Are you sure?", VersionApp, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult resp = MessageBox.Show($"CEN references will be inserted{Environment.NewLine + Environment.NewLine}Are you sure?", Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resp == DialogResult.Yes)
                 {
@@ -869,7 +862,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
 
-                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", VersionApp, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (DialogResult == DialogResult.Yes)
                 {
                     BackgroundWorker bgwConvertPdf = new BackgroundWorker
@@ -901,7 +894,7 @@ namespace Centralizador.WinApp.GUI
 
         #region Creditor Transactions
 
-        private void BtnCreditor_Click(object sender, EventArgs e)
+        private async void BtnCreditor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0 && !BgwCreditor.IsBusy)
             {
@@ -913,7 +906,7 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Bussy!";
                 return;
             }
-            IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1)).Result;
+            IList<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
             if (matrices != null)
             {
                 BgwCreditor.RunWorkerAsync(matrices);
@@ -934,12 +927,13 @@ namespace Centralizador.WinApp.GUI
             con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
             foreach (ResultPaymentMatrix m in matrices)
             {
+
                 m.BillingWindow = BillingWindow.GetBillingWindowByIdAsync(m).Result; ;
                 IList<ResultInstruction> lista = Instruction.GetInstructionCreditorAsync(m, UserParticipant).Result;
                 if (lista == null)
                 {
                     // Error Exception
-                    MessageBox.Show("There was an error connecting to the CEN API.", VersionApp, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 else
@@ -949,7 +943,11 @@ namespace Centralizador.WinApp.GUI
                         int d = 0;
                         foreach (ResultInstruction instruction in lista)
                         {
-                            instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor);
+                            //if (d == 3)
+                            //{
+                            //    continue;
+                            //}
+                            instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
                             Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
                             // REF from Softland 
                             IList<Reference> references = Reference.GetInfoFactura(instruction, con);
@@ -957,7 +955,7 @@ namespace Centralizador.WinApp.GUI
                             if (references == null)
                             {
                                 // Error Exception
-                                MessageBox.Show("There was an error connecting to the server Softland.", VersionApp, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("There was an error connecting to the server Softland.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return;
                             }
                             else
@@ -985,7 +983,7 @@ namespace Centralizador.WinApp.GUI
                                             // Flags         
                                             detalle.Flag = ValidateCen(detalle);
                                             // Events Sii                       
-                                            detalle.DataEvento = ServiceEvento.GetStatusDte("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert);
+                                            detalle.DataEvento = ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
                                             // Status
                                             detalle.StatusDetalle = GetStatus(detalle);
                                             // Insert CEN, only Accepted.
@@ -1050,7 +1048,7 @@ namespace Centralizador.WinApp.GUI
 
         #region Debtor Transactions
 
-        private void BtnDebtor_Click(object sender, EventArgs e)
+        private async void BtnDebtor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0 && !BgwDebtor.IsBusy)
             {
@@ -1063,7 +1061,7 @@ namespace Centralizador.WinApp.GUI
                 return;
             }
             DetallesDebtor = new List<Detalle>();
-            DetallesDebtor = GetLibro("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+            DetallesDebtor = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
             string nameFile = "";
             nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
             if (DetallesDebtor != null)
@@ -1150,7 +1148,7 @@ namespace Centralizador.WinApp.GUI
                 // Flags       
                 item.Flag = ValidateCen(item);
                 // Events Sii
-                item.DataEvento = ServiceEvento.GetStatusDte("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert);
+                item.DataEvento = ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
                 // Status
                 if (item.DataEvento != null)
                 {
@@ -1307,7 +1305,7 @@ namespace Centralizador.WinApp.GUI
                             rejectedNeto += item.MntNeto;
                             rejectedExento += item.MntExento;
                             rejectedIva += item.MntIva;
-                            rejectedTotal += item.MntTotal;                          
+                            rejectedTotal += item.MntTotal;
                             break;
                         case StatusDetalle.No:
                             // Col Status
@@ -1328,7 +1326,7 @@ namespace Centralizador.WinApp.GUI
                             break;
                         default:
                             break;
-                    }   
+                    }
                 }
                 // Footer Rejected
                 IGridMain.Footer.Cells[0, "neto"].Value = rejectedNeto;
@@ -1358,7 +1356,7 @@ namespace Centralizador.WinApp.GUI
             TxtFolioRef.Text = "";
             TxtRznRef.Text = "";
             TxtFmaPago.Text = "";
-            TxtDscItem.Text = "";
+            //TxtDscItem.Text = "";
             TxtTpoDocRef.Text = "";
         }
         private void BtnExcelConvert_Click(object sender, EventArgs e)
@@ -1438,7 +1436,7 @@ namespace Centralizador.WinApp.GUI
                     foreach (DTEDefTypeDocumentoDetalle detailProd in detalles)
                     {
                         TxtNmbItem.Text += "+ :" + detailProd.NmbItem.ToLowerInvariant() + Environment.NewLine;
-                        TxtDscItem.Text = dte.Detalle[0].DscItem;
+                        //TxtDscItem.Text = dte.Detalle[0].DscItem;
                     }
                     if (dte.Referencia != null)
                     {
@@ -1447,7 +1445,7 @@ namespace Centralizador.WinApp.GUI
                         {
                             TxtFolioRef.Text = referencia.FolioRef;
                             TxtRznRef.Text = referencia.RazonRef;
-                            TxtDscItem.Text = dte.Detalle[0].DscItem;
+                            //TxtDscItem.Text = dte.Detalle[0].DscItem;
                             TxtTpoDocRef.Text = referencia.TpoDocRef;
                         }
                     }
@@ -1574,7 +1572,7 @@ namespace Centralizador.WinApp.GUI
                     builder.Append("Are you sure?");
 
 
-                    DialogResult result = MessageBox.Show(builder.ToString(), VersionApp, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    DialogResult result = MessageBox.Show(builder.ToString(), Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
                         if (Mail == null)
@@ -1732,7 +1730,7 @@ namespace Centralizador.WinApp.GUI
 
 
 
-        
+
     }
 }
 

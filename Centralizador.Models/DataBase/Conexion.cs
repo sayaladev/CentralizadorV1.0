@@ -53,9 +53,7 @@ namespace Centralizador.Models.DataBase
                     }  
                 }
                 catch (Exception ex)
-                {
-                    //Tester
-                    System.Windows.Forms.MessageBox.Show(ex.Message);
+                {                   
                     return null; // Error server
                 }
             }
@@ -77,9 +75,7 @@ namespace Centralizador.Models.DataBase
                     } 
                 }
                 catch (Exception ex)
-                {
-                    //Tester
-                    System.Windows.Forms.MessageBox.Show(ex.Message);
+                {               
                     return 99; // Error
                 }
             }
@@ -113,8 +109,7 @@ namespace Centralizador.Models.DataBase
                 }
                 catch (Exception ex)
                 {
-                    //Tester
-                    System.Windows.Forms.MessageBox.Show(ex.Message);
+              
                     return 99; // Error
                 }
             }
