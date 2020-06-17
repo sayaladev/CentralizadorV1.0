@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Xml;
 using System.Xml.Serialization;
-using Centralizador.Models.AppFunctions;
+
 using Centralizador.Models.CrSeed;
 using Centralizador.Models.GetTokenFromSeed;
 using Centralizador.Models.registroreclamodteservice;
@@ -52,10 +52,10 @@ namespace Centralizador.Models.ApiSII
                                     if (XmlObject.RESP_HDR.ESTADO == "00")
                                     {
                                         return XmlObject.RESP_BODY.TOKEN;
-                                    }                                 
+                                    }
                                 }
                             }
-                        }                      
+                        }
                     }
                 }
             }

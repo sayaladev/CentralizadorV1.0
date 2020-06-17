@@ -96,7 +96,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="Userparticipant"></param>
         /// <returns></returns>
         public static async Task<IList<ResultInstruction>> GetInstructionCreditorAsync(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
-        {      
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -115,7 +115,7 @@ namespace Centralizador.Models.ApiCEN
                                 item.PaymentMatrix = matrix;
                             }
                             return instruction.Results;
-                        }                    
+                        }
                     }
                 }
             }
@@ -134,7 +134,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="idDebtor"></param>
         /// <returns></returns>
         public static async Task<ResultInstruction> GetInstructionDebtorAsync(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
-        { 
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })

@@ -138,7 +138,7 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                      return p.Results[0];
+                        return p.Results[0];
                     }
                 }
             }
@@ -155,7 +155,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="rut"></param>
         /// <returns></returns>
         public static async Task<ResultParticipant> GetParticipantByRutAsync(string rut)
-        {           
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -181,11 +181,11 @@ namespace Centralizador.Models.ApiCEN
         }
 
 
-        public static IList<ResultParticipant> GetParticipants()
+        public static IList<ResultParticipant> GetParticipants(string userCEN)
         {
             try
             {
-                ResultAgent agent = Agent.GetAgetByEmailAsync().Result;
+                ResultAgent agent = Agent.GetAgetByEmailAsync(userCEN).Result;
                 if (agent != null)
                 {
                     IList<ResultParticipant> participants = new List<ResultParticipant>();
@@ -199,7 +199,7 @@ namespace Centralizador.Models.ApiCEN
                     participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
 
                     return participants;
-                }            
+                }
             }
             catch (Exception)
             {

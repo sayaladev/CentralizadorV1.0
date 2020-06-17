@@ -70,5 +70,23 @@ namespace Centralizador.WinApp.Properties {
                 return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("german.gomez@cvegroup.com")]
+        public string UserCEN {
+            get {
+                return ((string)(this["UserCEN"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("cvepagos2017")]
+        public string PasswordCEN {
+            get {
+                return ((string)(this["PasswordCEN"]));
+            }
+        }
     }
 }

@@ -59,8 +59,7 @@ namespace Centralizador.Models.Outlook
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
                 MailInfo[] infos = oClient.GetMailInfos();
-                //string pathTemp = Directory.GetCurrentDirectory() + @"\temp";
-                string pathTemp = @"C:\Centralizador\Temp";
+                string pathTemp = @"C:\Centralizador\Temp\";
                 if (!Directory.Exists(pathTemp))
                 {
                     Directory.CreateDirectory(pathTemp);
@@ -80,17 +79,17 @@ namespace Centralizador.Models.Outlook
                     {
                         if (att.Name.Contains(".xml"))
                         {
-                            att.SaveAs(pathTemp + @"\" + att.Name, true);
+                            att.SaveAs(pathTemp + att.Name, true);
                             try
                             {
                                 XDocument xmlDocument;
-                                using (StreamReader oReader = new StreamReader(pathTemp + @"\" + att.Name, Encoding.GetEncoding("ISO-8859-1")))
+                                using (StreamReader oReader = new StreamReader(pathTemp + att.Name, Encoding.GetEncoding("ISO-8859-1")))
                                 {
                                     xmlDocument = XDocument.Load(oReader);
                                 }
                                 if (xmlDocument.Root.Name.LocalName == "EnvioDTE")
                                 {
-                                    int res = SaveFiles(pathTemp + @"\" + att.Name);
+                                    int res = SaveFiles(pathTemp + att.Name);
                                     switch (res)
                                     {
                                         case 0: // Success
@@ -199,11 +198,11 @@ namespace Centralizador.Models.Outlook
         }
         private void Save(string nameFolder, string nameFile, DTEDefType dte)
         {
-            if (!Directory.Exists(@"C:\Centralizador\Inbox" + nameFolder))
+            if (!Directory.Exists(@"C:\Centralizador\Inbox\" + nameFolder))
             {
-                Directory.CreateDirectory(@"C:\Centralizador\Inbox" + nameFolder);
+                Directory.CreateDirectory(@"C:\Centralizador\Inbox\" + nameFolder);
             }
-            File.WriteAllText(@"C:\" + Application.ProductName + @"\Inbox" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
+            File.WriteAllText(@"C:\Centralizador\Inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
         }
 
         public static DateTime GetLastDateTime()

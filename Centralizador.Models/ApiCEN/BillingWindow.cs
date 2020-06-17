@@ -52,7 +52,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="matrix"></param>
         /// <returns></returns>
         public static async Task<ResultBillingWindow> GetBillingWindowByIdAsync(ResultPaymentMatrix matrix)
-        {  
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -102,7 +102,7 @@ namespace Centralizador.Models.ApiCEN
                         BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                         if (b.Count > 0)
                         {
-                           return b.Results[0];
+                            return b.Results[0];
                         }
                     }
                 }

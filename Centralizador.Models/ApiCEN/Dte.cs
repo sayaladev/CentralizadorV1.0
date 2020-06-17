@@ -193,7 +193,7 @@ namespace Centralizador.Models.ApiCEN
                         InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                         if (r != null && r.Errors.Count == 0)
                         {
-                          return r.ResultDte;
+                            return r.ResultDte;
                         }
                     }
                 }
@@ -213,7 +213,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="doc"></param>
         /// <returns></returns>
         private static async Task<string> SendFileAsync(string tokenCen, string fileName, string doc)
-        {      
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -226,7 +226,7 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
-                      return dic["invoice_file_id"];
+                        return dic["invoice_file_id"];
                     }
                 }
             }

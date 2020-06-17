@@ -63,13 +63,13 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="userCEN"></param>
         /// <returns></returns>
-        public static async Task<ResultAgent> GetAgetByEmailAsync()
-        {        
+        public static async Task<ResultAgent> GetAgetByEmailAsync(string userCEN)
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}");
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={userCEN}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)
@@ -95,12 +95,12 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="userCEN"></param>
         /// <param name="passwordCEN"></param>
         /// <returns></returns>
-        public static async Task<string> GetTokenCenAsync()
-        {      
+        public static async Task<string> GetTokenCenAsync(string userCEN, string passwordCEN)
+        {
             Dictionary<string, string> dic = new Dictionary<string, string>
                 {
-                    { "username", Properties.Settings.Default.UserCEN  },
-                    { "password", Properties.Settings.Default.PasswordCEN }
+                    { "username", userCEN  },
+                    { "password", passwordCEN }
                 };
             try
             {
@@ -126,7 +126,7 @@ namespace Centralizador.Models.ApiCEN
         /// <summary>
         /// Get UserCEN from Configuration settings
         /// </summary>
-        public static string GetUserCEN => Properties.Settings.Default.UserCEN;
+        //public static string GetUserCEN => Properties.Settings.Default.UserCEN;
     }
 
 }

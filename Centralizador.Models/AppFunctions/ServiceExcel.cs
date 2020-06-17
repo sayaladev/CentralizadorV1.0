@@ -108,12 +108,13 @@ namespace Centralizador.Models.AppFunctions
                 }
 
 
-                if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+
+                if (!Directory.Exists(@"C:\Centralizador\Log\"))
                 {
-                    Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
                 }
-                workbook.SaveToFile(Directory.GetCurrentDirectory() + @"\log\" + nameFile, FileFormat.Version2016);
-                ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile)
+                workbook.SaveToFile(@"C:\Centralizador\Log\" + nameFile, FileFormat.Version2016);
+                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile)
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };
@@ -266,12 +267,12 @@ namespace Centralizador.Models.AppFunctions
                 worksheet.InsertDataTable(table, false, 1, 1);
                 string nameFile = $"{UserParticipant.Name}_NominaBank_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
 
-                if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+                if (!Directory.Exists(@"C:\Centralizador\Log\"))
                 {
-                    Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
                 }
-                workbook.SaveToFile(Directory.GetCurrentDirectory() + @"\log\" + nameFile, FileFormat.Version2016);
-                ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile)
+                workbook.SaveToFile(@"C:\Centralizador\Log\" + nameFile, FileFormat.Version2016);
+                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile)
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };

@@ -78,8 +78,7 @@ namespace Centralizador.Models.DataBase
                 }
                 catch (Exception)
                 {
-                    // Error Exception
-                    return 99;
+                    throw;
                 }
             }
         }
@@ -112,8 +111,7 @@ namespace Centralizador.Models.DataBase
                 }
                 catch (Exception)
                 {
-                    // Error Exception
-                    return 99;
+                    throw;
                 }
             }
         }

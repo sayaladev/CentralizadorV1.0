@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
+            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -158,7 +159,7 @@
             this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
+            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -235,6 +236,7 @@
             this.TxtTpoDocRef.ReadOnly = true;
             this.TxtTpoDocRef.Size = new System.Drawing.Size(31, 18);
             this.TxtTpoDocRef.TabIndex = 11;
+            this.TxtTpoDocRef.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // TxtFmaPago
             // 
@@ -254,6 +256,7 @@
             this.TxtRznRef.ReadOnly = true;
             this.TxtRznRef.Size = new System.Drawing.Size(165, 18);
             this.TxtRznRef.TabIndex = 8;
+            this.TxtRznRef.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // TxtFolioRef
             // 
@@ -263,6 +266,7 @@
             this.TxtFolioRef.ReadOnly = true;
             this.TxtFolioRef.Size = new System.Drawing.Size(110, 18);
             this.TxtFolioRef.TabIndex = 7;
+            this.TxtFolioRef.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // TxtNmbItem
             // 
@@ -327,7 +331,7 @@
             this.BtnInsertNv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.BtnInsertNv.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.BtnInsertNv.UseVisualStyleBackColor = false;
-            this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_Click);
+            this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_ClickAsync);
             // 
             // ChkIncludeReclaimed
             // 

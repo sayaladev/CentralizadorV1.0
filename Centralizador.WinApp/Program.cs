@@ -27,9 +27,9 @@ namespace Centralizador.WinApp
             try
             {
                 tokenSii = ServiceSoap.GETTokenFromSii(Properties.Settings.Default.SerialDigitalCert);
-                tokenCen = Agent.GetTokenCenAsync().Result;
+                tokenCen = Agent.GetTokenCenAsync(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN).Result;
                 // Get Participants
-                participants = Participant.GetParticipants();
+                participants = Participant.GetParticipants(Properties.Settings.Default.UserCEN);
                 // Get Biling types
                 billingTypes = BilingType.GetBilinTypesAsync().Result;
             }
@@ -51,17 +51,17 @@ namespace Centralizador.WinApp
                 // Checking
                 if (string.IsNullOrEmpty(tokenSii))
                 {
-                    new ErrorMsgCen("The token has not been obtained from SII", "Impossible to start the Application.", MessageBoxIcon.Stop);             
+                    new ErrorMsgCen("The token has not been obtained from SII", "Impossible to start the Application.", MessageBoxIcon.Stop);
                     return;
                 }
                 else if (string.IsNullOrEmpty(tokenCen) || participants == null || billingTypes == null)
                 {
                     new ErrorMsgCen("The token has not been obtained from CEN", "Impossible to start the Application.", MessageBoxIcon.Stop);
-                    return;             
+                    return;
                 }
                 else if (participants.Count == 0)
                 {
-                    new ErrorMsgCen("No participants found", "Impossible to start the Application.", MessageBoxIcon.Stop);   
+                    new ErrorMsgCen("No participants found", "Impossible to start the Application.", MessageBoxIcon.Stop);
                     return;
                 }
                 // Open Form

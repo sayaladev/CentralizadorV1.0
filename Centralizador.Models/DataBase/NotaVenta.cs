@@ -2,6 +2,7 @@
 using System.Data;
 using System.Globalization;
 using System.Text;
+using System.Threading.Tasks;
 
 using Centralizador.Models.ApiCEN;
 
@@ -23,23 +24,22 @@ namespace Centralizador.Models.DataBase
             }
         }
 
-        public static int CheckFolios(Conexion conexion)
+        public static async Task<int> CheckFoliosAsync(Conexion conexion)
         {
-            int count = 0;
             try
             {
                 conexion.Query = "EXEC [softland].[DTE_FoliosDisp] @Tipo = N'F', @SubTipo = N'T'";
-                DataTable dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+                DataTable dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null)
                 {
-                    count = dataTable.Rows.Count;
+                    return dataTable.Rows.Count;
                 }
             }
             catch (Exception)
             {
                 throw;
             }
-            return count;
+            return 0;
         }
 
         public static int InsertNv(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
@@ -48,7 +48,17 @@ namespace Centralizador.Models.DataBase
             try
             {
                 StringBuilder query = new StringBuilder();
-                string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
+                //string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
+                // Insertó 2020-09-06 17:28:00.000
+
+                // Prueba
+                string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", DateTime.Now);
+
+                if (Environment.MachineName == "DEVELOPER")
+                {
+                    time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
+                }
+
                 int neto = instruction.Amount;
                 double iva = neto * 0.19;
                 double total = Math.Ceiling(neto + iva);
@@ -70,11 +80,11 @@ namespace Centralizador.Models.DataBase
                         query.Clear();
                         query.Append("INSERT INTO softland.NW_Impto (nvNumero, CodImpto, ValPctIni, AfectoImpto, Impto)  VALUES ( ");
                         query.Append($"{folioNV},'IVA',19,{neto},{iva})");
-                        conexion.Query = query.ToString();                        
+                        conexion.Query = query.ToString();
+                        return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!     
                     }
                 }
-
-                return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!                
+                return 0;
             }
             catch (Exception)
             {
@@ -83,21 +93,21 @@ namespace Centralizador.Models.DataBase
         }
 
         public static int GetNv(ResultInstruction instruction, Conexion conexion)
-        {    
-          
-                StringBuilder query = new StringBuilder();
-                query.Append("SELECT DISTINCT TOP (1) ");
-                query.Append("  nv.NVNumero ");
-                query.Append("FROM softland.nw_nventa nv ");
-                query.Append("INNER JOIN softland.nw_detnv d ");
-                query.Append("  ON nv.NVNumero = d.NVNumero ");
-                query.Append("LEFT JOIN softland.nw_fFactNCredNV() f ");
-                query.Append("  ON f.nvnumero = d.nvnumero ");
-                query.Append("  AND f.codprod = d.codprod ");
-                query.Append("  AND f.nvcorrela = d.nvlinea ");
-                query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
-                query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
-                query.Append("AND f.folio IS NULL ");
+        {
+
+            StringBuilder query = new StringBuilder();
+            query.Append("SELECT DISTINCT TOP (1) ");
+            query.Append("  nv.NVNumero ");
+            query.Append("FROM softland.nw_nventa nv ");
+            query.Append("INNER JOIN softland.nw_detnv d ");
+            query.Append("  ON nv.NVNumero = d.NVNumero ");
+            query.Append("LEFT JOIN softland.nw_fFactNCredNV() f ");
+            query.Append("  ON f.nvnumero = d.nvnumero ");
+            query.Append("  AND f.codprod = d.codprod ");
+            query.Append("  AND f.nvcorrela = d.nvlinea ");
+            query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
+            query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
+            query.Append("AND f.folio IS NULL ");
 
             try
             {
@@ -107,7 +117,7 @@ namespace Centralizador.Models.DataBase
             catch (Exception)
             {
                 throw;
-            }            
+            }
         }
     }
 }

@@ -101,7 +101,7 @@ namespace Centralizador.WinApp.GUI
 
 
             // User email
-            TssLblUserEmail.Text = "|  " + Agent.GetUserCEN;
+            TssLblUserEmail.Text = "|  " + Properties.Settings.Default.UserCEN;
 
             // Worker Debtor
             BgwDebtor = new BackgroundWorker
@@ -434,7 +434,7 @@ namespace Centralizador.WinApp.GUI
 
         #region Insert NV
 
-        private void BtnInsertNv_Click(object sender, EventArgs e)
+        private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
         {
             if (IsRunning)
             {
@@ -497,6 +497,13 @@ namespace Centralizador.WinApp.GUI
 
                 if (resp == DialogResult.Yes)
                 {
+                    // Sql          
+                    Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+                    int foliosDisp = await NotaVenta.CheckFoliosAsync(con);
+                    if (foliosDisp < detallesFinal.Count)
+                    {
+                        MessageBox.Show($"F° Available: {foliosDisp}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     BgwInsertNv.RunWorkerAsync(detallesFinal);
                 }
             }
@@ -523,7 +530,7 @@ namespace Centralizador.WinApp.GUI
 
             // Sql          
             Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-            int foliosDisp = NotaVenta.CheckFolios(con);        
+            int foliosDisp = NotaVenta.CheckFoliosAsync(con).Result;
             IList<int> folios = new List<int>();
             int resultInsertNV;
             int lastF = 0;
@@ -573,6 +580,10 @@ namespace Centralizador.WinApp.GUI
                                 string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                                 resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
                                 folios.Add(lastF + 1);
+                                if (resultInsertNV == 0)
+                                {
+                                    StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
+                                }
                             }
                             else
                             {
@@ -600,7 +611,11 @@ namespace Centralizador.WinApp.GUI
                                     // 
                                     lastF = NotaVenta.GetLastNv(con);
                                     string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                                    resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);                                   
+                                    resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
+                                    if (resultInsertNV == 0)
+                                    {
+                                        StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
+                                    }
                                 }
                             }
                         }
@@ -623,7 +638,7 @@ namespace Centralizador.WinApp.GUI
                 {
                     folios.Add(F);
                 }
-           
+
                 c++;
                 porcent = (float)(100 * c) / detallesFinal.Count;
                 BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");
@@ -637,11 +652,14 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Error!";
             }
             else
-            {                // folios[] <>
+            {
                 IList<int> folios = e.Result as List<int>;
-                int menor = folios.Min();
-                int mayor = folios.Max();
-                StringLogging.AppendLine($"Resumen: From-{menor} To-{mayor}");
+                if (folios.Count > 0)
+                {
+                    int menor = folios.Min();
+                    int mayor = folios.Max();
+                    StringLogging.AppendLine($"Resumen: From-{menor} To-{mayor}");
+                }
                 TssLblMensaje.Text = "Check the log file.";
             }
             TssLblProgBar.Value = 0;
@@ -652,12 +670,12 @@ namespace Centralizador.WinApp.GUI
 
             if (StringLogging.Length > 0)
             {
-                if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+                if (!Directory.Exists(@"C:\Centralizador\Log\"))
                 {
-                    Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
                 }
-                File.WriteAllText(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt", StringLogging.ToString());
-                ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt")
+                File.WriteAllText(@"C:\Centralizador\Log\" + nameFile + ".txt", StringLogging.ToString());
+                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile + ".txt")
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };
@@ -731,18 +749,20 @@ namespace Centralizador.WinApp.GUI
                     if (item.References.NroInt > 0)
                     {
                         int result = Reference.InsertReference(item.Instruction, item.References.NroInt, con);
-                        switch (result)
+                        if (result == 0)
                         {
-                            case 2: // Success
-                                StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: " + item.Folio);
-                                break;
-                            case 0:
-                                StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Error");
-                                break;
-                            case -1: // ya existe
-                                StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: *" + item.Folio);
-                                break;
+                            StringLogging.AppendLine($"{item.Instruction.Id}\tREF Insert:\t\t Error Invoice: {item.References.Folio}");
                         }
+                        //else if (result == -1)
+                        //{
+                        //    // Exists
+                        //    StringLogging.AppendLine(item.Instruction.Id + "\t" + "REF Insert:" + "\t\t" + "Invoice F°: *" + item.Folio);
+                        //}
+                        //else if (result == 2)
+                        //{
+                        //    // OK
+                        //}
+
                     }
                 }
                 c++;
@@ -757,16 +777,18 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = 0;
             IsCreditor = true;
             IsRunning = false;
-            TssLblMensaje.Text = "Check the log file.";
-            string nameFile = $"{UserParticipant.Name}_InsertRef_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
+            TssLblMensaje.Text = "Complete!.";
+            // Only shows msg if Error
             if (StringLogging.Length > 0)
             {
-                if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+                string nameFile = $"{UserParticipant.Name}_InsertRef_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
+                TssLblMensaje.Text = "Check the log file.";
+                if (!Directory.Exists(@"C:\Centralizador\Log\"))
                 {
-                    Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
                 }
-                File.WriteAllText(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt", StringLogging.ToString());
-                ProcessStartInfo process = new ProcessStartInfo(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".txt")
+                File.WriteAllText(@"C:\Centralizador\Log\" + nameFile + ".txt", StringLogging.ToString());
+                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile + ".txt")
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };

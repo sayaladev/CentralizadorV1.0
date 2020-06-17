@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace Centralizador.WinApp.GUI
 {
-   
+
     [Serializable()]
     public class ErrorMsgCen : Exception
     {
@@ -24,7 +24,7 @@ namespace Centralizador.WinApp.GUI
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine("Error: " + message);
-            builder.AppendLine("");           
+            builder.AppendLine("");
             MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, msgIcon);
         }
         public ErrorMsgCen(string msgTitle, string msgDetail, MessageBoxIcon msgIcon) : base(msgTitle)
@@ -53,10 +53,10 @@ namespace Centralizador.WinApp.GUI
                 builder.AppendLine(innerException.InnerException.Message);
             }
             else
-            {               
+            {
                 builder.AppendLine(innerException.Message);
             }
- 
+
             MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, msgIcon);
         }
         protected ErrorMsgCen(SerializationInfo info, StreamingContext context) : base(info, context)

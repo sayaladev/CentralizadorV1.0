@@ -19,7 +19,7 @@ namespace Centralizador.Models.DataBase
         public string DirAux { get; set; }
         public string ComAux { get; set; }
 
-        public static int InsertAuxiliar(ResultInstruction instruction,  Conexion conexion, IList<Comuna> comunas)
+        public static int InsertAuxiliar(ResultInstruction instruction, Conexion conexion, IList<Comuna> comunas)
         {
             // Get Comuna
             Comuna comuna = null;

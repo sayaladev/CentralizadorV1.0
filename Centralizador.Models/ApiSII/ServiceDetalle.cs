@@ -30,7 +30,7 @@ namespace Centralizador.Models.ApiSII
             Data = data;
         }
         public static async Task<IList<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
-        {         
+        {
             string ns = "", url = "", op = "";
             switch (tipoUser)
             {
@@ -79,7 +79,7 @@ namespace Centralizador.Models.ApiSII
                                 MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return null;
                             case 0:
-                                return detalleLibro.DataResp.Detalles;                              
+                                return detalleLibro.DataResp.Detalles;
                             case 99:
                                 MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;

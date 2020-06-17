@@ -75,11 +75,11 @@ namespace Centralizador.Models.Outlook
                 // delivered
                 nameFile = $"{UserParticipant.Name}_SendEmail_{mail.Date:dd-MM-yyyy-HH-mm-ss}";
             }
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
+            if (!Directory.Exists(@"C:\Centralizador\Log\"))
             {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\log\");
+                Directory.CreateDirectory(@"C:\Centralizador\Log\");
             }
-            mail.SaveAs(Directory.GetCurrentDirectory() + @"\log\" + nameFile + ".eml", false);
+            mail.SaveAs(@"C:\Centralizador\Log\" + nameFile + ".eml", false);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace Centralizador.Models.Outlook
                 Count = 0;
             }
 
-        }      
+        }
 
     }
 }

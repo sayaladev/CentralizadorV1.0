@@ -98,7 +98,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="date"></param>
         /// <returns></returns>
         public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
-        {           
+        {
             DateTime createdBefore = date.AddMonths(1);
             try
             {
@@ -110,7 +110,7 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                     return p.Results;
+                        return p.Results;
                     }
                 }
             }
@@ -142,7 +142,7 @@ namespace Centralizador.Models.ApiCEN
                         {
                             item.BillingWindow = window;
                         }
-                  return p.Results;
+                        return p.Results;
                     }
                 }
             }

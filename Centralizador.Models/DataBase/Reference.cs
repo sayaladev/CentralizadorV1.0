@@ -120,13 +120,13 @@ namespace Centralizador.Models.DataBase
 
         public static int InsertReference(ResultInstruction instruction, int nroInt, Conexion conexion)
         {
-            int count = 0;
             try
             {
                 StringBuilder query = new StringBuilder();
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
 
                 string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", instruction.PaymentMatrix.PublishDate); // Sí funciona!
+
                 query.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} ");
                 query.Append("  AND Tipo = 'F' ");
                 query.Append("  AND CodRefSII = 'SEN') ");
@@ -140,13 +140,12 @@ namespace Centralizador.Models.DataBase
                 query.Append("END ");
 
                 conexion.Query = query.ToString();
-                count = Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
+                return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
             }
             catch (Exception)
             {
                 throw;
             }
-            return count;
         }
     }
 }

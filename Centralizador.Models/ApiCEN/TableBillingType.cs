@@ -56,7 +56,7 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <returns></returns>
         public static async Task<IList<ResultBilingType>> GetBilinTypesAsync()
-        {      
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
