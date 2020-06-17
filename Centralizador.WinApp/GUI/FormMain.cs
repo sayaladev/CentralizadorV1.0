@@ -523,9 +523,10 @@ namespace Centralizador.WinApp.GUI
 
             // Sql          
             Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-            int foliosDisp = NotaVenta.CheckFolios(con);
-            int[] folios = new int[detallesFinal.Count];
+            int foliosDisp = NotaVenta.CheckFolios(con);        
+            IList<int> folios = new List<int>();
             int resultInsertNV;
+            int lastF = 0;
             // Get comunas                      
             IList<Comuna> comunas = Comuna.GetComunas(con);
 
@@ -568,9 +569,10 @@ namespace Centralizador.WinApp.GUI
                             {
                                 StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tRut: {item.Instruction.ParticipantDebtor.Rut}");
                                 // Insert NV
-                                int lastF = NotaVenta.GetLastNv(con);
+                                lastF = NotaVenta.GetLastNv(con);
                                 string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                                 resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
+                                folios.Add(lastF + 1);
                             }
                             else
                             {
@@ -596,28 +598,19 @@ namespace Centralizador.WinApp.GUI
                                 else
                                 {
                                     // 
-                                    int lastF = NotaVenta.GetLastNv(con);
+                                    lastF = NotaVenta.GetLastNv(con);
                                     string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                                    resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
+                                    resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);                                   
                                 }
                             }
                         }
-
-
-                        // Success Insert NV               
-
-
+                        // Insert NV  
                         if (resultInsertNV == 1)
                         {
                             // Success
+                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tF°: {lastF + 1}");
+                            folios.Add(lastF + 1);
                         }
-                        else
-                        {
-                            // Error
-                            StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tError Softland: {item.Instruction.ParticipantDebtor.Rut}");
-                        }
-
-
                     }
                     catch (Exception ex)
                     {
@@ -626,7 +619,11 @@ namespace Centralizador.WinApp.GUI
                         return;
                     }
                 }
-                folios[c] = F;
+                else
+                {
+                    folios.Add(F);
+                }
+           
                 c++;
                 porcent = (float)(100 * c) / detallesFinal.Count;
                 BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");
@@ -640,12 +637,11 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Error!";
             }
             else
-            {
-                // folios[] <>
-                int[] folios = e.Result as int[];
+            {                // folios[] <>
+                IList<int> folios = e.Result as List<int>;
                 int menor = folios.Min();
                 int mayor = folios.Max();
-                StringLogging.AppendLine($"Resumen: From-{menor}\tTo-{mayor}");
+                StringLogging.AppendLine($"Resumen: From-{menor} To-{mayor}");
                 TssLblMensaje.Text = "Check the log file.";
             }
             TssLblProgBar.Value = 0;
