@@ -21,11 +21,10 @@ namespace Centralizador.Models.DataBase
         public int Total { get; set; }
         public string Rut { get; set; }
         public static IList<Reference> GetInfoFactura(ResultInstruction instruction, Conexion conexion)
-        {    
+        {
+
             try
             {
-
-                IList<Reference> softland = new List<Reference>();
                 StringBuilder query = new StringBuilder();
 
                 query.Append("SELECT ");
@@ -55,90 +54,78 @@ namespace Centralizador.Models.DataBase
                 query.Append($"AND g.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 query.Append("ORDER BY g.Folio DESC ");
 
-
+                IList<Reference> softland = new List<Reference>();
                 conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
-                if (dataTable == null)
+                if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-                    // Error Exception
-                    return null;
-                }
-                else
-                {
-                    if (dataTable.Rows.Count > 0)
-                    {
-                        foreach (DataRow item in dataTable.Rows)
-                        {
 
-                            Reference reference = new Reference();
-                            if (item["Folio"] != DBNull.Value)
-                            {
-                                reference.Folio = Convert.ToInt32(item["Folio"]);
-                            }
-                            if (item["NroInt"] != DBNull.Value)
-                            {
-                                reference.NroInt = Convert.ToInt32(item["NroInt"]);
-                            }
-                            if (item["RecepcionSii"] != DBNull.Value)
-                            {
-                                reference.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
-                            }
-                            if (item["Fecha"] != DBNull.Value)
-                            {
-                                reference.FechaEmision = Convert.ToDateTime(item["Fecha"]);
-                            }
-                            if (item["FileEnviado"] != DBNull.Value)
-                            {
-                                reference.FileEnviado = item["FileEnviado"].ToString();
-                            }
-                            if (item["FileBasico"] != DBNull.Value)
-                            {
-                                reference.FileBasico = item["FileBasico"].ToString();
-                            }
-                            if (item["NetoAfecto"] != DBNull.Value)
-                            {
-                                reference.NetoAfecto = Convert.ToInt32(item["NetoAfecto"]);
-                            }
-                            if (item["IVA"] != DBNull.Value)
-                            {
-                                reference.Iva = Convert.ToInt32(item["IVA"]);
-                            }
-                            if (item["Total"] != DBNull.Value)
-                            {
-                                reference.Total = Convert.ToInt32(item["Total"]);
-                            }
-                            if (item["CodAux"] != DBNull.Value)
-                            {
-                                reference.Rut = item["CodAux"].ToString();
-                            }
-                            softland.Add(reference);
-                        }
-                        return softland;
-                    }
-                    else
+                    foreach (DataRow item in dataTable.Rows)
                     {
-                        return softland;
+                        Reference reference = new Reference();
+                        if (item["Folio"] != DBNull.Value)
+                        {
+                            reference.Folio = Convert.ToInt32(item["Folio"]);
+                        }
+                        if (item["NroInt"] != DBNull.Value)
+                        {
+                            reference.NroInt = Convert.ToInt32(item["NroInt"]);
+                        }
+                        if (item["RecepcionSii"] != DBNull.Value)
+                        {
+                            reference.FechaRecepcionSii = Convert.ToDateTime(item["RecepcionSii"]);
+                        }
+                        if (item["Fecha"] != DBNull.Value)
+                        {
+                            reference.FechaEmision = Convert.ToDateTime(item["Fecha"]);
+                        }
+                        if (item["FileEnviado"] != DBNull.Value)
+                        {
+                            reference.FileEnviado = item["FileEnviado"].ToString();
+                        }
+                        if (item["FileBasico"] != DBNull.Value)
+                        {
+                            reference.FileBasico = item["FileBasico"].ToString();
+                        }
+                        if (item["NetoAfecto"] != DBNull.Value)
+                        {
+                            reference.NetoAfecto = Convert.ToInt32(item["NetoAfecto"]);
+                        }
+                        if (item["IVA"] != DBNull.Value)
+                        {
+                            reference.Iva = Convert.ToInt32(item["IVA"]);
+                        }
+                        if (item["Total"] != DBNull.Value)
+                        {
+                            reference.Total = Convert.ToInt32(item["Total"]);
+                        }
+                        if (item["CodAux"] != DBNull.Value)
+                        {
+                            reference.Rut = item["CodAux"].ToString();
+                        }
+                        softland.Add(reference);
                     }
-                } 
+                    return softland;
+
+                }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
+            return null;
         }
 
 
         public static int InsertReference(ResultInstruction instruction, int nroInt, Conexion conexion)
         {
-            int count;
+            int count = 0;
             try
             {
-                StringBuilder query = new StringBuilder();              
-                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");    
+                StringBuilder query = new StringBuilder();
+                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
 
-                
                 string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", instruction.PaymentMatrix.PublishDate); // Sí funciona!
                 query.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} ");
                 query.Append("  AND Tipo = 'F' ");
@@ -157,8 +144,7 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                // Error Exception
-                return 99;
+                throw;
             }
             return count;
         }

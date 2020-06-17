@@ -55,8 +55,7 @@ namespace Centralizador.Models.DataBase
                 }
                 catch (Exception)
                 {
-                    // Error Exception
-                    return null;
+                    throw;
                 }
             }
             return table;

@@ -30,8 +30,7 @@ namespace Centralizador.Models.ApiSII
             Data = data;
         }
         public static async Task<IList<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
-        {
-            IList<Detalle> detallesDebtor = new List<Detalle>();
+        {         
             string ns = "", url = "", op = "";
             switch (tipoUser)
             {
@@ -67,10 +66,10 @@ namespace Centralizador.Models.ApiSII
             {
                 string jSon = JsonConvert.SerializeObject(apiDetalleLibroReq, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
-                {                   
-                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";            
+                {
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     wc.Headers[HttpRequestHeader.Cookie] = $"RUT_NS={userParticipant.Rut}; DV_NS={userParticipant.VerificationCode};TOKEN={token}";
-                    string result = await wc.UploadStringTaskAsync(url, WebRequestMethods.Http.Post, jSon).ConfigureAwait(false);
+                    string result = await wc.UploadStringTaskAsync(url, WebRequestMethods.Http.Post, jSon);
                     if (result != null)
                     {
                         DetalleLibro detalleLibro = JsonConvert.DeserializeObject<DetalleLibro>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -80,8 +79,7 @@ namespace Centralizador.Models.ApiSII
                                 MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return null;
                             case 0:
-                                detallesDebtor = detalleLibro.DataResp.Detalles;
-                                break;
+                                return detalleLibro.DataResp.Detalles;                              
                             case 99:
                                 MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
@@ -91,13 +89,12 @@ namespace Centralizador.Models.ApiSII
                         }
                     }
                 }
-
             }
             catch (Exception)
             {
-                return null;
-            }            
-            return detallesDebtor;
+                throw;
+            }
+            return null;
         }
         public static int GetFlagImageIndex(LetterFlag flag)
         {
@@ -144,7 +141,7 @@ namespace Centralizador.Models.ApiSII
                     DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
                     if (dte.Referencia != null)
                     {
-                        DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                        DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
                         if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
                         {
                             return LetterFlag.Red;
@@ -153,7 +150,7 @@ namespace Centralizador.Models.ApiSII
                         {
                             return LetterFlag.Red;
                         }
-                        else if (referencia.FolioRef != detalle.Instruction.PaymentMatrix.ReferenceCode)
+                        else if (string.Compare(referencia.FolioRef, detalle.Instruction.PaymentMatrix.ReferenceCode, true) != 0)
                         {
                             return LetterFlag.Red;
                         }
@@ -165,7 +162,7 @@ namespace Centralizador.Models.ApiSII
                         {
                             return LetterFlag.Red;
                         }
-                        else if (dte.Detalle == null || dte.Detalle.Length != 1)
+                        else if (dte.Detalle == null || dte.Detalle.Length < 1)
                         {
                             //if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
                             //{

@@ -12,23 +12,15 @@ namespace Centralizador.Models.DataBase
 
         public static int GetLastNv(Conexion conexion)
         {
-            int count = 0;
             try
             {
-
                 conexion.Query = "select MAX(NVNumero) from softland.nw_nventa";
-                object result = Conexion.ExecuteScalarAsync(conexion).Result;
-                if (result != null)
-                {
-                    count = Convert.ToInt32(result);
-                }             
+                return Convert.ToInt32(Conexion.ExecuteScalarAsync(conexion).Result);
             }
             catch (Exception)
             {
-                // Error Exception
-                return 99;
+                throw;
             }
-            return count;
         }
 
         public static int CheckFolios(Conexion conexion)
@@ -45,8 +37,7 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                // Error Exception
-                return 99;
+                throw;
             }
             return count;
         }
@@ -56,7 +47,6 @@ namespace Centralizador.Models.DataBase
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
             try
             {
-
                 StringBuilder query = new StringBuilder();
                 string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
                 int neto = instruction.Amount;
@@ -80,22 +70,21 @@ namespace Centralizador.Models.DataBase
                         query.Clear();
                         query.Append("INSERT INTO softland.NW_Impto (nvNumero, CodImpto, ValPctIni, AfectoImpto, Impto)  VALUES ( ");
                         query.Append($"{folioNV},'IVA',19,{neto},{iva})");
-                        conexion.Query = query.ToString();
-                        return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
+                        conexion.Query = query.ToString();                        
                     }
                 }
-                return 0;
+
+                return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!                
             }
             catch (Exception)
             {
-                return 99;
+                throw;
             }
         }
 
         public static int GetNv(ResultInstruction instruction, Conexion conexion)
-        {
-            try
-            {
+        {    
+          
                 StringBuilder query = new StringBuilder();
                 query.Append("SELECT DISTINCT TOP (1) ");
                 query.Append("  nv.NVNumero ");
@@ -109,13 +98,16 @@ namespace Centralizador.Models.DataBase
                 query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
                 query.Append("AND f.folio IS NULL ");
+
+            try
+            {
                 conexion.Query = query.ToString();
                 return Convert.ToInt32(Conexion.ExecuteScalarAsync(conexion).Result);
             }
             catch (Exception)
             {
-                return 99;
-            }
+                throw;
+            }            
         }
     }
 }

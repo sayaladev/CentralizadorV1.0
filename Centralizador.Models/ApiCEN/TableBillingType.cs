@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -54,29 +55,27 @@ namespace Centralizador.Models.ApiCEN
         /// 
         /// </summary>
         /// <returns></returns>
-        public static async Task<IList<ResultBilingType>> GetBilinTypesAsync() 
-        {
-            IList<ResultBilingType> billingTypes = new List<ResultBilingType>();
+        public static async Task<IList<ResultBilingType>> GetBilinTypesAsync()
+        {      
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-types");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false); // GET
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)
                     {
-                        BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });                     
-                            billingTypes = bilingType.Results;                        
+                        BilingType bilingType = JsonConvert.DeserializeObject<BilingType>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        return bilingType.Results;
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
-            }           
-            return billingTypes;
+                throw;
+            }
+            return null;
         }
     }
 

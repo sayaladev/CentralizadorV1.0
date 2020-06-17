@@ -59,7 +59,8 @@ namespace Centralizador.Models.Outlook
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
                 MailInfo[] infos = oClient.GetMailInfos();
-                string pathTemp = Directory.GetCurrentDirectory() + @"\temp";
+                //string pathTemp = Directory.GetCurrentDirectory() + @"\temp";
+                string pathTemp = @"C:\Centralizador\Temp";
                 if (!Directory.Exists(pathTemp))
                 {
                     Directory.CreateDirectory(pathTemp);
@@ -93,18 +94,18 @@ namespace Centralizador.Models.Outlook
                                     switch (res)
                                     {
                                         case 0: // Success
-                                            continue;                                            
+                                            continue;
                                         case 1: // Error in Sii (exit funcion)
                                             MessageBox.Show("Sii: Application with Momentary Suspension", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            return;                                          
+                                            return;
                                         case 2: // Error in serialization
-                                            continue;                                            
+                                            continue;
                                         case 3: // Error in query in Sii: folio wrong example.
                                             break;
 
                                         default:
                                             break;
-                                    }                                
+                                    }
                                 }
                             }
                             catch (System.Xml.XmlException)
@@ -190,22 +191,23 @@ namespace Centralizador.Models.Outlook
                 }
             }
             else
-            {        
+            {
                 // Serialialization failed
-                return 2;           
-            }           
+                return 2;
+            }
             return 0;
         }
         private void Save(string nameFolder, string nameFile, DTEDefType dte)
         {
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder))
+            if (!Directory.Exists(@"C:\Centralizador\Inbox" + nameFolder))
             {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder);
+                Directory.CreateDirectory(@"C:\Centralizador\Inbox" + nameFolder);
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + @"\inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
+            File.WriteAllText(@"C:\" + Application.ProductName + @"\Inbox" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
         }
 
-        public static DateTime GetLastDateTime() {
+        public static DateTime GetLastDateTime()
+        {
             return Properties.Settings.Default.DateTimeEmail;
         }
     }

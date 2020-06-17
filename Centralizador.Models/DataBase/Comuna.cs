@@ -36,7 +36,7 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
             return comunas;
         }

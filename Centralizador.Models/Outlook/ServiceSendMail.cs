@@ -24,13 +24,13 @@ namespace Centralizador.Models.Outlook
     public class ServiceSendMail
     {
 
-        private  SmtpServer OServer { get; set; }
+        private SmtpServer OServer { get; set; }
         private static SmtpMail[] OMails { get; set; }
         private static SmtpServer[] OServers { get; set; }
         private static SmtpClient OSmtp { get; set; }
         private static int Count { get; set; }
         private ResultParticipant UserParticipant { get; set; }
-              
+
         public ServiceSendMail(int count, ResultParticipant participant)
         {
             UserParticipant = participant;
@@ -101,7 +101,7 @@ namespace Centralizador.Models.Outlook
                 DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
                 if (dte.Referencia != null)
                 {
-                    referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef == "SEN");
+                    referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
                 }
 
                 if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
@@ -114,20 +114,20 @@ namespace Centralizador.Models.Outlook
                 }
                 if (referencia != null)
                 {
-                    if (referencia.FolioRef != detalle.Instruction.PaymentMatrix.ReferenceCode)
+                    if (string.Compare(referencia.FolioRef, detalle.Instruction.PaymentMatrix.ReferenceCode, true) != 0)
                     {
                         builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;FolioRef&gt;{detalle.Instruction.PaymentMatrix.ReferenceCode}&lt;/FolioRef&gt;" + "<br/>");
                     }
-                    if (string.Compare(referencia.RazonRef, detalle.Instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) != 0)
+                    if (string.Compare(referencia.RazonRef, detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
                     {
                         builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;RazonRef&gt;{detalle.Instruction.PaymentMatrix.NaturalKey}&lt;/RazonRef&gt;" + "<br/>");
                     }
                 }
                 if (dte.Detalle != null && dte.Detalle.Length == 1)
                 {
-                    if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
+                    if (string.Compare(dte.Detalle[0].DscItem, detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
                     {
-                        builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;DscItem&gt;{detalle.Instruction.PaymentMatrix.ReferenceCode}&lt;/DscItem&gt;" + "<br/>");
+                        //builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;DscItem&gt;{detalle.Instruction.PaymentMatrix.ReferenceCode}&lt;/DscItem&gt;" + "<br/>");
                     }
                 }
                 else
@@ -210,11 +210,7 @@ namespace Centralizador.Models.Outlook
                 Count = 0;
             }
 
-        }
-
-        public static void Reject() { 
-        
-        }
+        }      
 
     }
 }

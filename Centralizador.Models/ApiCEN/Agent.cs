@@ -64,32 +64,29 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="userCEN"></param>
         /// <returns></returns>
         public static async Task<ResultAgent> GetAgetByEmailAsync()
-        {
-            string userCEN = Properties.Settings.Default.UserCEN;
-            ResultAgent resultAgent = new ResultAgent();
+        {        
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={userCEN}");
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={Properties.Settings.Default.UserCEN}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false); // GET
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)
                     {
                         Agent agent = JsonConvert.DeserializeObject<Agent>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                         if (agent.Results.Count == 1)
                         {
-                            resultAgent = agent.Results[0];                   
+                            return agent.Results[0];
                         }
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return resultAgent;
+            return null;
         }
 
         /// <summary>
@@ -99,8 +96,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="passwordCEN"></param>
         /// <returns></returns>
         public static async Task<string> GetTokenCenAsync()
-        {
-            string token = "";
+        {      
             Dictionary<string, string> dic = new Dictionary<string, string>
                 {
                     { "username", Properties.Settings.Default.UserCEN  },
@@ -112,27 +108,25 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/token-auth/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.UploadStringTaskAsync(uri, WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)).ConfigureAwait(false); // POST
+                    string res = await wc.UploadStringTaskAsync(uri, WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)); // POST
                     if (res != null)
                     {
                         dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
-                        token = dic["token"];
+                        return dic["token"];
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return token;
+            return null;
         }
 
         /// <summary>
         /// Get UserCEN from Configuration settings
         /// </summary>
         public static string GetUserCEN => Properties.Settings.Default.UserCEN;
-
     }
 
 }

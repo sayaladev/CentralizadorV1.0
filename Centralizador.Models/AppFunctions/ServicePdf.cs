@@ -241,6 +241,12 @@ namespace Centralizador.Models.AppFunctions
                     nomenclatura = item.RutReceptor + "_" + item.Folio;
                     File.WriteAllBytes(dialog.SelectedPath + "\\" + nomenclatura + ".pdf", content);
                 }
+                // Is Cancel?
+                if (bgw.CancellationPending)
+                {
+                    e.Cancel = true;
+                    break;
+                }
                 c++;
                 float porcent = (float)(100 * c) / Detalles.Count;
                 bgw.ReportProgress((int)porcent, $"Converting to Pdf... [{item.Folio}] ({c}/{Detalles.Count})");

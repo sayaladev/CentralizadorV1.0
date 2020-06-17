@@ -55,16 +55,17 @@
             this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnInsertRef = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
+            this.BtnCancelTak = new System.Windows.Forms.Button();
+            this.FListPics = new System.Windows.Forms.ImageList(this.components);
+            this.BtnCreditor = new System.Windows.Forms.Button();
+            this.BtnDebtor = new System.Windows.Forms.Button();
             this.TxtCtaCteParticipant = new System.Windows.Forms.TextBox();
             this.BtnOutlook = new System.Windows.Forms.Button();
             this.TxtRutParticipant = new System.Windows.Forms.TextBox();
             this.BtnHiperLink = new System.Windows.Forms.Button();
-            this.BtnCreditor = new System.Windows.Forms.Button();
             this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
-            this.BtnDebtor = new System.Windows.Forms.Button();
-            this.FListPics = new System.Windows.Forms.ImageList(this.components);
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -294,7 +295,7 @@
             // ChkNoIncludeCEN
             // 
             this.ChkNoIncludeCEN.AutoSize = true;
-            this.ChkNoIncludeCEN.Location = new System.Drawing.Point(114, 132);
+            this.ChkNoIncludeCEN.Location = new System.Drawing.Point(114, 131);
             this.ChkNoIncludeCEN.Name = "ChkNoIncludeCEN";
             this.ChkNoIncludeCEN.Size = new System.Drawing.Size(65, 17);
             this.ChkNoIncludeCEN.TabIndex = 13;
@@ -305,7 +306,7 @@
             // ChkIncludeCEN
             // 
             this.ChkIncludeCEN.AutoSize = true;
-            this.ChkIncludeCEN.Location = new System.Drawing.Point(114, 111);
+            this.ChkIncludeCEN.Location = new System.Drawing.Point(114, 110);
             this.ChkIncludeCEN.Name = "ChkIncludeCEN";
             this.ChkIncludeCEN.Size = new System.Drawing.Size(72, 17);
             this.ChkIncludeCEN.TabIndex = 12;
@@ -317,18 +318,21 @@
             // 
             this.BtnInsertNv.BackColor = System.Drawing.SystemColors.Control;
             this.BtnInsertNv.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnInsertNv.Location = new System.Drawing.Point(20, 19);
+            this.BtnInsertNv.Image = ((System.Drawing.Image)(resources.GetObject("BtnInsertNv.Image")));
+            this.BtnInsertNv.Location = new System.Drawing.Point(20, 18);
             this.BtnInsertNv.Name = "BtnInsertNv";
             this.BtnInsertNv.Size = new System.Drawing.Size(84, 38);
             this.BtnInsertNv.TabIndex = 10;
             this.BtnInsertNv.Text = "NV";
+            this.BtnInsertNv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnInsertNv.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.BtnInsertNv.UseVisualStyleBackColor = false;
             this.BtnInsertNv.Click += new System.EventHandler(this.BtnInsertNv_Click);
             // 
             // ChkIncludeReclaimed
             // 
             this.ChkIncludeReclaimed.AutoSize = true;
-            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(118, 31);
+            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(118, 30);
             this.ChkIncludeReclaimed.Name = "ChkIncludeReclaimed";
             this.ChkIncludeReclaimed.Size = new System.Drawing.Size(76, 17);
             this.ChkIncludeReclaimed.TabIndex = 9;
@@ -340,13 +344,13 @@
             this.BtnPagar.BackColor = System.Drawing.SystemColors.Control;
             this.BtnPagar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnPagar.Image = ((System.Drawing.Image)(resources.GetObject("BtnPagar.Image")));
-            this.BtnPagar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnPagar.Location = new System.Drawing.Point(31, 111);
+            this.BtnPagar.Location = new System.Drawing.Point(31, 110);
             this.BtnPagar.Name = "BtnPagar";
             this.BtnPagar.Size = new System.Drawing.Size(66, 38);
             this.BtnPagar.TabIndex = 6;
             this.BtnPagar.Text = "Pay";
             this.BtnPagar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnPagar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.BtnPagar.UseVisualStyleBackColor = false;
             this.BtnPagar.Click += new System.EventHandler(this.BtnPagar_Click);
             // 
@@ -355,13 +359,13 @@
             this.BtnInsertRef.BackColor = System.Drawing.SystemColors.Control;
             this.BtnInsertRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnInsertRef.Image = ((System.Drawing.Image)(resources.GetObject("BtnInsertRef.Image")));
-            this.BtnInsertRef.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnInsertRef.Location = new System.Drawing.Point(40, 67);
+            this.BtnInsertRef.Location = new System.Drawing.Point(40, 64);
             this.BtnInsertRef.Name = "BtnInsertRef";
             this.BtnInsertRef.Size = new System.Drawing.Size(129, 38);
             this.BtnInsertRef.TabIndex = 8;
             this.BtnInsertRef.Text = "<References>";
             this.BtnInsertRef.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BtnInsertRef.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.BtnInsertRef.UseVisualStyleBackColor = false;
             this.BtnInsertRef.Click += new System.EventHandler(this.BtnInsertRef_Click);
             // 
@@ -369,23 +373,89 @@
             // 
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBox1.Controls.Add(this.BtnCancelTak);
+            this.GroupBox1.Controls.Add(this.BtnCreditor);
+            this.GroupBox1.Controls.Add(this.BtnDebtor);
             this.GroupBox1.Controls.Add(this.TxtCtaCteParticipant);
             this.GroupBox1.Controls.Add(this.BtnOutlook);
             this.GroupBox1.Controls.Add(this.TxtRutParticipant);
             this.GroupBox1.Controls.Add(this.BtnHiperLink);
-            this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.CboParticipants);
             this.GroupBox1.Controls.Add(this.CboYears);
             this.GroupBox1.Controls.Add(this.CboMonths);
-            this.GroupBox1.Controls.Add(this.BtnDebtor);
             this.GroupBox1.Location = new System.Drawing.Point(3, 3);
             this.GroupBox1.Name = "GroupBox1";
             this.GroupBox1.Size = new System.Drawing.Size(212, 272);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             // 
+            // BtnCancelTak
+            // 
+            this.BtnCancelTak.ImageIndex = 17;
+            this.BtnCancelTak.ImageList = this.FListPics;
+            this.BtnCancelTak.Location = new System.Drawing.Point(171, 164);
+            this.BtnCancelTak.Name = "BtnCancelTak";
+            this.BtnCancelTak.Size = new System.Drawing.Size(30, 23);
+            this.BtnCancelTak.TabIndex = 12;
+            this.BtnCancelTak.UseVisualStyleBackColor = true;
+            this.BtnCancelTak.Click += new System.EventHandler(this.BtnCancelTak_Click);
+            // 
+            // FListPics
+            // 
+            this.FListPics.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("FListPics.ImageStream")));
+            this.FListPics.TransparentColor = System.Drawing.Color.Transparent;
+            this.FListPics.Images.SetKeyName(0, "");
+            this.FListPics.Images.SetKeyName(1, "");
+            this.FListPics.Images.SetKeyName(2, "");
+            this.FListPics.Images.SetKeyName(3, "");
+            this.FListPics.Images.SetKeyName(4, "");
+            this.FListPics.Images.SetKeyName(5, "");
+            this.FListPics.Images.SetKeyName(6, "");
+            this.FListPics.Images.SetKeyName(7, "");
+            this.FListPics.Images.SetKeyName(8, "");
+            this.FListPics.Images.SetKeyName(9, "");
+            this.FListPics.Images.SetKeyName(10, "");
+            this.FListPics.Images.SetKeyName(11, "");
+            this.FListPics.Images.SetKeyName(12, "");
+            this.FListPics.Images.SetKeyName(13, "");
+            this.FListPics.Images.SetKeyName(14, "");
+            this.FListPics.Images.SetKeyName(15, "");
+            this.FListPics.Images.SetKeyName(16, "");
+            this.FListPics.Images.SetKeyName(17, "cancel_16.png");
+            // 
+            // BtnCreditor
+            // 
+            this.BtnCreditor.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnCreditor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnCreditor.Image = ((System.Drawing.Image)(resources.GetObject("BtnCreditor.Image")));
+            this.BtnCreditor.Location = new System.Drawing.Point(10, 99);
+            this.BtnCreditor.Name = "BtnCreditor";
+            this.BtnCreditor.Size = new System.Drawing.Size(85, 59);
+            this.BtnCreditor.TabIndex = 4;
+            this.BtnCreditor.Text = "Creditor";
+            this.BtnCreditor.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.BtnCreditor.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.BtnCreditor.UseVisualStyleBackColor = false;
+            this.BtnCreditor.Click += new System.EventHandler(this.BtnCreditor_Click);
+            // 
+            // BtnDebtor
+            // 
+            this.BtnDebtor.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnDebtor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnDebtor.Image = ((System.Drawing.Image)(resources.GetObject("BtnDebtor.Image")));
+            this.BtnDebtor.Location = new System.Drawing.Point(116, 99);
+            this.BtnDebtor.Name = "BtnDebtor";
+            this.BtnDebtor.Size = new System.Drawing.Size(85, 59);
+            this.BtnDebtor.TabIndex = 5;
+            this.BtnDebtor.Text = "Debtor";
+            this.BtnDebtor.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.BtnDebtor.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.BtnDebtor.UseVisualStyleBackColor = false;
+            this.BtnDebtor.Click += new System.EventHandler(this.BtnDebtor_Click);
+            // 
             // TxtCtaCteParticipant
             // 
+            this.TxtCtaCteParticipant.BackColor = System.Drawing.SystemColors.Info;
             this.TxtCtaCteParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtCtaCteParticipant.Location = new System.Drawing.Point(110, 73);
             this.TxtCtaCteParticipant.Name = "TxtCtaCteParticipant";
@@ -399,7 +469,7 @@
             this.BtnOutlook.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnOutlook.Image = ((System.Drawing.Image)(resources.GetObject("BtnOutlook.Image")));
             this.BtnOutlook.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.BtnOutlook.Location = new System.Drawing.Point(30, 212);
+            this.BtnOutlook.Location = new System.Drawing.Point(30, 220);
             this.BtnOutlook.Name = "BtnOutlook";
             this.BtnOutlook.Size = new System.Drawing.Size(152, 46);
             this.BtnOutlook.TabIndex = 1;
@@ -409,6 +479,7 @@
             // 
             // TxtRutParticipant
             // 
+            this.TxtRutParticipant.BackColor = System.Drawing.SystemColors.Info;
             this.TxtRutParticipant.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtRutParticipant.Location = new System.Drawing.Point(10, 73);
             this.TxtRutParticipant.Name = "TxtRutParticipant";
@@ -422,28 +493,13 @@
             this.BtnHiperLink.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
             this.BtnHiperLink.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("BtnHiperLink.BackgroundImage")));
             this.BtnHiperLink.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.BtnHiperLink.Location = new System.Drawing.Point(55, 156);
+            this.BtnHiperLink.Location = new System.Drawing.Point(55, 163);
             this.BtnHiperLink.Name = "BtnHiperLink";
             this.BtnHiperLink.Size = new System.Drawing.Size(102, 51);
             this.BtnHiperLink.TabIndex = 11;
             this.BtnHiperLink.UseVisualStyleBackColor = false;
             this.BtnHiperLink.Click += new System.EventHandler(this.BtnHiperLink_Click);
             this.BtnHiperLink.MouseHover += new System.EventHandler(this.BtnHiperLink_MouseHover);
-            // 
-            // BtnCreditor
-            // 
-            this.BtnCreditor.BackColor = System.Drawing.SystemColors.Control;
-            this.BtnCreditor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnCreditor.Image = ((System.Drawing.Image)(resources.GetObject("BtnCreditor.Image")));
-            this.BtnCreditor.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.BtnCreditor.Location = new System.Drawing.Point(10, 99);
-            this.BtnCreditor.Name = "BtnCreditor";
-            this.BtnCreditor.Size = new System.Drawing.Size(85, 51);
-            this.BtnCreditor.TabIndex = 4;
-            this.BtnCreditor.Text = "Creditor";
-            this.BtnCreditor.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.BtnCreditor.UseVisualStyleBackColor = false;
-            this.BtnCreditor.Click += new System.EventHandler(this.BtnCreditor_Click);
             // 
             // CboParticipants
             // 
@@ -478,43 +534,6 @@
             this.CboMonths.Name = "CboMonths";
             this.CboMonths.Size = new System.Drawing.Size(107, 23);
             this.CboMonths.TabIndex = 2;
-            // 
-            // BtnDebtor
-            // 
-            this.BtnDebtor.BackColor = System.Drawing.SystemColors.Control;
-            this.BtnDebtor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnDebtor.Image = ((System.Drawing.Image)(resources.GetObject("BtnDebtor.Image")));
-            this.BtnDebtor.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.BtnDebtor.Location = new System.Drawing.Point(116, 99);
-            this.BtnDebtor.Name = "BtnDebtor";
-            this.BtnDebtor.Size = new System.Drawing.Size(85, 51);
-            this.BtnDebtor.TabIndex = 5;
-            this.BtnDebtor.Text = "Debtor";
-            this.BtnDebtor.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.BtnDebtor.UseVisualStyleBackColor = false;
-            this.BtnDebtor.Click += new System.EventHandler(this.BtnDebtor_Click);
-            // 
-            // FListPics
-            // 
-            this.FListPics.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("FListPics.ImageStream")));
-            this.FListPics.TransparentColor = System.Drawing.Color.Transparent;
-            this.FListPics.Images.SetKeyName(0, "");
-            this.FListPics.Images.SetKeyName(1, "");
-            this.FListPics.Images.SetKeyName(2, "");
-            this.FListPics.Images.SetKeyName(3, "");
-            this.FListPics.Images.SetKeyName(4, "");
-            this.FListPics.Images.SetKeyName(5, "");
-            this.FListPics.Images.SetKeyName(6, "");
-            this.FListPics.Images.SetKeyName(7, "");
-            this.FListPics.Images.SetKeyName(8, "");
-            this.FListPics.Images.SetKeyName(9, "");
-            this.FListPics.Images.SetKeyName(10, "");
-            this.FListPics.Images.SetKeyName(11, "");
-            this.FListPics.Images.SetKeyName(12, "");
-            this.FListPics.Images.SetKeyName(13, "");
-            this.FListPics.Images.SetKeyName(14, "");
-            this.FListPics.Images.SetKeyName(15, "");
-            this.FListPics.Images.SetKeyName(16, "");
             // 
             // FormMain
             // 
@@ -586,5 +605,6 @@
         private System.Windows.Forms.CheckBox ChkIncludeCEN;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox ChkNoIncludeCEN;
+        private System.Windows.Forms.Button BtnCancelTak;
     }
 }

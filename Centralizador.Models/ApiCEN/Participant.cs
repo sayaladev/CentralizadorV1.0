@@ -128,7 +128,6 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<ResultParticipant> GetParticipantByIdAsync(int id)
         {
-            ResultParticipant participant = new ResultParticipant();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -139,16 +138,15 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        participant = p.Results[0];
+                      return p.Results[0];
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return participant;
+            return null;
         }
 
         /// <summary>
@@ -157,8 +155,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="rut"></param>
         /// <returns></returns>
         public static async Task<ResultParticipant> GetParticipantByRutAsync(string rut)
-        {
-            ResultParticipant participant = new ResultParticipant();
+        {           
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -169,48 +166,46 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        participant = p.Results[0];
+                        if (p.Count > 0)
+                        {
+                            return p.Results[0];
+                        }
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return participant;
+            return null;
         }
 
 
         public static IList<ResultParticipant> GetParticipants()
         {
-            IList<ResultParticipant> participants = new List<ResultParticipant>();           
-            ResultAgent agent = Agent.GetAgetByEmailAsync().Result;
-            if (agent != null)
+            try
             {
-                foreach (ResultParticipant item in agent.Participants)
+                ResultAgent agent = Agent.GetAgetByEmailAsync().Result;
+                if (agent != null)
                 {
-                    ResultParticipant participant = GetParticipantByIdAsync(item.ParticipantId).Result;
-                    if (participant != null)
+                    IList<ResultParticipant> participants = new List<ResultParticipant>();
+                    foreach (ResultParticipant item in agent.Participants)
                     {
+                        ResultParticipant participant = GetParticipantByIdAsync(item.ParticipantId).Result;
                         participants.Add(participant);
                     }
-                    else
-                    {
-                        // Error Exception
-                        return null;
-                    }
-                }
-                // Add Cve 76.532.358-4  
-                participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
-                participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
+                    // Add Cve 76.532.358-4  
+                    participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
+                    participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
+
+                    return participants;
+                }            
             }
-            else
+            catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return participants;
+            return null;
         }
     }
 

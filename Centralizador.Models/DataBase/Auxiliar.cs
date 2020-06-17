@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using Centralizador.Models.ApiCEN;
 
@@ -18,15 +19,49 @@ namespace Centralizador.Models.DataBase
         public string DirAux { get; set; }
         public string ComAux { get; set; }
 
-        public static int InsertAuxiliar(ResultInstruction instruction, string acteco, Comuna comuna, Conexion conexion)
+        public static int InsertAuxiliar(ResultInstruction instruction,  Conexion conexion, IList<Comuna> comunas)
         {
+            // Get Comuna
+            Comuna comuna = null;
+            string acteco = null;
+            Regex regex = new Regex(@"\b[\s,\.-:;]*");
+            IEnumerable<string> words = regex.Split(instruction.ParticipantDebtor.CommercialAddress).Where(x => !string.IsNullOrEmpty(x));
+            IList<Comuna> coms = new List<Comuna>();
+            foreach (string w in words)
+            {
+                // Comuna según info de CEN
+                Comuna r = comunas.FirstOrDefault(x => x.ComDes.Contains(w));
+                if (r != null)
+                {
+                    coms.Add(r);
+                }
+            }
+            if (coms.Count == 1)
+            {
+                comuna = coms[0];
+            }
+            else
+            {
+                comuna = coms[1];
+            }
+            // Get acteco from CEN
+            if (instruction.ParticipantDebtor.CommercialBusiness != null)
+            {
+                if (instruction.ParticipantDebtor.CommercialBusiness.Length > 60)
+                {
+                    acteco = instruction.ParticipantDebtor.CommercialBusiness.Substring(0, 60);
+                }
+                else
+                {
+                    acteco = instruction.ParticipantDebtor.CommercialBusiness;
+                }
+                // Insert new Acteco
+                Acteco.InsertActeco(acteco, conexion);
+
+            }
             try
             {
-                if (acteco == null || comuna == null )
-                {
-                    return 99;
-                }
-                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');             
+                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
                 StringBuilder query = new StringBuilder();
                 query.Append($"IF (NOT EXISTS(SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}')) BEGIN ");
                 query.Append("INSERT INTO softland.CWTAUXI (CodAux, NomAux, NoFAux, RutAux, ActAux, GirAux, PaiAux, Comaux, ");
@@ -41,13 +76,12 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                return 99;
+                throw;
             }
         }
 
         public static Auxiliar GetAuxiliar(ResultInstruction instruction, Conexion conexion)
         {
-            Auxiliar auxiliar = new Auxiliar();
             try
             {
                 StringBuilder query = new StringBuilder();
@@ -55,12 +89,9 @@ namespace Centralizador.Models.DataBase
                 conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
-                if (dataTable == null )
+                if (dataTable != null && dataTable.Rows.Count == 1)
                 {
-                    return null;
-                }
-                if (dataTable.Rows.Count == 1)
-                {             
+                    Auxiliar auxiliar = new Auxiliar();
                     if (dataTable.Rows[0]["CodAux"] != DBNull.Value)
                     {
                         auxiliar.CodAux = dataTable.Rows[0]["CodAux"].ToString();
@@ -84,14 +115,15 @@ namespace Centralizador.Models.DataBase
                     if (dataTable.Rows[0]["ComAux"] != DBNull.Value)
                     {
                         auxiliar.ComAux = dataTable.Rows[0]["ComAux"].ToString();
-                    }               
+                    }
+                    return auxiliar;
                 }
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
-            return auxiliar;
+            return null;
         }
 
         public static int UpdateAuxiliar(ResultInstruction instruction, Conexion conexion)
@@ -99,7 +131,6 @@ namespace Centralizador.Models.DataBase
             try
             {
                 StringBuilder query = new StringBuilder();
-
                 query.Append($"UPDATE softland.cwtauxi SET NomAux='{instruction.ParticipantDebtor.BusinessName}', NoFAux='{instruction.ParticipantDebtor.Name}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 conexion.Query = query.ToString();
@@ -107,7 +138,7 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                return 99;
+                throw;
             }
         }
     }

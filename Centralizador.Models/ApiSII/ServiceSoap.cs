@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Xml;
 using System.Xml.Serialization;
-
+using Centralizador.Models.AppFunctions;
 using Centralizador.Models.CrSeed;
 using Centralizador.Models.GetTokenFromSeed;
 using Centralizador.Models.registroreclamodteservice;
@@ -16,7 +16,8 @@ namespace Centralizador.Models.ApiSII
     {
         public static string GETTokenFromSii(string serialDigitalCert)
         {
-            // Get digital cert  
+            // Get digital cert                   
+
             X509Certificate2 cert = null;
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
@@ -51,29 +52,21 @@ namespace Centralizador.Models.ApiSII
                                     if (XmlObject.RESP_HDR.ESTADO == "00")
                                     {
                                         return XmlObject.RESP_BODY.TOKEN;
-                                    }
-                                    else
-                                    {
-                                        return null;
-                                    }
+                                    }                                 
                                 }
                             }
-                        }
-                        else
-                        {
-                            return null;
-                        }
+                        }                      
                     }
                 }
             }
             catch (Exception)
-            {                
-                return null;
+            {
+                throw;
             }
+            return null;
         }
         private static string FirmarSeedDigital(string documento, X509Certificate2 certificado)
         {
-
             try
             {
                 XmlDocument doc = new XmlDocument()
@@ -110,10 +103,9 @@ namespace Centralizador.Models.ApiSII
 
                 return doc.InnerXml;
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-
-                return null;
+                throw;
             }
         }
         public static respuestaTo SendActionToSii(string token, Detalle detalle, string accionDoc)
@@ -129,8 +121,7 @@ namespace Centralizador.Models.ApiSII
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
             return respuesta;
         }

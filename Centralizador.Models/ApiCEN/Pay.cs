@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
@@ -64,7 +65,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="tokenCen"></param>
         /// <returns></returns>
         public static async Task<ResultPay> SendPayAsync(ResultPay pay, string tokenCen)
-        {       
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -81,16 +82,23 @@ namespace Centralizador.Models.ApiCEN
 
                         if (p != null)
                         {
-                            pay = p.Result;
+                            return p.Result;
                         }
                     }
                 }
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
-            return pay;
+            return null;
+        }
+        public enum StatusPay
+        {
+            NoPagado = 1,
+            Pagado = 2,
+            PagadoAtraso = 3
+
         }
     }
 }

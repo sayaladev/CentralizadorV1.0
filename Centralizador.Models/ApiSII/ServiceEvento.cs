@@ -37,7 +37,6 @@ namespace Centralizador.Models.ApiSII
         /// <returns></returns>
         public static async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant, string serialDigitalCert)
         {
-            DataEvento evento = new DataEvento();
             // Get digital cert  
             X509Certificate2 cert = null;
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
@@ -88,22 +87,22 @@ namespace Centralizador.Models.ApiSII
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     wc.Encoding = Encoding.UTF8;
                     wc.Headers[HttpRequestHeader.Cookie] = $"TOKEN={token}";
-                    string result = await wc.UploadStringTaskAsync(url, WebRequestMethods.Http.Post, jSon).ConfigureAwait(false);
+                    string result = await wc.UploadStringTaskAsync(url, WebRequestMethods.Http.Post, jSon);
                     if (result != null)
                     {
                         ResultEvent detalleLibro = JsonConvert.DeserializeObject<ResultEvent>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                         if (detalleLibro.MetaData.Errors == null)
                         {
-                            evento = detalleLibro.DataEvento;
+                            return detalleLibro.DataEvento;
                         }
                     }
                 }
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
-            return evento;
+            return null;
         }
     }
 

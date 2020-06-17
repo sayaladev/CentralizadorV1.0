@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Text;
-using System.Xml;
-
-using Centralizador.Models.ApiCEN;
 
 using Newtonsoft.Json;
 
@@ -39,7 +35,7 @@ namespace Centralizador.Models.DataBase
         public static int InsertActeco(string descripcion, Conexion conexion)
         {
             try
-            {     
+            {
                 StringBuilder query = new StringBuilder();
                 query.Append($"IF (NOT EXISTS (SELECT * FROM softland.cwtgiro WHERE GirDes = '{descripcion}')) BEGIN ");
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");

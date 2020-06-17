@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using static Centralizador.Models.ApiCEN.Pay;
+
 namespace Centralizador.Models.ApiCEN
 {
 
@@ -40,7 +42,7 @@ namespace Centralizador.Models.ApiCEN
         public Instruction.StatusBilled StatusBilled { get; set; }
 
         [JsonProperty("status_paid")]
-        public int StatusPaid { get; set; }
+        public StatusPay StatusPaid { get; set; }
 
         [JsonProperty("resolution")]
         public string Resolution { get; set; }
@@ -94,8 +96,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="Userparticipant"></param>
         /// <returns></returns>
         public static async Task<IList<ResultInstruction>> GetInstructionCreditorAsync(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
-        {
-            IList<ResultInstruction> resultInstructions = new List<ResultInstruction>();
+        {      
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -113,17 +114,16 @@ namespace Centralizador.Models.ApiCEN
                                 item.ParticipantCreditor = Userparticipant;
                                 item.PaymentMatrix = matrix;
                             }
-                        }
-                        resultInstructions = instruction.Results;
-                    }                 
+                            return instruction.Results;
+                        }                    
+                    }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return resultInstructions;
+            return null;
         }
 
         /// <summary>
@@ -134,34 +134,35 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="idDebtor"></param>
         /// <returns></returns>
         public static async Task<ResultInstruction> GetInstructionDebtorAsync(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
-        {
-            ResultInstruction resultInstruction = new ResultInstruction();
+        { 
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false);
+                    string res = await wc.DownloadStringTaskAsync(uri);
                     if (res != null)
                     {
-                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });                      
+                        Instruction instruction = JsonConvert.DeserializeObject<Instruction>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        if (instruction.Count > 0)
+                        {
                             instruction.Results[0].PaymentMatrix = matrix;
                             instruction.Results[0].ParticipantCreditor = participant;
                             instruction.Results[0].ParticipantDebtor = userPart;
-                            resultInstruction = instruction.Results[0];                        
+                            return instruction.Results[0];
+                        }
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return resultInstruction;
+            return null;
         }
 
-       
+
 
         /// <summary>
         /// 

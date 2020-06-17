@@ -98,8 +98,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="date"></param>
         /// <returns></returns>
         public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
-        {
-            IList<ResultPaymentMatrix> matrices = new List<ResultPaymentMatrix>();
+        {           
             DateTime createdBefore = date.AddMonths(1);
             try
             {
@@ -107,20 +106,19 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = await wc.DownloadStringTaskAsync(uri).ConfigureAwait(false); // GET
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)
                     {
                         PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        matrices = p.Results;
+                     return p.Results;
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return matrices;
+            return null;
         }
 
         /// <summary>
@@ -130,7 +128,6 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixByBillingWindowIdAsync(ResultBillingWindow window)
         {
-            IList<ResultPaymentMatrix> matrices = new List<ResultPaymentMatrix>();
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -145,16 +142,15 @@ namespace Centralizador.Models.ApiCEN
                         {
                             item.BillingWindow = window;
                         }
-                        matrices = p.Results;
+                  return p.Results;
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return matrices;
+            return null;
         }
 
     }

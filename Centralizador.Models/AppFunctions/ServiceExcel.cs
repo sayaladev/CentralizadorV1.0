@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
+
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 
@@ -71,7 +72,7 @@ namespace Centralizador.Models.AppFunctions
                 {
                     row[5] = item.Instruction.Id;
                 }
-      
+
                 row[6] = item.MntNeto;
                 row[7] = item.MntExento;
                 row[8] = item.MntIva;
@@ -99,13 +100,13 @@ namespace Centralizador.Models.AppFunctions
                 worksheet.InsertDataTable(table, true, 1, 1);
                 if (isCreditor)
                 {
-                     nameFile = $"{UserParticipant.Name}_ExportData_Creditor_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
+                    nameFile = $"{UserParticipant.Name}_ExportData_Creditor_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 }
                 else
                 {
-                     nameFile = $"{UserParticipant.Name}_ExportData_Debtor_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
+                    nameFile = $"{UserParticipant.Name}_ExportData_Debtor_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 }
-  
+
 
                 if (!Directory.Exists(Directory.GetCurrentDirectory() + @"\log\"))
                 {
@@ -117,7 +118,7 @@ namespace Centralizador.Models.AppFunctions
                     WindowStyle = ProcessWindowStyle.Minimized
                 };
                 Process.Start(process);
-  
+
             }
 
         }
@@ -236,21 +237,21 @@ namespace Centralizador.Models.AppFunctions
                             Dtes = new List<long>() { item.Instruction.Dte.Id },
                             TransactionType = 3
                         };
-                        ResultPay resultPay =  Pay.SendPayAsync(pay, TokenCen).Result;                   
+                        ResultPay resultPay = Pay.SendPayAsync(pay, TokenCen).Result;
                         if (resultPay == null)
                         {
                             // Error Exception
-                            MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);                    
+                            MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
-                        item.Instruction.StatusPaid = 2;
+                        item.Instruction.StatusPaid = Pay.StatusPay.Pagado;
                         item.Instruction.IsPaid = true;
                     }
                     // Insert Softland
                 }
                 catch (Exception)
-                {                 
-                   
+                {
+                    throw;
                 }
                 c++;
                 float porcent = (float)(100 * c) / Detalles.Count;

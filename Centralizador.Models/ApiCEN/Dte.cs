@@ -92,7 +92,7 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public IList<ResultDte> Results { get; set; }
 
-     
+
         /// <summary>
         /// Send 1 Dte to CEN API (Creditor)
         /// </summary>
@@ -102,14 +102,7 @@ namespace Centralizador.Models.ApiCEN
         public static async Task<ResultDte> SendDteCreditorAsync(Detalle detalle, string tokenCen)
         {
             string fileName = detalle.Folio + "_" + detalle.Instruction;
-            string docXml = detalle.References.FileBasico;
-            string idFile = SendFileAsync(tokenCen, fileName, docXml).Result;
-            if (idFile == null)
-            {
-                // Error Exception
-                return null;
-            }
-            ResultDte resultDte = new ResultDte();
+            string idFile = SendFileAsync(tokenCen, fileName, detalle.References.FileBasico).Result;
             if (!string.IsNullOrEmpty(idFile))
             {
                 ResultDte dte = new ResultDte
@@ -139,18 +132,17 @@ namespace Centralizador.Models.ApiCEN
                             InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                             if (r != null)
                             {
-                                resultDte = r.ResultDte;
+                                return r.ResultDte;
                             }
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    // Error Exception
-                    return null;
+                    throw;
                 }
             }
-            return resultDte;
+            return null;
         }
 
         /// <summary>
@@ -161,7 +153,6 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<ResultDte> SendDteDebtorAsync(Detalle detalle, string tokenCen)
         {
-            ResultDte resultDte = new ResultDte();
             ResultDte dte = new ResultDte
             {
                 Folio = detalle.Folio,
@@ -195,24 +186,23 @@ namespace Centralizador.Models.ApiCEN
                     wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                     NameValueCollection postData = new NameValueCollection() { { "data", d } };
 
-                    byte[] res = await wc.UploadValuesTaskAsync("api/v1/operations/dtes/create/", WebRequestMethods.Http.Post, postData); // POST
+                    byte[] res = await wc.UploadValuesTaskAsync(uri, WebRequestMethods.Http.Post, postData); // POST
                     if (res != null)
                     {
                         string json = Encoding.UTF8.GetString(res);
                         InsertDTe r = JsonConvert.DeserializeObject<InsertDTe>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        if (r != null)
+                        if (r != null && r.Errors.Count == 0)
                         {
-                            resultDte = r.ResultDte;
+                          return r.ResultDte;
                         }
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return resultDte;
+            return null;
         }
 
         /// <summary>
@@ -223,8 +213,7 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="doc"></param>
         /// <returns></returns>
         private static async Task<string> SendFileAsync(string tokenCen, string fileName, string doc)
-        {
-            string fileId = "";
+        {      
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -237,16 +226,15 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
-                        fileId = dic["invoice_file_id"];
+                      return dic["invoice_file_id"];
                     }
                 }
             }
             catch (Exception)
             {
-                // Error Exception
-                return null;
+                throw;
             }
-            return fileId;
+            return null;
         }
     }
 
