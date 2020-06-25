@@ -86,7 +86,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("46000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("84000")]
         public string UIDRange {
             get {
                 return ((string)(this["UIDRange"]));

@@ -121,6 +121,7 @@
             // SplitContainer
             // 
             this.SplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitContainer.IsSplitterFixed = true;
             this.SplitContainer.Location = new System.Drawing.Point(0, 0);
             this.SplitContainer.Name = "SplitContainer";
             // 
@@ -151,6 +152,7 @@
             // 
             // IGridMain
             // 
+            this.IGridMain.Appearance = TenTec.Windows.iGridLib.iGControlPaintAppearance.StyleFlat;
             this.IGridMain.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("IGridMain.BackgroundImage")));
             this.IGridMain.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.IGridMain.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -547,6 +549,7 @@
             this.Controls.Add(this.SplitContainer);
             this.Controls.Add(this.StatusStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);

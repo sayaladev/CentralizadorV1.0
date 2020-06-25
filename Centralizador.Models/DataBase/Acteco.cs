@@ -45,7 +45,7 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-                return 99;
+                throw;
             }
         }
 

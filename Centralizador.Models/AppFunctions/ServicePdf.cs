@@ -191,13 +191,13 @@ namespace Centralizador.Models.AppFunctions
                 return null;
             }
         }
-
         public static void ConvertToPdf(Detalle detalle)
         {
             IPdfDocument document;
             string nomenclatura;
             document = ConvertXmlToPdf(detalle);
-            nomenclatura = detalle.RutReceptor + "_" + detalle.Folio;
+            //nomenclatura = detalle.RutReceptor + "_" + detalle.Folio;
+            nomenclatura = detalle.Folio + "_" + detalle.RutReceptor;
             byte[] content = document.Content();
             try
             {
@@ -238,7 +238,8 @@ namespace Centralizador.Models.AppFunctions
                 {
                     document = ConvertXmlToPdf(item);
                     byte[] content = document.Content();
-                    nomenclatura = item.RutReceptor + "_" + item.Folio;
+                    //nomenclatura = item.RutReceptor + "_" + item.Folio;
+                    nomenclatura = item.Folio + "_" + item.RutReceptor;
                     File.WriteAllBytes(dialog.SelectedPath + "\\" + nomenclatura + ".pdf", content);
                 }
                 // Is Cancel?
@@ -253,7 +254,6 @@ namespace Centralizador.Models.AppFunctions
             }
             Process.Start(dialog.SelectedPath);
         }
-
         private static IPdfDocument ConvertXmlToPdf(Detalle obj)
         {
             // Timbre Pdf417            

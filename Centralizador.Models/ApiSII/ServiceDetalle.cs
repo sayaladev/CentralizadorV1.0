@@ -76,15 +76,15 @@ namespace Centralizador.Models.ApiSII
                         switch (detalleLibro.RespEstado.CodRespuesta)
                         {
                             case 2:
-                                MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return null;
                             case 0:
                                 return detalleLibro.DataResp.Detalles;
                             case 99:
-                                MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
                             case 1:
-                                MessageBox.Show("This option only maintains the detail of the last six months", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                                MessageBox.Show("This option only maintains the detail of the last six months", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Stop);
                                 break;
                         }
                     }

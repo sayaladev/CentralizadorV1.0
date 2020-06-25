@@ -7,7 +7,7 @@
     <ProjectGuid>{830E7CEA-25D3-4FD1-A1FE-13F9FC577D61}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Centralizador.WinApp</RootNamespace>
-    <AssemblyName>Centralizador.WinApp</AssemblyName>
+    <AssemblyName>Centralizador</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -25,14 +25,14 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>Centralizador</ProductName>
     <PublisherName>sayaladev%40outlook.com</PublisherName>
-    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationRevision>22</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -86,6 +86,7 @@
     <Reference Include="TenTec.Windows.iGridLib.iGrid.v6.0, Version=6.0.37.0, Culture=neutral, PublicKeyToken=9d47002745f2416c, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GUI\ComunaInput.cs" />
     <Compile Include="GUI\ErrorMsgCustom.cs" />
     <Compile Include="GUI\FormMain.cs">
       <SubType>Form</SubType>

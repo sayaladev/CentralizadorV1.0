@@ -13,32 +13,32 @@ namespace Centralizador.Models.DataBase
 
         public static IList<Comuna> GetComunas(Conexion conexion)
         {
-            IList<Comuna> comunas = new List<Comuna>();
             try
             {
                 conexion.Query = "SELECT * FROM softland.cwtcomu";
                 DataTable dataTable = new DataTable();
                 dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
-                if (dataTable == null)
+                if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-                    return null;
-                }
-                foreach (DataRow item in dataTable.Rows)
-                {
-                    Comuna comuna = new Comuna
+                    IList<Comuna> comunas = new List<Comuna>();
+                    foreach (DataRow item in dataTable.Rows)
                     {
-                        ComCod = item["ComCod"].ToString(),
-                        ComDes = item["ComDes"].ToString(),
-                        Id_Region = Convert.ToInt32(item["Id_Region"])
-                    };
-                    comunas.Add(comuna);
+                        Comuna comuna = new Comuna
+                        {
+                            ComCod = item["ComCod"].ToString(),
+                            ComDes = item["ComDes"].ToString(),
+                            Id_Region = Convert.ToInt32(item["Id_Region"])
+                        };
+                        comunas.Add(comuna);
+                    }
+                    return comunas;
                 }
             }
             catch (Exception)
             {
                 throw;
             }
-            return comunas;
+            return null;
         }
     }
 }

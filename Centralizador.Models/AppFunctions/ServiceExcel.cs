@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
@@ -58,6 +59,7 @@ namespace Centralizador.Models.AppFunctions
             table.Columns.Add("Detail");
             table.Columns.Add("Sending Date");
             table.Columns.Add("Status");
+            table.Columns.Add("NC");
 
             foreach (Detalle item in detalles)
             {
@@ -86,6 +88,17 @@ namespace Centralizador.Models.AppFunctions
 
                 row[11] = item.FechaRecepcion;
                 row[12] = item.StatusDetalle;
+                if (item.DataEvento != null)
+                {
+                    if (item.DataEvento.ListEvenHistDoc.Count > 0)
+                    {
+                        if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null) // // Recepción de NC de anulación que referencia al documento.
+                        {
+                            row[13] = "NCA";
+                        }
+                    }
+                }
+          
 
                 table.Rows.Add(row);
 
@@ -107,21 +120,15 @@ namespace Centralizador.Models.AppFunctions
                     nameFile = $"{UserParticipant.Name}_ExportData_Debtor_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 }
 
-
-
-                if (!Directory.Exists(@"C:\Centralizador\Log\"))
-                {
-                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
-                }
-                workbook.SaveToFile(@"C:\Centralizador\Log\" + nameFile, FileFormat.Version2016);
-                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile)
+                string path = @"C:\Centralizador\Log\";
+                new CreatePath(path);               
+                workbook.SaveToFile(path + nameFile, FileFormat.Version2016);
+                ProcessStartInfo process = new ProcessStartInfo(path + nameFile)
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };
                 Process.Start(process);
-
             }
-
         }
 
         private void BgwPay_DoWork(object sender, DoWorkEventArgs e)
@@ -242,7 +249,7 @@ namespace Centralizador.Models.AppFunctions
                         if (resultPay == null)
                         {
                             // Error Exception
-                            MessageBox.Show("There was an error connecting to the CEN API.", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("There was an error connecting to the CEN API.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
                         item.Instruction.StatusPaid = Pay.StatusPay.Pagado;
@@ -266,13 +273,10 @@ namespace Centralizador.Models.AppFunctions
                 Worksheet worksheet = workbook.Worksheets[0];
                 worksheet.InsertDataTable(table, false, 1, 1);
                 string nameFile = $"{UserParticipant.Name}_NominaBank_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
-
-                if (!Directory.Exists(@"C:\Centralizador\Log\"))
-                {
-                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
-                }
-                workbook.SaveToFile(@"C:\Centralizador\Log\" + nameFile, FileFormat.Version2016);
-                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile)
+                string path = @"C:\Centralizador\Log\";
+                new CreatePath(path);
+                workbook.SaveToFile(path + nameFile, FileFormat.Version2016);
+                ProcessStartInfo process = new ProcessStartInfo(path + nameFile)
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };

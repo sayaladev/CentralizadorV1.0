@@ -124,9 +124,7 @@ namespace Centralizador.Models.DataBase
             {
                 StringBuilder query = new StringBuilder();
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
-
-                string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", instruction.PaymentMatrix.PublishDate); // Sí funciona!
-
+                string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", instruction.PaymentMatrix.PublishDate);
                 query.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} ");
                 query.Append("  AND Tipo = 'F' ");
                 query.Append("  AND CodRefSII = 'SEN') ");

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Centralizador")]
 [assembly: AssemblyDescription("Sistema Centralizador")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Compañia?")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Centralizador")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]

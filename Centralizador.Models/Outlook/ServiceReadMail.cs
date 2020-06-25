@@ -60,10 +60,7 @@ namespace Centralizador.Models.Outlook
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
                 MailInfo[] infos = oClient.GetMailInfos();
                 string pathTemp = @"C:\Centralizador\Temp\";
-                if (!Directory.Exists(pathTemp))
-                {
-                    Directory.CreateDirectory(pathTemp);
-                }
+                new CreatePath(pathTemp);
                 e.Result = Properties.Settings.Default.DateTimeEmail;
                 for (int i = 0; i < infos.Length; i++)
                 {
@@ -95,7 +92,7 @@ namespace Centralizador.Models.Outlook
                                         case 0: // Success
                                             continue;
                                         case 1: // Error in Sii (exit funcion)
-                                            MessageBox.Show("Sii: Application with Momentary Suspension", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            MessageBox.Show("Sii: Application with Momentary Suspension", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                             return;
                                         case 2: // Error in serialization
                                             continue;
@@ -198,11 +195,16 @@ namespace Centralizador.Models.Outlook
         }
         private void Save(string nameFolder, string nameFile, DTEDefType dte)
         {
-            if (!Directory.Exists(@"C:\Centralizador\Inbox\" + nameFolder))
+            try
             {
-                Directory.CreateDirectory(@"C:\Centralizador\Inbox\" + nameFolder);
+                string path = @"C:\Centralizador\Inbox\" + nameFolder;
+                new CreatePath(path);
+                File.WriteAllText(path + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
             }
-            File.WriteAllText(@"C:\Centralizador\Inbox\" + nameFolder + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
+            catch (Exception)
+            {
+                throw;
+            }          
         }
 
         public static DateTime GetLastDateTime()

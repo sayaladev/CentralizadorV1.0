@@ -11,6 +11,13 @@ namespace Centralizador.Models.DataBase
         public string Query { get; set; }
         private static SqlDataReader SqlDataReader { get; set; }
 
+
+        /// <summary>
+        /// Constructor Clase Conexión Softland
+        /// </summary>
+        /// <param name="dataBaseName"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="dbPassword"></param>
         public Conexion(string dataBaseName, string dbUser, string dbPassword)
         {
             // change user name 
@@ -35,8 +42,7 @@ namespace Centralizador.Models.DataBase
 
 
         public static async Task<DataTable> ExecuteReaderAsync(Conexion conn)
-        {
-            DataTable table = new DataTable();
+        {   
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
                 try
@@ -49,7 +55,7 @@ namespace Centralizador.Models.DataBase
                             SqlDataReader = await cmd.ExecuteReaderAsync();
                             DataTable dataTable = new DataTable();
                             dataTable.Load(SqlDataReader);
-                            table = dataTable;
+                            return dataTable;
                         }
                     }
                 }
@@ -57,8 +63,7 @@ namespace Centralizador.Models.DataBase
                 {
                     throw;
                 }
-            }
-            return table;
+            }            
         }
         public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
         {
@@ -97,13 +102,11 @@ namespace Centralizador.Models.DataBase
                         {
                             object obj = await cmd.ExecuteScalarAsync();
                             if (obj != null && DBNull.Value != obj)
-                            {
-                                SqlDataReader.Close();
+                            {                            
                                 return obj;
                             }
                             else
-                            {
-                                SqlDataReader.Close();
+                            {                           
                                 return null;
                             }
                         }

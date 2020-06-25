@@ -16,12 +16,18 @@ namespace Centralizador.Models.DataBase
             try
             {
                 conexion.Query = "select MAX(NVNumero) from softland.nw_nventa";
-                return Convert.ToInt32(Conexion.ExecuteScalarAsync(conexion).Result);
+                object result = Conexion.ExecuteScalarAsync(conexion).Result;
+                if (result != null)
+                {
+                    return Convert.ToInt32(result);
+                }
+             
             }
             catch (Exception)
             {
                 throw;
             }
+            return 0;
         }
 
         public static async Task<int> CheckFoliosAsync(Conexion conexion)
@@ -30,7 +36,7 @@ namespace Centralizador.Models.DataBase
             {
                 conexion.Query = "EXEC [softland].[DTE_FoliosDisp] @Tipo = N'F', @SubTipo = N'T'";
                 DataTable dataTable = await Conexion.ExecuteReaderAsync(conexion);
-                if (dataTable != null)
+                if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     return dataTable.Rows.Count;
                 }
@@ -52,7 +58,7 @@ namespace Centralizador.Models.DataBase
                 // Insertó 2020-09-06 17:28:00.000
 
                 // Prueba
-                string time = string.Format(cultureInfo, "{0:yyyy-MM-dd}", DateTime.Now);
+                string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", DateTime.Now);
 
                 if (Environment.MachineName == "DEVELOPER")
                 {
@@ -83,16 +89,16 @@ namespace Centralizador.Models.DataBase
                         conexion.Query = query.ToString();
                         return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!     
                     }
-                }
-                return 0;
+                }            
             }
             catch (Exception)
             {
                 throw;
             }
+            return 0;
         }
 
-        public static int GetNv(ResultInstruction instruction, Conexion conexion)
+        public static int GetNvIfExists(ResultInstruction instruction, Conexion conexion)
         {
 
             StringBuilder query = new StringBuilder();
@@ -112,12 +118,17 @@ namespace Centralizador.Models.DataBase
             try
             {
                 conexion.Query = query.ToString();
-                return Convert.ToInt32(Conexion.ExecuteScalarAsync(conexion).Result);
+                object result = Conexion.ExecuteScalarAsync(conexion).Result;
+                if (result != null)
+                {
+                 return Convert.ToInt32(result);
+                }
             }
             catch (Exception)
             {
                 throw;
             }
+            return 0;
         }
     }
 }

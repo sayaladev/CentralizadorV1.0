@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -85,6 +86,7 @@ namespace Centralizador.WinApp.GUI
             // Load                   
             VersionApp = AssemblyVersion;
             Text = VersionApp;
+      
 
             //Load ComboBox participants
             CboParticipants.DisplayMember = "Name";
@@ -185,7 +187,16 @@ namespace Centralizador.WinApp.GUI
         }
         private void TimerMinute_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
+            try
+            {
+                TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
+            }
+            catch (Exception)
+            {
+
+                //throw;
+            }
+
         }
         private void FormMain_Shown(object sender, EventArgs e)
         {
@@ -340,7 +351,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 if (string.IsNullOrEmpty(DataBaseName))
                 {
-                    MessageBox.Show("This company does not have an associated database in the config file (Xml)", Application.CompanyName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("This company does not have an associated database in the config file (Xml)", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     CboParticipants.SelectedIndex = 0;
                     TxtCtaCteParticipant.Text = "";
                     TxtRutParticipant.Text = "";
@@ -457,7 +468,7 @@ namespace Centralizador.WinApp.GUI
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
             if (!File.Exists(path))
             {
-                DialogResult resp = MessageBox.Show($"The file '{file}' NOT found, please download...", Application.CompanyName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                DialogResult resp = MessageBox.Show($"The file '{file}' NOT found, please download...", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (resp == DialogResult.OK)
                 {
                     Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
@@ -493,16 +504,23 @@ namespace Centralizador.WinApp.GUI
             }
             if (detallesFinal.Count > 0)
             {
-                DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?", Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resp == DialogResult.Yes)
                 {
-                    // Sql          
-                    Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-                    int foliosDisp = await NotaVenta.CheckFoliosAsync(con);
-                    if (foliosDisp < detallesFinal.Count)
+                    try
                     {
-                        MessageBox.Show($"F° Available: {foliosDisp}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        // Sql          
+                        Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+                        int foliosDisp = await NotaVenta.CheckFoliosAsync(con);
+                        if (foliosDisp > 0 && foliosDisp < detallesFinal.Count)
+                        {
+                            MessageBox.Show($"F° Available: {foliosDisp}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
                     }
                     BgwInsertNv.RunWorkerAsync(detallesFinal);
                 }
@@ -516,6 +534,7 @@ namespace Centralizador.WinApp.GUI
         {
             IsRunning = true;
             IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
+            List<AuxCsv> values = new List<AuxCsv>();
             int c = 0;
             float porcent = 0;
             int result = 0;
@@ -526,16 +545,32 @@ namespace Centralizador.WinApp.GUI
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
 
             BgwInsertNv.ReportProgress(0, "Wait please...");
-            List<AuxCsv> values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+            try
+            {
+                values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+            }
+            catch (Exception ex)
+            {
+                new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
+            }
 
-            // Sql          
-            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-            int foliosDisp = NotaVenta.CheckFoliosAsync(con).Result;
-            IList<int> folios = new List<int>();
             int resultInsertNV;
             int lastF = 0;
-            // Get comunas                      
-            IList<Comuna> comunas = Comuna.GetComunas(con);
+            int foliosDisp = 0;
+            IList<int> folios = new List<int>();
+            IList<Comuna> comunas = new List<Comuna>();
+            // Sql          
+            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+            try
+            {
+                foliosDisp = NotaVenta.CheckFoliosAsync(con).Result;
+                // Get comunas                      
+                comunas = Comuna.GetComunas(con);
+            }
+            catch (Exception ex)
+            {
+                new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
+            }
 
             foreach (Detalle item in detallesFinal)
             {
@@ -545,7 +580,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 resultInsertNV = 0;
                 // Get F° NV if exists
-                int F = NotaVenta.GetNv(item.Instruction, con);
+                int F = NotaVenta.GetNvIfExists(item.Instruction, con);
                 if (F == 0)
                 {
                     try
@@ -567,27 +602,60 @@ namespace Centralizador.WinApp.GUI
                     }
                     try
                     {
-                        Auxiliar auxiliar = Auxiliar.GetAuxiliar(item.Instruction, con);
+                        Auxiliar aux = new Auxiliar
+                        {
+                            //RutAux = item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode,
+                            //CodAux = item.Instruction.ParticipantDebtor.Rut
+                        };
+                        Auxiliar auxiliar = aux.GetAuxiliar(item.Instruction, con);
                         if (auxiliar == null)
                         {
-                            // Insert New Auxiliar
-                            result = Auxiliar.InsertAuxiliar(item.Instruction, con, comunas);
-                            if (result == 2)
+                            Comuna comunaobj = null;
+                            // Insert New Auxiliar   
+                            // Sending porperty for show DirAux in Log
+                            result = aux.InsertAuxiliar(item.Instruction, con, comunas, ref aux, comunaobj);
+                            switch (result)
                             {
-                                StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tRut: {item.Instruction.ParticipantDebtor.Rut}");
-                                // Insert NV
-                                lastF = NotaVenta.GetLastNv(con);
-                                string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                                resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
-                                folios.Add(lastF + 1);
-                                if (resultInsertNV == 0)
-                                {
-                                    StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
-                                }
-                            }
-                            else
-                            {
-                                StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tError Rut: {item.Instruction.ParticipantDebtor.Rut}");
+                                case 1:
+                                    // Change Control
+                                    // 24-06-2020
+                                    // Incorporar ventana para ingresar Comuna 
+                                    do
+                                    {                                
+                                        string promptValue = ComunaInput.ShowDialog( Application.ProductName,
+                                            $"'Comuna' not found, please input below:",
+                                            item.Instruction.ParticipantDebtor.BusinessName,
+                                            item.RutReceptor,
+                                            item.Instruction.ParticipantDebtor.CommercialAddress,
+                                            comunas);
+
+                                        comunaobj = comunas.FirstOrDefault(x => aux.RemoveDiacritics(x.ComDes).ToLower() == aux.RemoveDiacritics(promptValue.ToLower()));
+                                    } while (comunaobj == null);                         
+                                    result = aux.InsertAuxiliar(item.Instruction, con, comunas, ref aux, comunaobj);
+                                    if (result == 1)
+                                    {
+                                        // Error Fatal! No se encuenta Comuna en dirección. No se puede Insertar.
+                                        StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tError: {item.Instruction.ParticipantDebtor.Rut} (Comuna)");
+                                    }
+                                    else if (result == 2)
+                                    {
+                                        StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.ComAux}");
+                                    }
+                                    break;
+                                case 0:
+                                    break;
+                                case 2:
+                                    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.DirAux}");
+                                    // Insert NV
+                                    lastF = NotaVenta.GetLastNv(con);
+                                    string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                                    resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
+                                    folios.Add(lastF + 1);
+                                    if (resultInsertNV == 0) { StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql"); }
+                                    break;
+                                default:
+                                    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tError: {item.Instruction.ParticipantDebtor.Rut}");
+                                    break;
                             }
                         }
                         else
@@ -600,7 +668,7 @@ namespace Centralizador.WinApp.GUI
                             else
                             {
                                 // Update Aux
-                                result = Auxiliar.UpdateAuxiliar(item.Instruction, con);
+                                result = aux.UpdateAuxiliar(item.Instruction, con);
                                 if (result != 1)
                                 {
                                     // Error
@@ -629,9 +697,8 @@ namespace Centralizador.WinApp.GUI
                     }
                     catch (Exception ex)
                     {
-                        new ErrorMsgCen("There was an error Inserting the data", ex, MessageBoxIcon.Stop);
-                        e.Cancel = true;
-                        return;
+                        new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
+                        //return;
                     }
                 }
                 else
@@ -647,35 +714,34 @@ namespace Centralizador.WinApp.GUI
         }
         private void BgwInsertNv_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            IList<int> folios = e.Result as List<int>;
             if (e.Cancelled == true)
             {
                 TssLblMensaje.Text = "Error!";
             }
             else
             {
-                IList<int> folios = e.Result as List<int>;
-                if (folios.Count > 0)
-                {
-                    int menor = folios.Min();
-                    int mayor = folios.Max();
-                    StringLogging.AppendLine($"Resumen: From-{menor} To-{mayor}");
-                }
+
                 TssLblMensaje.Text = "Check the log file.";
             }
             TssLblProgBar.Value = 0;
             IsCreditor = true;
             IsRunning = false;
 
+            if (folios != null && folios.Count > 0)
+            {
+                int menor = folios.Min();
+                int mayor = folios.Max();
+                StringLogging.AppendLine($"Resumen: From-{menor} To-{mayor}");
+            }
             string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
 
             if (StringLogging.Length > 0)
             {
-                if (!Directory.Exists(@"C:\Centralizador\Log\"))
-                {
-                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
-                }
-                File.WriteAllText(@"C:\Centralizador\Log\" + nameFile + ".txt", StringLogging.ToString());
-                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile + ".txt")
+                string path = @"C:\Centralizador\Log\";
+                new CreatePath(path);
+                File.WriteAllText(path + nameFile + ".txt", StringLogging.ToString());
+                ProcessStartInfo process = new ProcessStartInfo(path + nameFile + ".txt")
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };
@@ -720,7 +786,7 @@ namespace Centralizador.WinApp.GUI
             }
             if (detallesFinal.Count > 0)
             {
-                DialogResult resp = MessageBox.Show($"CEN references will be inserted{Environment.NewLine + Environment.NewLine}Are you sure?", Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult resp = MessageBox.Show($"CEN references will be inserted{Environment.NewLine + Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resp == DialogResult.Yes)
                 {
@@ -769,8 +835,6 @@ namespace Centralizador.WinApp.GUI
                 float porcent = (float)(100 * c) / detallesFinal.Count;
                 BgwInsertRef.ReportProgress((int)porcent, $"Inserting REF, wait please...   ({c}/{detallesFinal.Count})");
             }
-
-
         }
         private void BgwInsertRef_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -783,12 +847,10 @@ namespace Centralizador.WinApp.GUI
             {
                 string nameFile = $"{UserParticipant.Name}_InsertRef_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
                 TssLblMensaje.Text = "Check the log file.";
-                if (!Directory.Exists(@"C:\Centralizador\Log\"))
-                {
-                    Directory.CreateDirectory(@"C:\Centralizador\Log\");
-                }
-                File.WriteAllText(@"C:\Centralizador\Log\" + nameFile + ".txt", StringLogging.ToString());
-                ProcessStartInfo process = new ProcessStartInfo(@"C:\Centralizador\Log\" + nameFile + ".txt")
+                string path = @"C:\Centralizador\Log\";
+                new CreatePath(path);
+                File.WriteAllText(path + nameFile + ".txt", StringLogging.ToString());
+                ProcessStartInfo process = new ProcessStartInfo(path + nameFile + ".txt")
                 {
                     WindowStyle = ProcessWindowStyle.Minimized
                 };
@@ -832,7 +894,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
 
-                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (DialogResult == DialogResult.Yes)
                 {
                     BgwConvertPdf = new BackgroundWorker
@@ -882,15 +944,24 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Bussy!";
                 return;
             }
-            IList<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-            if (matrices != null && matrices.Count > 0)
+            try
             {
-                BgwCreditor.RunWorkerAsync(matrices);
+                IList<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
+                if (matrices != null && matrices.Count > 0)
+                {
+                    BgwCreditor.RunWorkerAsync(matrices);
+                }
+                else
+                {
+                    TssLblMensaje.Text = $"There are no published instructions for:  {CboMonths.SelectedItem}-{CboYears.SelectedItem}.";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TssLblMensaje.Text = $"There are no published instructions for:  {CboMonths.SelectedItem}-{CboYears.SelectedItem}.";
+                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning); return;
             }
+
+
         }
         private void BgwCreditor_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -914,6 +985,11 @@ namespace Centralizador.WinApp.GUI
                         int d = 0;
                         foreach (ResultInstruction instruction in lista)
                         {
+                            // Tester
+                            if (instruction.Id != 1881400)
+                            {
+                                continue;
+                            }
                             // Get Participant Debtor
                             instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
                             // Root Class
@@ -988,15 +1064,10 @@ namespace Centralizador.WinApp.GUI
                             d++;
                             porcent = (float)(100 * d) / lista.Count;
                             BgwCreditor.ReportProgress((int)porcent, $"Searching 'Pay Instructions' from CEN, wait please.  ({c}/{matrices.Count}) / ({d}/{lista.Count})");
-                            // Is Cancel?
-                            if (BgwCreditor.CancellationPending)
-                            {
-                                e.Cancel = true;
-                                return;
-                            }
+                            // Cancel Task
+                            if (BgwCreditor.CancellationPending) { e.Cancel = true; return; }
                         }
                     }
-
                     c++;
                     porcent = (float)(100 * c) / matrices.Count;
                     BgwCreditor.ReportProgress((int)porcent, $"Searching 'Pay Instructions' from CEN, wait please. ({c}/{matrices.Count})");
@@ -1004,8 +1075,7 @@ namespace Centralizador.WinApp.GUI
             }
             catch (Exception ex)
             {
-                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
-                e.Cancel = true;
+                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning); e.Cancel = true;
             }
         }
         private void BgwCreditor_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -1015,10 +1085,6 @@ namespace Centralizador.WinApp.GUI
         }
         private void BgwCreditor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled == true)
-            {
-                TssLblMensaje.Text = "Canceled!";
-            }
             CleanControls();
             IsCreditor = true;
             IGridFill(DetallesCreditor);
@@ -1031,6 +1097,10 @@ namespace Centralizador.WinApp.GUI
             // Send email                                      
             ServiceSendMail.BatchSendMail();
             IGridMain.BackgroundImage = null;
+            if (e.Cancelled == true)
+            {
+                TssLblMensaje.Text = "Canceled!";
+            }
         }
 
         #endregion
@@ -1054,7 +1124,7 @@ namespace Centralizador.WinApp.GUI
             {
                 DetallesDebtor = detallesDebtor;
                 string nameFile = "";
-                nameFile += $"{Directory.GetCurrentDirectory()}\\inbox\\{CboYears.SelectedItem}\\{CboMonths.SelectedIndex + 1}";
+                nameFile += @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
                 BgwDebtor.RunWorkerAsync(nameFile);
             }
         }
@@ -1150,18 +1220,14 @@ namespace Centralizador.WinApp.GUI
                     c++;
                     float porcent = (float)(100 * c) / DetallesDebtor.Count;
                     BgwDebtor.ReportProgress((int)porcent, $"Retrieve information Debtor, wait please. ({c}/{DetallesDebtor.Count})");
-                    // Is Cancel?
-                    if (BgwDebtor.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        break;
-                    }
+                    // Cancel Task
+                    if (BgwDebtor.CancellationPending) { e.Cancel = true; break; }
                 }
                 DetallesDebtor = DetallesDebtor.OrderBy(x => x.FechaRecepcion).ToList();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                e.Cancel = true;
+                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning); e.Cancel = true;
             }
 
         }
@@ -1172,10 +1238,6 @@ namespace Centralizador.WinApp.GUI
         }
         private void BgwDebtor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled == true)
-            {
-                TssLblMensaje.Text = "Canceled!";
-            }
             CleanControls();
             TssLblProgBar.Value = 0;
             IsCreditor = false;
@@ -1188,15 +1250,31 @@ namespace Centralizador.WinApp.GUI
             // Send email                                      
             ServiceSendMail.BatchSendMail();
             IGridMain.BackgroundImage = null;
+            if (e.Cancelled == true)
+            {
+                TssLblMensaje.Text = "Canceled!";
+            }
 
         }
 
         #endregion
 
         #region Common functions
-
-
-
+        private void BtnCancelTak_Click(object sender, EventArgs e)
+        {
+            if (BgwCreditor != null && !BgwCreditor.CancellationPending && BgwCreditor.IsBusy)
+            {
+                BgwCreditor.CancelAsync();
+            }
+            else if (BgwDebtor != null && !BgwDebtor.CancellationPending && BgwDebtor.IsBusy)
+            {
+                BgwDebtor.CancelAsync();
+            }
+            else if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy)
+            {
+                BgwConvertPdf.CancelAsync();
+            }
+        }
         public string AssemblyVersion
         {
             get
@@ -1204,12 +1282,12 @@ namespace Centralizador.WinApp.GUI
                 if (ApplicationDeployment.IsNetworkDeployed)
                 {
                     Version ver = ApplicationDeployment.CurrentDeployment.CurrentVersion;
-                    return string.Format("{4} Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
+                    return string.Format("{4} Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Application.ProductName);
                 }
                 else
                 {
                     Version ver = Assembly.GetExecutingAssembly().GetName().Version;
-                    return string.Format("{4} Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
+                    return string.Format("{4} Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Application.ProductName);
                 }
             }
         }
@@ -1276,7 +1354,7 @@ namespace Centralizador.WinApp.GUI
                         {
                             myRow.Cells["P3"].Type = iGCellType.Check;
                             myRow.Cells["P4"].Type = iGCellType.Check;
-                            if (item.Instruction != null)
+                            if (item.Instruction != null && item.Instruction.Dte != null) // Debtor dont use StatusBilled.Facturado, use dte property.
                             {
                                 myRow.Cells["P3"].Value = 1;
                             }
@@ -1571,9 +1649,7 @@ namespace Centralizador.WinApp.GUI
                     builder.AppendLine($"Remaining time to reject: {8 - detalle.DataEvento.DiferenciaFecha} days");
                     builder.Append(Environment.NewLine);
                     builder.Append("Are you sure?");
-
-
-                    DialogResult result = MessageBox.Show(builder.ToString(), Application.CompanyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    DialogResult result = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
                         if (Mail == null)
@@ -1588,15 +1664,22 @@ namespace Centralizador.WinApp.GUI
                         // RFP: Reclamo por Falta Parcial de Mercaderías
                         // RFT: Reclamo por Falta Total de Mercaderías
                         respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
+                        // Tester
+                        //respuestaTo resp = new respuestaTo();
+                        resp.codResp = 0;
+                        builder.Clear();
+                        builder.AppendLine("Results:");
+                        builder.AppendLine(Environment.NewLine);
                         if (resp != null)
                         {
-                            detalle.StatusDetalle = StatusDetalle.Rejected;
+                            builder.AppendLine("Rejected in SII: Yes");
                             if (detalle.IsParticipant && detalle.Instruction != null)
                             {
+
                                 switch (resp.codResp)
                                 {
                                     case 0: // Acción Completada OK. 
-
+                                        detalle.StatusDetalle = StatusDetalle.Rejected;
                                         // Send email
                                         Mail.SendEmailToParticipant(detalle);
                                         // Reject in CEN                                
@@ -1605,7 +1688,15 @@ namespace Centralizador.WinApp.GUI
                                         {
                                             detalle.Instruction.Dte = doc;
                                             IGridMain.CurRow.Cells["P3"].Value = 1;
+                                            builder.AppendLine("Rejected in CEN: Yes");
                                         }
+                                        else
+                                        {
+                                            builder.AppendLine("Rejected in CEN: No");
+                                        }
+                                        builder.AppendLine("Email Send: Yes");
+
+
                                         break;
                                     case 7: // Evento registrado previamente
                                         break;
@@ -1618,10 +1709,18 @@ namespace Centralizador.WinApp.GUI
                             }
                             else
                             {
-                                TssLblMensaje.Text = "Impossible to send Email.";
+                                builder.AppendLine("Email Send: No");
+                                builder.AppendLine("Rejected in CEN: No");
                             }
                         }
-
+                        else
+                        {
+                            builder.AppendLine("Rejected in SII: No");
+                            builder.AppendLine("Email Send: No");
+                            builder.AppendLine("Rejected in CEN: No");
+                        }
+                        Thread.Sleep(2000); // 2 segundos
+                        MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
@@ -1675,38 +1774,52 @@ namespace Centralizador.WinApp.GUI
         #region Pagar
         private void BtnPagar_Click(object sender, EventArgs e)
         {
+            // Excluir Banco Security Rut 97.053.000-2
             if (!BgwPay.IsBusy && !IsCreditor && !IsRunning && IGridMain.Rows.Count > 0)
             {
                 IList<Detalle> detallesFinal = new List<Detalle>();
-                if (ChkIncludeCEN.CheckState == CheckState.Checked)
+                if (ChkIncludeCEN.CheckState == CheckState.Checked) // Only Participants
                 {
-                    foreach (Detalle item in DetallesDebtor) // Only Participants
+                    foreach (Detalle item in DetallesDebtor)
                     {
-                        if (item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted)
+                        if (item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted && item.RutReceptor != "97053000")
                         {
                             detallesFinal.Add(item);
                         }
                     }
                 }
-                else if (ChkNoIncludeCEN.CheckState == CheckState.Checked)
+                else if (ChkNoIncludeCEN.CheckState == CheckState.Checked) // Only NO Participants
                 {
-                    foreach (Detalle item in DetallesDebtor) // Only NO Participants
+                    foreach (Detalle item in DetallesDebtor)
                     {
-                        if (!item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted)
+                        if (!item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted && item.RutReceptor != "97053000")
                         {
                             detallesFinal.Add(item);
                         }
                     }
                 }
-                else if (ChkNoIncludeCEN.CheckState == CheckState.Unchecked && ChkIncludeCEN.CheckState == CheckState.Unchecked)
+                else if (ChkNoIncludeCEN.CheckState == CheckState.Unchecked && ChkIncludeCEN.CheckState == CheckState.Unchecked)  // All
                 {
-                    detallesFinal = DetallesDebtor;
+                    foreach (Detalle item in DetallesDebtor)
+                    {
+                        if (item.StatusDetalle == StatusDetalle.Accepted && item.RutReceptor != "97053000")
+                        {
+                            detallesFinal.Add(item);
+                        }
+                    }
                 }
-
+                // Total
                 if (detallesFinal.Count > 0)
                 {
-                    ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
-                    serviceExcel.CreateNomina(BgwPay);
+                    string monto = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detallesFinal.Sum(x => x.MntTotal));
+                    DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for pay:{Environment.NewLine} ${monto} {Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (resp == DialogResult.OK)
+                    {
+                        ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
+                        serviceExcel.CreateNomina(BgwPay);
+                    }
+
                 }
                 else if (detallesFinal.Count == 0)
                 {
@@ -1746,21 +1859,7 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-        private void BtnCancelTak_Click(object sender, EventArgs e)
-        {
-            if (!BgwCreditor.CancellationPending && BgwCreditor.IsBusy)
-            {
-                BgwCreditor.CancelAsync();
-            }
-            else if (!BgwDebtor.CancellationPending && BgwDebtor.IsBusy)
-            {
-                BgwDebtor.CancelAsync();
-            }
-            else if (!BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy)
-            {
-                BgwConvertPdf.CancelAsync();
-            }
-        }
+
     }
 }
 

@@ -91,6 +91,7 @@ namespace Centralizador.Models.Outlook
             StringBuilder builder = new StringBuilder();
             StringBuilder builderCEN = new StringBuilder();
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+            string dv = detalle.Instruction.ParticipantDebtor.VerificationCode;
             string nameCreditor = ti.ToTitleCase(detalle.RznSocRecep.ToLower());
             string nameDebtor = ti.ToTitleCase(detalle.Instruction.ParticipantDebtor.BusinessName.ToLower());
             string rutCreditor = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detalle.Instruction.ParticipantCreditor.Rut).Replace(',', '.');
@@ -110,7 +111,7 @@ namespace Centralizador.Models.Outlook
                 }
                 if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
                 {
-                    builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;MntNeto&gt;{detalle.Instruction.Amount}&lt;/MntNeto&gt;" + "<br/>");
+                    builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el monto :  &lt;MntNeto&gt;{detalle.Instruction.Amount}&lt;/MntNeto&gt;" + "<br/>");
                 }
                 if (referencia != null)
                 {
@@ -158,7 +159,7 @@ namespace Centralizador.Models.Outlook
                 "<p>&nbsp;</p>\r\n<p>Para mayor informaci&oacute;n sobre las exigencias del CEN: " +
                 "<a href=\"https://shorturl.at/foHX6\">https://shorturl.at/foHX6</a>&nbsp;" +
                 "</p>\r\n<hr />\r\n<p><strong><span style=\"color: #0000ff;\">" +
-                "Una herramienta Centralizador.</span></strong></p>", nameCreditor, rutCreditor, detalle.DvReceptor, nameDebtor, rutDebtor, detalle.Instruction.ParticipantDebtor.VerificationCode, detalle.Folio, detalle.FechaEmision, detalle.MntNeto.ToString("#,##"), builderCEN.ToString());
+                "Una herramienta Centralizador.</span></strong></p>", nameCreditor, rutCreditor, detalle.DvReceptor, nameDebtor, rutDebtor, dv, detalle.Folio, detalle.FechaEmision, detalle.MntNeto.ToString("#,##"), builderCEN.ToString());
             try
             {
                 SmtpMail OMail = new SmtpMail("TryIt")
