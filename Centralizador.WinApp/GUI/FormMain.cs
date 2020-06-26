@@ -71,6 +71,8 @@ namespace Centralizador.WinApp.GUI
         // Button Class
         private readonly IGButtonColumnManager Btn = new IGButtonColumnManager();
 
+        // Watch
+        public Stopwatch Watch { get; set; }
 
         #endregion
 
@@ -86,7 +88,8 @@ namespace Centralizador.WinApp.GUI
             // Load                   
             VersionApp = AssemblyVersion;
             Text = VersionApp;
-      
+            Watch = new Stopwatch();
+
 
             //Load ComboBox participants
             CboParticipants.DisplayMember = "Name";
@@ -611,41 +614,30 @@ namespace Centralizador.WinApp.GUI
                         if (auxiliar == null)
                         {
                             Comuna comunaobj = null;
-                            // Insert New Auxiliar   
+                            // Insert New Auxiliar
+
+                            // Get Comuna
+                            do
+                            {
+                                string promptValue = ComunaInput.ShowDialog(Application.ProductName,
+                                    $"'Comuna' not found, please input below:",
+                                    item.Instruction.ParticipantDebtor.BusinessName,
+                                    item.RutReceptor,
+                                    item.Instruction.ParticipantDebtor.CommercialAddress,
+                                    comunas);
+
+                                comunaobj = comunas.FirstOrDefault(x => aux.RemoveDiacritics(x.ComDes).ToLower() == aux.RemoveDiacritics(promptValue.ToLower()));
+                            } while (comunaobj == null);
                             // Sending porperty for show DirAux in Log
-                            result = aux.InsertAuxiliar(item.Instruction, con, comunas, ref aux, comunaobj);
+                            result = aux.InsertAuxiliar(item.Instruction, con, ref aux, comunaobj);
                             switch (result)
                             {
                                 case 1:
-                                    // Change Control
-                                    // 24-06-2020
-                                    // Incorporar ventana para ingresar Comuna 
-                                    do
-                                    {                                
-                                        string promptValue = ComunaInput.ShowDialog( Application.ProductName,
-                                            $"'Comuna' not found, please input below:",
-                                            item.Instruction.ParticipantDebtor.BusinessName,
-                                            item.RutReceptor,
-                                            item.Instruction.ParticipantDebtor.CommercialAddress,
-                                            comunas);
-
-                                        comunaobj = comunas.FirstOrDefault(x => aux.RemoveDiacritics(x.ComDes).ToLower() == aux.RemoveDiacritics(promptValue.ToLower()));
-                                    } while (comunaobj == null);                         
-                                    result = aux.InsertAuxiliar(item.Instruction, con, comunas, ref aux, comunaobj);
-                                    if (result == 1)
-                                    {
-                                        // Error Fatal! No se encuenta Comuna en dirección. No se puede Insertar.
-                                        StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tError: {item.Instruction.ParticipantDebtor.Rut} (Comuna)");
-                                    }
-                                    else if (result == 2)
-                                    {
-                                        StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.ComAux}");
-                                    }
                                     break;
                                 case 0:
                                     break;
                                 case 2:
-                                    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.DirAux}");
+                                    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.DirAux} / {aux.ComAux}");
                                     // Insert NV
                                     lastF = NotaVenta.GetLastNv(con);
                                     string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
@@ -661,31 +653,31 @@ namespace Centralizador.WinApp.GUI
                         else
                         {
                             // Yes Exists : Update
-                            if (auxiliar != null && (auxiliar.ComAux == null || auxiliar.DirAux == null || auxiliar.GirAux == null || auxiliar.RutAux == null))
+                            //if (auxiliar != null && (auxiliar.ComAux == null || auxiliar.DirAux == null || auxiliar.GirAux == null || auxiliar.RutAux == null))
+                            //{
+                            //    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Softland: {item.Instruction.ParticipantDebtor.Rut}");
+                            //}
+                            //else
+                            //{
+                            // Update Aux
+                            result = aux.UpdateAuxiliar(item.Instruction, con);
+                            if (result != 1)
                             {
-                                StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Softland: {item.Instruction.ParticipantDebtor.Rut}");
+                                // Error
+                                StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Sql: {item.Instruction.ParticipantDebtor.Rut}");
                             }
                             else
                             {
-                                // Update Aux
-                                result = aux.UpdateAuxiliar(item.Instruction, con);
-                                if (result != 1)
+                                // 
+                                lastF = NotaVenta.GetLastNv(con);
+                                string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                                resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
+                                if (resultInsertNV == 0)
                                 {
-                                    // Error
-                                    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Sql: {item.Instruction.ParticipantDebtor.Rut}");
-                                }
-                                else
-                                {
-                                    // 
-                                    lastF = NotaVenta.GetLastNv(con);
-                                    string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                                    resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
-                                    if (resultInsertNV == 0)
-                                    {
-                                        StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
-                                    }
+                                    StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
                                 }
                             }
+                            //}
                         }
                         // Insert NV  
                         if (resultInsertNV == 1)
@@ -975,8 +967,12 @@ namespace Centralizador.WinApp.GUI
 
             try
             {
+                Watch.Restart();
+                Watch.Start();
                 foreach (ResultPaymentMatrix m in matrices)
                 {
+
+
                     // Get Window Billing
                     m.BillingWindow = BillingWindow.GetBillingWindowByIdAsync(m).Result;
                     IList<ResultInstruction> lista = Instruction.GetInstructionCreditorAsync(m, UserParticipant).Result;
@@ -986,10 +982,11 @@ namespace Centralizador.WinApp.GUI
                         foreach (ResultInstruction instruction in lista)
                         {
                             // Tester
-                            if (instruction.Id != 1881400)
-                            {
-                                continue;
-                            }
+
+                            //if (instruction.Id != 1881400)
+                            //{
+                            //    continue;
+                            //}
                             // Get Participant Debtor
                             instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
                             // Root Class
@@ -1090,6 +1087,8 @@ namespace Centralizador.WinApp.GUI
             IGridFill(DetallesCreditor);
             TssLblProgBar.Value = 0;
             IsRunning = false;
+            Watch.Stop();
+            TssLblMensaje.Text += "         *[" + Watch.Elapsed.TotalSeconds + " seconds.]";
             // Buttons
             BtnPagar.Enabled = false;
             BtnInsertNv.Enabled = true;

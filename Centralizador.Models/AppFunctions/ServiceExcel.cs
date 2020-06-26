@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -98,7 +97,7 @@ namespace Centralizador.Models.AppFunctions
                         }
                     }
                 }
-          
+
 
                 table.Rows.Add(row);
 
@@ -121,7 +120,7 @@ namespace Centralizador.Models.AppFunctions
                 }
 
                 string path = @"C:\Centralizador\Log\";
-                new CreatePath(path);               
+                new CreatePath(path);
                 workbook.SaveToFile(path + nameFile, FileFormat.Version2016);
                 ProcessStartInfo process = new ProcessStartInfo(path + nameFile)
                 {

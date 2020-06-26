@@ -34,7 +34,7 @@ namespace Centralizador.WinApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("sa")]
+        [global::System.Configuration.DefaultSettingValueAttribute("centra")]
         public string DBUser {
             get {
                 return ((string)(this["DBUser"]));
@@ -47,27 +47,6 @@ namespace Centralizador.WinApp.Properties {
         public string DBPassword {
             get {
                 return ((string)(this["DBPassword"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<DatosEmpresas>
-  <Empresa id=""189"">SANFRANCISCO</Empresa>
-  <Empresa id=""190"">QUINTA</Empresa>
-  <Empresa id=""194"">VALLE</Empresa>
-  <Empresa id=""364"">OCOA</Empresa>
-  <Empresa id=""415"">ST4</Empresa>
-  <Empresa id=""427"">ST10</Empresa>
-  <Empresa id=""428"">TRICAHUESOLAR</Empresa>
-  <Empresa id=""469"">ST11</Empresa>
-  <Empresa id=""470"">PILPILEN</Empresa>
-  <Empresa id=""999"">RENOVABLE</Empresa>
-</DatosEmpresas>")]
-        public global::System.Xml.XmlDocument DBSoftland {
-            get {
-                return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
             }
         }
         
@@ -86,6 +65,28 @@ namespace Centralizador.WinApp.Properties {
         public string PasswordCEN {
             get {
                 return ((string)(this["PasswordCEN"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<DatosEmpresas>
+  <Empresa id=""189"">SANFRANCISCO</Empresa>
+  <Empresa id=""190"">QUINTA</Empresa>
+  <Empresa id=""194"">VALLE</Empresa>
+  <Empresa id=""364"">OCOA</Empresa>
+  <Empresa id=""415"">ST4</Empresa>
+  <Empresa id=""427"">ST10</Empresa>
+  <Empresa id=""428"">TRICAHUESOLAR</Empresa>
+  <Empresa id=""469"">ST11</Empresa>
+  <Empresa id=""470"">PILPILEN</Empresa>
+  <Empresa id=""491"">TRICAHUE</Empresa>
+  <Empresa id=""999"">RENOVABLE</Empresa>
+</DatosEmpresas>")]
+        public global::System.Xml.XmlDocument DBSoftland {
+            get {
+                return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
             }
         }
     }

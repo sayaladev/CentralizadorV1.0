@@ -42,7 +42,7 @@ namespace Centralizador.Models.DataBase
 
 
         public static async Task<DataTable> ExecuteReaderAsync(Conexion conn)
-        {   
+        {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
                 try
@@ -63,7 +63,7 @@ namespace Centralizador.Models.DataBase
                 {
                     throw;
                 }
-            }            
+            }
         }
         public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
         {
@@ -102,11 +102,11 @@ namespace Centralizador.Models.DataBase
                         {
                             object obj = await cmd.ExecuteScalarAsync();
                             if (obj != null && DBNull.Value != obj)
-                            {                            
+                            {
                                 return obj;
                             }
                             else
-                            {                           
+                            {
                                 return null;
                             }
                         }

@@ -204,7 +204,7 @@ namespace Centralizador.Models.Outlook
             catch (Exception)
             {
                 throw;
-            }          
+            }
         }
 
         public static DateTime GetLastDateTime()

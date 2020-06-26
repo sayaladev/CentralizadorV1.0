@@ -21,7 +21,7 @@ namespace Centralizador.Models.DataBase
                 {
                     return Convert.ToInt32(result);
                 }
-             
+
             }
             catch (Exception)
             {
@@ -54,10 +54,8 @@ namespace Centralizador.Models.DataBase
             try
             {
                 StringBuilder query = new StringBuilder();
-                //string time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
-                // Insertó 2020-09-06 17:28:00.000
 
-                // Prueba
+                // Production:
                 string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", DateTime.Now);
 
                 if (Environment.MachineName == "DEVELOPER")
@@ -89,7 +87,7 @@ namespace Centralizador.Models.DataBase
                         conexion.Query = query.ToString();
                         return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!     
                     }
-                }            
+                }
             }
             catch (Exception)
             {
@@ -121,7 +119,7 @@ namespace Centralizador.Models.DataBase
                 object result = Conexion.ExecuteScalarAsync(conexion).Result;
                 if (result != null)
                 {
-                 return Convert.ToInt32(result);
+                    return Convert.ToInt32(result);
                 }
             }
             catch (Exception)

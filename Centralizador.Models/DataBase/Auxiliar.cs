@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
+
 using Centralizador.Models.ApiCEN;
-using Microsoft.VisualBasic;
 
 namespace Centralizador.Models.DataBase
 {
@@ -20,11 +17,11 @@ namespace Centralizador.Models.DataBase
         public string DirAux { get; set; }
         public string ComAux { get; set; }
 
-        public int InsertAuxiliar(ResultInstruction instruction, Conexion conexion, IList<Comuna> comunas, ref Auxiliar aux, Comuna comuna)
+        public int InsertAuxiliar(ResultInstruction instruction, Conexion conexion, ref Auxiliar aux, Comuna comuna)
         {
-      
             string acteco = null;
-
+            CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+            string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", DateTime.Now);
             string adressTemp = instruction.ParticipantDebtor.CommercialAddress;
             if (instruction.ParticipantDebtor.CommercialAddress.Contains(','))
             {
@@ -32,45 +29,6 @@ namespace Centralizador.Models.DataBase
                 adressTemp = instruction.ParticipantDebtor.CommercialAddress.Substring(0, index);
             }
             if (adressTemp.Length > 60) { adressTemp = adressTemp.Substring(0, 60); }
-            if (comuna == null)
-            {
-            // Get Comuna            
-            Regex regex = new Regex(@"\b[\s,\.-:;]*");
-            IEnumerable<string> words = regex.Split(instruction.ParticipantDebtor.CommercialAddress).Where(x => !string.IsNullOrEmpty(x));
-            IList<Comuna> coms = new List<Comuna>();
-            foreach (string w in words)
-            {          
-                foreach (Comuna c in comunas)
-                {
-                    if (RemoveDiacritics(c.ComDes).Contains(RemoveDiacritics(w)))
-                    {
-                        //coms.Add(c);                                           
-                        coms.Add(c);
-                    }
-                }
-            }
-            if (coms.Count == 0)
-            {
-                // Error
-                return 1;
-            }
-            else
-            {
-                // Remove duplicates
-                List<Comuna> uniqueList = coms.Distinct().ToList();
-                // Ejemplo: Ruta 5 Km 10 Caletera Poniente, Puerto Varas => arriba encontrará 2: Puerto Varas y Puerto Montt
-                foreach (Comuna e in uniqueList)
-                {
-                    if (RemoveDiacritics(instruction.ParticipantDebtor.CommercialAddress).Contains(RemoveDiacritics(e.ComDes)))
-                    {
-                        // Ejemplo: Avenida Naipú 87, Bulnes. *** el último del for queda                        
-                        comuna = e;
-                        //return s encuentra?
-                    }
-                }
-            }
-
-            }
             // Get acteco from CEN
             if (instruction.ParticipantDebtor.CommercialBusiness != null)
             {
@@ -85,20 +43,24 @@ namespace Centralizador.Models.DataBase
                 // Insert new Acteco
                 Acteco.InsertActeco(acteco, conexion);
 
+                // Production:
+                if (Environment.MachineName == "DEVELOPER")
+                {
+                    time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
+                }
             }
-          
             try
             {
                 string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
                 StringBuilder query = new StringBuilder();
                 query.Append($"IF (NOT EXISTS(SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}')) BEGIN ");
                 query.Append("INSERT INTO softland.CWTAUXI (CodAux, NomAux, NoFAux, RutAux, ActAux, GirAux, PaiAux, Comaux, ");
-                query.Append("DirAux, ClaCli, ClaPro, Bloqueado, BloqueadoPro, EsReceptorDTE ,eMailDTE, Usuario, Proceso, Sistema, Region) ");
+                query.Append("DirAux, ClaCli, ClaPro, Bloqueado, BloqueadoPro, EsReceptorDTE ,eMailDTE, Usuario, Proceso, Sistema, Region, FechaUlMod) ");
                 query.Append($"VALUES ('{instruction.ParticipantDebtor.Rut}', ");
                 query.Append($"'{instruction.ParticipantDebtor.BusinessName}','{instruction.ParticipantDebtor.Name}', ");
                 query.Append($"'{rut}-{instruction.ParticipantDebtor.VerificationCode}','S',(select GirCod from softland.cwtgiro where GirDes = '{acteco}' ),'CL','{comuna.ComCod}', ");
                 query.Append($"'{adressTemp}','S', 'S','N', 'N', 'S','{instruction.ParticipantDebtor.DteReceptionEmail}' ");
-                query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}) END");
+                query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}, '{time}') END");
                 conexion.Query = query.ToString();
                 aux.DirAux = adressTemp;
                 aux.ComAux = comuna.ComDes;
@@ -167,7 +129,7 @@ namespace Centralizador.Models.DataBase
             {
                 name = instruction.ParticipantDebtor.BusinessName;
             }
-     
+
 
             try
             {

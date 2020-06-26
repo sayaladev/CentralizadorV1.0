@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -12,15 +11,15 @@ namespace Centralizador.WinApp.GUI
     internal class ComunaInput
     {
         public static IList<Comuna> Comunas { get; set; }
-        public static TextBox TextBox  { get; set; }
+        public static TextBox TextBox { get; set; }
         public static string ShowDialog(string title, string promptText, string rzn, string rut, string add, IList<Comuna> comunas)
         {
             Comunas = comunas;
             Form form = new Form();
             Label label = new Label();
             TextBox = new TextBox();
-            TextBox.TextChanged += TextBox_TextChanged;
-            TextBox.KeyPress += TextBox_KeyPress;
+            //TextBox.TextChanged += TextBox_TextChanged;
+            //TextBox.KeyPress += TextBox_KeyPress;
             Button buttonOk = new Button();
             Button buttonCancel = new Button();
 
@@ -66,27 +65,27 @@ namespace Centralizador.WinApp.GUI
             //return dialogResult;
         }
 
-        private static void TextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == '\b' && TextBox.Text.Length > 0)
-            {
-                TextBox.Text = "";
-            }
-        }
+        //private static void TextBox_KeyPress(object sender, KeyPressEventArgs e)
+        //{
+        //    if (e.KeyChar == '\b' && TextBox.Text.Length > 0)
+        //    {
+        //        TextBox.Text = "";
+        //    }
+        //}
 
-        private static void TextBox_TextChanged(object sender, EventArgs e)
-        {
-            var txt = sender as TextBox;
-         
-            if (Comunas != null && txt.Text.Length > 4)
-            {
-                Comuna res = Comunas.FirstOrDefault(c => c.ComDes.Contains(txt.Text));
-                if (res != null)
-                {
-                    TextBox.Text = res.ComDes;
-                }
+        //private static void TextBox_TextChanged(object sender, EventArgs e)
+        //{
+        //    var txt = sender as TextBox;
 
-            }
-        }
+        //    if (Comunas != null && txt.Text.Length > 4)
+        //    {
+        //        Comuna res = Comunas.FirstOrDefault(c => c.ComDes.Contains(txt.Text));
+        //        if (res != null)
+        //        {
+        //            TextBox.Text = res.ComDes;
+        //        }
+
+        //    }
+        //}
     }
 }
