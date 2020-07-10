@@ -653,15 +653,16 @@ namespace Centralizador.WinApp.GUI
                         else
                         {
                             // Yes Exists : Update
-                            //if (auxiliar != null && (auxiliar.ComAux == null || auxiliar.DirAux == null || auxiliar.GirAux == null || auxiliar.RutAux == null))
-                            //{
-                            //    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Softland: {item.Instruction.ParticipantDebtor.Rut}");
-                            //}
+                            if (auxiliar.ComAux == null || auxiliar.DirAux == null || auxiliar.GirAux == null || auxiliar.RutAux == null)
+                            {
+                                // Only msg
+                                StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError, update in Softland: {item.Instruction.ParticipantDebtor.Rut}");
+                            }
                             //else
                             //{
                             // Update Aux
                             result = aux.UpdateAuxiliar(item.Instruction, con);
-                            if (result != 1)
+                            if (result != 2)
                             {
                                 // Error
                                 StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Sql: {item.Instruction.ParticipantDebtor.Rut}");
@@ -971,8 +972,6 @@ namespace Centralizador.WinApp.GUI
                 Watch.Start();
                 foreach (ResultPaymentMatrix m in matrices)
                 {
-
-
                     // Get Window Billing
                     m.BillingWindow = BillingWindow.GetBillingWindowByIdAsync(m).Result;
                     IList<ResultInstruction> lista = Instruction.GetInstructionCreditorAsync(m, UserParticipant).Result;
@@ -982,8 +981,7 @@ namespace Centralizador.WinApp.GUI
                         foreach (ResultInstruction instruction in lista)
                         {
                             // Tester
-
-                            //if (instruction.Id != 1881400)
+                            //if (instruction.Id != 1857064)
                             //{
                             //    continue;
                             //}

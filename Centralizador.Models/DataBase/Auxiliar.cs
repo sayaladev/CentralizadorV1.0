@@ -21,8 +21,9 @@ namespace Centralizador.Models.DataBase
         {
             string acteco = null;
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", DateTime.Now);
-            string adressTemp = instruction.ParticipantDebtor.CommercialAddress;
+            string adressTemp = ti.ToTitleCase(instruction.ParticipantDebtor.CommercialAddress.ToLower());
             if (instruction.ParticipantDebtor.CommercialAddress.Contains(','))
             {
                 int index = instruction.ParticipantDebtor.CommercialAddress.IndexOf(',');
