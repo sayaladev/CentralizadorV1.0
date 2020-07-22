@@ -981,7 +981,7 @@ namespace Centralizador.WinApp.GUI
                         foreach (ResultInstruction instruction in lista)
                         {
                             // Tester
-                            //if (instruction.Id != 1857064)
+                            //if (instruction.Id != 1896104)
                             //{
                             //    continue;
                             //}
@@ -1376,11 +1376,14 @@ namespace Centralizador.WinApp.GUI
                             break;
                         case StatusDetalle.Rejected:
                             // Col Status
-                            myRow.Cells["status"].Value = item.StatusDetalle;
+                            myRow.Cells["status"].Value = item.StatusDetalle;                           
+                            myRow.Cells["status"].Style = new iGCellStyle() { ForeColor = Color.Red };
+                    
                             // Col Rejected
                             myRow.Cells["btnRejected"].Enabled = iGBool.False;
                             myRow.Cells["btnRejected"].ImageIndex = 5;
-                            rejectedNeto += item.MntNeto;
+               
+                          rejectedNeto += item.MntNeto;
                             rejectedExento += item.MntExento;
                             rejectedIva += item.MntIva;
                             rejectedTotal += item.MntTotal;

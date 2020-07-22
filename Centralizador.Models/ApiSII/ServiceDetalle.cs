@@ -220,7 +220,11 @@ namespace Centralizador.Models.ApiSII
                 {
                     return StatusDetalle.Accepted;
                 }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RFT") != null) // Receclamo por falta total de mercaderías
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RFT") != null) // Receclamo por falta total de mercaderías.
+                {
+                    return StatusDetalle.Rejected;
+                }
+                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RFP") != null) // Receclamo por falta parcial de mercaderías.
                 {
                     return StatusDetalle.Rejected;
                 }

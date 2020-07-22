@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -196,8 +197,11 @@ namespace Centralizador.Models.AppFunctions
             IPdfDocument document;
             string nomenclatura;
             document = ConvertXmlToPdf(detalle);
+
             //nomenclatura = detalle.RutReceptor + "_" + detalle.Folio;
-            nomenclatura = detalle.Folio + "_" + detalle.RutReceptor;
+            //nomenclatura = detalle.Folio + "_" + detalle.RutReceptor;  
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+            nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower());
             byte[] content = document.Content();
             try
             {
@@ -239,7 +243,9 @@ namespace Centralizador.Models.AppFunctions
                     document = ConvertXmlToPdf(item);
                     byte[] content = document.Content();
                     //nomenclatura = item.RutReceptor + "_" + item.Folio;
-                    nomenclatura = item.Folio + "_" + item.RutReceptor;
+                    //nomenclatura = item.Folio + "_" + item.RutReceptor;
+                    TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                    nomenclatura = item.Folio + "_" + ti.ToTitleCase(item.RznSocRecep.ToLower());
                     File.WriteAllBytes(dialog.SelectedPath + "\\" + nomenclatura + ".pdf", content);
                 }
                 // Is Cancel?

@@ -67,7 +67,7 @@ namespace Centralizador.Models.AppFunctions
                 row[0] = c;
                 row[1] = item.Folio;
                 row[2] = item.FechaEmision;
-                row[3] = item.RutReceptor;
+                row[3] = item.RutReceptor + "-" + item.DvReceptor;
                 row[4] = item.RznSocRecep;
                 if (item.Instruction != null)
                 {
