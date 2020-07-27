@@ -77,7 +77,8 @@ namespace Centralizador.Models.DataBase
                         using (SqlDataReader)
                         {
                             SqlDataReader.Close();
-                            return await cmd.ExecuteNonQueryAsync();
+                            int res = await cmd.ExecuteNonQueryAsync();
+                            return res;
                         }
                     }
                 }

@@ -171,7 +171,7 @@ namespace Centralizador.Models.Outlook
                         {
                             DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
                             // 2020\06\76470581-5
-                            nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep; 
+                            nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
 
                             // 15357870_33_8888
                             nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;

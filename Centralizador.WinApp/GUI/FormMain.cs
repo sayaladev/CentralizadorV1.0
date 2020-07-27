@@ -662,7 +662,7 @@ namespace Centralizador.WinApp.GUI
                             //{
                             // Update Aux
                             result = aux.UpdateAuxiliar(item.Instruction, con);
-                            if (result != 2)
+                            if (result != 1) // 1= update ok
                             {
                                 // Error
                                 StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Sql: {item.Instruction.ParticipantDebtor.Rut}");
@@ -1376,14 +1376,14 @@ namespace Centralizador.WinApp.GUI
                             break;
                         case StatusDetalle.Rejected:
                             // Col Status
-                            myRow.Cells["status"].Value = item.StatusDetalle;                           
+                            myRow.Cells["status"].Value = item.StatusDetalle;
                             myRow.Cells["status"].Style = new iGCellStyle() { ForeColor = Color.Red };
-                    
+
                             // Col Rejected
                             myRow.Cells["btnRejected"].Enabled = iGBool.False;
                             myRow.Cells["btnRejected"].ImageIndex = 5;
-               
-                          rejectedNeto += item.MntNeto;
+
+                            rejectedNeto += item.MntNeto;
                             rejectedExento += item.MntExento;
                             rejectedIva += item.MntIva;
                             rejectedTotal += item.MntTotal;

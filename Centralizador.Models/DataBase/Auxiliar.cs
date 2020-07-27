@@ -138,7 +138,8 @@ namespace Centralizador.Models.DataBase
                 query.Append($"UPDATE softland.cwtauxi SET NomAux='{name}', NoFAux='{instruction.ParticipantDebtor.Name}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 conexion.Query = query.ToString();
-                return Conexion.ExecuteNonQueryAsync(conexion).Result;
+                int res = Conexion.ExecuteNonQueryAsync(conexion).Result;
+                return res;
             }
             catch (Exception)
             {
