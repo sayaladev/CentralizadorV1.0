@@ -16,54 +16,62 @@ namespace Centralizador.Models.ApiSII
     {
         public static string GETTokenFromSii(string serialDigitalCert)
         {
-            // Get digital cert                   
-
+            // Get digital cert                  
+            DateTime now = DateTime.Now;
             X509Certificate2 cert = null;
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
             foreach (X509Certificate2 item in store.Certificates)
             {
-                if (item.SerialNumber == serialDigitalCert)
+                if (item.SerialNumber == serialDigitalCert && item.NotAfter > now)
                 {
                     cert = item;
                 }
             }
             store.Close();
-            try
+            if (cert != null)
             {
-                RESPUESTA XmlObject;
-                using (CrSeedService proxyCrSeedService = new CrSeedService())
+                try
                 {
-                    string responseCrSeedService = proxyCrSeedService.getSeed();
-                    XmlSerializer serializadorCrSeedService = new XmlSerializer(typeof(RESPUESTA));
-                    using (TextReader readerCrSeedService = new StringReader(responseCrSeedService))
+                    RESPUESTA XmlObject;
+                    using (CrSeedService proxyCrSeedService = new CrSeedService())
                     {
-                        RESPUESTA xmlObjectCrSeedService = (RESPUESTA)serializadorCrSeedService.Deserialize(readerCrSeedService);
-                        if (xmlObjectCrSeedService.RESP_HDR.ESTADO == "00")
+                        string responseCrSeedService = proxyCrSeedService.getSeed();
+                        XmlSerializer serializadorCrSeedService = new XmlSerializer(typeof(RESPUESTA));
+                        using (TextReader readerCrSeedService = new StringReader(responseCrSeedService))
                         {
-                            string xmlNofirmado = string.Format("<getToken><item><Semilla>{0}</Semilla></item></getToken>", xmlObjectCrSeedService.RESP_BODY.SEMILLA);
-                            using (GetTokenFromSeedService proxyGetTokenFromSeedService = new GetTokenFromSeedService())
+                            RESPUESTA xmlObjectCrSeedService = (RESPUESTA)serializadorCrSeedService.Deserialize(readerCrSeedService);
+                            if (xmlObjectCrSeedService.RESP_HDR.ESTADO == "00")
                             {
-                                string responseGetTokenFromSeedService = proxyGetTokenFromSeedService.getToken(FirmarSeedDigital(xmlNofirmado, cert));
-                                XmlSerializer serializadorGetTokenFromSeedService = new XmlSerializer(typeof(RESPUESTA));
-                                using (TextReader readerGetTokenFromSeedService = new StringReader(responseGetTokenFromSeedService))
+                                string xmlNofirmado = string.Format("<getToken><item><Semilla>{0}</Semilla></item></getToken>", xmlObjectCrSeedService.RESP_BODY.SEMILLA);
+                                using (GetTokenFromSeedService proxyGetTokenFromSeedService = new GetTokenFromSeedService())
                                 {
-                                    XmlObject = (RESPUESTA)serializadorGetTokenFromSeedService.Deserialize(readerGetTokenFromSeedService);
-                                    if (XmlObject.RESP_HDR.ESTADO == "00")
+                                    string responseGetTokenFromSeedService = proxyGetTokenFromSeedService.getToken(FirmarSeedDigital(xmlNofirmado, cert));
+                                    XmlSerializer serializadorGetTokenFromSeedService = new XmlSerializer(typeof(RESPUESTA));
+                                    using (TextReader readerGetTokenFromSeedService = new StringReader(responseGetTokenFromSeedService))
                                     {
-                                        return XmlObject.RESP_BODY.TOKEN;
+                                        XmlObject = (RESPUESTA)serializadorGetTokenFromSeedService.Deserialize(readerGetTokenFromSeedService);
+                                        if (XmlObject.RESP_HDR.ESTADO == "00")
+                                        {
+                                            return XmlObject.RESP_BODY.TOKEN;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                catch (Exception)
+                {
+                    throw;
+                }
+                return null;
             }
-            catch (Exception)
+            else
             {
-                throw;
+                return null;
             }
-            return null;
+            
         }
         private static string FirmarSeedDigital(string documento, X509Certificate2 certificado)
         {
@@ -170,6 +178,11 @@ namespace Centralizador.Models.ApiSII
         /// <remarks/>
         [XmlElement(Namespace = "")]
         public string ESTADO { get; set; }
+
+        /// <remarks/>
+        [XmlElement(Namespace = "")]
+        public string GLOSA { get; set; }
     }
+
 
 }

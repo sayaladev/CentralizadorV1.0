@@ -194,7 +194,7 @@ namespace Centralizador.Models.ApiCEN
                         if (r != null && r.Errors.Count == 0)
                         {
                             return r.ResultDte;
-                        }
+                        }                     
                     }
                 }
             }
@@ -227,6 +227,27 @@ namespace Centralizador.Models.ApiCEN
                     {
                         Dictionary<string, string> dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(res);
                         return dic["invoice_file_id"];
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return null;
+        }
+        public static async Task<ResultDte> GetDteAsync(Detalle detalle, bool isCreditor) {
+            try
+            {
+                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                {
+                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&folio={detalle.Folio}&instruccion={detalle.Instruction.Id}&creditor={detalle.Instruction.Creditor}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri);  // GET
+                    if (res != null)
+                    {
+                        Dte p = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        return p.Results[0];
                     }
                 }
             }

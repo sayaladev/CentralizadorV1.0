@@ -662,7 +662,8 @@ namespace Centralizador.WinApp.GUI
                             //{
                             // Update Aux
                             result = aux.UpdateAuxiliar(item.Instruction, con);
-                            if (result != 1) // 1= update ok
+                            // 1= update ok 2= update ok (en algunos escenarios)
+                            if (result == 0)
                             {
                                 // Error
                                 StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Sql: {item.Instruction.ParticipantDebtor.Rut}");
@@ -1028,11 +1029,22 @@ namespace Centralizador.WinApp.GUI
                                             // 1 No Facturado y cuando hay más de 1 dte informado
                                             // 2 Facturado
                                             // 3 Facturado con retraso
-                                            ResultDte resultDte = Dte.SendDteCreditorAsync(detalle, TokenCen).Result;
-                                            if (resultDte != null)
+                                            // Existe el DTE?
+                                            ResultDte doc = Dte.GetDteAsync(detalle, true).Result;
+                                            if (doc == null)
                                             {
-                                                detalle.Instruction.Dte = resultDte;
+                                                // Enviar el DTE
+                                                ResultDte resultDte = Dte.SendDteCreditorAsync(detalle, TokenCen).Result;
+                                                if (resultDte != null)
+                                                {
+                                                    detalle.Instruction.Dte = resultDte;
+                                                }
                                             }
+                                            else
+                                            {
+                                                detalle.Instruction.Dte = doc;
+                                            }
+                                          
                                         }
                                     }
                                     //else
@@ -1207,11 +1219,21 @@ namespace Centralizador.WinApp.GUI
                     {
                         // 1 No Facturado y cuando hay más de 1 dte informado
                         // 2 Facturado
-                        // 3 Facturado con retraso                  
-                        ResultDte resultDte = Dte.SendDteDebtorAsync(item, TokenCen).Result;
-                        if (resultDte != null && resultDte.Folio > 0)
+                        // 3 Facturado con retraso    
+                        // Existe el DTE?
+                        ResultDte doc = Dte.GetDteAsync(item, false).Result;
+                        if (doc == null)
                         {
-                            item.Instruction.Dte = resultDte;
+                            // Enviar el DTE
+                            ResultDte resultDte = Dte.SendDteDebtorAsync(item, TokenCen).Result;
+                            if (resultDte != null && resultDte.Folio > 0)
+                            {
+                                item.Instruction.Dte = resultDte;
+                            }
+                        }
+                        else
+                        {
+                            item.Instruction.Dte = doc;
                         }
                     }
                     c++;
