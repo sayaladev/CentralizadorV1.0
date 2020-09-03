@@ -251,8 +251,20 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Cols.Add("fechaEmision", "Emission", 60, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("rut", "RUT", 63, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("rznsocial", "Name", 300, pattern).CellStyle = new iGCellStyle() { TextAlign = iGContentAlignment.MiddleCenter, Font = new Font("Microsoft Sans Serif", 8f) };
+
             //Button see xml to pdf
+
             IGridMain.Cols.Add("flagxml", "", 20, pattern);
+            //iGCellStyle cellStyleFlag = new iGCellStyle
+            //{
+            //    ImageAlign = iGContentAlignment.MiddleCenter
+            //};
+            //iGCol colflagxml = IGridMain.Cols.Add("flagxml", "", 20, pattern);
+            //colflagxml.CellStyle = cellStyleFlag;
+            //colflagxml.CellStyle = new iGCellStyle();
+
+
+
             IGridMain.Cols.Add("inst", "Instructions", 47, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("codProd", "Code", 35, pattern).CellStyle = cellStyleCommon;
 
@@ -287,9 +299,9 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Cols["status"].AllowGrouping = true;
 
             // Button Reject
-            iGCol col = IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern);
-            col.Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
-            col.CellStyle = new iGCellStyle();
+            iGCol colbtnRejected = IGridMain.Cols.Add("btnRejected", "Reject", 40, pattern);
+            colbtnRejected.Tag = IGButtonColumnManager.BUTTON_COLUMN_TAG;
+            colbtnRejected.CellStyle = new iGCellStyle();
             Btn.CellButtonClick += Bcm_CellButtonClick;
             Btn.Attach(IGridMain);
             //Btn.CellButtonVisible += Bcm_CellButtonVisible;
@@ -1044,7 +1056,7 @@ namespace Centralizador.WinApp.GUI
                                             {
                                                 detalle.Instruction.Dte = doc;
                                             }
-                                          
+
                                         }
                                     }
                                     //else
@@ -1128,13 +1140,21 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "Bussy!";
                 return;
             }
-            IList<Detalle> detallesDebtor = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
-            if (detallesDebtor != null && detallesDebtor.Count > 0)
+            try
             {
-                DetallesDebtor = detallesDebtor;
-                string nameFile = "";
-                nameFile += @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
-                BgwDebtor.RunWorkerAsync(nameFile);
+                // Get info from Sii.
+                IList<Detalle> detallesDebtor = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+                if (detallesDebtor != null && detallesDebtor.Count > 0)
+                {
+                    DetallesDebtor = detallesDebtor;
+                    string nameFile = "";
+                    nameFile += @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
+                    BgwDebtor.RunWorkerAsync(nameFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning); return;
             }
         }
         private void BgwDebtor_DoWork(object sender, DoWorkEventArgs e)
@@ -1337,6 +1357,19 @@ namespace Centralizador.WinApp.GUI
                     }
                     myRow.Cells["rut"].Value = item.RutReceptor + "-" + item.DvReceptor;
                     myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
+                    // Icon for Participants
+                    if (item.IsParticipant)
+                    {
+                        myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
+                        myRow.Cells["rznsocial"].ImageList = fImageListSmall;
+                        myRow.Cells["rznsocial"].ImageIndex = 0;
+                        myRow.Cells["rznsocial"].ImageAlign = iGContentAlignment.MiddleLeft;
+                    }
+                    else
+                    {
+                        myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
+                    }
+
                     myRow.Cells["neto"].Value = item.MntNeto;
                     myRow.Cells["exento"].Value = item.MntExento;
                     myRow.Cells["iva"].Value = item.MntIva;
@@ -1443,7 +1476,7 @@ namespace Centralizador.WinApp.GUI
             }
             catch (Exception)
             {
-
+                throw;
             }
             finally
             {
@@ -1796,6 +1829,9 @@ namespace Centralizador.WinApp.GUI
         #region Pagar
         private void BtnPagar_Click(object sender, EventArgs e)
         {
+            string monto;
+            string msje = null;
+
             // Excluir Banco Security Rut 97.053.000-2
             if (!BgwPay.IsBusy && !IsCreditor && !IsRunning && IGridMain.Rows.Count > 0)
             {
@@ -1804,11 +1840,16 @@ namespace Centralizador.WinApp.GUI
                 {
                     foreach (Detalle item in DetallesDebtor)
                     {
-                        if (item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted && item.RutReceptor != "97053000")
+                        if (item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null && item.RutReceptor != "97053000")
                         {
-                            detallesFinal.Add(item);
+                            if (item.Instruction.Dte != null && item.Flag == LetterFlag.Green) // If exists Dte can Pay
+                            {
+                                detallesFinal.Add(item);
+                            }
                         }
                     }
+                    monto = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detallesFinal.Sum(x => x.MntTotal));
+                    msje = $"There are {detallesFinal.Count} pending invoices for pay:{Environment.NewLine} ${monto} (Accepted + Green Flags)";
                 }
                 else if (ChkNoIncludeCEN.CheckState == CheckState.Checked) // Only NO Participants
                 {
@@ -1819,6 +1860,8 @@ namespace Centralizador.WinApp.GUI
                             detallesFinal.Add(item);
                         }
                     }
+                    monto = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detallesFinal.Sum(x => x.MntTotal));
+                    msje = $"There are {detallesFinal.Count} pending invoices for pay:{Environment.NewLine} ${monto} (Accepted)";
                 }
                 else if (ChkNoIncludeCEN.CheckState == CheckState.Unchecked && ChkIncludeCEN.CheckState == CheckState.Unchecked)  // All
                 {
@@ -1829,14 +1872,16 @@ namespace Centralizador.WinApp.GUI
                             detallesFinal.Add(item);
                         }
                     }
+                    monto = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detallesFinal.Sum(x => x.MntTotal));
+                    msje = $"There are {detallesFinal.Count} pending invoices for pay:{Environment.NewLine} ${monto} (All)";
                 }
                 // Total
                 if (detallesFinal.Count > 0)
                 {
-                    string monto = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detallesFinal.Sum(x => x.MntTotal));
-                    DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for pay:{Environment.NewLine} ${monto} {Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    monto = string.Format(CultureInfo.CurrentCulture, "{0:N0}", detallesFinal.Sum(x => x.MntTotal));
+                    DialogResult resp = MessageBox.Show($"{msje} {Environment.NewLine} Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                    if (resp == DialogResult.OK)
+                    if (resp == DialogResult.Yes)
                     {
                         ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
                         serviceExcel.CreateNomina(BgwPay);

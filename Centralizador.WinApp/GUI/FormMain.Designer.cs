@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -67,6 +66,7 @@
             this.CboParticipants = new System.Windows.Forms.ComboBox();
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
+            this.fImageListSmall = new System.Windows.Forms.ImageList(this.components);
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -161,7 +161,7 @@
             this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
+            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -541,6 +541,18 @@
             this.CboMonths.Size = new System.Drawing.Size(107, 23);
             this.CboMonths.TabIndex = 2;
             // 
+            // fImageListSmall
+            // 
+            this.fImageListSmall.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("fImageListSmall.ImageStream")));
+            this.fImageListSmall.TransparentColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(153)))), ((int)(((byte)(153)))));
+            this.fImageListSmall.Images.SetKeyName(0, "");
+            this.fImageListSmall.Images.SetKeyName(1, "");
+            this.fImageListSmall.Images.SetKeyName(2, "");
+            this.fImageListSmall.Images.SetKeyName(3, "");
+            this.fImageListSmall.Images.SetKeyName(4, "");
+            this.fImageListSmall.Images.SetKeyName(5, "");
+            this.fImageListSmall.Images.SetKeyName(6, "");
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -613,5 +625,6 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox ChkNoIncludeCEN;
         private System.Windows.Forms.Button BtnCancelTak;
+        private System.Windows.Forms.ImageList fImageListSmall;
     }
 }

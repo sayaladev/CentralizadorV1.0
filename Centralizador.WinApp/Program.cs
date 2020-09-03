@@ -43,7 +43,7 @@ namespace Centralizador.WinApp
             }
 
             //Tester
-            tokenSii = "RWARM2S4NX7MD";
+            //tokenSii = "RWARM2S4NX7MD";
 
             // Prevent to open twice the form
             Mutex mutex = new Mutex(true, "FormMain", out bool active);

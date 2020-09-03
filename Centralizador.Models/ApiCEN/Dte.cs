@@ -247,7 +247,10 @@ namespace Centralizador.Models.ApiCEN
                     if (res != null)
                     {
                         Dte p = JsonConvert.DeserializeObject<Dte>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                        return p.Results[0];
+                        if (p.Count == 1)
+                        {
+                            return p.Results[0];
+                        }                      
                     }
                 }
             }

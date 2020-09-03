@@ -87,7 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GUI\ComunaInput.cs" />
-    <Compile Include="GUI\ErrorMsgCustom.cs" />
+    <Compile Include="GUI\MsgErrorCustom.cs" />
     <Compile Include="GUI\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
