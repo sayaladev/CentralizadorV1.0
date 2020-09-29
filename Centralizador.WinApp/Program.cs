@@ -9,6 +9,9 @@ using Centralizador.WinApp.GUI;
 
 namespace Centralizador.WinApp
 {
+    /// <summary>
+    /// Internal Class Init
+    /// </summary>
     internal static class Program
     {
 
@@ -70,7 +73,12 @@ namespace Centralizador.WinApp
                     return;
                 }
                 // Open Form
-                Application.Run(new FormMain() { TokenCen = tokenCen, TokenSii = tokenSii, Participants = participants, BillingTypes = billingTypes });
+                FormMain main = new FormMain() { TokenCen = tokenCen, TokenSii = tokenSii, Participants = participants, BillingTypes = billingTypes };
+                main.WindowState = FormWindowState.Normal;
+                main.BringToFront();
+                //main.TopMost = true;
+                main.Focus();
+                Application.Run(main);
             }
             mutex.ReleaseMutex();
 
@@ -85,5 +93,7 @@ namespace Centralizador.WinApp
             //key.SetValue("UntrustedSites", "Disabled");
             //key.Close();
         }
+
+       
     }
 }

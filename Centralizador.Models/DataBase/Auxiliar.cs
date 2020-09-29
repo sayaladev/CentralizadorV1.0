@@ -59,7 +59,7 @@ namespace Centralizador.Models.DataBase
                 query.Append("DirAux, ClaCli, ClaPro, Bloqueado, BloqueadoPro, EsReceptorDTE ,eMailDTE, Usuario, Proceso, Sistema, Region, FechaUlMod) ");
                 query.Append($"VALUES ('{instruction.ParticipantDebtor.Rut}', ");
                 query.Append($"'{instruction.ParticipantDebtor.BusinessName}','{instruction.ParticipantDebtor.Name}', ");
-                query.Append($"'{rut}-{instruction.ParticipantDebtor.VerificationCode}','S',(select GirCod from softland.cwtgiro where GirDes = '{acteco}' ),'CL','{comuna.ComCod}', ");
+                query.Append($"'{rut}-{instruction.ParticipantDebtor.VerificationCode}','S',(SELECT TOP 1 GirCod from softland.cwtgiro where GirDes = '{acteco}' ),'CL','{comuna.ComCod}', ");
                 query.Append($"'{adressTemp}','S', 'S','N', 'N', 'S','{instruction.ParticipantDebtor.DteReceptionEmail}' ");
                 query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}, '{time}') END");
                 conexion.Query = query.ToString();
