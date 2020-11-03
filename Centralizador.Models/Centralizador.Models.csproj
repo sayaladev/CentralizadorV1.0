@@ -107,6 +107,7 @@
     <Compile Include="AppFunctions\CreatePath.cs" />
     <Compile Include="AppFunctions\ServiceExcel.cs" />
     <Compile Include="AppFunctions\ServicePdf.cs" />
+    <Compile Include="AppFunctions\ValidatorFlag.cs" />
     <Compile Include="DataBase\Acteco.cs" />
     <Compile Include="DataBase\Auxiliar.cs" />
     <Compile Include="DataBase\Comuna.cs" />

@@ -25,6 +25,7 @@ using Centralizador.Models.registroreclamodteservice;
 using TenTec.Windows.iGridLib;
 
 using static Centralizador.Models.ApiSII.ServiceDetalle;
+using static Centralizador.Models.AppFunctions.ValidatorFlag;
 
 namespace Centralizador.WinApp.GUI
 {
@@ -272,10 +273,10 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Cols.Add("flagRef", "", 17, pattern);
 
             // Info checkboxes
-            IGridMain.Cols.Add("P1", "", 16, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("P2", "", 16, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("P3", "", 16, pattern).CellStyle = cellStyleCommon;
-            IGridMain.Cols.Add("P4", "", 16, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("P1", "I", 16, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("P2", "II", 16, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("P3", "III", 16, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("P4", "IV", 16, pattern).CellStyle = cellStyleCommon;
 
             // Money cols
             iGCellStyle cellStyleMoney = new iGCellStyle
@@ -311,7 +312,7 @@ namespace Centralizador.WinApp.GUI
 
             // Header
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
-            IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
+            //IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
 
 
             // Footer freezer section
@@ -994,7 +995,7 @@ namespace Centralizador.WinApp.GUI
                         foreach (ResultInstruction instruction in lista)
                         {
                             // Tester
-                            //if (instruction.Id != 1896104)
+                            //if (instruction.Id != 1924576)
                             //{
                             //    continue;
                             //}
@@ -1026,7 +1027,7 @@ namespace Centralizador.WinApp.GUI
                                         // Attach object dte
                                         detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
                                         // Flags         
-                                        detalle.Flag = ValidateCen(detalle);
+                                        detalle.ValidatorFlag = new ValidatorFlag(detalle);
                                         // Events Sii
                                         DataEvento evento = ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
                                         if (evento != null)
@@ -1167,7 +1168,7 @@ namespace Centralizador.WinApp.GUI
             {
                 foreach (Detalle item in DetallesDebtor)
                 {
-                    //if (item.Folio != 20841)
+                    //if (item.Folio != 6705)
                     //{
                     //    continue;
                     //}
@@ -1185,7 +1186,7 @@ namespace Centralizador.WinApp.GUI
                     }
                     // Get Participant
                     participant = Participant.GetParticipantByRutAsync(item.RutReceptor.ToString()).Result;
-                    if (participant != null && participant.Id > 0 && participant.Rut != "96800570") // Exclude to: Enel Distribución Chile S.A.
+                    if (participant != null && participant.Id > 0)
                     {
                         item.IsParticipant = true;
                     }
@@ -1208,7 +1209,7 @@ namespace Centralizador.WinApp.GUI
                                     IList<ResultPaymentMatrix> matrices = PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window).Result;
                                     if (matrices != null && matrices.Count > 0)
                                     {
-                                        ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(reference.RazonRef, StringComparison.OrdinalIgnoreCase));
+                                        ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(reference.RazonRef.Trim(), StringComparison.OrdinalIgnoreCase));
                                         if (matrix != null)
                                         {
                                             ResultInstruction instruction = Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant).Result;
@@ -1224,8 +1225,9 @@ namespace Centralizador.WinApp.GUI
                             }
                         }
                     }
-                    // Flags       
-                    item.Flag = ValidateCen(item);
+                    // Flags 
+                    item.ValidatorFlag = new ValidatorFlag(item);
+
                     // Events Sii  
                     item.DataEvento = ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
                     // Status
@@ -1355,6 +1357,14 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["inst"].Value = item.Instruction.Id;
                         myRow.Cells["codProd"].Value = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     }
+                    else
+                    {
+                        if (item.IsParticipant && item.DTEDef != null)
+                        {
+                            myRow.Cells["inst"].Value = "*";
+                        }
+
+                    }
                     myRow.Cells["rut"].Value = item.RutReceptor + "-" + item.DvReceptor;
                     myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
                     // Icon for Participants
@@ -1417,8 +1427,8 @@ namespace Centralizador.WinApp.GUI
                         }
                     }
                     // Flags                    
-                    myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.Flag);
-                    myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.Flag);
+                    myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.ValidatorFlag.Flag);
+                    myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.ValidatorFlag.Flag);
                     // Status      
                     switch (item.StatusDetalle)
                     {
@@ -1444,8 +1454,8 @@ namespace Centralizador.WinApp.GUI
                             rejectedTotal += item.MntTotal;
                             break;
                         case StatusDetalle.No:
-                            // Col Status
-                            if (item.Flag != LetterFlag.Green && IsCreditor == false)
+                            // Col Status                         
+                            if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && IsCreditor == false)
                             {
                                 myRow.Cells["btnRejected"].ImageIndex = 6;
                                 myRow.Cells["btnRejected"].Enabled = iGBool.True;
@@ -1470,17 +1480,15 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
                 IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
 
-
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
 
             }
             catch (Exception)
             {
-                throw;
+                //throw;
             }
             finally
             {
-
                 IGridMain.EndUpdate();
                 IGridMain.Focus();
             }
@@ -1494,6 +1502,13 @@ namespace Centralizador.WinApp.GUI
             TxtFmaPago.Text = "";
             //TxtDscItem.Text = "";
             TxtTpoDocRef.Text = "";
+
+            // Clean Colors
+            TxtFolioRef.BackColor = Color.Empty;
+            TxtFmaPago.BackColor = Color.Empty;
+            TxtRznRef.BackColor = Color.Empty;
+            TxtTpoDocRef.BackColor = Color.Empty;
+
         }
         private void BtnExcelConvert_Click(object sender, EventArgs e)
         {
@@ -1593,6 +1608,54 @@ namespace Centralizador.WinApp.GUI
                         TssLblMensaje.Text = "This Invoice has not been sent to Sii.";
                     }
                 }
+                //Req: Pintar TextBox indicando el error de la bandera roja 27-10-2020
+                if (detalle.ValidatorFlag != null && detalle.IsParticipant && detalle.DTEDef != null)
+                {
+                    if (detalle.ValidatorFlag.FmaPago && detalle.ValidatorFlag.FolioRef == false && detalle.ValidatorFlag.TpoDocRef == false && detalle.ValidatorFlag.RazonRef == false)
+                    {
+                        TxtFmaPago.BackColor = GetFlagBackColor(detalle.ValidatorFlag.Flag);
+                        TxtFolioRef.BackColor = GetFlagBackColor(LetterFlag.Green);
+                        TxtTpoDocRef.BackColor = GetFlagBackColor(LetterFlag.Green);
+                        TxtRznRef.BackColor = GetFlagBackColor(LetterFlag.Green);
+                    }
+                    if (detalle.ValidatorFlag.FmaPago)
+                    {
+                        TxtFmaPago.BackColor = GetFlagBackColor(detalle.ValidatorFlag.Flag);
+                    }
+                    else
+                    {
+                        TxtFmaPago.BackColor = GetFlagBackColor(LetterFlag.Green);
+                    }
+                    if (detalle.ValidatorFlag.FolioRef)
+                    {
+                        TxtFolioRef.BackColor = GetFlagBackColor(detalle.ValidatorFlag.Flag);
+                    }
+                    else
+                    {
+                        TxtFolioRef.BackColor = GetFlagBackColor(LetterFlag.Green);
+                    }
+                    if (detalle.ValidatorFlag.TpoDocRef)
+                    {
+                        TxtTpoDocRef.BackColor = GetFlagBackColor(detalle.ValidatorFlag.Flag);
+                    }
+                    else
+                    {
+                        TxtTpoDocRef.BackColor = GetFlagBackColor(LetterFlag.Green);
+                    }
+                    if (detalle.ValidatorFlag.RazonRef)
+                    {
+                        TxtRznRef.BackColor = GetFlagBackColor(detalle.ValidatorFlag.Flag);
+                    }
+                    else
+                    {
+                        TxtRznRef.BackColor = GetFlagBackColor(LetterFlag.Green);
+                    }
+                }
+                //IGridMain.BeginUpdate();
+                //iGRow myRow = IGridMain.CurRow;
+                //myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(detalle.ValidatorFlag.Flag);
+                // myRow.Cells["flagRef"].BackColor = GetFlagBackColor(detalle.ValidatorFlag.Flag);
+                //IGridMain.EndUpdate();
             }
         }
         private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
@@ -1842,7 +1905,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         if (item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null && item.RutReceptor != "97053000")
                         {
-                            if (item.Instruction.Dte != null && item.Flag == LetterFlag.Green) // If exists Dte can Pay
+                            if (item.Instruction.Dte != null && item.ValidatorFlag != null && item.ValidatorFlag.Flag == LetterFlag.Green) // If exists Dte can Pay
                             {
                                 detallesFinal.Add(item);
                             }

@@ -20,10 +20,10 @@ namespace Centralizador.WinApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-     
+
 
             // Variables 
-            IList<ResultBilingType> billingTypes;  
+            IList<ResultBilingType> billingTypes;
             IList<ResultParticipant> participants;
             string tokenSii;
             string tokenCen;
@@ -94,6 +94,6 @@ namespace Centralizador.WinApp
             //key.Close();
         }
 
-       
+
     }
 }

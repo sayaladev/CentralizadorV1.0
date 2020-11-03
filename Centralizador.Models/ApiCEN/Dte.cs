@@ -194,7 +194,7 @@ namespace Centralizador.Models.ApiCEN
                         if (r != null && r.Errors.Count == 0)
                         {
                             return r.ResultDte;
-                        }                     
+                        }
                     }
                 }
             }
@@ -236,7 +236,8 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
         }
-        public static async Task<ResultDte> GetDteAsync(Detalle detalle, bool isCreditor) {
+        public static async Task<ResultDte> GetDteAsync(Detalle detalle, bool isCreditor)
+        {
             try
             {
                 using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
@@ -250,7 +251,7 @@ namespace Centralizador.Models.ApiCEN
                         if (p.Count == 1)
                         {
                             return p.Results[0];
-                        }                      
+                        }
                     }
                 }
             }

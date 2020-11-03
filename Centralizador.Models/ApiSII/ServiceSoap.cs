@@ -71,7 +71,7 @@ namespace Centralizador.Models.ApiSII
             {
                 return null;
             }
-            
+
         }
         private static string FirmarSeedDigital(string documento, X509Certificate2 certificado)
         {
