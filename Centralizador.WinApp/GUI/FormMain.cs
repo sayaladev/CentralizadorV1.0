@@ -995,7 +995,7 @@ namespace Centralizador.WinApp.GUI
                         foreach (ResultInstruction instruction in lista)
                         {
                             // Tester
-                            //if (instruction.Id != 1924576)
+                            //if (instruction.Id != 2220790)
                             //{
                             //    continue;
                             //}
@@ -1485,9 +1485,9 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                new ErrorMsgCen("There was an error loading the data (IGridFill).", ex, MessageBoxIcon.Warning);
             }
             finally
             {

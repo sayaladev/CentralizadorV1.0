@@ -69,6 +69,9 @@ namespace Centralizador.Models.AppFunctions
         }
         private void ValidateCen(Detalle detalle)
         {
+            try
+            {       
+            
             if (detalle.IsParticipant)
             {
                 Flag = LetterFlag.Green; // Set Color
@@ -168,6 +171,13 @@ namespace Centralizador.Models.AppFunctions
             {
                 // No Participant
                 Flag = LetterFlag.Clear;
+            }
+
+
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
         public enum LetterFlag
