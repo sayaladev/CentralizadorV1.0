@@ -84,6 +84,7 @@ namespace Centralizador.WinApp.Properties {
   <Empresa id=""491"">TRICAHUE</Empresa>
   <Empresa id=""999"">RENOVABLE</Empresa>
   <Empresa id=""465"">TAMARUGAL</Empresa>
+  <Empresa id=""528"">ALFA</Empresa>
 </DatosEmpresas>")]
         public global::System.Xml.XmlDocument DBSoftland {
             get {

@@ -1078,6 +1078,8 @@ namespace Centralizador.WinApp.GUI
                             else
                             {
                                 // Instrucciones pendientes por facturar
+                                // Flags         
+                                detalle.ValidatorFlag = new ValidatorFlag(detalle);
 
                             }
                             DetallesCreditor.Add(detalle);
@@ -1485,7 +1487,7 @@ namespace Centralizador.WinApp.GUI
             }
             catch (Exception)
             {
-                //throw;
+                throw;
             }
             finally
             {
