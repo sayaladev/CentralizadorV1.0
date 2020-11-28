@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
@@ -55,7 +54,7 @@ namespace Centralizador.Models.ApiCEN
         {
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -92,7 +91,7 @@ namespace Centralizador.Models.ApiCEN
 
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";

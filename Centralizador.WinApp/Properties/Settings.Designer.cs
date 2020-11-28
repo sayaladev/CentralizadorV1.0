@@ -34,15 +34,6 @@ namespace Centralizador.WinApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("centra")]
-        public string DBUser {
-            get {
-                return ((string)(this["DBUser"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Softland358")]
         public string DBPassword {
             get {
@@ -89,6 +80,15 @@ namespace Centralizador.WinApp.Properties {
         public global::System.Xml.XmlDocument DBSoftland {
             get {
                 return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("centra")]
+        public string DBUser {
+            get {
+                return ((string)(this["DBUser"]));
             }
         }
     }

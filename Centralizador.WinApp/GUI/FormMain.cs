@@ -357,25 +357,27 @@ namespace Centralizador.WinApp.GUI
             {
                 UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
                 XmlDocument document = Properties.Settings.Default.DBSoftland;
+                string databaseTemp = null;               
                 foreach (XmlNode item in document.ChildNodes[0])
                 {
                     if (item.Attributes["id"].Value == UserParticipant.Id.ToString())
                     {
-                        DataBaseName = item.FirstChild.InnerText;
+                        databaseTemp = item.FirstChild.InnerText;
                         break;
                     }
                 }
-                if (string.IsNullOrEmpty(DataBaseName))
+                if (string.IsNullOrEmpty(databaseTemp))
                 {
                     MessageBox.Show("This company does not have an associated database in the config file (Xml)", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     CboParticipants.SelectedIndex = 0;
-                    TxtCtaCteParticipant.Text = "";
-                    TxtRutParticipant.Text = "";
-                    DataBaseName = "";
+                    //TxtCtaCteParticipant.Text = "";
+                    //TxtRutParticipant.Text = "";
+                    //DataBaseName = "";
                 }
                 else
                 {
                     // Success
+                    DataBaseName = databaseTemp;
                     TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
                     TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
                 }
@@ -624,15 +626,17 @@ namespace Centralizador.WinApp.GUI
                             //CodAux = item.Instruction.ParticipantDebtor.Rut
                         };
                         Auxiliar auxiliar = aux.GetAuxiliar(item.Instruction, con);
+                        Comuna comunaobj = null;
+                        string promptValue;
                         if (auxiliar == null)
                         {
-                            Comuna comunaobj = null;
+                           
                             // Insert New Auxiliar
 
                             // Get Comuna
                             do
                             {
-                                string promptValue = ComunaInput.ShowDialog(Application.ProductName,
+                                promptValue = ComunaInput.ShowDialog(Application.ProductName,
                                     $"'Comuna' not found, please input below:",
                                     item.Instruction.ParticipantDebtor.BusinessName,
                                     item.RutReceptor,
@@ -666,15 +670,33 @@ namespace Centralizador.WinApp.GUI
                         else
                         {
                             // Yes Exists : Update
-                            if (auxiliar.ComAux == null || auxiliar.DirAux == null || auxiliar.GirAux == null || auxiliar.RutAux == null)
+                            // Check if aux was created wrong.
+                            if (auxiliar.ComAux == null)
                             {
-                                // Only msg
-                                StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError, update in Softland: {item.Instruction.ParticipantDebtor.Rut}");
+                                // Get Comuna
+                                do
+                                {
+                                    promptValue = ComunaInput.ShowDialog(Application.ProductName,
+                                        $"'Comuna' not found, please input below:",
+                                        item.Instruction.ParticipantDebtor.BusinessName,
+                                        item.RutReceptor,
+                                        item.Instruction.ParticipantDebtor.CommercialAddress,
+                                        comunas);
+
+                                    comunaobj = comunas.FirstOrDefault(x => aux.RemoveDiacritics(x.ComDes).ToLower() == aux.RemoveDiacritics(promptValue.ToLower()));
+                                } while (comunaobj == null);
+
                             }
-                            //else
-                            //{
+                            else
+                            {
+                                comunaobj = new Comuna { ComCod = auxiliar.ComAux };
+                            }
+                            // Only msg
+                            //StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tBad aux created in Softland, Fixed !: {item.Instruction.ParticipantDebtor.Rut}");
+
+
                             // Update Aux
-                            result = aux.UpdateAuxiliar(item.Instruction, con);
+                            result = aux.UpdateAuxiliar(item.Instruction, con, comunaobj);
                             // 1= update ok 2= update ok (en algunos escenarios)
                             if (result == 0)
                             {
@@ -691,8 +713,7 @@ namespace Centralizador.WinApp.GUI
                                 {
                                     StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
                                 }
-                            }
-                            //}
+                            }                  
                         }
                         // Insert NV  
                         if (resultInsertNV == 1)
@@ -926,7 +947,7 @@ namespace Centralizador.WinApp.GUI
         {
             if (e.Cancelled == true)
             {
-                TssLblMensaje.Text = "Canceled!";
+                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
             }
 
             TssLblProgBar.Value = 0;
@@ -995,7 +1016,7 @@ namespace Centralizador.WinApp.GUI
                         foreach (ResultInstruction instruction in lista)
                         {
                             // Tester
-                            //if (instruction.Id != 2220790)
+                            //if (instruction.Id != 2177368)
                             //{
                             //    continue;
                             //}
@@ -1006,10 +1027,14 @@ namespace Centralizador.WinApp.GUI
                             // REF from Softland 
                             IList<Reference> references = Reference.GetInfoFactura(instruction, con);
                             detalle.StatusDetalle = StatusDetalle.No;
+
+                            // Flags       ACA NO FUNCIONA PORQUE ESTÁ SIN LAS REFERENCIAS
+                            detalle.ValidatorFlag = new ValidatorFlag(detalle);
+
                             if (references != null)
                             {
                                 Reference reference = references.OrderByDescending(x => x.Folio).First();
-                                // Compare DateTime
+                                // Compare DateTime // REVISAR TAMARUGAL FOLIO  F 1743 !!!!!!!!!!!!!!!!!!!!!!!!!!
                                 int compare = DateTime.Compare(reference.FechaEmision, instruction.PaymentMatrix.PublishDate);
                                 if (compare > 0)
                                 {
@@ -1020,14 +1045,16 @@ namespace Centralizador.WinApp.GUI
                                     detalle.MntIva = reference.Iva;
                                     detalle.MntTotal = reference.Total;
 
+
+                                    // DEBO SABER QUE SIGNIFICA FILEENVIADO
+                                    // MIENTRAS EVALUARÉ FECHA ENVIO A SII
                                     if (reference.FileEnviado != null)
                                     {
                                         // Facturado y enviado al Sii
                                         detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
                                         // Attach object dte
                                         detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
-                                        // Flags         
-                                        detalle.ValidatorFlag = new ValidatorFlag(detalle);
+
                                         // Events Sii
                                         DataEvento evento = ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
                                         if (evento != null)
@@ -1079,7 +1106,7 @@ namespace Centralizador.WinApp.GUI
                             {
                                 // Instrucciones pendientes por facturar
                                 // Flags         
-                                detalle.ValidatorFlag = new ValidatorFlag(detalle);
+                                //detalle.ValidatorFlag = new ValidatorFlag(detalle);
 
                             }
                             DetallesCreditor.Add(detalle);
@@ -1113,7 +1140,7 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = 0;
             IsRunning = false;
             Watch.Stop();
-            TssLblMensaje.Text += "         *[" + Watch.Elapsed.TotalSeconds + " seconds.]";
+            TssLblMensaje.Text += "         *[" + Watch.Elapsed.TotalSeconds.ToString("0.00") + " seconds.]";
             // Buttons
             BtnPagar.Enabled = false;
             BtnInsertNv.Enabled = true;
@@ -1123,7 +1150,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.BackgroundImage = null;
             if (e.Cancelled == true)
             {
-                TssLblMensaje.Text = "Canceled!";
+                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
             }
         }
 
@@ -1295,7 +1322,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.BackgroundImage = null;
             if (e.Cancelled == true)
             {
-                TssLblMensaje.Text = "Canceled!";
+                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
             }
 
         }

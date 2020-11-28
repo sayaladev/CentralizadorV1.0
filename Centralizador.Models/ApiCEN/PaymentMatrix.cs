@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
@@ -102,7 +101,7 @@ namespace Centralizador.Models.ApiCEN
             DateTime createdBefore = date.AddMonths(1);
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -130,7 +129,7 @@ namespace Centralizador.Models.ApiCEN
         {
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?billing_window={window.Id}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";

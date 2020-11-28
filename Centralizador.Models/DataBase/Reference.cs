@@ -22,37 +22,42 @@ namespace Centralizador.Models.DataBase
         public string Rut { get; set; }
         public static IList<Reference> GetInfoFactura(ResultInstruction instruction, Conexion conexion)
         {
-
             try
             {
                 StringBuilder query = new StringBuilder();
 
-                query.Append("SELECT ");
-                query.Append("  g.Folio, ");
-                query.Append("  g.NroInt, ");
-                query.Append("  l.Fecha 'RecepcionSii', ");
-                query.Append("  g.Fecha, ");
-                query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = l.XMLSET) 'FileEnviado', ");
-                query.Append("  (SELECT Archivo FROM softland.dte_archivos WHERE ID_Archivo = c.IDXMLDoc) 'FileBasico', ");
-                query.Append("  g.NetoAfecto, ");
-                query.Append("  g.IVA, ");
-                query.Append("  g.Total, ");
-                query.Append("  g.CodAux ");
+                query.Append("SELECT g.Folio ");
+                query.Append("        ,g.NroInt ");
+                query.Append("        ,l.Fecha 'RecepcionSii' ");
+                query.Append("        ,g.Fecha ");
+                query.Append("        ,( ");
+                query.Append("                SELECT Archivo ");
+                query.Append("                FROM softland.dte_archivos ");
+                query.Append("                WHERE ID_Archivo = l.XMLSET ");
+                query.Append("                ) 'FileEnviado' ");
+                query.Append("        ,( ");
+                query.Append("                SELECT Archivo ");
+                query.Append("                FROM softland.dte_archivos ");
+                query.Append("                WHERE ID_Archivo = c.IDXMLDoc ");
+                query.Append("                ) 'FileBasico' ");
+                query.Append("        ,g.NetoAfecto ");
+                query.Append("        ,g.IVA ");
+                query.Append("        ,g.Total ");
+                query.Append("        ,g.CodAux ");
                 query.Append("FROM softland.IW_GSaEn_RefDTE r ");
-                query.Append("FULL OUTER JOIN softland.iw_gsaen g ");
-                //query.Append("INNER JOIN softland.iw_gsaen g ");
-                query.Append("  ON r.NroInt = g.NroInt ");
-                query.Append("  AND r.Tipo = 'F' ");
-                query.Append($"  AND (r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' ");
-                query.Append($"  OR r.FolioRef = '{instruction.PaymentMatrix.ReferenceCode}') ");
-                query.Append("LEFT JOIN softland.DTE_DocCab c ");
-                query.Append("  ON c.Folio = g.Folio ");
-                query.Append("  AND c.NroInt = g.NroInt ");
-                query.Append("LEFT JOIN softland.dte_logrecenv l ");
-                query.Append("  ON l.IDSetDTE = c.IDSetDTESII ");
+                query.Append("FULL OUTER JOIN softland.iw_gsaen g ON r.NroInt = g.NroInt ");
+                query.Append("        AND r.Tipo = 'F' ");
+                query.Append("        AND ( ");
+                query.Append($"                r.Glosa = '{instruction.PaymentMatrix.NaturalKey}' ");
+                query.Append($"                OR r.FolioRef = '{instruction.PaymentMatrix.ReferenceCode}' ");
+                query.Append("                ) ");
+                query.Append("LEFT JOIN softland.DTE_DocCab c ON c.Folio = g.Folio ");
+                query.Append("        AND c.NroInt = g.NroInt ");
+                query.Append("LEFT JOIN softland.dte_logrecenv l ON l.IDSetDTE = c.IDSetDTESII ");
                 query.Append($"WHERE g.NetoAfecto = {instruction.Amount} ");
-                query.Append($"AND g.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
+                query.Append($"        AND g.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 query.Append("ORDER BY g.Folio DESC ");
+
 
                 IList<Reference> softland = new List<Reference>();
                 conexion.Query = query.ToString();
@@ -60,7 +65,6 @@ namespace Centralizador.Models.DataBase
                 dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-
                     foreach (DataRow item in dataTable.Rows)
                     {
                         Reference reference = new Reference();
@@ -107,7 +111,6 @@ namespace Centralizador.Models.DataBase
                         softland.Add(reference);
                     }
                     return softland;
-
                 }
             }
             catch (Exception)

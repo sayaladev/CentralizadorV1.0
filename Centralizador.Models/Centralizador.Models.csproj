@@ -92,6 +92,9 @@
   <ItemGroup>
     <Compile Include="ApiCEN\Agent.cs" />
     <Compile Include="ApiCEN\AuxiliaryData.cs" />
+    <Compile Include="ApiCEN\WebClientCustom.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ApiCEN\Pay.cs" />
     <Compile Include="ApiCEN\TableBillingType.cs" />
     <Compile Include="ApiCEN\BillingWindow.cs" />

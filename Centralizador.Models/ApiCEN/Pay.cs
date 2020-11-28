@@ -68,7 +68,7 @@ namespace Centralizador.Models.ApiCEN
         {
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/operations/payments/create/");
                     string d = JsonConvert.SerializeObject(pay);

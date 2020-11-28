@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
@@ -67,7 +66,7 @@ namespace Centralizador.Models.ApiCEN
         {
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={userCEN}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -104,7 +103,7 @@ namespace Centralizador.Models.ApiCEN
                 };
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/token-auth/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";

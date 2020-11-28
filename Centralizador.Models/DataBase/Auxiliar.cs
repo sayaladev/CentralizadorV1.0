@@ -119,9 +119,22 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
-        public int UpdateAuxiliar(ResultInstruction instruction, Conexion conexion)
+        public int UpdateAuxiliar(ResultInstruction instruction, Conexion conexion, Comuna comuna)
         {
             string name;
+            string acteco = null;
+            CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+            string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", DateTime.Now);
+            string adressTemp = ti.ToTitleCase(instruction.ParticipantDebtor.CommercialAddress.ToLower());
+            if (instruction.ParticipantDebtor.CommercialAddress.Contains(','))
+            {
+                int index = instruction.ParticipantDebtor.CommercialAddress.IndexOf(',');
+                adressTemp = instruction.ParticipantDebtor.CommercialAddress.Substring(0, index);
+            }
+            if (adressTemp.Length > 60) { adressTemp = adressTemp.Substring(0, 60); }
+
+            // Address
             if (instruction.ParticipantDebtor.BusinessName.Length > 60)
             {
                 name = instruction.ParticipantDebtor.BusinessName.Substring(0, 60);
@@ -130,12 +143,35 @@ namespace Centralizador.Models.DataBase
             {
                 name = instruction.ParticipantDebtor.BusinessName;
             }
+            // Get acteco from CEN
+            if (instruction.ParticipantDebtor.CommercialBusiness != null)
+            {
+                if (instruction.ParticipantDebtor.CommercialBusiness.Length > 60)
+                {
+                    acteco = instruction.ParticipantDebtor.CommercialBusiness.Substring(0, 60);
+                }
+                else
+                {
+                    acteco = instruction.ParticipantDebtor.CommercialBusiness;
+                }
+                // Insert new Acteco
+                Acteco.InsertActeco(acteco, conexion);
+            }
 
+            // Production:
+            if (Environment.MachineName == "DEVELOPER")
+            {
+                time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
+            }
 
             try
             {
                 StringBuilder query = new StringBuilder();
-                query.Append($"UPDATE softland.cwtauxi SET NomAux='{name}', NoFAux='{instruction.ParticipantDebtor.Name}', ");
+                string rut = string.Format(CultureInfo.CurrentCulture, "{0:N0}", instruction.ParticipantDebtor.Rut).Replace(',', '.');
+                query.Append($"UPDATE softland.cwtauxi SET NomAux='{name}', NoFAux='{instruction.ParticipantDebtor.Name}', ClaCli = 'S', ClaPro = 'S', Bloqueado = 'N', ");
+                query.Append($"Comaux = '{comuna.ComCod}', GirAux = (SELECT TOP 1 GirCod from softland.cwtgiro where GirDes = '{acteco}' ), EsReceptorDTE = 'S', PaiAux='CL', ActAux='S', ");
+                query.Append($"Usuario='Softland', Proceso='Centralizador', Sistema='IW', RutAux='{rut}-{instruction.ParticipantDebtor.VerificationCode}', FechaUlMod ='{time}', ");
+                query.Append($"DirAux = '{adressTemp}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 conexion.Query = query.ToString();
                 int res = Conexion.ExecuteNonQueryAsync(conexion).Result;

@@ -119,7 +119,7 @@ namespace Centralizador.Models.ApiCEN
                 };
                 try
                 {
-                    using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                    using (WebClientCustom wc = new WebClientCustom())
                     {
                         Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/operations/dtes/create/");
                         string d = JsonConvert.SerializeObject(dte);
@@ -178,7 +178,7 @@ namespace Centralizador.Models.ApiCEN
             }
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/operations/dtes/create/");
                     string d = JsonConvert.SerializeObject(dte);
@@ -216,7 +216,7 @@ namespace Centralizador.Models.ApiCEN
         {
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/resources/auxiliary-files/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
@@ -240,7 +240,7 @@ namespace Centralizador.Models.ApiCEN
         {
             try
             {
-                using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                using (WebClientCustom wc = new WebClientCustom())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&folio={detalle.Folio}&instruccion={detalle.Instruction.Id}&creditor={detalle.Instruction.Creditor}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";

@@ -70,108 +70,108 @@ namespace Centralizador.Models.AppFunctions
         private void ValidateCen(Detalle detalle)
         {
             try
-            {       
-            
-            if (detalle.IsParticipant)
             {
-                Flag = LetterFlag.Green; // Set Color
-                if (detalle.DTEDef != null)
-                {
-                    DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-                    // Valide FmaPago
-                    if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
-                    {
-                        Flag = LetterFlag.Yellow;
-                        FmaPago = true;
-                    }
 
-                    // Valide Reference
-                    if (dte.Referencia != null)
+                if (detalle.IsParticipant)
+                {
+                    Flag = LetterFlag.Green; // Set Color
+                    if (detalle.DTEDef != null)
                     {
-                        DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
-                        if (referencia != null)
+                        DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                        // Valide FmaPago
+                        if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
                         {
-                            // Valide NroLinRef
-                            if (string.IsNullOrEmpty(referencia.NroLinRef))
+                            Flag = LetterFlag.Yellow;
+                            FmaPago = true;
+                        }
+
+                        // Valide Reference
+                        if (dte.Referencia != null)
+                        {
+                            DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
+                            if (referencia != null)
                             {
-                                NroLinRef = true;
+                                // Valide NroLinRef
+                                if (string.IsNullOrEmpty(referencia.NroLinRef))
+                                {
+                                    NroLinRef = true;
+                                }
+                                // Valide FolioRef ex: DE01724A17C14S0015
+                                if (detalle.Instruction != null && (string.Compare(referencia.FolioRef.Trim(), detalle.Instruction.PaymentMatrix.ReferenceCode, true) != 0)) // IgnoreCase
+                                {
+                                    Flag = LetterFlag.Red;
+                                    FolioRef = true;
+                                }
+                                // Valide RazonRef ex: SEN_[RBPA][Ene18-Dic18][R][V02]
+                                if (detalle.Instruction != null && (string.Compare(referencia.RazonRef.Trim(), detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)) // IgnoreCase
+                                {
+                                    Flag = LetterFlag.Red;
+                                    RazonRef = true;
+                                }
+                                // Valide FchRef
+                                if (string.IsNullOrEmpty(referencia.FchRef.ToString()))
+                                {
+                                    FchRef = true;
+                                }
                             }
-                            // Valide FolioRef ex: DE01724A17C14S0015
-                            if (detalle.Instruction != null && (string.Compare(referencia.FolioRef.Trim(), detalle.Instruction.PaymentMatrix.ReferenceCode, true) != 0)) // IgnoreCase
+                            else
                             {
                                 Flag = LetterFlag.Red;
-                                FolioRef = true;
-                            }
-                            // Valide RazonRef ex: SEN_[RBPA][Ene18-Dic18][R][V02]
-                            if (detalle.Instruction != null && (string.Compare(referencia.RazonRef.Trim(), detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)) // IgnoreCase
-                            {
-                                Flag = LetterFlag.Red;
-                                RazonRef = true;
-                            }
-                            // Valide FchRef
-                            if (string.IsNullOrEmpty(referencia.FchRef.ToString()))
-                            {
-                                FchRef = true;
+                                TpoDocRef = true;
                             }
                         }
                         else
                         {
                             Flag = LetterFlag.Red;
+                            FolioRef = true;
+                            RazonRef = true;
                             TpoDocRef = true;
                         }
-                    }
-                    else
-                    {
-                        Flag = LetterFlag.Red;
-                        FolioRef = true;
-                        RazonRef = true;
-                        TpoDocRef = true;
-                    }
 
-                    // Valide Instruction
-                    if (detalle.Instruction == null)
-                    {
-                        Flag = LetterFlag.Red;
-                        FolioRef = true;
-                        RazonRef = true;
-                        TpoDocRef = true;
+                        // Valide Instruction
+                        if (detalle.Instruction == null)
+                        {
+                            Flag = LetterFlag.Red;
+                            FolioRef = true;
+                            RazonRef = true;
+                            TpoDocRef = true;
+                        }
+                        else
+                        {
+                            // Valide Amount 
+                            if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
+                            {
+                                Flag = LetterFlag.Blue;
+                            }
+                            // Valide DscItem ex: SEN_[RBPA][Ene18-Dic18][R][V02]
+                            //if (dte.Detalle != null && dte.Detalle.Length == 1 && dte.Detalle[0].DscItem != null )
+                            //{
+                            //    if (string.Compare(dte.Detalle[0].DscItem.TrimEnd(), detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0) // IgnoreCase
+                            //    {
+                            //        Flag = LetterFlag.Yellow;
+                            //        DscItem = true;
+                            //    }
+                            //}
+                        }
+                        // Valide excluide
+                        // Enel Distribución Chile S.A. & Chilquinta Energía S.A && Cge S.A
+                        // 96800570 / 96813520 / 76411321
+                        if (detalle.RutReceptor == "96800570" || detalle.RutReceptor == "96813520" || detalle.RutReceptor == "76411321")
+                        {
+                            Flag = LetterFlag.Clear;
+                        }
                     }
                     else
                     {
-                        // Valide Amount 
-                        if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
-                        {
-                            Flag = LetterFlag.Blue;
-                        }
-                        // Valide DscItem ex: SEN_[RBPA][Ene18-Dic18][R][V02]
-                        //if (dte.Detalle != null && dte.Detalle.Length == 1 && dte.Detalle[0].DscItem != null )
-                        //{
-                        //    if (string.Compare(dte.Detalle[0].DscItem.TrimEnd(), detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0) // IgnoreCase
-                        //    {
-                        //        Flag = LetterFlag.Yellow;
-                        //        DscItem = true;
-                        //    }
-                        //}
-                    }
-                    // Valide excluide
-                    // Enel Distribución Chile S.A. & Chilquinta Energía S.A && Cge S.A
-                    // 96800570 / 96813520 / 76411321
-                    if (detalle.RutReceptor == "96800570" || detalle.RutReceptor == "96813520" || detalle.RutReceptor == "76411321")
-                    {
-                        Flag = LetterFlag.Clear;
+                        // No Xml
+                        Flag = LetterFlag.Red;
                     }
                 }
                 else
                 {
-                    // No Xml
-                    Flag = LetterFlag.Red;
+                    // No Participant
+                    Flag = LetterFlag.Clear;
                 }
-            }
-            else
-            {
-                // No Participant
-                Flag = LetterFlag.Clear;
-            }
 
 
             }
