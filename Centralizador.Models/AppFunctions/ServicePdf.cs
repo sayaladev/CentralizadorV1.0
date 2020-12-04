@@ -30,7 +30,6 @@ namespace Centralizador.Models.AppFunctions
             Detalles = detalles;
         }
 
-
         /// <summary>
         /// Method return a object (Xml 'EnvioDTE' to object).
         /// </summary>
@@ -54,42 +53,42 @@ namespace Centralizador.Models.AppFunctions
 
         }
 
-        public static RespuestaDTE TransformXmlRespuestaDTEToObject(string pathFile)
-        {
-            try
-            {
-                XmlSerializer deserializer = new XmlSerializer(typeof(RespuestaDTE));
-                using (StreamReader reader = new StreamReader(pathFile, Encoding.Default))
-                {
-                    RespuestaDTE document = (RespuestaDTE)deserializer.Deserialize(reader);
-                    return document;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+        //public static RespuestaDTE TransformXmlRespuestaDTEToObject(string pathFile)
+        //{
+        //    try
+        //    {
+        //        XmlSerializer deserializer = new XmlSerializer(typeof(RespuestaDTE));
+        //        using (StreamReader reader = new StreamReader(pathFile, Encoding.Default))
+        //        {
+        //            RespuestaDTE document = (RespuestaDTE)deserializer.Deserialize(reader);
+        //            return document;
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
 
-        }
-        public static string TransformObjectToXml(RespuestaDTEResultadoResultadoDTE obj)
-        {
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(RespuestaDTEResultadoResultadoDTE), new XmlRootAttribute("ResultadoDTE"));
-                using (Utf8StringWriter stringWriter = new Utf8StringWriter())
-                {
-                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
-                    {
-                        serializer.Serialize(xmlWriter, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
-                    }
-                    return stringWriter.ToString();
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
+        //}
+        //public static string TransformObjectToXml(RespuestaDTEResultadoResultadoDTE obj)
+        //{
+        //    try
+        //    {
+        //        XmlSerializer serializer = new XmlSerializer(typeof(RespuestaDTEResultadoResultadoDTE), new XmlRootAttribute("ResultadoDTE"));
+        //        using (Utf8StringWriter stringWriter = new Utf8StringWriter())
+        //        {
+        //            using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
+        //            {
+        //                serializer.Serialize(xmlWriter, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
+        //            }
+        //            return stringWriter.ToString();
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
 
         /// <summary>
         /// 
@@ -144,6 +143,25 @@ namespace Centralizador.Models.AppFunctions
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        public static string TransformObjectToXmlDte(DTEDefType obj) // DTE INSERT REF INTO XML AND UPDATE DB => FILED SEND TO CLIENTS
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(DTEDefType), new XmlRootAttribute("DTE"));             
+                using (Utf8StringWriter stringWriter = new Utf8StringWriter())
+                {
+                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
+                    {
+                        serializer.Serialize(xmlWriter, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
+                    }
+                    return stringWriter.ToString();
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
         public static string TransformObjectToXml(DTEDefType obj)
         {
             try
@@ -163,6 +181,7 @@ namespace Centralizador.Models.AppFunctions
                 return null;
             }
         }
+
         public sealed class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding => Encoding.UTF8;
@@ -277,12 +296,13 @@ namespace Centralizador.Models.AppFunctions
                     NarrowBarWidth = 2
                 };
                 //encoder.WidthToHeightRatio(1.9);
-                encoder.Encode(TransformObjectToXml(documento.TED).ToString());
+                encoder.Encode(TransformObjectToXml(documento.TED).ToString());  
                 encoder.SaveBarcodeToPngFile(Path.GetTempPath() + "\\timbre.png");
                 XsltArgumentList argumentList = new XsltArgumentList();
                 argumentList.AddParam("timbre", "", Path.GetTempPath() + "\\timbre.png");
                 // Xml to Html
                 XmlDocument xmlDocument = new XmlDocument();
+                //xmlDocument.LoadXml(TransformObjectToXml(obj.DTEDef));
                 xmlDocument.LoadXml(TransformObjectToXml(obj.DTEDef));
                 XslCompiledTransform transform = new XslCompiledTransform();
                 using (XmlReader xmlReader = XmlReader.Create(new StringReader(Properties.Resources.EncoderXmlToHtml)))
@@ -303,5 +323,46 @@ namespace Centralizador.Models.AppFunctions
                 throw;
             }
         }
+
+        //public static string TransformObjectToXml2(EnvioDTE obj)
+        //{
+        //    try
+        //    {
+        //        XmlSerializer serializer = new XmlSerializer(typeof(EnvioDTE));
+        //        using (Utf8StringWriter stringWriter = new Utf8StringWriter())
+        //        {
+        //            using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
+        //            {
+        //                serializer.Serialize(xmlWriter, obj);
+        //            }
+        //            return stringWriter.ToString();
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
+
+        //public static EnvioDTE TransformStringDTEDefTypeToObjectDTE2(string file)
+        //{
+        //    try
+        //    {
+        //        XmlDocument xmlDoc = new XmlDocument();
+        //        xmlDoc.LoadXml(file);
+        //        xmlDoc.DocumentElement.SetAttribute("xmlns", "http://www.sii.cl/SiiDte");
+        //        XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
+        //        using (StringReader reader = new StringReader(xmlDoc.InnerXml))
+        //        {
+        //            EnvioDTE document = (EnvioDTE)deserializer.Deserialize(reader);
+        //            return document;
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+
+        //}
     }
 }

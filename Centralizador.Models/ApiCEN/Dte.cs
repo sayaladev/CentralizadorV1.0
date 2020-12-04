@@ -99,10 +99,10 @@ namespace Centralizador.Models.ApiCEN
         /// <param name="detalle"></param>
         /// <param name="tokenCen"></param>
         /// <returns></returns>
-        public static async Task<ResultDte> SendDteCreditorAsync(Detalle detalle, string tokenCen)
+        public static async Task<ResultDte> SendDteCreditorAsync(Detalle detalle, string tokenCen, string doc)
         {
             string fileName = detalle.Folio + "_" + detalle.Instruction;
-            string idFile = SendFileAsync(tokenCen, fileName, detalle.References.FileBasico).Result;
+            string idFile = SendFileAsync(tokenCen, fileName, doc).Result;
             if (!string.IsNullOrEmpty(idFile))
             {
                 ResultDte dte = new ResultDte
@@ -171,7 +171,7 @@ namespace Centralizador.Models.ApiCEN
                 case StatusDetalle.Rejected:
                     dte.AcceptanceStatus = 2;
                     break;
-                case StatusDetalle.No:
+                case StatusDetalle.Pending:
                     break;
                 default:
                     break;

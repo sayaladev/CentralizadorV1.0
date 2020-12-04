@@ -24,11 +24,13 @@ namespace Centralizador.Models.AppFunctions
         // Flag Color
         public LetterFlag Flag { get; set; }
 
-        public ValidatorFlag(Detalle detalle)
+        // Constructor
+        public ValidatorFlag(Detalle detalle, bool isCreditor)
         {
-            ValidateCen(detalle);
+            ValidateCen(detalle, isCreditor);
         }
 
+        // Functions
         public static int GetFlagImageIndex(LetterFlag flag)
         {
 
@@ -48,7 +50,6 @@ namespace Centralizador.Models.AppFunctions
                     return 16;
             }
         }
-
         public static Color GetFlagBackColor(LetterFlag flag)
         {
             switch (flag)
@@ -67,14 +68,14 @@ namespace Centralizador.Models.AppFunctions
                     return Color.Empty;
             }
         }
-        private void ValidateCen(Detalle detalle)
+        private void ValidateCen(Detalle detalle, bool isCreditor)
         {
             try
             {
-
-                if (detalle.IsParticipant)
+                if (detalle.Folio > 0 && detalle.IsParticipant) // Facturada
                 {
-                    Flag = LetterFlag.Green; // Set Color
+                    // Set Default.
+                    Flag = LetterFlag.Green;
                     if (detalle.DTEDef != null)
                     {
                         DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
@@ -102,7 +103,7 @@ namespace Centralizador.Models.AppFunctions
                                     Flag = LetterFlag.Red;
                                     FolioRef = true;
                                 }
-                                // Valide RazonRef ex: SEN_[RBPA][Ene18-Dic18][R][V02]
+                                // Valide RazonRef ex: SEN_[RBPA][Ene18-Dic18][R][V02] / Glosa
                                 if (detalle.Instruction != null && (string.Compare(referencia.RazonRef.Trim(), detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)) // IgnoreCase
                                 {
                                     Flag = LetterFlag.Red;
@@ -128,7 +129,7 @@ namespace Centralizador.Models.AppFunctions
                             TpoDocRef = true;
                         }
 
-                        // Valide Instruction
+                        // Valide Instruction (Only Debtor)
                         if (detalle.Instruction == null)
                         {
                             Flag = LetterFlag.Red;
@@ -156,24 +157,21 @@ namespace Centralizador.Models.AppFunctions
                         // Valide excluide
                         // Enel Distribución Chile S.A. & Chilquinta Energía S.A && Cge S.A
                         // 96800570 / 96813520 / 76411321
-                        if (detalle.RutReceptor == "96800570" || detalle.RutReceptor == "96813520" || detalle.RutReceptor == "76411321")
+                        if ((detalle.RutReceptor == "96800570" || detalle.RutReceptor == "96813520" || detalle.RutReceptor == "76411321") && (isCreditor == false ) )
                         {
                             Flag = LetterFlag.Clear;
                         }
                     }
                     else
-                    {
-                        // No Xml
+                    {   // No Xml
                         Flag = LetterFlag.Red;
                     }
                 }
                 else
                 {
-                    // No Participant
+                    // No facturada & No participant
                     Flag = LetterFlag.Clear;
                 }
-
-
             }
             catch (Exception)
             {

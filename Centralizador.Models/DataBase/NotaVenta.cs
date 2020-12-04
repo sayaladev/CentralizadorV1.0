@@ -49,19 +49,13 @@ namespace Centralizador.Models.DataBase
         }
 
         public static int InsertNv(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
-        {
-            CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+        {           
             try
             {
                 StringBuilder query = new StringBuilder();
 
                 // Production:
-                string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", DateTime.Now);
-
-                if (Environment.MachineName == "DEVELOPER")
-                {
-                    time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
-                }
+                string time = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
                 int neto = instruction.Amount;
                 double iva = neto * 0.19;

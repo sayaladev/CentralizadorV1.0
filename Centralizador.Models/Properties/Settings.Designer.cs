@@ -74,7 +74,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinadorelectrico.cl/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinador.cl/")]
         public global::System.Uri BaseAddress {
             get {
                 return ((global::System.Uri)(this["BaseAddress"]));

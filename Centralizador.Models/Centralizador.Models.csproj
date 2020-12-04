@@ -50,11 +50,11 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EAGetMail, Version=5.2.0.1, Culture=neutral, PublicKeyToken=e10a0812eb29cf94, processorArchitecture=MSIL">
-      <HintPath>..\packages\EAGetMail.5.2.0.1\lib\net461\EAGetMail.dll</HintPath>
+    <Reference Include="EAGetMail, Version=5.2.0.9, Culture=neutral, PublicKeyToken=e10a0812eb29cf94, processorArchitecture=MSIL">
+      <HintPath>..\packages\EAGetMail.5.2.0.9\lib\net461\EAGetMail.dll</HintPath>
     </Reference>
-    <Reference Include="EASendMail, Version=7.7.0.1, Culture=neutral, PublicKeyToken=88adb80ecd66540b, processorArchitecture=MSIL">
-      <HintPath>..\packages\EASendMail.7.7.0.1\lib\net461\EASendMail.dll</HintPath>
+    <Reference Include="EASendMail, Version=7.7.0.5, Culture=neutral, PublicKeyToken=88adb80ecd66540b, processorArchitecture=MSIL">
+      <HintPath>..\packages\EASendMail.7.7.0.5\lib\net461\EASendMail.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -66,14 +66,14 @@
     <Reference Include="Pdf417EncoderLibrary, Version=2.11.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Pdf417EncoderLibrary.2.1.0\lib\netstandard2.0\Pdf417EncoderLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Spire.License, Version=1.3.8.46, Culture=neutral, PublicKeyToken=b1144360237c8b3f, processorArchitecture=MSIL">
-      <HintPath>..\packages\FreeSpire.XLS.10.1.0\lib\net46\Spire.License.dll</HintPath>
+    <Reference Include="Spire.License, Version=1.3.8.40, Culture=neutral, PublicKeyToken=b1144360237c8b3f, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeSpire.XLS.10.10.0\lib\net40\Spire.License.dll</HintPath>
     </Reference>
-    <Reference Include="Spire.Pdf, Version=6.1.4.2046, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
-      <HintPath>..\packages\FreeSpire.XLS.10.1.0\lib\net46\Spire.Pdf.dll</HintPath>
+    <Reference Include="Spire.Pdf, Version=6.10.0.0, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeSpire.XLS.10.10.0\lib\net40\Spire.Pdf.dll</HintPath>
     </Reference>
-    <Reference Include="Spire.XLS, Version=10.1.4.61046, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
-      <HintPath>..\packages\FreeSpire.XLS.10.1.0\lib\net46\Spire.XLS.dll</HintPath>
+    <Reference Include="Spire.XLS, Version=10.10.1.0, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeSpire.XLS.10.10.0\lib\net40\Spire.XLS.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -92,9 +92,6 @@
   <ItemGroup>
     <Compile Include="ApiCEN\Agent.cs" />
     <Compile Include="ApiCEN\AuxiliaryData.cs" />
-    <Compile Include="ApiCEN\WebClientCustom.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ApiCEN\Pay.cs" />
     <Compile Include="ApiCEN\TableBillingType.cs" />
     <Compile Include="ApiCEN\BillingWindow.cs" />
@@ -102,6 +99,9 @@
     <Compile Include="ApiCEN\Instruction.cs" />
     <Compile Include="ApiCEN\Participant.cs" />
     <Compile Include="ApiCEN\PaymentMatrix.cs" />
+    <Compile Include="ApiCEN\WebClientCustom.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ApiSII\Data.cs" />
     <Compile Include="ApiSII\MetaData.cs" />
     <Compile Include="ApiSII\ServiceEvento.cs" />
@@ -115,8 +115,10 @@
     <Compile Include="DataBase\Auxiliar.cs" />
     <Compile Include="DataBase\Comuna.cs" />
     <Compile Include="DataBase\Conexion.cs" />
+    <Compile Include="DataBase\DteFiles.cs" />
+    <Compile Include="DataBase\DteLog.cs" />
     <Compile Include="DataBase\NotaVenta.cs" />
-    <Compile Include="DataBase\Reference.cs" />
+    <Compile Include="DataBase\DteInfoRef.cs" />
     <Compile Include="Outlook\ServiceSendMail.cs" />
     <Compile Include="Outlook\XsdEnvioDTE.cs" />
     <Compile Include="Outlook\ServiceReadMail.cs" />

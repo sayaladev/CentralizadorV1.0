@@ -20,7 +20,7 @@ namespace Centralizador.Models.DataBase
         /// <param name="dbPassword"></param>
         public Conexion(string dataBaseName, string dbUser, string dbPassword)
         {
-            // change user name 
+            // change server name 
             string serverName;
             if (Environment.MachineName == "DEVELOPER")
             {
@@ -86,6 +86,42 @@ namespace Centralizador.Models.DataBase
                 {
                     throw;
                 }
+            }
+        }
+        public static async Task<int> ExecuteNonQueryTranAsync(Conexion conn, string q1, string q2, string q3)
+        {
+            using (SqlConnection cnn = new SqlConnection(conn.Cnn))
+            {
+                cnn.Open();
+                SqlCommand sqlCommand = cnn.CreateCommand();
+                SqlTransaction sqlTransaction;
+
+                // Start
+                sqlTransaction = cnn.BeginTransaction("InsertReferencesIntoSoftland");
+                sqlCommand.Connection = cnn;
+                sqlCommand.Transaction = sqlTransaction;
+
+                try
+                {
+                    sqlCommand.CommandText = q1;
+                    await sqlCommand.ExecuteNonQueryAsync();
+                    sqlCommand.CommandText = q2;
+                    await sqlCommand.ExecuteNonQueryAsync();
+                    sqlCommand.CommandText = q3;
+                    await sqlCommand.ExecuteNonQueryAsync();
+                    //sqlCommand.CommandText = q4;
+                    //await sqlCommand.ExecuteNonQueryAsync();
+
+                    sqlTransaction.Commit();
+                    return 1; // Success
+                }
+                catch (Exception)
+                {
+                    sqlTransaction.Rollback();
+                    return 0;
+                    throw;
+                }
+
             }
         }
 

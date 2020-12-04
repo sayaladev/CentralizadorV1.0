@@ -59,6 +59,9 @@ namespace Centralizador.Models.AppFunctions
             table.Columns.Add("Sending Date");
             table.Columns.Add("Status");
             table.Columns.Add("NC");
+            table.Columns.Add("Glosa");
+            table.Columns.Add("FolioRef");
+            table.Columns.Add("Publication");
 
             foreach (Detalle item in detalles)
             {
@@ -98,6 +101,10 @@ namespace Centralizador.Models.AppFunctions
                     }
                 }
 
+                row[14] = item.Instruction.PaymentMatrix.NaturalKey;
+                row[15] = item.Instruction.PaymentMatrix.ReferenceCode;
+                row[16] = item.Instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy");
+
 
                 table.Rows.Add(row);
 
@@ -124,7 +131,7 @@ namespace Centralizador.Models.AppFunctions
                 workbook.SaveToFile(path + nameFile, FileFormat.Version2016);
                 ProcessStartInfo process = new ProcessStartInfo(path + nameFile)
                 {
-                    WindowStyle = ProcessWindowStyle.Minimized
+                    WindowStyle = ProcessWindowStyle.Normal
                 };
                 Process.Start(process);
             }

@@ -5,6 +5,7 @@ namespace Centralizador.Models.ApiCEN
 {
     internal class WebClientCustom : WebClient
     {
+
         public WebClientCustom()
         {
 
@@ -16,8 +17,10 @@ namespace Centralizador.Models.ApiCEN
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         }
 
-        public void Getalgo() { 
-        
+        public void FunctionTest()
+        {
+
         }
+
     }
 }
