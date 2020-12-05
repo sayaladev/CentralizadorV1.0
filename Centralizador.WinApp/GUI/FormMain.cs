@@ -768,7 +768,6 @@ namespace Centralizador.WinApp.GUI
                 Process.Start(process);
             }
         }
-
         private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
