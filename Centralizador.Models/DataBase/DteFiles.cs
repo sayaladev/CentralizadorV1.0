@@ -18,6 +18,13 @@ namespace Centralizador.Models.DataBase
 
         #endregion
 
+        /// <summary>
+        /// Get Xml from Softland DB (Versión Update Softland 26-11-2020)
+        /// </summary>
+        /// <param name="conexion"></param>
+        /// <param name="nroInt"></param>
+        /// <param name="Folio"></param>
+        /// <returns></returns>
         public static IList<DteFiles> GetDteFiles(Conexion conexion, int nroInt, int Folio)
         {
             try
@@ -26,7 +33,7 @@ namespace Centralizador.Models.DataBase
                 IList<DteFiles> lista = new List<DteFiles>();
                 DataTable dataTable;
 
-                query.Append("SELECT ID_Archivo ");
+                query.Append("SELECT TOP 2 ID_Archivo ");
                 query.Append("        ,Extension ");
                 query.Append("        ,Archivo ");
                 query.Append("        ,FechaGenDTE ");
@@ -34,7 +41,7 @@ namespace Centralizador.Models.DataBase
                 query.Append("FROM softland.DTE_Archivos ");
                 query.Append("WHERE Tipo = 'F' ");
                 query.Append($"        AND Nroint = {nroInt} ");
-                query.Append($"        AND Folio = {Folio} ");
+                query.Append($"        AND Folio = {Folio} ORDER BY FechaGenDTE DESC  ");
                 conexion.Query = query.ToString();
                 dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
                 if (dataTable != null && dataTable.Rows.Count > 0)
@@ -61,6 +68,12 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
+        /// <summary>
+        /// Get Xml from Softland DB
+        /// </summary>
+        /// <param name="conexion"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public static IList<DteFiles> GetDteFiles(Conexion conexion, int id)
         {
             try

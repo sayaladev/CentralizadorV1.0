@@ -30,7 +30,12 @@ namespace Centralizador.Models.DataBase
             return 0;
         }
 
-        public static async Task<int> CheckFoliosAsync(Conexion conexion)
+        /// <summary>
+        /// Check F° DTE Availables
+        /// </summary>
+        /// <param name="conexion"></param>
+        /// <returns></returns>
+        public static async Task<int> GetFoliosDisponiblesDTEAsync(Conexion conexion)
         {
             try
             {

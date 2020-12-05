@@ -142,7 +142,7 @@ namespace Centralizador.Models.AppFunctions
                             // Valide Amount 
                             if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
                             {
-                                Flag = LetterFlag.Blue;
+                                Flag = LetterFlag.Blue;                     
                             }
                             // Valide DscItem ex: SEN_[RBPA][Ene18-Dic18][R][V02]
                             //if (dte.Detalle != null && dte.Detalle.Length == 1 && dte.Detalle[0].DscItem != null )

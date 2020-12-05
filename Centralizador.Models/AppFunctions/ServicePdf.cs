@@ -182,6 +182,32 @@ namespace Centralizador.Models.AppFunctions
             }
         }
 
+        public static string TransformObjectToXmlForCen(DTEDefType obj) // POR ALGUNA RAZÓN ESTÁ ENVIANDO EL DTE AL CEN SIN <?xml version="1.0" encoding="utf-8"?>
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(DTEDefType));
+                //var encoding = Encoding.GetEncoding("ISO-8859-1");
+                XmlWriterSettings xmlWriterSettings = new XmlWriterSettings
+                {
+                    Indent = true,
+                    OmitXmlDeclaration = false                    
+                };
+                using (Utf8StringWriter stringWriter = new Utf8StringWriter())
+                {
+                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, xmlWriterSettings)) // OmitXmlDecla : <?xml version="1.0" encoding="utf-8"?>
+                    {
+                        serializer.Serialize(xmlWriter, obj);
+                    }
+                    return stringWriter.ToString();
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public sealed class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding => Encoding.UTF8;

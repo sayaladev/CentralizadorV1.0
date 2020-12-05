@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
+            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -89,7 +90,7 @@
             this.TssLblMensaje});
             this.StatusStrip.Location = new System.Drawing.Point(0, 707);
             this.StatusStrip.Name = "StatusStrip";
-            this.StatusStrip.Size = new System.Drawing.Size(1350, 22);
+            this.StatusStrip.Size = new System.Drawing.Size(1396, 22);
             this.StatusStrip.TabIndex = 0;
             this.StatusStrip.Text = "statusStrip1";
             // 
@@ -136,8 +137,8 @@
             this.SplitContainer.Panel2.Controls.Add(this.groupBox4);
             this.SplitContainer.Panel2.Controls.Add(this.groupBox2);
             this.SplitContainer.Panel2.Controls.Add(this.GroupBox1);
-            this.SplitContainer.Size = new System.Drawing.Size(1350, 707);
-            this.SplitContainer.SplitterDistance = 1128;
+            this.SplitContainer.Size = new System.Drawing.Size(1396, 707);
+            this.SplitContainer.SplitterDistance = 1166;
             this.SplitContainer.TabIndex = 1;
             // 
             // FpicBoxSearch
@@ -161,13 +162,13 @@
             this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
+            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
             this.IGridMain.SelCellsBackColor = System.Drawing.SystemColors.ControlLight;
             this.IGridMain.SelCellsForeColor = System.Drawing.Color.Black;
-            this.IGridMain.Size = new System.Drawing.Size(1128, 707);
+            this.IGridMain.Size = new System.Drawing.Size(1166, 707);
             this.IGridMain.TabIndex = 0;
             this.IGridMain.CustomDrawCellForeground += new TenTec.Windows.iGridLib.iGCustomDrawCellEventHandler(this.IGridMain_CustomDrawCellForeground);
             this.IGridMain.CustomDrawCellEllipsisButtonForeground += new TenTec.Windows.iGridLib.iGCustomDrawEllipsisButtonEventHandler(this.IGridMain_CustomDrawCellEllipsisButtonForeground);
@@ -225,7 +226,7 @@
                 | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox4.Location = new System.Drawing.Point(2, 281);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(212, 150);
+            this.groupBox4.Size = new System.Drawing.Size(220, 150);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Invoice Info:";
@@ -294,7 +295,7 @@
             this.groupBox2.Controls.Add(this.BtnInsertRef);
             this.groupBox2.Location = new System.Drawing.Point(2, 437);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(212, 176);
+            this.groupBox2.Size = new System.Drawing.Size(220, 176);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
@@ -391,7 +392,7 @@
             this.GroupBox1.Controls.Add(this.CboMonths);
             this.GroupBox1.Location = new System.Drawing.Point(3, 3);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new System.Drawing.Size(212, 272);
+            this.GroupBox1.Size = new System.Drawing.Size(220, 272);
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             // 
@@ -557,7 +558,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1350, 729);
+            this.ClientSize = new System.Drawing.Size(1396, 729);
             this.Controls.Add(this.SplitContainer);
             this.Controls.Add(this.StatusStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

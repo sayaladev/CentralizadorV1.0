@@ -294,9 +294,9 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Cols["total"].AllowGrouping = false;
 
             // Sii info
-            IGridMain.Cols.Add("fechaEnvio", "Sending", 60, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("fechaEnvio", "Sending", 80, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols["fechaEnvio"].AllowGrouping = true;
-            IGridMain.Cols.Add("status", "Status", 50, pattern).CellStyle = cellStyleCommon;
+            IGridMain.Cols.Add("status", "Status", 68, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols["status"].AllowGrouping = true;
 
             // Button Reject
@@ -465,21 +465,10 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
         {
-            if (IsRunning)
-            {
-                TssLblMensaje.Text = "Bussy!";
-                return;
-            }
-            if (!IsCreditor || IGridMain.Rows.Count == 0)
-            {
-                TssLblMensaje.Text = "Plesase select Creditor!";
-                return;
-            }
-            if (CboParticipants.SelectedIndex == 0)
-            {
-                TssLblMensaje.Text = "Plesase select a Company!";
-                return;
-            }
+            if (IsRunning) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (!IsCreditor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
+            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
+
             // Exist file?
             DateTime now = DateTime.Now;
             string file = $"ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
@@ -502,6 +491,7 @@ namespace Centralizador.WinApp.GUI
             IList<Detalle> detallesFinal = new List<Detalle>();
             foreach (Detalle item in DetallesCreditor)
             {
+                // CheckBox
                 if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
                 {
                     if (item.DataEvento != null)
@@ -517,6 +507,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 if (item.Folio == 0 && item.MntNeto > 9) // only up then CLP $10
                 {
+                    // Check 
                     detallesFinal.Add(item);
                 }
             }
@@ -530,7 +521,7 @@ namespace Centralizador.WinApp.GUI
                     {
                         // Sql          
                         Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-                        int foliosDisp = await NotaVenta.CheckFoliosAsync(con);
+                        int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(con);
                         if (foliosDisp > 0 && foliosDisp < detallesFinal.Count)
                         {
                             MessageBox.Show($"F° Available: {foliosDisp}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -581,7 +572,7 @@ namespace Centralizador.WinApp.GUI
             Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
             try
             {
-                foliosDisp = NotaVenta.CheckFoliosAsync(con).Result;
+                foliosDisp = NotaVenta.GetFoliosDisponiblesDTEAsync(con).Result;
                 // Get comunas                      
                 comunas = Comuna.GetComunas(con);
             }
@@ -756,6 +747,7 @@ namespace Centralizador.WinApp.GUI
             IsCreditor = true;
             IsRunning = false;
 
+
             if (folios != null && folios.Count > 0)
             {
                 int menor = folios.Min();
@@ -776,6 +768,7 @@ namespace Centralizador.WinApp.GUI
                 Process.Start(process);
             }
         }
+
         private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
@@ -1016,16 +1009,16 @@ namespace Centralizador.WinApp.GUI
                     m.BillingWindow = BillingWindow.GetBillingWindowByIdAsync(m).Result;
                     IList<ResultInstruction> lista = Instruction.GetInstructionCreditorAsync(m, UserParticipant).Result;
                     if (lista != null && lista.Count > 0)
-                    {                      
+                    {
                         int d = 0;
                         foreach (ResultInstruction instruction in lista)
                         {
-                           // TESTER
+                            // TESTER
 
-                            if (instruction.Id != 2235844)
-                            {
-                                continue;
-                            }
+                            //if (instruction.Id != 1996264)
+                            //{
+                            //    continue;
+                            //}
 
                             // Get Participant Debtor
                             instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
@@ -1053,12 +1046,14 @@ namespace Centralizador.WinApp.GUI
                                 // SABER CUÁL ES LA ÚLTIMA F EMITIDA.
                                 // NO PUEDE SER EL ÚLTIMO FOLIO PORQUE SI EXISTE OTRA F EMITIDA EN MES SIGUIENTE IGUAL MONTO, DECIDE POR ESA Y NO!
                                 DteInfoRef infoLastF = null;
-                                foreach (var item in dteInfos)
+                                int contador = 0;
+                                foreach (DteInfoRef item in dteInfos)
                                 {
 
-                                    if (detalle.Instruction.PaymentMatrix.NaturalKey == item.Glosa) // Y LAS F QUE NO TENGAN LA REF Y SI ESTÉN FACTURADAS?
+                                    if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0) // Y LAS F QUE NO TENGAN LA REF Y SI ESTÉN FACTURADAS?
                                     {
-                                         infoLastF = item;
+                                        infoLastF = item;
+                                        contador++;
                                     }
                                     //if (item.FechaGenDTE >= new DateTime(2020,11,25)) // Update Softland + SP
                                     //{
@@ -1070,29 +1065,15 @@ namespace Centralizador.WinApp.GUI
                                     //    // Versión vieja
                                     //}
                                 }
-                          
+                                // Si encuentra + de 1 de igual referencia
+                                if (contador > 1)
+                                {
+                                    infoLastF = dteInfos.OrderByDescending(x => x.Folio).First();
+
+                                }
+
                                 // infoLastF = dteInfos.OrderByDescending(x => x.Folio).First();
                                 detalle.NroInt = infoLastF.NroInt;
-                     
-                                //foreach (DteInfoRef item in dteInfos) 
-                                //{
-                                //    if (!string.IsNullOrEmpty(item.Glosa))       // SIN REFERENCIAS
-                                //    {
-                                //        if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0)
-                                //        {
-                                //            infoLastF = dteInfos.OrderByDescending(x => x.Folio).First(); // El folio más alto es la última F emitida. 
-                                //            detalle.NroInt = infoLastF.NroInt;
-                                //        }
-                                //        else
-                                //        {
-                                //            infoLastF = dteInfos.FirstOrDefault(x => x.Glosa == instruction.PaymentMatrix.NaturalKey);
-                                //            detalle.NroInt = infoLastF.NroInt;
-                                //        }
-                                //    }
-
-                                //}
-                                //if (infoLastF != null)
-                                //{
                                 // Instruccion facturada
                                 switch (infoLastF.DteFiles.Count)
                                 {
@@ -1101,7 +1082,7 @@ namespace Centralizador.WinApp.GUI
                                         if (infoLastF.DteFiles[0].TipoXML == null)
                                         {
                                             detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles[0].Archivo); // Version antigua tiene 1 file
-                                        }                                  
+                                        }
                                         break;
                                     default:
                                         {
@@ -1110,24 +1091,18 @@ namespace Centralizador.WinApp.GUI
                                             break;
                                         }
                                 }
-
                                 // SET REF MISSING
-                                var obj = (DTEDefTypeDocumento) detalle.DTEDef.Item;
+                                DTEDefTypeDocumento obj = (DTEDefTypeDocumento)detalle.DTEDef.Item;
                                 DTEDefTypeDocumentoReferencia[] refr = obj.Referencia;
-                                var r = refr.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");                               
+                                DTEDefTypeDocumentoReferencia r = refr.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
                                 if (infoLastF.EnviadoSII == 0) // No ha sido enviado a SII
                                 {
                                     // No Existen las REF
-                                    if (r == null || string.IsNullOrEmpty(infoLastF.Glosa) || string.IsNullOrEmpty(infoLastF.FolioRef) )
+                                    if (r == null || string.IsNullOrEmpty(infoLastF.Glosa) || string.IsNullOrEmpty(infoLastF.FolioRef))
                                     {
                                         detalle.RefMissing = true;
                                     }
                                 }
-                                 
-                          
-
-                             
-
                                 detalle.FechaEmision = infoLastF.Fecha.ToString();
                                 detalle.Folio = infoLastF.Folio;
                                 detalle.MntNeto = infoLastF.NetoAfecto;
@@ -1151,106 +1126,39 @@ namespace Centralizador.WinApp.GUI
                                     detalle.StatusDetalle = GetStatus(detalle);
 
                                     // Insert CEN, only Accepted.
-                                    //if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
-                                    //{
-                                    //    // 1 No Facturado y cuando hay más de 1 dte informado
-                                    //    // 2 Facturado
-                                    //    // 3 Facturado con retraso
-                                    //    // Existe el DTE?
-                                    //    ResultDte doc = Dte.GetDteAsync(detalle, true).Result;
-                                    //    if (doc == null)
-                                    //    {
-                                    //        // Enviar el DTE
-                                    //        ResultDte resultDte = Dte.SendDteCreditorAsync(detalle, TokenCen, infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo).Result;
-                                    //        if (resultDte != null)
-                                    //        {
-                                    //            detalle.Instruction.Dte = resultDte;
-                                    //        }
-                                    //    }
-                                    //    else
-                                    //    {
-                                    //        detalle.Instruction.Dte = doc;
-                                    //    }
-                                    //}
+                                    if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
+                                    {
+                                        ResultDte doc = Dte.GetDteAsync(detalle, true).Result;
+                                        if (doc == null)
+                                        {
+                                            //ResultDte resultDte = Dte.SendDteCreditorAsync(detalle, TokenCen, infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo).Result;
+                                            string xmlDoc = ServicePdf.TransformObjectToXmlForCen(detalle.DTEDef);
+                                            ResultDte resultDte = Dte.SendDteCreditorAsync(detalle, TokenCen, xmlDoc).Result;
+                                            if (resultDte != null)
+                                            {
+                                                detalle.Instruction.Dte = resultDte;
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            detalle.Instruction.Dte = doc;
+                                        }
+                                    }
                                 }
                                 else
                                 {
                                     // No enviado al SII aun, pero sí facturada.
                                 }
-
-                                // }
-
-
-
-
-
-
                             }
                             else
                             {
                                 // No está facturado
-
                             }
 
                             // Validar referencias insertadas de la F
                             bool validaCreditor = true;
                             detalle.ValidatorFlag = new ValidatorFlag(detalle, validaCreditor);
-
-
-                            //if (reference.FileEnviado != null)
-                            //{
-                            //    // Facturado y enviado al Sii
-                            //    detalle.FechaRecepcion = reference.FechaRecepcionSii.ToString();
-                            //    // Attach object dte
-                            //    detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(reference.FileBasico);
-
-                            //    // Events Sii
-                            //    DataEvento evento = ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
-                            //    if (evento != null)
-                            //    {
-                            //        detalle.DataEvento = evento;
-                            //    }
-                            //    // Status
-                            //    detalle.StatusDetalle = GetStatus(detalle);
-                            //    // Insert CEN, only Accepted.
-                            //    if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
-                            //    {
-                            //        // 1 No Facturado y cuando hay más de 1 dte informado
-                            //        // 2 Facturado
-                            //        // 3 Facturado con retraso
-                            //        // Existe el DTE?
-                            //        ResultDte doc = Dte.GetDteAsync(detalle, true).Result;
-                            //        if (doc == null)
-                            //        {
-                            //            // Enviar el DTE
-                            //            ResultDte resultDte = Dte.SendDteCreditorAsync(detalle, TokenCen).Result;
-                            //            if (resultDte != null)
-                            //            {
-                            //                detalle.Instruction.Dte = resultDte;
-                            //            }
-                            //        }
-                            //        else
-                            //        {
-                            //            detalle.Instruction.Dte = doc;
-                            //        }
-
-                            //    }
-                            //}
-                            //else
-                            //{
-                            //    // Facturado pero no enviado a Sii o
-                            //    // Facturado pero sin Ref insertadas
-                            //}
-                            // BgwCreditor.ReportProgress((int)porcent, $"Retrieve information of invoices, wait please. ({c}/{instructions.Count})");
-                            //}
-                            //else
-                            // {
-                            // -1 
-                            // Existen F que están aceptadas pero emitidas a diferente RUT, caso Guacolda.
-                            // -1 La fecha de la publicación es mayor que la fecha de la ref encontrada. 
-                            // BgwCreditor.ReportProgress((int)porcent, $"Retrieve information Creditor, wait please. ({c}/{instructions.Count})");
-                            //}
-                            //}
 
                             DetallesCreditor.Add(detalle);
                             d++;
@@ -1571,13 +1479,24 @@ namespace Centralizador.WinApp.GUI
 
                     }
                     if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision)); }
-                    if (item.FechaRecepcion != null) { myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)); }
+                    if (item.FechaRecepcion != null)
+                    {
+                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion));
+                        myRow.Cells["fechaEnvio"].ImageList = FListPics;
+                        myRow.Cells["fechaEnvio"].ImageIndex = 9;
+                        myRow.Cells["fechaEnvio"].ImageAlign = iGContentAlignment.MiddleRight;
+
+                    }
+                    if (item.DteInfoRef != null && item.DteInfoRef[0].EnviadoCliente == 1)
+                    {
+                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)) + "";
+                    }
                     if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
                     if (IsCreditor)
                     {
                         myRow.Cells["P1"].Type = iGCellType.Check;
                         myRow.Cells["P2"].Type = iGCellType.Check;
-                        if (item.Instruction != null && (item.Instruction.StatusBilled == Instruction.StatusBilled.ConRetraso || item.Instruction.StatusBilled == Instruction.StatusBilled.Facturado))
+                        if (item.Folio > 0 && item.Instruction != null && (item.Instruction.StatusBilled == Instruction.StatusBilled.ConRetraso || item.Instruction.StatusBilled == Instruction.StatusBilled.Facturado))
                         {
                             myRow.Cells["P1"].Value = 1;
                             myRow.Cells["P2"].Value = 1;
@@ -1625,6 +1544,14 @@ namespace Centralizador.WinApp.GUI
                             rejectedExento += item.MntExento;
                             rejectedIva += item.MntIva;
                             rejectedTotal += item.MntTotal;
+
+                            // Icon
+                            if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
+                            {
+                                myRow.Cells["status"].ImageList = fImageListSmall;
+                                myRow.Cells["status"].ImageIndex = 5;
+                                myRow.Cells["status"].ImageAlign = iGContentAlignment.MiddleRight;
+                            }
                             break;
                         case StatusDetalle.Pending:
                             // Col Status                         
@@ -1776,15 +1703,9 @@ namespace Centralizador.WinApp.GUI
                         }
                     }
                 }
-                if (detalle != null && detalle.DteInfoRef != null)
+                if (detalle != null && detalle.DteInfoRef != null && detalle.FechaRecepcion == null)
                 {
-                    //  REVISAR ESTE DEBE DESCOMENTARSE!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-                    //if (detalle.References.FileEnviado == null)
-                    //{
-                    //    TssLblMensaje.Text = "This Invoice has not been sent to Sii.";
-                    //}
+                    TssLblMensaje.Text = "This Invoice has not been sent to Sii.";
                 }
                 //Req: Pintar TextBox indicando el error de la bandera roja 27-10-2020
                 if (detalle.ValidatorFlag != null && detalle.IsParticipant && detalle.DTEDef != null)
@@ -1828,6 +1749,12 @@ namespace Centralizador.WinApp.GUI
                     {
                         TxtRznRef.BackColor = GetFlagBackColor(LetterFlag.Green);
                     }
+                    //if (detalle.ValidatorFlag.TpoDocRef)
+                    //{
+                    //    TxtTpoDocRef.BackColor = GetFlagBackColor(LetterFlag.Green);
+                    //}
+
+                    // TxtTpoDocRef.BackColor = GetFlagBackColor(detalle.ValidatorFlag.Flag);
                 }
                 //IGridMain.BeginUpdate();
                 //iGRow myRow = IGridMain.CurRow;
@@ -1853,9 +1780,19 @@ namespace Centralizador.WinApp.GUI
                 if (detalle.DTEDef != null)
                 {
                     IGridMain.DrawAsFocused = true;
-                    ServicePdf.ConvertToPdf(detalle);
-                    IGridMain.Focus();
-                    IGridMain.DrawAsFocused = false;
+                    try
+                    {
+                        ServicePdf.ConvertToPdf(detalle);
+                        IGridMain.Focus();
+                        IGridMain.DrawAsFocused = false;
+                    }
+                    catch (Exception)
+                    {
+                        TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                        string nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower() + ".pdf");
+                        new ErrorMsgCen($"The process cannot access the file '{nomenclatura}' because it is being used by another process.", MessageBoxIcon.Warning);
+                    }
+
                 }
             }
         }
