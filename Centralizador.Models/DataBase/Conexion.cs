@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -40,7 +41,11 @@ namespace Centralizador.Models.DataBase
             Cnn = builder.ToString();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <returns>CONJUNTO DE FILAS</returns>
         public static async Task<DataTable> ExecuteReaderAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -65,6 +70,13 @@ namespace Centralizador.Models.DataBase
                 }
             }
         }
+       
+        
+        /// <summary>
+       /// INSERT / UPDATE / DELETE
+       /// </summary>
+       /// <param name="conn"></param>
+       /// <returns></returns>
         public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -88,7 +100,7 @@ namespace Centralizador.Models.DataBase
                 }
             }
         }
-        public static async Task<int> ExecuteNonQueryTranAsync(Conexion conn, string q1, string q2, string q3)
+        public static async Task<int> ExecuteNonQueryTranAsync(Conexion conn, List<string> listQ)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
@@ -97,18 +109,23 @@ namespace Centralizador.Models.DataBase
                 SqlTransaction sqlTransaction;
 
                 // Start
-                sqlTransaction = cnn.BeginTransaction("InsertReferencesIntoSoftland");
+                sqlTransaction = cnn.BeginTransaction("Centralizador");
                 sqlCommand.Connection = cnn;
                 sqlCommand.Transaction = sqlTransaction;
 
                 try
                 {
-                    sqlCommand.CommandText = q1;
-                    await sqlCommand.ExecuteNonQueryAsync();
-                    sqlCommand.CommandText = q2;
-                    await sqlCommand.ExecuteNonQueryAsync();
-                    sqlCommand.CommandText = q3;
-                    await sqlCommand.ExecuteNonQueryAsync();
+                    foreach (var item in listQ)
+                    {
+                        sqlCommand.CommandText = item;
+                        await sqlCommand.ExecuteNonQueryAsync();
+                    }
+                    //sqlCommand.CommandText = q1;
+                    //await sqlCommand.ExecuteNonQueryAsync();
+                    //sqlCommand.CommandText = q2;
+                    //await sqlCommand.ExecuteNonQueryAsync();
+                    //sqlCommand.CommandText = q3;
+                    //await sqlCommand.ExecuteNonQueryAsync();
                     //sqlCommand.CommandText = q4;
                     //await sqlCommand.ExecuteNonQueryAsync();
 
@@ -125,7 +142,11 @@ namespace Centralizador.Models.DataBase
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <returns>UN ÚNICO VALOR</returns>
         public static async Task<object> ExecuteScalarAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))

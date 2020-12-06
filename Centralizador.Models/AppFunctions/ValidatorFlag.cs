@@ -30,6 +30,12 @@ namespace Centralizador.Models.AppFunctions
             ValidateCen(detalle, isCreditor);
         }
 
+        public ValidatorFlag()
+        {
+        }
+
+
+
         // Functions
         public static int GetFlagImageIndex(LetterFlag flag)
         {

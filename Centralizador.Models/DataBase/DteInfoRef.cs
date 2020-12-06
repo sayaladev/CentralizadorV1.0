@@ -323,10 +323,9 @@ namespace Centralizador.Models.DataBase
 
                 // Execute Transaction
                 if (!string.IsNullOrEmpty(query1.ToString()) || !string.IsNullOrEmpty(query2.ToString()) || !string.IsNullOrEmpty(query3))
-                {
-                    int algo = Convert.ToInt32(Conexion.ExecuteNonQueryTranAsync(conexion, query1.ToString(), query2.ToString(), query3).Result);
-                    //System.Windows.Forms.MessageBox.Show("RESULTADO QUERY :" + algo.ToString());
-                    return algo;
+                {    
+                    int res = Convert.ToInt32( Conexion.ExecuteNonQueryTranAsync(conexion, new List<string> { query1.ToString(), query2.ToString(), query3.ToString() }).Result);              
+                    return res;
                 }
                 else
                 {

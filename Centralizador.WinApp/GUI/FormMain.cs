@@ -126,7 +126,7 @@ namespace Centralizador.WinApp.GUI
             };
             BgwCreditor.ProgressChanged += BgwCreditor_ProgressChanged;
             BgwCreditor.RunWorkerCompleted += BgwCreditor_RunWorkerCompleted;
-            BgwCreditor.DoWork += BgwCreditor_DoWork;
+            BgwCreditor.DoWork += BgwCreditor_DoWorkAsync;
             // Worker Insert Nv
             BgwInsertNv = new BackgroundWorker
             {
@@ -487,60 +487,66 @@ namespace Centralizador.WinApp.GUI
                 }
 
             }
-            // Sql          
-            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+
             IList<Detalle> detallesFinal = new List<Detalle>();
+            int count = 0;
             foreach (Detalle item in DetallesCreditor)
-            {              
-                if (item.Folio == 0 && item.MntNeto > 9) // only up then CLP $10
+            {
+                if (item.FolioNVInsertada > 0) // Check if exists NV in the DB or this instruction
                 {
-                    //
-                    int F = NotaVenta.GetNvIfExists(item.Instruction, con);
-                    if (F == 0)
+                    count++;
+                }
+                if (ChkIncludeReclaimed.CheckState == CheckState.Checked)  // Only Rechazos
+                {
+                    if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
                     {
+                        // Search NV from Invoice for
+                        //if (item.DteInfoRef.Nvnumero != 0)
+                        //{
                         detallesFinal.Add(item);
-                    }             
+                        //}
+                    }
                 }
                 else
                 {
-                    if (ChkIncludeReclaimed.CheckState == CheckState.Checked)  // Facturar Rechazos
+                    // revisar insert no RECHAZOS
+                    if (item.Folio == 0 && item.MntNeto > 9) // only > $10
                     {
-                        if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
-                        {
-                            // Search NV from Invoice
-                            if (item.DteInfoRef.Nvnumero != 0 )
-                            {
-                                detallesFinal.Add(item);
-                            }                            
-                        }
+                        detallesFinal.Add(item);
                     }
                 }
             }
             if (detallesFinal.Count > 0)
             {
-                DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                // Sql          
+                Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+                int total = detallesFinal.Count - count;
+                DialogResult resp = MessageBox.Show($"There are {total} (of {DetallesCreditor.Count}) pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resp == DialogResult.Yes)
                 {
+     
                     try
                     {
-                       
                         int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(con);
+
                         if (foliosDisp > 0 && foliosDisp < detallesFinal.Count)
                         {
-                            MessageBox.Show($"F° Available: {foliosDisp}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            // MessageBox.Show($"F° Available: {foliosDisp}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            new ErrorMsgCen($"F° Available: {foliosDisp}", MessageBoxIcon.Information);
                         }
                     }
                     catch (Exception)
                     {
                         throw;
-                    }
-                    BgwInsertNv.RunWorkerAsync(detallesFinal);
+                    }                
+                        BgwInsertNv.RunWorkerAsync(detallesFinal);
+                   
                 }
             }
             else
             {
-                TssLblMensaje.Text = "All payment instructions are billed, cannot insert NV.";
+                TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
             }
         }
         private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
@@ -557,7 +563,7 @@ namespace Centralizador.WinApp.GUI
             string file = $"ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
 
-            BgwInsertNv.ReportProgress(0, "Wait please...");
+            BgwInsertNv.ReportProgress(0, "Wait please... Reading SII file.");
             try
             {
                 values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
@@ -576,23 +582,26 @@ namespace Centralizador.WinApp.GUI
             Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
             try
             {
-                foliosDisp = NotaVenta.GetFoliosDisponiblesDTEAsync(con).Result;               
+                foliosDisp = NotaVenta.GetFoliosDisponiblesDTEAsync(con).Result;
                 // Get comunas                      
                 comunas = Comuna.GetComunas(con);
             }
             catch (Exception ex)
             {
                 new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
-            }    
+            }
             foreach (Detalle item in detallesFinal)
             {
                 if (c == foliosDisp)
                 {
                     break;
                 }
-                resultInsertNV = 0;
-                // Get F° NV if exists
-                // 
+                // Checks if exists NV for this instruction   
+                if (item.FolioNVInsertada > 0)
+                {
+                    folios.Add(item.FolioNVInsertada);
+                    continue;
+                }
                 int F = NotaVenta.GetNvIfExists(item.Instruction, con);
                 if (F == 0)
                 {
@@ -623,11 +632,8 @@ namespace Centralizador.WinApp.GUI
                         Auxiliar auxiliar = aux.GetAuxiliar(item.Instruction, con);
                         Comuna comunaobj = null;
                         string promptValue;
-                        if (auxiliar == null)
+                        if (auxiliar == null)  // Insert New Auxiliar
                         {
-
-                            // Insert New Auxiliar
-
                             // Get Comuna
                             do
                             {
@@ -642,31 +648,11 @@ namespace Centralizador.WinApp.GUI
                             } while (comunaobj == null);
                             // Sending porperty for show DirAux in Log
                             result = aux.InsertAuxiliar(item.Instruction, con, ref aux, comunaobj);
-                            switch (result)
-                            {
-                                case 1:
-                                    break;
-                                case 0:
-                                    break;
-                                case 2:
-                                    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.DirAux} / {aux.ComAux}");
-                                    // Insert NV
-                                    lastF = NotaVenta.GetLastNv(con);
-                                    string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                                    resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
-                                    folios.Add(lastF + 1);
-                                    if (resultInsertNV == 0) { StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql"); }
-                                    break;
-                                default:
-                                    StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tError: {item.Instruction.ParticipantDebtor.Rut}");
-                                    break;
-                            }
+                            if (result == 2) { StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.DirAux} / {aux.ComAux}"); }
                         }
                         else
                         {
-                            // Yes Exists : Update
-                            // Check if aux was created wrong.
-                            if (auxiliar.ComAux == null)
+                            if (auxiliar.ComAux == null) // Checks Aux
                             {
                                 // Get Comuna
                                 do
@@ -680,59 +666,43 @@ namespace Centralizador.WinApp.GUI
 
                                     comunaobj = comunas.FirstOrDefault(x => aux.RemoveDiacritics(x.ComDes).ToLower() == aux.RemoveDiacritics(promptValue.ToLower()));
                                 } while (comunaobj == null);
-
                             }
                             else
                             {
                                 comunaobj = new Comuna { ComCod = auxiliar.ComAux };
                             }
-                            // Only msg
-                            //StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tBad aux created in Softland, Fixed !: {item.Instruction.ParticipantDebtor.Rut}");
-
-
                             // Update Aux
                             result = aux.UpdateAuxiliar(item.Instruction, con, comunaobj);
                             // 1= update ok 2= update ok (en algunos escenarios)
                             if (result == 0)
                             {
-                                // Error
                                 StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Sql: {item.Instruction.ParticipantDebtor.Rut}");
-                            }
-                            else
-                            {
-                                // 
-                                lastF = NotaVenta.GetLastNv(con);
-                                string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                                resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF + 1, prod, con);
-                                if (resultInsertNV == 0)
-                                {
-                                    StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
-                                }
+                                continue;
                             }
                         }
-                        // Insert NV  
-                        if (resultInsertNV == 1)
+                        // Insert NV   
+                        lastF = NotaVenta.GetLastNv(con);
+                        string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                        resultInsertNV = NotaVenta.InsertNv(item.Instruction, lastF, prod, con);
+                        if (resultInsertNV == 0)
+                        {
+                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
+                        }
+                        else if (resultInsertNV == 1)
                         {
                             // Success
-                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tF°: {lastF + 1}");
-                            folios.Add(lastF + 1);
+                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tF°: {lastF}");
+                            folios.Add(lastF);
                         }
                     }
                     catch (Exception ex)
                     {
                         new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
-                        //return;
                     }
                 }
-                //else
-                //{
-                    
-                //    folios.Add(F);
-                //}
-
                 c++;
                 porcent = (float)(100 * c) / detallesFinal.Count;
-                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})");
+                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})  F°: {lastF}");
             }
             e.Result = folios;
         }
@@ -743,40 +713,28 @@ namespace Centralizador.WinApp.GUI
             {
                 TssLblMensaje.Text = "Error!";
             }
-            else
-            {
+            //else
+            //{
 
-                TssLblMensaje.Text = "Check the log file.";
-            }
+            //    TssLblMensaje.Text = "Check the log file.";
+            //}
             TssLblProgBar.Value = 0;
             IsCreditor = true;
             IsRunning = false;
+            BtnInsertNv.Enabled = false;
+            string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
             if (folios != null && folios.Count > 0)
             {
                 int menor = folios.Min();
                 int mayor = folios.Max();
                 StringLogging.AppendLine("");
-                StringLogging.AppendLine($"Resumen: From-{menor} To-{mayor}");
+                StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
+                TssLblMensaje.Text = $"Check the log file:   => Summary: From {menor} To-{mayor}";
+                new CreateFile(@"C:\Centralizador\Log\", StringLogging, nameFile);
+                //CreateTxtLogFile(nameFile);
             }
-            string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
-            CreateTxtLogFile(nameFile);
         }
 
-        private void CreateTxtLogFile(string nameFile) {
-            if (StringLogging.Length > 0)
-            {
-                string path = @"C:\Centralizador\Log\";
-                new CreatePath(path);
-                File.WriteAllText(path + nameFile + ".txt", StringLogging.ToString());
-                ProcessStartInfo process = new ProcessStartInfo(path + nameFile + ".txt")
-                {
-                    WindowStyle = ProcessWindowStyle.Normal
-                    
-                };
-                Process.Start(process);
-                
-            }
-        }
         private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
@@ -876,14 +834,7 @@ namespace Centralizador.WinApp.GUI
             {
                 string nameFile = $"{UserParticipant.Name}_InsertRef_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
                 TssLblMensaje.Text = "Check the log file.";
-                string path = @"C:\Centralizador\Log\";
-                new CreatePath(path);
-                File.WriteAllText(path + nameFile + ".txt", StringLogging.ToString());
-                ProcessStartInfo process = new ProcessStartInfo(path + nameFile + ".txt")
-                {
-                    WindowStyle = ProcessWindowStyle.Minimized
-                };
-                Process.Start(process);
+                new CreateFile(@"C:\Centralizador\Log\", StringLogging, nameFile);
             }
             else
             {
@@ -983,6 +934,10 @@ namespace Centralizador.WinApp.GUI
                 IList<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
                 if (matrices != null && matrices.Count > 0)
                 {
+                    // Delete NV no usadas
+                    // Sql          
+                    Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+                    int resNv = await NotaVenta.DeleteNvAsync(con);
                     BgwCreditor.RunWorkerAsync(matrices);
                 }
                 else
@@ -997,7 +952,7 @@ namespace Centralizador.WinApp.GUI
 
 
         }
-        private void BgwCreditor_DoWork(object sender, DoWorkEventArgs e)
+        private void BgwCreditor_DoWorkAsync(object sender, DoWorkEventArgs e)
         {
             IsRunning = true;
             IList<ResultPaymentMatrix> matrices = (IList<ResultPaymentMatrix>)e.Argument;
@@ -1011,6 +966,8 @@ namespace Centralizador.WinApp.GUI
             {
                 Watch.Restart();
                 Watch.Start();
+            
+
                 foreach (ResultPaymentMatrix m in matrices)
                 {
                     // Get Window Billing
@@ -1023,7 +980,8 @@ namespace Centralizador.WinApp.GUI
                         {
                             // TESTER
 
-                            //if (instruction.Id != 1996264)
+
+                            //if (instruction.Id != 2076556)
                             //{
                             //    continue;
                             //}
@@ -1049,7 +1007,7 @@ namespace Centralizador.WinApp.GUI
                                         item.DteFiles = files;
                                     }
                                 }
-                                
+
                                 // SI HAY MAS DE UNA FACTURA EMITIDA ANTERIORIDAD, SON VARIAS FILAS. 
                                 // SABER CUÁL ES LA ÚLTIMA F EMITIDA.
                                 // NO PUEDE SER EL ÚLTIMO FOLIO PORQUE SI EXISTE OTRA F EMITIDA EN MES SIGUIENTE IGUAL MONTO, DECIDE POR ESA Y NO!
@@ -1062,7 +1020,7 @@ namespace Centralizador.WinApp.GUI
                                     {
                                         infoLastF = item;
                                         contador++;
-                                    }                               
+                                    }
                                 }
                                 // Si encuentra + de 1 de igual referencia
                                 if (contador > 1)
@@ -1070,7 +1028,7 @@ namespace Centralizador.WinApp.GUI
                                     infoLastF = dteInfos.OrderByDescending(x => x.Folio).First();
 
                                 }
-                               
+
                                 // Instruccion facturada
                                 switch (infoLastF.DteFiles.Count)
                                 {
@@ -1149,15 +1107,25 @@ namespace Centralizador.WinApp.GUI
                                 {
                                     // No enviado al SII aun, pero sí facturada.
                                 }
+
+                                // Validar referencias insertadas de la F
+                                bool validaCreditor = true;
+                                detalle.ValidatorFlag = new ValidatorFlag(detalle, validaCreditor);
                             }
                             else
                             {
-                                // No está facturado
+                                // No está facturado              
+
+                                int F = NotaVenta.GetNvIfExists(instruction, con);
+                                if (F > 0)
+                                {
+                                    detalle.FolioNVInsertada = F;
+                                }
+
+                                // Set Default Flag
+                                detalle.ValidatorFlag = new ValidatorFlag() { Flag = LetterFlag.Clear };
                             }
 
-                            // Validar referencias insertadas de la F
-                            bool validaCreditor = true;
-                            detalle.ValidatorFlag = new ValidatorFlag(detalle, validaCreditor);
 
                             DetallesCreditor.Add(detalle);
                             d++;
@@ -1171,6 +1139,9 @@ namespace Centralizador.WinApp.GUI
                     porcent = (float)(100 * c) / matrices.Count;
                     BgwCreditor.ReportProgress((int)porcent, $"Searching 'Pay Instructions' from CEN, wait please. ({c}/{matrices.Count})");
                 }
+
+                
+
             }
             catch (Exception ex)
             {

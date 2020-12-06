@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Text;
@@ -15,7 +16,7 @@ namespace Centralizador.Models.DataBase
         {
             try
             {
-                conexion.Query = "select MAX(NVNumero) from softland.nw_nventa";
+                conexion.Query = "select MAX(NVNumero) + 1  from softland.nw_nventa";
                 object result = Conexion.ExecuteScalarAsync(conexion).Result;
                 if (result != null)
                 {
@@ -53,14 +54,63 @@ namespace Centralizador.Models.DataBase
             return 0;
         }
 
+        public static async Task<int> DeleteNvAsync(Conexion conexion)
+        {
+            try
+            {
+                StringBuilder query = new StringBuilder();
+                query.AppendLine("SELECT nv.nvnumero ");
+                query.AppendLine("FROM softland.nw_nventa nv ");
+                query.AppendLine("INNER JOIN softland.nw_detnv d ");
+                query.AppendLine("ON   nv.nvnumero = d.nvnumero ");
+                query.AppendLine("LEFT JOIN softland.nw_ffactncrednv() f ");
+                query.AppendLine("ON   f.nvnumero = d.nvnumero ");
+                query.AppendLine("     AND f.codprod = d.codprod ");
+                query.AppendLine("     AND f.nvcorrela = d.nvlinea ");
+                query.AppendLine("WHERE f.folio IS NULL ");
+                query.AppendLine("ORDER BY nvnumero DESC");
+                conexion.Query = query.ToString();
+                DataTable dataTable = await Conexion.ExecuteReaderAsync(conexion);
+                if (dataTable != null && dataTable.Rows.Count > 0)
+                {
+                    var listQ = new List<string>();                    
+                    foreach (DataRow item in dataTable.Rows)
+                    {                       
+                            string q = $"DELETE FROM softland.nw_nventa where NVNumero = {item["nvnumero"]}";
+                            listQ.Add(q);
+                                           
+                    }
+                    var res = await Conexion.ExecuteNonQueryTranAsync(conexion, listQ);
+                    return res; // 1 Success
+                }
+            }
+            catch (Exception)
+            {
+                return 0;
+                throw;
+            }
+            return 1;
+        }
+
         public static int InsertNv(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
         {           
             try
             {
                 StringBuilder query = new StringBuilder();
+          
+                string date;
+                if (Environment.MachineName == "DEVELOPER")
+                {
+                    // Developer
+                    date = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    date = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                }
 
-                // Production:
-                string time = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                // HACER UNA TRANSACCIÓN!!!!!!!!!!!!!
+
 
                 int neto = instruction.Amount;
                 double iva = neto * 0.19;
@@ -69,14 +119,14 @@ namespace Centralizador.Models.DataBase
 
                 query.Append("INSERT INTO softland.nw_nventa (CodAux,CveCod,NomCon,nvFeEnt,nvFem,NVNumero,nvObser,VenCod,nvSubTotal, ");
                 query.Append("nvNetoAfecto,nvNetoExento,nvMonto,proceso,nvEquiv,CodMon,nvEstado,FechaHoraCreacion) values ( ");
-                query.Append($"'{instruction.ParticipantDebtor.Rut}','1','.','{time}','{time}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
-                query.Append($"'Centralizador',1,'01','A','{time}') ");
+                query.Append($"'{instruction.ParticipantDebtor.Rut}','1','.','{date}','{date}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
+                query.Append($"'Centralizador',1,'01','A','{date}') ");
                 conexion.Query = query.ToString();
                 if (Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
                 {
                     query.Clear();
                     query.Append("INSERT INTO softland.nw_detnv (NVNumero,nvLinea,nvFecCompr,CodProd,nvCant,nvPrecio,nvSubTotal,nvTotLinea,CodUMed,CantUVta,nvEquiv)VALUES(");
-                    query.Append($"{folioNV},1,'{time}','{codProd}',1,{neto},{neto},{neto},'UN',1,1)");
+                    query.Append($"{folioNV},1,'{date}','{codProd}',1,{neto},{neto},{neto},'UN',1,1)");
                     conexion.Query = query.ToString();
                     if (Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result) == 1) // 1 : Softland execute only this query
                     {
@@ -97,20 +147,17 @@ namespace Centralizador.Models.DataBase
 
         public static int GetNvIfExists(ResultInstruction instruction, Conexion conexion)
         {
+            string date;
+            if (Environment.MachineName == "DEVELOPER")
+            {
+                // Developer
+                date = instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                date = instruction.PaymentMatrix.PublishDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            }
 
-            //StringBuilder query = new StringBuilder();
-            //query.Append("SELECT DISTINCT TOP (1) ");
-            //query.Append("  nv.NVNumero ");
-            //query.Append("FROM softland.nw_nventa nv ");
-            //query.Append("INNER JOIN softland.nw_detnv d ");
-            //query.Append("  ON nv.NVNumero = d.NVNumero ");
-            //query.Append("LEFT JOIN softland.nw_fFactNCredNV() f ");
-            //query.Append("  ON f.nvnumero = d.nvnumero ");
-            //query.Append("  AND f.codprod = d.codprod ");
-            //query.Append("  AND f.nvcorrela = d.nvlinea ");
-            //query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
-            //query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
-            //query.Append("AND f.folio IS NULL ");
 
             StringBuilder query = new StringBuilder();
             query.AppendLine("SELECT DISTINCT top (1) nv.nvnumero ");
@@ -121,10 +168,10 @@ namespace Centralizador.Models.DataBase
             query.AppendLine("ON   f.nvnumero = d.nvnumero ");
             query.AppendLine("     AND f.codprod = d.codprod ");
             query.AppendLine("     AND f.nvcorrela = d.nvlinea ");
-            query.AppendLine("WHERE nv.codaux = '96990040' ");
-            query.AppendLine("     AND nv.nvsubtotal = 358 ");
+            query.AppendLine($"WHERE nv.codaux = '{instruction.ParticipantDebtor.Rut}' ");
+            query.AppendLine($"     AND nv.nvsubtotal = {instruction.Amount} ");
             query.AppendLine("     AND f.folio IS NULL ");
-            query.AppendLine("     AND nv.fechahoracreacion >= '18-11-2020'");
+            query.AppendLine($"     AND nv.fechahoracreacion >= '{date}'");
 
             try
             {

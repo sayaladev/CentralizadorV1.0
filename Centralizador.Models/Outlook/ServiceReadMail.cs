@@ -60,7 +60,7 @@ namespace Centralizador.Models.Outlook
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
                 MailInfo[] infos = oClient.GetMailInfos();
                 string pathTemp = @"C:\Centralizador\Temp\";
-                new CreatePath(pathTemp);
+                //new CreateTxt(pathTemp);
                 e.Result = Properties.Settings.Default.DateTimeEmail;
                 for (int i = 0; i < infos.Length; i++)
                 {
@@ -201,7 +201,7 @@ namespace Centralizador.Models.Outlook
             try
             {
                 string path = @"C:\Centralizador\Inbox\" + nameFolder;
-                new CreatePath(path);
+               // new CreateTxt(path);
                 File.WriteAllText(path + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
             }
             catch (Exception)

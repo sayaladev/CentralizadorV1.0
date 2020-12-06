@@ -127,7 +127,7 @@ namespace Centralizador.Models.AppFunctions
                 }
 
                 string path = @"C:\Centralizador\Log\";
-                new CreatePath(path);
+               // new CreateTxt(path);
                 workbook.SaveToFile(path + nameFile, FileFormat.Version2016);
                 ProcessStartInfo process = new ProcessStartInfo(path + nameFile)
                 {
@@ -280,7 +280,7 @@ namespace Centralizador.Models.AppFunctions
                 worksheet.InsertDataTable(table, false, 1, 1);
                 string nameFile = $"{UserParticipant.Name}_NominaBank_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 string path = @"C:\Centralizador\Log\";
-                new CreatePath(path);
+                new CreateFile(path);
                 workbook.SaveToFile(path + nameFile, FileFormat.Version2016);
                 ProcessStartInfo process = new ProcessStartInfo(path + nameFile)
                 {

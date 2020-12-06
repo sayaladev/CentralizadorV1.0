@@ -306,7 +306,8 @@ namespace Centralizador.Models.ApiSII
         public StatusDetalle StatusDetalle { get; set; }
         public ValidatorFlag ValidatorFlag { get; set; } // CEN requeriment validator.
         public int NroInt { get; set; }
-        public bool RefMissing { get; set; }
+        public bool RefMissing { get; set; }       
+        public int FolioNVInsertada { get; set; }
 
         // Constructor
         public Detalle(string rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)
