@@ -98,19 +98,33 @@ namespace Centralizador.Models.DataBase
         public static int GetNvIfExists(ResultInstruction instruction, Conexion conexion)
         {
 
+            //StringBuilder query = new StringBuilder();
+            //query.Append("SELECT DISTINCT TOP (1) ");
+            //query.Append("  nv.NVNumero ");
+            //query.Append("FROM softland.nw_nventa nv ");
+            //query.Append("INNER JOIN softland.nw_detnv d ");
+            //query.Append("  ON nv.NVNumero = d.NVNumero ");
+            //query.Append("LEFT JOIN softland.nw_fFactNCredNV() f ");
+            //query.Append("  ON f.nvnumero = d.nvnumero ");
+            //query.Append("  AND f.codprod = d.codprod ");
+            //query.Append("  AND f.nvcorrela = d.nvlinea ");
+            //query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
+            //query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
+            //query.Append("AND f.folio IS NULL ");
+
             StringBuilder query = new StringBuilder();
-            query.Append("SELECT DISTINCT TOP (1) ");
-            query.Append("  nv.NVNumero ");
-            query.Append("FROM softland.nw_nventa nv ");
-            query.Append("INNER JOIN softland.nw_detnv d ");
-            query.Append("  ON nv.NVNumero = d.NVNumero ");
-            query.Append("LEFT JOIN softland.nw_fFactNCredNV() f ");
-            query.Append("  ON f.nvnumero = d.nvnumero ");
-            query.Append("  AND f.codprod = d.codprod ");
-            query.Append("  AND f.nvcorrela = d.nvlinea ");
-            query.Append($"WHERE nv.CodAux = '{instruction.ParticipantDebtor.Rut}' ");
-            query.Append($"AND nv.nvSubTotal = {instruction.Amount} ");
-            query.Append("AND f.folio IS NULL ");
+            query.AppendLine("SELECT DISTINCT top (1) nv.nvnumero ");
+            query.AppendLine("FROM softland.nw_nventa nv ");
+            query.AppendLine("INNER JOIN softland.nw_detnv d ");
+            query.AppendLine("ON   nv.nvnumero = d.nvnumero ");
+            query.AppendLine("LEFT JOIN softland.nw_ffactncrednv() f ");
+            query.AppendLine("ON   f.nvnumero = d.nvnumero ");
+            query.AppendLine("     AND f.codprod = d.codprod ");
+            query.AppendLine("     AND f.nvcorrela = d.nvlinea ");
+            query.AppendLine("WHERE nv.codaux = '96990040' ");
+            query.AppendLine("     AND nv.nvsubtotal = 358 ");
+            query.AppendLine("     AND f.folio IS NULL ");
+            query.AppendLine("     AND nv.fechahoracreacion >= '18-11-2020'");
 
             try
             {

@@ -298,7 +298,7 @@ namespace Centralizador.Models.ApiSII
         // New properties
         public int Nro { get; set; }
         public ResultInstruction Instruction { get; set; }
-        public IList<DteInfoRef> DteInfoRef { get; set; }
+        public DteInfoRef DteInfoRef { get; set; }
         public DTEDefType DTEDef { get; set; }
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }

@@ -487,28 +487,33 @@ namespace Centralizador.WinApp.GUI
                 }
 
             }
-
+            // Sql          
+            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
             IList<Detalle> detallesFinal = new List<Detalle>();
             foreach (Detalle item in DetallesCreditor)
-            {
-                // CheckBox
-                if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
-                {
-                    if (item.DataEvento != null)
-                    {
-                        if (item.DataEvento.ListEvenHistDoc.Count > 0)
-                        {
-                            if (item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null) // // Recepción de NC de anulación que referencia al documento.
-                            {
-                                detallesFinal.Add(item);
-                            }
-                        }
-                    }
-                }
+            {              
                 if (item.Folio == 0 && item.MntNeto > 9) // only up then CLP $10
                 {
-                    // Check 
-                    detallesFinal.Add(item);
+                    //
+                    int F = NotaVenta.GetNvIfExists(item.Instruction, con);
+                    if (F == 0)
+                    {
+                        detallesFinal.Add(item);
+                    }             
+                }
+                else
+                {
+                    if (ChkIncludeReclaimed.CheckState == CheckState.Checked)  // Facturar Rechazos
+                    {
+                        if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
+                        {
+                            // Search NV from Invoice
+                            if (item.DteInfoRef.Nvnumero != 0 )
+                            {
+                                detallesFinal.Add(item);
+                            }                            
+                        }
+                    }
                 }
             }
             if (detallesFinal.Count > 0)
@@ -519,8 +524,7 @@ namespace Centralizador.WinApp.GUI
                 {
                     try
                     {
-                        // Sql          
-                        Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
+                       
                         int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(con);
                         if (foliosDisp > 0 && foliosDisp < detallesFinal.Count)
                         {
@@ -572,23 +576,23 @@ namespace Centralizador.WinApp.GUI
             Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
             try
             {
-                foliosDisp = NotaVenta.GetFoliosDisponiblesDTEAsync(con).Result;
+                foliosDisp = NotaVenta.GetFoliosDisponiblesDTEAsync(con).Result;               
                 // Get comunas                      
                 comunas = Comuna.GetComunas(con);
             }
             catch (Exception ex)
             {
                 new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
-            }
-
+            }    
             foreach (Detalle item in detallesFinal)
             {
                 if (c == foliosDisp)
                 {
-                    continue;
+                    break;
                 }
                 resultInsertNV = 0;
                 // Get F° NV if exists
+                // 
                 int F = NotaVenta.GetNvIfExists(item.Instruction, con);
                 if (F == 0)
                 {
@@ -720,10 +724,11 @@ namespace Centralizador.WinApp.GUI
                         //return;
                     }
                 }
-                else
-                {
-                    folios.Add(F);
-                }
+                //else
+                //{
+                    
+                //    folios.Add(F);
+                //}
 
                 c++;
                 porcent = (float)(100 * c) / detallesFinal.Count;
@@ -746,16 +751,18 @@ namespace Centralizador.WinApp.GUI
             TssLblProgBar.Value = 0;
             IsCreditor = true;
             IsRunning = false;
-
-
             if (folios != null && folios.Count > 0)
             {
                 int menor = folios.Min();
                 int mayor = folios.Max();
+                StringLogging.AppendLine("");
                 StringLogging.AppendLine($"Resumen: From-{menor} To-{mayor}");
             }
             string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
+            CreateTxtLogFile(nameFile);
+        }
 
+        private void CreateTxtLogFile(string nameFile) {
             if (StringLogging.Length > 0)
             {
                 string path = @"C:\Centralizador\Log\";
@@ -763,9 +770,11 @@ namespace Centralizador.WinApp.GUI
                 File.WriteAllText(path + nameFile + ".txt", StringLogging.ToString());
                 ProcessStartInfo process = new ProcessStartInfo(path + nameFile + ".txt")
                 {
-                    WindowStyle = ProcessWindowStyle.Minimized
+                    WindowStyle = ProcessWindowStyle.Normal
+                    
                 };
                 Process.Start(process);
+                
             }
         }
         private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -1040,8 +1049,8 @@ namespace Centralizador.WinApp.GUI
                                         item.DteFiles = files;
                                     }
                                 }
-                                // ATTACH 
-                                detalle.DteInfoRef = dteInfos; // SI HAY MAS DE UNA FACTURA EMITIDA ANTERIORIDAD, SON VARIAS FILAS. 
+                                
+                                // SI HAY MAS DE UNA FACTURA EMITIDA ANTERIORIDAD, SON VARIAS FILAS. 
                                 // SABER CUÁL ES LA ÚLTIMA F EMITIDA.
                                 // NO PUEDE SER EL ÚLTIMO FOLIO PORQUE SI EXISTE OTRA F EMITIDA EN MES SIGUIENTE IGUAL MONTO, DECIDE POR ESA Y NO!
                                 DteInfoRef infoLastF = null;
@@ -1053,16 +1062,7 @@ namespace Centralizador.WinApp.GUI
                                     {
                                         infoLastF = item;
                                         contador++;
-                                    }
-                                    //if (item.FechaGenDTE >= new DateTime(2020,11,25)) // Update Softland + SP
-                                    //{
-                                    //    // Version nueva 
-
-                                    //}
-                                    //else
-                                    //{
-                                    //    // Versión vieja
-                                    //}
+                                    }                               
                                 }
                                 // Si encuentra + de 1 de igual referencia
                                 if (contador > 1)
@@ -1070,9 +1070,7 @@ namespace Centralizador.WinApp.GUI
                                     infoLastF = dteInfos.OrderByDescending(x => x.Folio).First();
 
                                 }
-
-                                // infoLastF = dteInfos.OrderByDescending(x => x.Folio).First();
-                                detalle.NroInt = infoLastF.NroInt;
+                               
                                 // Instruccion facturada
                                 switch (infoLastF.DteFiles.Count)
                                 {
@@ -1102,6 +1100,8 @@ namespace Centralizador.WinApp.GUI
                                         detalle.RefMissing = true;
                                     }
                                 }
+                                detalle.DteInfoRef = infoLastF;
+                                detalle.NroInt = infoLastF.NroInt;
                                 detalle.FechaEmision = infoLastF.Fecha.ToString();
                                 detalle.Folio = infoLastF.Folio;
                                 detalle.MntNeto = infoLastF.NetoAfecto;
@@ -1486,7 +1486,7 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["fechaEnvio"].ImageAlign = iGContentAlignment.MiddleRight;
 
                     }
-                    if (item.DteInfoRef != null && item.DteInfoRef[0].EnviadoCliente == 1)
+                    if (item.DteInfoRef != null && item.DteInfoRef.EnviadoCliente == 1)
                     {
                         myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)) + "";
                     }
