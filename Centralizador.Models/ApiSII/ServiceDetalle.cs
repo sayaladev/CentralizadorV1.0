@@ -198,9 +198,38 @@ namespace Centralizador.Models.ApiSII
         public static StatusDetalle GetStatus(Detalle detalle)
         {
             // http://www.sii.cl/factura_electronica/Webservice_Registro_Reclamo_DTE_V1.2.pdf
+
+            // Ordeno por el evento más reciente
+            IList<ListEvenHistDoc> eventos = detalle.DataEvento.ListEvenHistDoc.OrderByDescending(x => x.FechaEvento).ToList();
+            ListEvenHistDoc res = detalle.DataEvento.ListEvenHistDoc.FirstOrDefault();
+
+            switch (res.CodEvento)
+            {
+                case "ACD": // Acepta Contenido del Documento
+                    return StatusDetalle.Accepted;
+                case "RCD": // Reclamo al Contenido del Documento
+                    return StatusDetalle.Rejected;
+                case "PAG": // Pago Contado
+                    return StatusDetalle.Accepted;
+                case "ERM": // Acuse de  Recibo de Mercaderías y Servicios Ley 19.983
+                    return StatusDetalle.Accepted;
+                case "ENC": // Recepción de NC, distinta de anulación, que referencia al documento.
+                    return StatusDetalle.Accepted;
+                case "RFT": // Receclamo por falta total de mercaderías.
+                    return StatusDetalle.Rejected;
+                case "RFP": // Receclamo por falta parcial de mercaderías.
+                    return StatusDetalle.Rejected;
+                case "NCA": // Recepción de NC de anulación que referencia al documento.
+                    return StatusDetalle.Rejected;
+                case "CED": // DTE Cedido.
+                    return StatusDetalle.Factoring;
+                default:
+                    break;
+            }
+
             if (detalle.DataEvento != null && detalle.DataEvento.ListEvenHistDoc.Count > 0)
             {
-                if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null) // Acepta Contenido del Documento
+                if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null)  // Acepta Contenido del Documento
                 {
                     return StatusDetalle.Accepted;
                 }

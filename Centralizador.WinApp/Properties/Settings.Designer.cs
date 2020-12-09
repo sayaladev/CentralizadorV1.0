@@ -12,7 +12,7 @@ namespace Centralizador.WinApp.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -61,6 +61,15 @@ namespace Centralizador.WinApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("centra")]
+        public string DBUser {
+            get {
+                return ((string)(this["DBUser"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <DatosEmpresas>
   <Empresa id=""189"">SANFRANCISCO</Empresa>
@@ -76,19 +85,11 @@ namespace Centralizador.WinApp.Properties {
   <Empresa id=""999"">RENOVABLE</Empresa>
   <Empresa id=""465"">TAMARUGAL</Empresa>
   <Empresa id=""528"">ALFA</Empresa>
+  <Empresa id=""545"">OCOA2</Empresa>
 </DatosEmpresas>")]
         public global::System.Xml.XmlDocument DBSoftland {
             get {
                 return ((global::System.Xml.XmlDocument)(this["DBSoftland"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("centra")]
-        public string DBUser {
-            get {
-                return ((string)(this["DBUser"]));
             }
         }
     }

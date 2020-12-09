@@ -59,63 +59,74 @@ namespace Centralizador.Models.Outlook
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
                 MailInfo[] infos = oClient.GetMailInfos();
-                string pathTemp = @"C:\Centralizador\Temp\";
-                //new CreateTxt(pathTemp);
-                e.Result = Properties.Settings.Default.DateTimeEmail;
-                for (int i = 0; i < infos.Length; i++)
-                {
-                    MailInfo info = infos[i];
-                    Mail oMail = new Mail("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
-                    oMail = oClient.GetMail(info);
-                    if (oMail.From.Address == Properties.Settings.Default.UserEmail)
-                    {
-                        continue;
-                    }
-                    Attachment[] atts = oMail.Attachments;
-                    foreach (Attachment att in atts)
-                    {
-                        if (att.Name.Contains(".xml"))
-                        {
-                            att.SaveAs(pathTemp + att.Name, true);
-                            try
-                            {
-                                XDocument xmlDocument;
-                                using (StreamReader oReader = new StreamReader(pathTemp + att.Name, Encoding.GetEncoding("ISO-8859-1")))
-                                {
-                                    xmlDocument = XDocument.Load(oReader);
-                                }
-                                if (xmlDocument.Root.Name.LocalName == "EnvioDTE")
-                                {
-                                    int res = SaveFiles(pathTemp + att.Name);
-                                    switch (res)
-                                    {
-                                        case 0: // Success
-                                            continue;
-                                        case 1: // Error in Sii (exit funcion)
-                                            MessageBox.Show("Sii: Application with Momentary Suspension", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            return;
-                                        case 2: // Error in serialization
-                                            continue;
-                                        case 3: // Error in query in Sii: folio wrong example.
-                                            break;
 
-                                        default:
-                                            break;
+                Imap4Folder[] imap4Folders = oClient.GetFolders();
+                foreach (Imap4Folder item in imap4Folders)
+                {
+                    if (item.Name == "INBOX" || item.Name == "Correo no deseado")
+                    {
+                        oClient.SelectFolder(item);
+
+                        string pathTemp = @"C:\Centralizador\Temp\";
+                        //new CreateTxt(pathTemp);
+                        e.Result = Properties.Settings.Default.DateTimeEmail;
+                        for (int i = 0; i < infos.Length; i++)
+                        {
+                            MailInfo info = infos[i];
+                            Mail oMail = new Mail("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
+                            oMail = oClient.GetMail(info);
+                            if (oMail.From.Address == Properties.Settings.Default.UserEmail)
+                            {
+                                continue;
+                            }
+                            Attachment[] atts = oMail.Attachments;
+                            foreach (Attachment att in atts)
+                            {
+                                if (att.Name.Contains(".xml"))
+                                {
+                                    att.SaveAs(pathTemp + att.Name, true);
+                                    try
+                                    {
+                                        XDocument xmlDocument;
+                                        using (StreamReader oReader = new StreamReader(pathTemp + att.Name, Encoding.GetEncoding("ISO-8859-1")))
+                                        {
+                                            xmlDocument = XDocument.Load(oReader);
+                                        }
+                                        if (xmlDocument.Root.Name.LocalName == "EnvioDTE")
+                                        {
+                                            int res = SaveFiles(pathTemp + att.Name);
+                                            switch (res)
+                                            {
+                                                case 0: // Success
+                                                    continue;
+                                                case 1: // Error in Sii (exit funcion)
+                                                    MessageBox.Show("Sii: Application with Momentary Suspension", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                    return;
+                                                case 2: // Error in serialization
+                                                    continue;
+                                                case 3: // Error in query in Sii: folio wrong example.
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                    catch (System.Xml.XmlException)
+                                    {
+                                        // Nothing for error in "xmlDocument = XDocument.Load(oReader);"
                                     }
                                 }
                             }
-                            catch (System.Xml.XmlException)
-                            {
-                                // Nothing for error in "xmlDocument = XDocument.Load(oReader);"
-                            }
+                            e.Result = oMail.ReceivedDate;
+                            Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
+                            Properties.Settings.Default.UIDRange = info.UIDL;
+                            c++;
+                            float porcent = (float)(100 * c) / infos.Length;
+                            bgw.ReportProgress((int)porcent, $"Dowloading messages from the email server... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})");
+
                         }
                     }
-                    e.Result = oMail.ReceivedDate;
-                    Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
-                    Properties.Settings.Default.UIDRange = info.UIDL;
-                    c++;
-                    float porcent = (float)(100 * c) / infos.Length;
-                    bgw.ReportProgress((int)porcent, $"Dowloading messages from the email server... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})");
                 }
             }
             catch (Exception)
@@ -201,7 +212,7 @@ namespace Centralizador.Models.Outlook
             try
             {
                 string path = @"C:\Centralizador\Inbox\" + nameFolder;
-               // new CreateTxt(path);
+                // new CreateTxt(path);
                 File.WriteAllText(path + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
             }
             catch (Exception)

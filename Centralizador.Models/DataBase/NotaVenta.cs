@@ -11,7 +11,11 @@ namespace Centralizador.Models.DataBase
 {
     public class NotaVenta
     {
-
+        /// <summary>
+        /// Get 1 F° available of NV.
+        /// </summary>
+        /// <param name="conexion"></param>
+        /// <returns></returns>
         public static int GetLastNv(Conexion conexion)
         {
             try
@@ -32,7 +36,7 @@ namespace Centralizador.Models.DataBase
         }
 
         /// <summary>
-        /// Check F° DTE Availables
+        /// Get count of F° Availables of DTE.
         /// </summary>
         /// <param name="conexion"></param>
         /// <returns></returns>
@@ -54,6 +58,11 @@ namespace Centralizador.Models.DataBase
             return 0;
         }
 
+        /// <summary>
+        /// Delete all NV without DTE asociate.
+        /// </summary>
+        /// <param name="conexion"></param>
+        /// <returns></returns>
         public static async Task<int> DeleteNvAsync(Conexion conexion)
         {
             try
@@ -77,8 +86,7 @@ namespace Centralizador.Models.DataBase
                     foreach (DataRow item in dataTable.Rows)
                     {                       
                             string q = $"DELETE FROM softland.nw_nventa where NVNumero = {item["nvnumero"]}";
-                            listQ.Add(q);
-                                           
+                            listQ.Add(q);                                           
                     }
                     var res = await Conexion.ExecuteNonQueryTranAsync(conexion, listQ);
                     return res; // 1 Success
@@ -92,6 +100,14 @@ namespace Centralizador.Models.DataBase
             return 1;
         }
 
+        /// <summary>
+        /// Insert a NV & details
+        /// </summary>
+        /// <param name="instruction"></param>
+        /// <param name="folioNV"></param>
+        /// <param name="codProd"></param>
+        /// <param name="conexion"></param>
+        /// <returns></returns>
         public static int InsertNv(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
         {           
             try
@@ -145,6 +161,12 @@ namespace Centralizador.Models.DataBase
             return 0;
         }
 
+        /// <summary>
+        /// Check if Insert NV.
+        /// </summary>
+        /// <param name="instruction"></param>
+        /// <param name="conexion"></param>
+        /// <returns></returns>
         public static int GetNvIfExists(ResultInstruction instruction, Conexion conexion)
         {
             string date;
@@ -158,7 +180,6 @@ namespace Centralizador.Models.DataBase
                 date = instruction.PaymentMatrix.PublishDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
 
-
             StringBuilder query = new StringBuilder();
             query.AppendLine("SELECT DISTINCT top (1) nv.nvnumero ");
             query.AppendLine("FROM softland.nw_nventa nv ");
@@ -169,9 +190,9 @@ namespace Centralizador.Models.DataBase
             query.AppendLine("     AND f.codprod = d.codprod ");
             query.AppendLine("     AND f.nvcorrela = d.nvlinea ");
             query.AppendLine($"WHERE nv.codaux = '{instruction.ParticipantDebtor.Rut}' ");
-            query.AppendLine($"     AND nv.nvsubtotal = {instruction.Amount} ");
+            query.AppendLine($"    AND nv.nvsubtotal = {instruction.Amount} ");
             query.AppendLine("     AND f.folio IS NULL ");
-            query.AppendLine($"     AND nv.fechahoracreacion >= '{date}'");
+            query.AppendLine($"    AND nv.fechahoracreacion >= '{date}'");
 
             try
             {

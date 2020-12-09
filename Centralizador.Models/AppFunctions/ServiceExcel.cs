@@ -40,10 +40,9 @@ namespace Centralizador.Models.AppFunctions
 
         }
 
-        public void ExportToExcel(IList<Detalle> detalles, bool isCreditor)
+        public void ExportToExcel(IList<Detalle> detalles, bool isCreditor, object month)
         {
             int c = 0;
-
             DataTable table = new DataTable();
             table.Columns.Add("N°");
             table.Columns.Add("F°");
@@ -76,7 +75,6 @@ namespace Centralizador.Models.AppFunctions
                 {
                     row[5] = item.Instruction.Id;
                 }
-
                 row[6] = item.MntNeto;
                 row[7] = item.MntExento;
                 row[8] = item.MntIva;
@@ -87,7 +85,6 @@ namespace Centralizador.Models.AppFunctions
                     DTEDefTypeDocumentoDetalle[] details = dte.Detalle;
                     row[10] = details[0].NmbItem.ToLowerInvariant();
                 }
-
                 row[11] = item.FechaRecepcion;
                 row[12] = item.StatusDetalle;
                 if (item.DataEvento != null)
@@ -100,15 +97,14 @@ namespace Centralizador.Models.AppFunctions
                         }
                     }
                 }
-
-                row[14] = item.Instruction.PaymentMatrix.NaturalKey;
-                row[15] = item.Instruction.PaymentMatrix.ReferenceCode;
-                row[16] = item.Instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy");
-
-
+                if (item.Instruction != null && item.Instruction.PaymentMatrix != null )
+                {
+                    row[14] = item.Instruction.PaymentMatrix.NaturalKey;
+                    row[15] = item.Instruction.PaymentMatrix.ReferenceCode;
+                    row[16] = item.Instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy");
+                }
+   
                 table.Rows.Add(row);
-
-
             }
             // Save Excel
             if (table.Rows.Count > 0)
@@ -119,11 +115,11 @@ namespace Centralizador.Models.AppFunctions
                 worksheet.InsertDataTable(table, true, 1, 1);
                 if (isCreditor)
                 {
-                    nameFile = $"{UserParticipant.Name}_ExportData_Creditor_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
+                    nameFile = $"{UserParticipant.Name}_Creditor_{month}_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 }
                 else
                 {
-                    nameFile = $"{UserParticipant.Name}_ExportData_Debtor_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
+                    nameFile = $"{UserParticipant.Name}_Debtor_{month}_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 }
 
                 string path = @"C:\Centralizador\Log\";

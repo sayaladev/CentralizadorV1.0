@@ -90,6 +90,7 @@ namespace Centralizador.WinApp.GUI
             VersionApp = AssemblyVersion;
             Text = VersionApp;
             Watch = new Stopwatch();
+            //AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", @"C:\Centralizador\Centralizador.exe.config");
 
 
             //Load ComboBox participants
@@ -322,7 +323,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Footer.Cells[1, 0].SpanCols = 3;
             IGridMain.Footer.Cells[0, 3].SpanCols = 11;
             IGridMain.Footer.Cells[1, 3].SpanCols = 11;
-            IGridMain.Footer.Cells[0, 18].SpanCols = 3;
+            //IGridMain.Footer.Cells[0, 18].SpanCols = 3;
             IGridMain.Footer.Cells[1, 18].SpanCols = 3;
             IGridMain.Footer.Cells[1, "neto"].AggregateFunction = iGAggregateFunction.Sum;
             IGridMain.Footer.Cells[1, "exento"].AggregateFunction = iGAggregateFunction.Sum;
@@ -355,16 +356,28 @@ namespace Centralizador.WinApp.GUI
         {
             if (CboParticipants.SelectedIndex != 0)
             {
-                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-                XmlDocument document = Properties.Settings.Default.DBSoftland;
                 string databaseTemp = null;
-                foreach (XmlNode item in document.ChildNodes[0])
+                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+                //XmlDocument document = Properties.Settings.Default.DBSoftland;
+                XmlDocument document = new XmlDocument();
+                try
                 {
-                    if (item.Attributes["id"].Value == UserParticipant.Id.ToString())
+                    document.Load(@"C:\Centralizador\Softland_DB_Names.xml");
+                    foreach (XmlNode item in document.ChildNodes[1])
                     {
-                        databaseTemp = item.FirstChild.InnerText;
-                        break;
+                        if (item.Attributes["id"].Value == UserParticipant.Id.ToString())
+                        {
+                            databaseTemp = item.FirstChild.InnerText;
+                            break;
+                        }
                     }
+                }
+                catch (Exception)
+                {
+                    new ErrorMsgCen("The file has problems", "Softland_DB_Names.xml", MessageBoxIcon.Stop);
+                    CboParticipants.SelectedIndex = 0;
+                    return;
+
                 }
                 if (string.IsNullOrEmpty(databaseTemp))
                 {
@@ -521,11 +534,11 @@ namespace Centralizador.WinApp.GUI
                 // Sql          
                 Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
                 int total = detallesFinal.Count - count;
-                DialogResult resp = MessageBox.Show($"There are {total} (of {DetallesCreditor.Count}) pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult resp = MessageBox.Show($"There are {total} (of {DetallesCreditor.Count}) pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?{Environment.NewLine + Environment.NewLine}WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resp == DialogResult.Yes)
                 {
-     
+
                     try
                     {
                         int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(con);
@@ -539,9 +552,9 @@ namespace Centralizador.WinApp.GUI
                     catch (Exception)
                     {
                         throw;
-                    }                
-                        BgwInsertNv.RunWorkerAsync(detallesFinal);
-                   
+                    }
+                    BgwInsertNv.RunWorkerAsync(detallesFinal);
+
                 }
             }
             else
@@ -554,9 +567,8 @@ namespace Centralizador.WinApp.GUI
             IsRunning = true;
             IList<Detalle> detallesFinal = e.Argument as IList<Detalle>;
             List<AuxCsv> values = new List<AuxCsv>();
-            int c = 0;
+            int c = 0, result = 0;
             float porcent = 0;
-            int result = 0;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             StringLogging.Clear();
             DateTime now = DateTime.Now;
@@ -700,6 +712,11 @@ namespace Centralizador.WinApp.GUI
                         new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
                     }
                 }
+                else
+                {
+                    // NO DEBERÍA ENCONTRAR FOLIOS, SE ELIMINAN LOS SIN USAR AL CARGAR GRILLA
+                    MessageBox.Show("Test");
+                }
                 c++;
                 porcent = (float)(100 * c) / detallesFinal.Count;
                 BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})  F°: {lastF}");
@@ -734,7 +751,6 @@ namespace Centralizador.WinApp.GUI
                 //CreateTxtLogFile(nameFile);
             }
         }
-
         private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
@@ -935,7 +951,8 @@ namespace Centralizador.WinApp.GUI
                 if (matrices != null && matrices.Count > 0)
                 {
                     // Delete NV no usadas
-                    // Sql          
+                    // Sql
+                    TssLblMensaje.Text = "Deleting unused NV... Wait please.";
                     Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
                     int resNv = await NotaVenta.DeleteNvAsync(con);
                     BgwCreditor.RunWorkerAsync(matrices);
@@ -945,12 +962,7 @@ namespace Centralizador.WinApp.GUI
                     TssLblMensaje.Text = $"There are no published instructions for:  {CboMonths.SelectedItem}-{CboYears.SelectedItem}.";
                 }
             }
-            catch (Exception ex)
-            {
-                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning); return;
-            }
-
-
+            catch (Exception ex) { new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning); return; }
         }
         private void BgwCreditor_DoWorkAsync(object sender, DoWorkEventArgs e)
         {
@@ -966,7 +978,7 @@ namespace Centralizador.WinApp.GUI
             {
                 Watch.Restart();
                 Watch.Start();
-            
+
 
                 foreach (ResultPaymentMatrix m in matrices)
                 {
@@ -981,10 +993,10 @@ namespace Centralizador.WinApp.GUI
                             // TESTER
 
 
-                            //if (instruction.Id != 2076556)
-                            //{
-                            //    continue;
-                            //}
+                            if (instruction.Id != 2211024)
+                            {
+                                continue;
+                            }
 
                             // Get Participant Debtor
                             instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
@@ -992,7 +1004,7 @@ namespace Centralizador.WinApp.GUI
                             Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
                             // Information Invoice & References CEN
                             IList<DteInfoRef> dteInfos = DteInfoRef.GetInfoRef(instruction, con, "F");
-                            if (dteInfos != null)         // FACTUARADA    
+                            if (dteInfos != null)         // FACTURADA    
                             {
                                 foreach (DteInfoRef item in dteInfos)
                                 {
@@ -1015,17 +1027,25 @@ namespace Centralizador.WinApp.GUI
                                 int contador = 0;
                                 foreach (DteInfoRef item in dteInfos)
                                 {
-
-                                    if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0) // Y LAS F QUE NO TENGAN LA REF Y SI ESTÉN FACTURADAS?
+                                    // Y LAS F QUE NO TENGAN LA REF Y SI ESTÉN FACTURADAS? CREO QUE YA NO EXISTEN!!!!
+                                    if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         infoLastF = item;
                                         contador++;
                                     }
                                 }
-                                // Si encuentra + de 1 de igual referencia
+                                // Si encuentra + de 1 de igual referencia                              
                                 if (contador > 1)
                                 {
                                     infoLastF = dteInfos.OrderByDescending(x => x.Folio).First();
+
+                                }
+                                else if (contador == 0)
+                                {
+
+                                }
+                                else if (contador == 1)
+                                {
 
                                 }
 
@@ -1073,14 +1093,28 @@ namespace Centralizador.WinApp.GUI
                                 //}
 
                                 // Info from SII
-                                if (infoLastF.EnviadoSII == 1) // 1 Enviado / 0 No enviado
+                                // 
+                                if (infoLastF.EnviadoSII == 1 && infoLastF.AceptadoCliente == 0) // 1 Enviado / 0 No enviado
                                 {
                                     detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
                                     // Events Sii
                                     DataEvento evento = ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert).Result;
-                                    if (evento != null) { detalle.DataEvento = evento; }
-                                    // Status
-                                    detalle.StatusDetalle = GetStatus(detalle);
+                                    if (evento != null) 
+                                    { 
+                                        detalle.DataEvento = evento;
+                                        if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
+                                        {
+                                            // Status
+                                            detalle.StatusDetalle = GetStatus(detalle);
+                                        }
+                                    }
+                                
+                                    if (detalle.StatusDetalle == StatusDetalle.Accepted)
+                                    {
+                                        // Update DTE_DocCab
+
+
+                                    }
 
                                     // Insert CEN, only Accepted.
                                     if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
@@ -1140,7 +1174,7 @@ namespace Centralizador.WinApp.GUI
                     BgwCreditor.ReportProgress((int)porcent, $"Searching 'Pay Instructions' from CEN, wait please. ({c}/{matrices.Count})");
                 }
 
-                
+
 
             }
             catch (Exception ex)
@@ -1392,10 +1426,8 @@ namespace Centralizador.WinApp.GUI
                 iGRow myRow;
                 int c = 0;
 
-                int rejectedNeto = 0;
-                int rejectedExento = 0;
-                int rejectedIva = 0;
-                int rejectedTotal = 0;
+                int rejectedNeto = 0, rejectedExento = 0, rejectedIva = 0, rejectedTotal = 0, rej = 0, rejNc = 0;
+
                 TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
                 foreach (Detalle item in detalles)
                 {
@@ -1514,10 +1546,11 @@ namespace Centralizador.WinApp.GUI
                             rejectedExento += item.MntExento;
                             rejectedIva += item.MntIva;
                             rejectedTotal += item.MntTotal;
-
+                            rejNc++;
                             // Icon
                             if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
                             {
+                                rej++;
                                 myRow.Cells["status"].ImageList = fImageListSmall;
                                 myRow.Cells["status"].ImageIndex = 5;
                                 myRow.Cells["status"].ImageAlign = iGContentAlignment.MiddleRight;
@@ -1551,9 +1584,15 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Footer.Cells[0, "exento"].Value = rejectedExento;
                 IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
                 IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
-
+                // Footer Status 
+                if (IsCreditor && rejNc > 0)
+                {
+                    IGridMain.Footer.Cells[0, "status"].ImageList = fImageListSmall;
+                    IGridMain.Footer.Cells[0, "status"].ImageIndex = 5;
+                    IGridMain.Footer.Cells[0, "status"].ImageAlign = iGContentAlignment.MiddleLeft;
+                    IGridMain.Footer.Cells[0, "status"].Value = $"{rej} of {rejNc}";
+                }
                 TssLblMensaje.Text = $"{detalles.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
-
             }
             catch (Exception ex)
             {
@@ -1589,13 +1628,15 @@ namespace Centralizador.WinApp.GUI
             {
                 if (IsCreditor && DetallesCreditor.Count > 0)
                 {
+                    // Creditor
                     ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
-                    serviceExcel.ExportToExcel(DetallesCreditor, true);
+                    serviceExcel.ExportToExcel(DetallesCreditor, true, CboMonths.SelectedItem);
                 }
                 else if (!IsRunning && !IsCreditor && DetallesDebtor.Count > 0)
                 {
+                    // Debitor
                     ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
-                    serviceExcel.ExportToExcel(DetallesDebtor, false);
+                    serviceExcel.ExportToExcel(DetallesDebtor, false, CboMonths.SelectedItem);
                 }
             }
 

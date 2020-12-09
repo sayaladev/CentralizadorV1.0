@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -17,7 +18,8 @@ namespace Centralizador.WinApp
 
         [STAThread]
         private static void Main()
-        {
+        {         
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -73,12 +75,15 @@ namespace Centralizador.WinApp
                     return;
                 }
                 // Open Form
+              
                 FormMain main = new FormMain() { TokenCen = tokenCen, TokenSii = tokenSii, Participants = participants, BillingTypes = billingTypes };
                 main.WindowState = FormWindowState.Normal;
                 main.BringToFront();
                 //main.TopMost = true;
                 main.Focus();
-                Application.Run(main);
+
+               Application.Run(main);
+              
             }
             mutex.ReleaseMutex();
 
@@ -93,7 +98,7 @@ namespace Centralizador.WinApp
             //key.SetValue("UntrustedSites", "Disabled");
             //key.Close();
         }
-
+       
 
     }
 }
