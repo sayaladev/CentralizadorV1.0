@@ -3,6 +3,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using Centralizador.Models.ApiCEN;
 
@@ -17,7 +18,7 @@ namespace Centralizador.Models.DataBase
         public string DirAux { get; set; }
         public string ComAux { get; set; }
 
-        public int InsertAuxiliar(ResultInstruction instruction, Conexion conexion, ref Auxiliar aux, Comuna comuna)
+        public async Task<int> InsertAuxiliarAsync(ResultInstruction instruction, Conexion conexion, Auxiliar aux, Comuna comuna)
         {
             string acteco = null;
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
@@ -42,7 +43,7 @@ namespace Centralizador.Models.DataBase
                     acteco = instruction.ParticipantDebtor.CommercialBusiness;
                 }
                 // Insert new Acteco
-                Acteco.InsertActeco(acteco, conexion);
+               await Acteco.InsertActecoAsync(acteco, conexion);
 
                 // Production:
                 if (Environment.MachineName == "DEVELOPER")
@@ -73,7 +74,7 @@ namespace Centralizador.Models.DataBase
             }
         }
 
-        public Auxiliar GetAuxiliar(ResultInstruction instruction, Conexion conexion)
+        public async Task<Auxiliar> GetAuxiliarAsync(ResultInstruction instruction, Conexion conexion)
         {
             try
             {
@@ -81,7 +82,7 @@ namespace Centralizador.Models.DataBase
                 query.Append($"SELECT * FROM softland.cwtauxi WHERE CodAux = '{instruction.ParticipantDebtor.Rut}' ");
                 conexion.Query = query.ToString();
                 DataTable dataTable = new DataTable();
-                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+                dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count == 1)
                 {
                     Auxiliar auxiliar = new Auxiliar();
@@ -119,7 +120,7 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
-        public int UpdateAuxiliar(ResultInstruction instruction, Conexion conexion, Comuna comuna)
+        public async Task<int> UpdateAuxiliarAsync(ResultInstruction instruction, Conexion conexion, Comuna comuna)
         {
             string name;
             string acteco = null;
@@ -155,7 +156,7 @@ namespace Centralizador.Models.DataBase
                     acteco = instruction.ParticipantDebtor.CommercialBusiness;
                 }
                 // Insert new Acteco
-                Acteco.InsertActeco(acteco, conexion);
+               await Acteco.InsertActecoAsync(acteco, conexion);
             }
 
             // Production:

@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
@@ -52,7 +53,7 @@ namespace Centralizador.Models.DataBase
 
         #endregion
 
-        public static IList<DteInfoRef> GetInfoRef(ResultInstruction instruction, Conexion conexion, string tipo)
+        public static async Task<IList<DteInfoRef>> GetInfoRefAsync(ResultInstruction instruction, Conexion conexion, string tipo)
         {
             try
             {
@@ -126,7 +127,7 @@ namespace Centralizador.Models.DataBase
                 query.Append($"        AND G.FecHoraCreacion >= '{date}' ");
                 query.Append($"        AND G.Tipo = '{tipo}' ");
                 conexion.Query = query.ToString();
-                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+                dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     foreach (DataRow item in dataTable.Rows)
@@ -176,7 +177,7 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
-        public static int InsertReference(ResultInstruction instruction, int nroInt, Conexion conexion)
+        public static async Task<int> InsertReferenceAsync(ResultInstruction instruction, int nroInt, Conexion conexion)
         {
             // FALTA INSERT DE DTE_DocRef
             // Manipular el Xml  UPDATE
@@ -199,7 +200,7 @@ namespace Centralizador.Models.DataBase
                 query.Append("END ");
 
                 conexion.Query = query.ToString();
-                return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!
+                return Convert.ToInt32(await Conexion.ExecuteNonQueryAsync(conexion)); // Return 1 if ok!
             }
             catch (Exception)
             {
@@ -207,7 +208,7 @@ namespace Centralizador.Models.DataBase
             }
         }
 
-        public static int InsertReferenceTrans(Conexion conexion, Detalle detalle, ResultParticipant participant)
+        public static async Task<int> InsertReferenceTransAsync(Conexion conexion, Detalle detalle, ResultParticipant participant)
         {
             string date = null;
             StringBuilder query1 = new StringBuilder();
@@ -324,7 +325,7 @@ namespace Centralizador.Models.DataBase
                 // Execute Transaction
                 if (!string.IsNullOrEmpty(query1.ToString()) || !string.IsNullOrEmpty(query2.ToString()) || !string.IsNullOrEmpty(query3))
                 {    
-                    int res = Convert.ToInt32( Conexion.ExecuteNonQueryTranAsync(conexion, new List<string> { query1.ToString(), query2.ToString(), query3.ToString() }).Result);              
+                    int res = Convert.ToInt32( await Conexion.ExecuteNonQueryTranAsync(conexion, new List<string> { query1.ToString(), query2.ToString(), query3.ToString() }));              
                     return res;
                 }
                 else

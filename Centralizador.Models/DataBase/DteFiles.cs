@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
+
+using Centralizador.Models.ApiSII;
 
 namespace Centralizador.Models.DataBase
 {
@@ -25,7 +28,7 @@ namespace Centralizador.Models.DataBase
         /// <param name="nroInt"></param>
         /// <param name="Folio"></param>
         /// <returns></returns>
-        public static IList<DteFiles> GetDteFiles(Conexion conexion, int nroInt, int Folio)
+        public static async Task<IList<DteFiles>> GetDteFilesAsync(Conexion conexion, int nroInt, int Folio)
         {
             try
             {
@@ -43,7 +46,7 @@ namespace Centralizador.Models.DataBase
                 query.Append($"        AND Nroint = {nroInt} ");
                 query.Append($"        AND Folio = {Folio} ORDER BY FechaGenDTE DESC  ");
                 conexion.Query = query.ToString();
-                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+                dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     foreach (DataRow item in dataTable.Rows)
@@ -68,13 +71,17 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
+        
+        
+        
+        
         /// <summary>
         /// Get Xml from Softland DB
         /// </summary>
         /// <param name="conexion"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static IList<DteFiles> GetDteFiles(Conexion conexion, int id)
+        public static async Task<IList<DteFiles>> GetDteFilesAsync(Conexion conexion, int id)
         {
             try
             {
@@ -90,7 +97,7 @@ namespace Centralizador.Models.DataBase
                 query.Append("FROM softland.DTE_Archivos ");
                 query.Append($"WHERE ID_Archivo = {id} ");
                 conexion.Query = query.ToString();
-                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+                dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     foreach (DataRow item in dataTable.Rows)
@@ -114,6 +121,27 @@ namespace Centralizador.Models.DataBase
             }
             return null;
 
+        }
+        
+        
+        
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conexion"></param>
+        /// <param name="detalle"></param>
+        public static async void UpdateFiles(Conexion conexion, Detalle detalle) {
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("UPDATE softland.dte_doccab ");
+            query.AppendLine("SET  aceptadocliente = 1 ");
+            query.AppendLine("WHERE tipodte = 33 ");
+            query.AppendLine($"     AND folio = {detalle.Folio} ");
+            query.AppendLine("     AND tipo = 'F' ");
+            query.AppendLine($"     AND nroint = {detalle.NroInt} ");
+            query.AppendLine($"     AND rutrecep = '{detalle.Instruction.ParticipantDebtor.Rut}-{detalle.Instruction.ParticipantDebtor.VerificationCode}'");
+            conexion.Query = query.ToString();
+            await Conexion.ExecuteNonQueryAsync(conexion);   
         }
     }
 }

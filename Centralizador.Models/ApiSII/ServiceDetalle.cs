@@ -96,96 +96,7 @@ namespace Centralizador.Models.ApiSII
             }
             return null;
         }
-        //public static int GetFlagImageIndex(LetterFlag flag)
-        //{
-        //    switch (flag)
-        //    {
-        //        case LetterFlag.Red:
-        //            return 11;
-        //        case LetterFlag.Blue:
-        //            return 12;
-        //        case LetterFlag.Yellow:
-        //            return 13;
-        //        case LetterFlag.Green:
-        //            return 14;
-        //        case LetterFlag.Complete:
-        //            return 15;
-        //        default:
-        //            return 16;
-        //    }
-        //}
-        //public static Color GetFlagBackColor(LetterFlag flag)
-        //{
-        //    switch (flag)
-        //    {
-        //        case LetterFlag.Red:
-        //            return Color.FromArgb(207, 93, 96);
-        //        case LetterFlag.Blue:
-        //            return Color.FromArgb(92, 131, 180);
-        //        case LetterFlag.Yellow:
-        //            return Color.FromArgb(255, 193, 96);
-        //        case LetterFlag.Green:
-        //            return Color.FromArgb(139, 180, 103);
-        //        case LetterFlag.Complete:
-        //            return Color.White;
-        //        default:
-        //            return Color.Empty;
-        //    }
-        //}
-        //public static LetterFlag ValidateCen(Detalle detalle)
-        //{
-        //    if (detalle.IsParticipant)
-        //    {
-        //        if (detalle.DTEDef != null && detalle.Instruction != null)
-        //        {
-        //            DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-        //            if (dte.Referencia != null)
-        //            {
-        //                DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
-        //                if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
-        //                {
-        //                    return LetterFlag.Red;
-        //                }
-        //                else if (referencia == null)
-        //                {
-        //                    return LetterFlag.Red;
-        //                }
-        //                else if (string.Compare(referencia.FolioRef, detalle.Instruction.PaymentMatrix.ReferenceCode, true) != 0)
-        //                {
-        //                    return LetterFlag.Red;
-        //                }
-        //                else if (string.Compare(referencia.RazonRef, detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
-        //                {
-        //                    return LetterFlag.Red;
-        //                }
-        //                else if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
-        //                {
-        //                    return LetterFlag.Red;
-        //                }
-        //                else if (dte.Detalle == null || dte.Detalle.Length < 1)
-        //                {
-        //                    //if (dte.Detalle[0].DscItem != detalle.Instruction.PaymentMatrix.NaturalKey)
-        //                    //{
-        //                    return LetterFlag.Red;
-        //                    //}
-        //                }
-
-        //                return LetterFlag.Green;
-        //            }
-        //        }
-        //        return LetterFlag.Red;
-        //    }
-        //    return LetterFlag.Clear;
-        //}
-        //public enum LetterFlag
-        //{
-        //    Red,
-        //    Blue,
-        //    Yellow,
-        //    Green,
-        //    Complete,
-        //    Clear
-        //}
+       
         public enum StatusDetalle
         {
             Accepted,
@@ -198,79 +109,45 @@ namespace Centralizador.Models.ApiSII
         public static StatusDetalle GetStatus(Detalle detalle)
         {
             // http://www.sii.cl/factura_electronica/Webservice_Registro_Reclamo_DTE_V1.2.pdf
-
-            // Ordeno por el evento más reciente
-            IList<ListEvenHistDoc> eventos = detalle.DataEvento.ListEvenHistDoc.OrderByDescending(x => x.FechaEvento).ToList();
-            ListEvenHistDoc res = detalle.DataEvento.ListEvenHistDoc.FirstOrDefault();
-
-            switch (res.CodEvento)
+            if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
             {
-                case "ACD": // Acepta Contenido del Documento
-                    return StatusDetalle.Accepted;
-                case "RCD": // Reclamo al Contenido del Documento
-                    return StatusDetalle.Rejected;
-                case "PAG": // Pago Contado
-                    return StatusDetalle.Accepted;
-                case "ERM": // Acuse de  Recibo de Mercaderías y Servicios Ley 19.983
-                    return StatusDetalle.Accepted;
-                case "ENC": // Recepción de NC, distinta de anulación, que referencia al documento.
-                    return StatusDetalle.Accepted;
-                case "RFT": // Receclamo por falta total de mercaderías.
-                    return StatusDetalle.Rejected;
-                case "RFP": // Receclamo por falta parcial de mercaderías.
-                    return StatusDetalle.Rejected;
-                case "NCA": // Recepción de NC de anulación que referencia al documento.
-                    return StatusDetalle.Rejected;
-                case "CED": // DTE Cedido.
-                    return StatusDetalle.Factoring;
-                default:
-                    break;
-            }
+                // Ordeno por el evento más reciente
+                IList<ListEvenHistDoc> eventos = detalle.DataEvento.ListEvenHistDoc.OrderByDescending(x => x.FechaEvento).ToList();
+                ListEvenHistDoc res = eventos.FirstOrDefault();
 
-            if (detalle.DataEvento != null && detalle.DataEvento.ListEvenHistDoc.Count > 0)
-            {
-                if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ACD") != null)  // Acepta Contenido del Documento
+                switch (res.CodEvento)
                 {
-                    return StatusDetalle.Accepted;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RCD") != null) // Reclamo al Contenido del Documento
-                {
-                    return StatusDetalle.Rejected;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "PAG") != null)
-                {
-                    return StatusDetalle.Accepted;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ERM") != null) // Acuse de  Recibo de Mercaderías y Servicios Ley 19.983
-                {
-                    return StatusDetalle.Accepted;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "ENC") != null) // Recepción de NC, distinta de anulación, que referencia al documento.
-                {
-                    return StatusDetalle.Accepted;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RFT") != null) // Receclamo por falta total de mercaderías.
-                {
-                    return StatusDetalle.Rejected;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "RFP") != null) // Receclamo por falta parcial de mercaderías.
-                {
-                    return StatusDetalle.Rejected;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null) // Recepción de NC de anulación que referencia al documento.
-                {
-                    return StatusDetalle.Rejected;
-                }
-                else if (detalle.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "CED") != null) // DTE Cedido.
-                {
-                    return StatusDetalle.Factoring;
+                    case "ACD": // Acepta Contenido del Documento
+                        return StatusDetalle.Accepted;
+                    case "RCD": // Reclamo al Contenido del Documento
+                        return StatusDetalle.Rejected;
+                    case "PAG": // Pago Contado
+                        return StatusDetalle.Accepted;
+                    case "ERM": // Acuse de  Recibo de Mercaderías y Servicios Ley 19.983
+                        return StatusDetalle.Accepted;
+                    case "ENC": // Recepción de NC, distinta de anulación, que referencia al documento.
+                        return StatusDetalle.Accepted;
+                    case "RFT": // Receclamo por falta total de mercaderías.
+                        return StatusDetalle.Rejected;
+                    case "RFP": // Receclamo por falta parcial de mercaderías.
+                        return StatusDetalle.Rejected;
+                    case "NCA": // Recepción de NC de anulación que referencia al documento.
+                        return StatusDetalle.Rejected;
+                    case "CED": // DTE Cedido.
+                        return StatusDetalle.Factoring;
+                    default:
+                        return StatusDetalle.Pending;
                 }
             }
             else
             {
-                if (detalle.DataEvento != null && detalle.DataEvento.MayorOchoDias)
+                if (detalle.DataEvento.MayorOchoDias)
                 {
                     return StatusDetalle.Accepted;
+                }
+                else
+                {
+                   return StatusDetalle.Pending;
                 }
             }
             return StatusDetalle.Pending;

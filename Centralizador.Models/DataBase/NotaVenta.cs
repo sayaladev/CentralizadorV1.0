@@ -108,7 +108,7 @@ namespace Centralizador.Models.DataBase
         /// <param name="codProd"></param>
         /// <param name="conexion"></param>
         /// <returns></returns>
-        public static int InsertNv(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
+        public static async Task<int> InsertNvAsync(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
         {           
             try
             {
@@ -138,19 +138,19 @@ namespace Centralizador.Models.DataBase
                 query.Append($"'{instruction.ParticipantDebtor.Rut}','1','.','{date}','{date}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
                 query.Append($"'Centralizador',1,'01','A','{date}') ");
                 conexion.Query = query.ToString();
-                if (Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
+                if (Convert.ToInt32(await Conexion.ExecuteNonQueryAsync(conexion)) == 2) // 2 : Softland execute batch with 2 queries (nventa + log).
                 {
                     query.Clear();
                     query.Append("INSERT INTO softland.nw_detnv (NVNumero,nvLinea,nvFecCompr,CodProd,nvCant,nvPrecio,nvSubTotal,nvTotLinea,CodUMed,CantUVta,nvEquiv)VALUES(");
                     query.Append($"{folioNV},1,'{date}','{codProd}',1,{neto},{neto},{neto},'UN',1,1)");
                     conexion.Query = query.ToString();
-                    if (Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result) == 1) // 1 : Softland execute only this query
+                    if (Convert.ToInt32(await Conexion.ExecuteNonQueryAsync(conexion)) == 1) // 1 : Softland execute only this query
                     {
                         query.Clear();
                         query.Append("INSERT INTO softland.NW_Impto (nvNumero, CodImpto, ValPctIni, AfectoImpto, Impto)  VALUES ( ");
                         query.Append($"{folioNV},'IVA',19,{neto},{iva})");
                         conexion.Query = query.ToString();
-                        return Convert.ToInt32(Conexion.ExecuteNonQueryAsync(conexion).Result); // Return 1 if ok!     
+                        return Convert.ToInt32(await Conexion.ExecuteNonQueryAsync(conexion)); // Return 1 if ok!     
                     }
                 }
             }
@@ -167,7 +167,7 @@ namespace Centralizador.Models.DataBase
         /// <param name="instruction"></param>
         /// <param name="conexion"></param>
         /// <returns></returns>
-        public static int GetNvIfExists(ResultInstruction instruction, Conexion conexion)
+        public static async Task<int> GetNvIfExistsAsync(ResultInstruction instruction, Conexion conexion)
         {
             string date;
             if (Environment.MachineName == "DEVELOPER")
@@ -197,7 +197,7 @@ namespace Centralizador.Models.DataBase
             try
             {
                 conexion.Query = query.ToString();
-                object result = Conexion.ExecuteScalarAsync(conexion).Result;
+                object result = await Conexion.ExecuteScalarAsync(conexion);
                 if (result != null)
                 {
                     return Convert.ToInt32(result);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
@@ -32,7 +33,7 @@ namespace Centralizador.Models.DataBase
         [JsonProperty("actividades")]
         public IList<Actividade> Actividades { get; set; }
 
-        public static int InsertActeco(string descripcion, Conexion conexion)
+        public static async Task<int> InsertActecoAsync(string descripcion, Conexion conexion)
         {
             try
             {
@@ -41,7 +42,7 @@ namespace Centralizador.Models.DataBase
                 query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
                 query.Append($"'{descripcion}') END");
                 conexion.Query = query.ToString();
-                return Conexion.ExecuteNonQueryAsync(conexion).Result;
+                return await Conexion.ExecuteNonQueryAsync(conexion);
             }
             catch (Exception)
             {

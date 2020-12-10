@@ -11,13 +11,13 @@ namespace Centralizador.Models.DataBase
         public string ComDes { get; set; }
         public int Id_Region { get; set; }
 
-        public static IList<Comuna> GetComunas(Conexion conexion)
+        public static async System.Threading.Tasks.Task<IList<Comuna>> GetComunasAsync(Conexion conexion)
         {
             try
             {
                 conexion.Query = "SELECT * FROM softland.cwtcomu";
                 DataTable dataTable = new DataTable();
-                dataTable = Conexion.ExecuteReaderAsync(conexion).Result;
+                dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     IList<Comuna> comunas = new List<Comuna>();
