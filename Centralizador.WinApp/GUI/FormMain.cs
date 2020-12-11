@@ -48,7 +48,7 @@ namespace Centralizador.WinApp.GUI
         //General
         private string VersionApp { get; set; }
         private ResultParticipant UserParticipant { get; set; }
-        private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
+        //private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
         public IEnumerable<ResultBilingType> BillingTypes { get; set; }
         public IList<ResultParticipant> Participants { get; set; }
 
@@ -167,7 +167,7 @@ namespace Centralizador.WinApp.GUI
             StringLogging = new StringBuilder();
 
             // Date Time Outlook
-            BtnOutlook.Text = string.Format(CultureInfo, "{0:g}", ServiceReadMail.GetLastDateTime());
+            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", ServiceReadMail.GetLastDateTime());
 
             // Timer Second (every minute)
             System.Timers.Timer timerMinute = new System.Timers.Timer(1000);
@@ -194,7 +194,7 @@ namespace Centralizador.WinApp.GUI
         {
             try
             {
-                TssLblFechaHora.Text = string.Format(CultureInfo, "{0:g}", DateTime.Now);
+                TssLblFechaHora.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", DateTime.Now);
             }
             catch (Exception)
             {
@@ -525,7 +525,7 @@ namespace Centralizador.WinApp.GUI
             }
             int c = 0;
             int foliosDispBefore = foliosDisp;
-            while (foliosDisp > 0 && detallesPaso.Count > 0)
+            while (foliosDisp > 0 && detallesPaso.Count > c)
             {
                 detallesFinal.Add(detallesPaso[c]);
                 foliosDisp--;
@@ -539,25 +539,13 @@ namespace Centralizador.WinApp.GUI
                 builder.AppendLine("WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.");
 
                 resp = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (resp == DialogResult.Yes)
-                {
-                    BgwInsertNv.RunWorkerAsync(detallesFinal);
-                }
-                else
-                {
-                    TssLblMensaje.Text = "Cancel.";
-                }
+                if (resp == DialogResult.Yes) { BgwInsertNv.RunWorkerAsync(detallesFinal); }
+                else { TssLblMensaje.Text = "Cancel."; }
             }
             else
             {
-                if (foliosDisp == 0 && detallesPaso.Count > 0)
-                {
-                    TssLblMensaje.Text = "F° Available: 0, you need get more in SII.";
-                }
-                else if (true)
-                {
-                    TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
-                }       
+                if (foliosDisp == 0 && detallesPaso.Count > 0) { TssLblMensaje.Text = "F° Available: 0, you need get more in SII."; }
+                else if (true) { TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted."; }
             }
         }
         private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
@@ -1685,10 +1673,10 @@ namespace Centralizador.WinApp.GUI
                         rejectedTotal += item.MntTotal;
 
                     }
-                    if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaEmision)); }
+                    if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaEmision)); }
                     if (item.FechaRecepcion != null)
                     {
-                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion));
+                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaRecepcion));
                         if (item.DteInfoRefLast != null && item.DteInfoRefLast.EnviadoCliente == 1)
                         {
                             myRow.Cells["fechaEnvio"].ImageList = FListPics;
@@ -1700,7 +1688,7 @@ namespace Centralizador.WinApp.GUI
                     }
                     if (item.DteInfoRefLast != null && item.DteInfoRefLast.EnviadoCliente == 1)
                     {
-                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo, "{0:d}", Convert.ToDateTime(item.FechaRecepcion)) + "";
+                        myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaRecepcion)) + "";
                     }
                     if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
                     if (IsCreditor)
@@ -2272,7 +2260,7 @@ namespace Centralizador.WinApp.GUI
         {
             TssLblProgBar.Value = 0;
             BtnOutlook.Enabled = true;
-            BtnOutlook.Text = string.Format(CultureInfo, "{0:g}", e.Result);
+            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", e.Result);
             TssLblMensaje.Text = "Complete!";
             IGridMain.Focus();
 
