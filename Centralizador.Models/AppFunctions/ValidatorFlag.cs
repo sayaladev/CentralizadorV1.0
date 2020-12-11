@@ -124,6 +124,8 @@ namespace Centralizador.Models.AppFunctions
                             else
                             {
                                 Flag = LetterFlag.Red;
+                                FolioRef = true;
+                                RazonRef = true;
                                 TpoDocRef = true;
                             }
                         }

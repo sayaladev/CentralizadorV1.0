@@ -24,10 +24,10 @@
       <Value Profile="(Default)">10.13.0.114\SQL2014</Value>
     </Setting>
     <Setting Name="UIDRange" Type="System.String" Scope="User">
-      <Value Profile="(Default)">98961</Value>
+      <Value Profile="(Default)">113496</Value>
     </Setting>
     <Setting Name="DateTimeEmail" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">08/31/2020 22:24:25</Value>
+      <Value Profile="(Default)">11/12/2020 22:24:25</Value>
     </Setting>
   </Settings>
 </SettingsFile>

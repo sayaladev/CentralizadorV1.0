@@ -58,15 +58,19 @@ namespace Centralizador.Models.Outlook
                 oClient.GetMailInfosParam.Reset();
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
-                MailInfo[] infos = oClient.GetMailInfos();
+                
 
                 Imap4Folder[] imap4Folders = oClient.GetFolders();
+                //oClient.SelectFolder(imap4Folders[1]); // spam
+
+
+
                 foreach (Imap4Folder item in imap4Folders)
                 {
                     if (item.Name == "INBOX" || item.Name == "Correo no deseado")
                     {
                         oClient.SelectFolder(item);
-
+                        MailInfo[] infos = oClient.GetMailInfos();
                         string pathTemp = @"C:\Centralizador\Temp\";
                         //new CreateTxt(pathTemp);
                         e.Result = Properties.Settings.Default.DateTimeEmail;
@@ -118,19 +122,27 @@ namespace Centralizador.Models.Outlook
                                     }
                                 }
                             }
-                            e.Result = oMail.ReceivedDate;
-                            Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
-                            Properties.Settings.Default.UIDRange = info.UIDL;
-                            c++;
-                            float porcent = (float)(100 * c) / infos.Length;
-                            bgw.ReportProgress((int)porcent, $"Dowloading messages from the email server... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})");
+                            if (item.Name == "INBOX")
+                            {
+                                e.Result = oMail.ReceivedDate;
+                                Properties.Settings.Default.DateTimeEmail = oMail.ReceivedDate;
+                                Properties.Settings.Default.UIDRange = info.UIDL;
+                                c++;
+                                float porcent = (float)(100 * c) / infos.Length;
+                                bgw.ReportProgress((int)porcent, $"Dowloading messages... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})  Subject: {oMail.Subject} ");
+                            }
+                        
 
                         }
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception )
             {
+                //if (ex.ErrorCode == 0)
+                //{
+
+                //}
                 throw;
             }
             finally

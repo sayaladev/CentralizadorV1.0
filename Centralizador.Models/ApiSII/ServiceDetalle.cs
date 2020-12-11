@@ -149,8 +149,7 @@ namespace Centralizador.Models.ApiSII
                 {
                    return StatusDetalle.Pending;
                 }
-            }
-            return StatusDetalle.Pending;
+            }          
         }
     }
 
@@ -204,7 +203,8 @@ namespace Centralizador.Models.ApiSII
         // New properties
         public int Nro { get; set; }
         public ResultInstruction Instruction { get; set; }
-        public DteInfoRef DteInfoRef { get; set; }
+        public DteInfoRef DteInfoRefLast { get; set; }
+        public IList<DteInfoRef> DteInfoRefs  { get; set; }
         public DTEDefType DTEDef { get; set; }
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }
@@ -213,7 +213,8 @@ namespace Centralizador.Models.ApiSII
         public ValidatorFlag ValidatorFlag { get; set; } // CEN requeriment validator.
         public int NroInt { get; set; }
         public bool RefMissing { get; set; }       
-        public int FolioNVInsertada { get; set; }
+       // public int FolioNVInsertada { get; set; }
+       
 
         // Constructor
         public Detalle(string rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)

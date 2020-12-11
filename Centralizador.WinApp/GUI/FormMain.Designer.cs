@@ -36,6 +36,7 @@
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblProgBar = new System.Windows.Forms.ToolStripProgressBar();
             this.TssLblMensaje = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TssLblDBName = new System.Windows.Forms.ToolStripStatusLabel();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.FpicBoxSearch = new System.Windows.Forms.PictureBox();
             this.IGridMain = new TenTec.Windows.iGridLib.iGrid();
@@ -87,7 +88,8 @@
             this.TssLblFechaHora,
             this.TssLblUserEmail,
             this.TssLblProgBar,
-            this.TssLblMensaje});
+            this.TssLblMensaje,
+            this.TssLblDBName});
             this.StatusStrip.Location = new System.Drawing.Point(0, 707);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(1396, 22);
@@ -98,7 +100,7 @@
             // 
             this.TssLblFechaHora.AutoSize = false;
             this.TssLblFechaHora.Name = "TssLblFechaHora";
-            this.TssLblFechaHora.Size = new System.Drawing.Size(180, 17);
+            this.TssLblFechaHora.Size = new System.Drawing.Size(100, 17);
             // 
             // TssLblUserEmail
             // 
@@ -109,15 +111,23 @@
             // TssLblProgBar
             // 
             this.TssLblProgBar.Name = "TssLblProgBar";
-            this.TssLblProgBar.Size = new System.Drawing.Size(350, 16);
+            this.TssLblProgBar.Size = new System.Drawing.Size(300, 16);
             // 
             // TssLblMensaje
             // 
             this.TssLblMensaje.AutoSize = false;
             this.TssLblMensaje.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.TssLblMensaje.Name = "TssLblMensaje";
-            this.TssLblMensaje.Size = new System.Drawing.Size(600, 17);
+            this.TssLblMensaje.Size = new System.Drawing.Size(650, 17);
             this.TssLblMensaje.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // TssLblDBName
+            // 
+            this.TssLblDBName.AutoSize = false;
+            this.TssLblDBName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.TssLblDBName.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.TssLblDBName.Name = "TssLblDBName";
+            this.TssLblDBName.Size = new System.Drawing.Size(100, 17);
             // 
             // SplitContainer
             // 
@@ -627,5 +637,6 @@
         private System.Windows.Forms.CheckBox ChkNoIncludeCEN;
         private System.Windows.Forms.Button BtnCancelTak;
         private System.Windows.Forms.ImageList fImageListSmall;
+        private System.Windows.Forms.ToolStripStatusLabel TssLblDBName;
     }
 }
