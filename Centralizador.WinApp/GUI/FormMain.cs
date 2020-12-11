@@ -507,9 +507,8 @@ namespace Centralizador.WinApp.GUI
             }
             int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(con);
             int count = DetallesCreditor.Count;
-           
+            //foliosDisp = 10;
             StringBuilder builder = new StringBuilder();
-            foliosDisp = 11;
             foreach (Detalle item in DetallesCreditor)
             {
                 if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
@@ -521,7 +520,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 else
                 {
-                    if (item.Folio == 0 && item.MntNeto > 9) { detallesPaso.Add(item); } // only > $10
+                    if (item.Folio < 0 && item.MntNeto > 9) { detallesPaso.Add(item); } // only > $10
                 }
             }
             int c = 0;
@@ -532,7 +531,7 @@ namespace Centralizador.WinApp.GUI
                 foliosDisp--;
                 c++;
             }
-           
+
             if (detallesFinal.Count > 0)
             {
                 builder.AppendLine($"There are {foliosDispBefore} F° available, so you can only insert {detallesFinal.Count} of {detallesPaso.Count} NV");
@@ -540,7 +539,8 @@ namespace Centralizador.WinApp.GUI
                 builder.AppendLine("WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.");
 
                 resp = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (resp == DialogResult.Yes) {
+                if (resp == DialogResult.Yes)
+                {
                     BgwInsertNv.RunWorkerAsync(detallesFinal);
                 }
                 else
@@ -550,52 +550,15 @@ namespace Centralizador.WinApp.GUI
             }
             else
             {
-                if (foliosDisp == 0 && detallesFinal.Count > 0)
+                if (foliosDisp == 0 && detallesPaso.Count > 0)
                 {
                     TssLblMensaje.Text = "F° Available: 0, you need get more in SII.";
                 }
-                else
+                else if (true)
                 {
                     TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
-                }
+                }       
             }
-
-            //if (detallesFinal.Count == 0)
-            //{
-            //    TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
-            //}
-
-            //if (detallesFinal.Count > 0)
-            //{
-
-            //    builder.AppendLine($"There are { detallesFinal.Count} (of { DetallesCreditor.Count}) pending payment instructions for billing.");
-            //    if (detallesFinal.Count <= foliosDisp)
-            //    {
-
-            //    }
-
-            //    DialogResult resp = MessageBox.Show($"There are {detallesFinal.Count} (of {DetallesCreditor.Count}) pending payment instructions for billing{Environment.NewLine + Environment.NewLine}Are you sure?{Environment.NewLine + Environment.NewLine}WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            //    if (resp == DialogResult.Yes)
-            //    {
-            //        if (foliosDisp > 0 && foliosDisp < detallesFinal.Count)
-            //        {
-            //            new ErrorMsgCen($"F° Available: {foliosDisp}", MessageBoxIcon.Information);
-            //        }
-            //        else
-            //        {
-            //            new ErrorMsgCen($"F° Available: {foliosDisp}, you need get more in SII.", MessageBoxIcon.Error);
-            //            return;
-            //        }
-
-            //        BgwInsertNv.RunWorkerAsync(detallesFinal);
-
-            //    }
-            //}
-            //else
-            //{
-            //    TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
-            //}
         }
         private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -637,7 +600,7 @@ namespace Centralizador.WinApp.GUI
                 new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
             }
             foreach (Detalle item in detallesFinal)
-            {           
+            {
                 // Checks if exists NV for this instruction   
                 //if (item.FolioNVInsertada > 0)
                 //{
