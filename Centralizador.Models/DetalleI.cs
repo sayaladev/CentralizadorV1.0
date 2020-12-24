@@ -215,7 +215,7 @@ namespace Centralizador.Models
               
         public async Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken cancellationToken, string p)
         {
-            string nameFilePath = p; // @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
+            string nameFilePath = p;
             string nameFile = "";
             int c = 0;
             List<Detalle> detallesFinal = new List<Detalle>();
@@ -315,7 +315,7 @@ namespace Centralizador.Models
             }
             return detallesFinal.OrderBy(x => x.FechaRecepcion).ToList();
         }
-       
 
+      
     }
 }
