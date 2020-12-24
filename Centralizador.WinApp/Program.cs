@@ -25,8 +25,8 @@ namespace Centralizador.WinApp
 
 
             // Variables 
-            IList<ResultBilingType> billingTypes;
-            IList<ResultParticipant> participants;
+            List<ResultBilingType> billingTypes;
+            List<ResultParticipant> participants;
             string tokenSii;
             string tokenCen;
 
@@ -38,7 +38,7 @@ namespace Centralizador.WinApp
                 // Get Biling types
                 billingTypes = BilingType.GetBilinTypesAsync().Result;
 
-                tokenCen = Agent.GetTokenCenAsync(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN).Result;
+                tokenCen = Agent.GetTokenCenAsync(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN).Result;     
 
             }
             catch (Exception ex)
@@ -81,24 +81,16 @@ namespace Centralizador.WinApp
                 main.BringToFront();
                 //main.TopMost = true;
                 main.Focus();
-
-               Application.Run(main);
-              
+                try
+                {
+                    Application.Run(main);
+                }
+                catch (Exception)
+                {
+                   throw;
+                }
             }
             mutex.ReleaseMutex();
-
-
-            // https://docs.microsoft.com/es-es/visualstudio/deployment/how-to-configure-the-clickonce-trust-prompt-behavior?view=vs-2019
-            //Microsoft.Win32.RegistryKey key;
-            //key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("SOFTWARE\\MICROSOFT\\.NETFramework\\Security\\TrustManager\\PromptingLevel");
-            //key.SetValue("MyComputer", "Enabled");
-            //key.SetValue("LocalIntranet", "Enabled");
-            //key.SetValue("Internet", "AuthenticodeRequired");
-            //key.SetValue("TrustedSites", "Enabled");
-            //key.SetValue("UntrustedSites", "Disabled");
-            //key.Close();
         }
-       
-
     }
 }

@@ -48,13 +48,13 @@ namespace Centralizador.Models.ApiCEN
         public object Previous { get; set; }
 
         [JsonProperty("results")]
-        public IList<ResultBilingType> Results { get; set; }
+        public List<ResultBilingType> Results { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public static async Task<IList<ResultBilingType>> GetBilinTypesAsync()
+        public static async Task<List<ResultBilingType>> GetBilinTypesAsync()
         {
             try
             {

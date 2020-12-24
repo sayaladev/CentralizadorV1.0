@@ -20,7 +20,7 @@ namespace Centralizador.Models.ApiCEN
         public string Address { get; set; }
 
         [JsonProperty("phones")]
-        public IList<string> Phones { get; set; }
+        public List<string> Phones { get; set; }
 
         [JsonProperty("email")]
         public string Email { get; set; }
@@ -39,7 +39,7 @@ namespace Centralizador.Models.ApiCEN
         public string Address { get; set; }
 
         [JsonProperty("phones")]
-        public IList<string> Phones { get; set; }
+        public List<string> Phones { get; set; }
 
         [JsonProperty("email")]
         public string Email { get; set; }
@@ -118,7 +118,7 @@ namespace Centralizador.Models.ApiCEN
         public object Previous { get; set; }
 
         [JsonProperty("results")]
-        public IList<ResultParticipant> Results { get; set; }
+        public List<ResultParticipant> Results { get; set; }
 
         /// <summary>
         /// Get 1 'Participante' from CEN API
@@ -180,14 +180,14 @@ namespace Centralizador.Models.ApiCEN
         }
 
 
-        public static IList<ResultParticipant> GetParticipants(string userCEN)
+        public static List<ResultParticipant> GetParticipants(string userCEN)
         {
             try
             {
                 ResultAgent agent = Agent.GetAgetByEmailAsync(userCEN).Result;
                 if (agent != null)
                 {
-                    IList<ResultParticipant> participants = new List<ResultParticipant>();
+                    List<ResultParticipant> participants = new List<ResultParticipant>();
                     foreach (ResultParticipant item in agent.Participants)
                     {
                         ResultParticipant participant = GetParticipantByIdAsync(item.ParticipantId).Result;

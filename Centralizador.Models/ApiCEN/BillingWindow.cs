@@ -79,7 +79,7 @@ namespace Centralizador.Models.ApiCEN
         /// </summary>
         /// <param name="referencia"></param>
         /// <returns></returns>
-        public static ResultBillingWindow GetBillingWindowByNaturalKey(DTEDefTypeDocumentoReferencia referencia)
+        public static async Task<ResultBillingWindow> GetBillingWindowByNaturalKeyAsync(DTEDefTypeDocumentoReferencia referencia)
         {
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             string r1 = referencia.RazonRef.Substring(0, referencia.RazonRef.IndexOf(']') + 1).TrimStart();
@@ -95,7 +95,7 @@ namespace Centralizador.Models.ApiCEN
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string res = wc.DownloadString(uri);
+                    string res = await wc.DownloadStringTaskAsync(uri);
                     if (res != null)
                     {
                         BillingWindow b = JsonConvert.DeserializeObject<BillingWindow>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });

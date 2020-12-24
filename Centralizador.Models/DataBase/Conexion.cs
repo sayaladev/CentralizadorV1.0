@@ -70,13 +70,13 @@ namespace Centralizador.Models.DataBase
                 }
             }
         }
-       
-        
+
+
         /// <summary>
-       /// INSERT / UPDATE / DELETE
-       /// </summary>
-       /// <param name="conn"></param>
-       /// <returns></returns>
+        /// INSERT / UPDATE / DELETE
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <returns></returns>
         public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -100,6 +100,26 @@ namespace Centralizador.Models.DataBase
                 }
             }
         }
+
+        public static async void ExecuteNonQueryAsyncTG(Conexion conn)
+        {
+            using (SqlConnection cnn = new SqlConnection(conn.Cnn))
+            {
+                try
+                {
+                    SqlCommand sqlCommand = cnn.CreateCommand();
+                    cnn.Open();
+                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
+                    {
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception)
+                {
+                    //throw;
+                }
+            }
+        }
         public static async Task<int> ExecuteNonQueryTranAsync(Conexion conn, List<string> listQ)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -115,7 +135,7 @@ namespace Centralizador.Models.DataBase
 
                 try
                 {
-                    foreach (var item in listQ)
+                    foreach (string item in listQ)
                     {
                         sqlCommand.CommandText = item;
                         await sqlCommand.ExecuteNonQueryAsync();

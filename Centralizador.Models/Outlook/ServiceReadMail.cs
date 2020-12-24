@@ -38,13 +38,15 @@ namespace Centralizador.Models.Outlook
         public void GetXmlFromEmail(BackgroundWorker BgwReadEmail)
         {
             BgwReadEmail.DoWork += BgwReadEmail_DoWork;
-            BgwReadEmail.RunWorkerAsync();
+            BgwReadEmail.RunWorkerAsync();        
         }
 
         private void BgwReadEmail_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker bgw = sender as BackgroundWorker;
             int c = 0;
+            string pathTemp = @"C:\Centralizador\Temp\";
+            new CreateFile(pathTemp);          
             MailServer oServer = new MailServer("outlook.office365.com", Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword, ServerProtocol.Imap4)
             {
                 SSLConnection = true,
@@ -53,17 +55,15 @@ namespace Centralizador.Models.Outlook
             MailClient oClient = new MailClient("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
             try
             {
-                bgw.ReportProgress(0, "Connecting to the mail server...");
+                //bgw.ReportProgress(0, "Connecting to the mail server...");
                 oClient.Connect(oServer);
                 oClient.GetMailInfosParam.Reset();
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
-                
+
 
                 Imap4Folder[] imap4Folders = oClient.GetFolders();
                 //oClient.SelectFolder(imap4Folders[1]); // spam
-
-
 
                 foreach (Imap4Folder item in imap4Folders)
                 {
@@ -71,8 +71,6 @@ namespace Centralizador.Models.Outlook
                     {
                         oClient.SelectFolder(item);
                         MailInfo[] infos = oClient.GetMailInfos();
-                        string pathTemp = @"C:\Centralizador\Temp\";
-                        //new CreateTxt(pathTemp);
                         e.Result = Properties.Settings.Default.DateTimeEmail;
                         for (int i = 0; i < infos.Length; i++)
                         {
@@ -131,13 +129,20 @@ namespace Centralizador.Models.Outlook
                                 float porcent = (float)(100 * c) / infos.Length;
                                 bgw.ReportProgress((int)porcent, $"Dowloading messages... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})  Subject: {oMail.Subject} ");
                             }
-                        
+
+                            // CANCEL
+                            if (bgw.CancellationPending)
+                            {
+                                e.Cancel = true;
+                                return;
+                            }
+
 
                         }
                     }
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
                 //if (ex.ErrorCode == 0)
                 //{
@@ -224,7 +229,7 @@ namespace Centralizador.Models.Outlook
             try
             {
                 string path = @"C:\Centralizador\Inbox\" + nameFolder;
-                // new CreateTxt(path);
+                new CreateFile(path);
                 File.WriteAllText(path + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
             }
             catch (Exception)

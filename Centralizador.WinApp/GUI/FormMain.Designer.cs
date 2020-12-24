@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -111,14 +110,14 @@
             // TssLblProgBar
             // 
             this.TssLblProgBar.Name = "TssLblProgBar";
-            this.TssLblProgBar.Size = new System.Drawing.Size(300, 16);
+            this.TssLblProgBar.Size = new System.Drawing.Size(200, 16);
             // 
             // TssLblMensaje
             // 
             this.TssLblMensaje.AutoSize = false;
             this.TssLblMensaje.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.TssLblMensaje.Name = "TssLblMensaje";
-            this.TssLblMensaje.Size = new System.Drawing.Size(650, 17);
+            this.TssLblMensaje.Size = new System.Drawing.Size(750, 17);
             this.TssLblMensaje.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // TssLblDBName
@@ -172,7 +171,7 @@
             this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
+            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -336,11 +335,11 @@
             this.BtnInsertNv.BackColor = System.Drawing.SystemColors.Control;
             this.BtnInsertNv.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnInsertNv.Image = ((System.Drawing.Image)(resources.GetObject("BtnInsertNv.Image")));
-            this.BtnInsertNv.Location = new System.Drawing.Point(20, 18);
+            this.BtnInsertNv.Location = new System.Drawing.Point(11, 18);
             this.BtnInsertNv.Name = "BtnInsertNv";
-            this.BtnInsertNv.Size = new System.Drawing.Size(84, 38);
+            this.BtnInsertNv.Size = new System.Drawing.Size(98, 86);
             this.BtnInsertNv.TabIndex = 10;
-            this.BtnInsertNv.Text = "NV";
+            this.BtnInsertNv.Text = "Nota de Venta";
             this.BtnInsertNv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.BtnInsertNv.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.BtnInsertNv.UseVisualStyleBackColor = false;
@@ -349,11 +348,11 @@
             // ChkIncludeReclaimed
             // 
             this.ChkIncludeReclaimed.AutoSize = true;
-            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(118, 30);
+            this.ChkIncludeReclaimed.Location = new System.Drawing.Point(114, 54);
             this.ChkIncludeReclaimed.Name = "ChkIncludeReclaimed";
-            this.ChkIncludeReclaimed.Size = new System.Drawing.Size(76, 17);
+            this.ChkIncludeReclaimed.Size = new System.Drawing.Size(100, 17);
             this.ChkIncludeReclaimed.TabIndex = 9;
-            this.ChkIncludeReclaimed.Text = "Reclaimed";
+            this.ChkIncludeReclaimed.Text = "Only Reclaimed";
             this.ChkIncludeReclaimed.UseVisualStyleBackColor = true;
             // 
             // BtnPagar
@@ -374,17 +373,17 @@
             // BtnInsertRef
             // 
             this.BtnInsertRef.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnInsertRef.Enabled = false;
             this.BtnInsertRef.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnInsertRef.Image = ((System.Drawing.Image)(resources.GetObject("BtnInsertRef.Image")));
-            this.BtnInsertRef.Location = new System.Drawing.Point(40, 64);
+            this.BtnInsertRef.Location = new System.Drawing.Point(6, 124);
             this.BtnInsertRef.Name = "BtnInsertRef";
-            this.BtnInsertRef.Size = new System.Drawing.Size(129, 38);
+            this.BtnInsertRef.Size = new System.Drawing.Size(10, 10);
             this.BtnInsertRef.TabIndex = 8;
             this.BtnInsertRef.Text = "<References>";
             this.BtnInsertRef.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.BtnInsertRef.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.BtnInsertRef.UseVisualStyleBackColor = false;
-            this.BtnInsertRef.Click += new System.EventHandler(this.BtnInsertRef_Click);
             // 
             // GroupBox1
             // 
@@ -528,7 +527,7 @@
             this.CboParticipants.Name = "CboParticipants";
             this.CboParticipants.Size = new System.Drawing.Size(191, 23);
             this.CboParticipants.TabIndex = 0;
-            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
+            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommittedAsync);
             // 
             // CboYears
             // 

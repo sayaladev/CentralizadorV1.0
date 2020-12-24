@@ -53,6 +53,20 @@ namespace Centralizador.Models.DataBase
 
         #endregion
 
+        public static void InsertTriggerRefCen(Conexion conexion, string db)
+        {
+            try
+            {
+                conexion.Query = $"USE [{db}] { Properties.Resources.sql_insert_Trigger}";
+                Conexion.ExecuteNonQueryAsyncTG(conexion);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
         public static async Task<IList<DteInfoRef>> GetInfoRefAsync(ResultInstruction instruction, Conexion conexion, string tipo)
         {
             try
@@ -129,14 +143,22 @@ namespace Centralizador.Models.DataBase
                 query.AppendLine("          AND d.nroint = g.nroint ");
                 query.AppendLine("          AND d.folio = g.folio ");
                 query.AppendLine($"WHERE     g.netoafecto = {monto} ");
-                query.AppendLine($"          AND g.codaux = '{instruction.ParticipantDebtor.Rut}' ");
+                if (instruction.ParticipantNew == null)
+                {
+                    query.AppendLine($"          AND g.codaux = '{instruction.ParticipantDebtor.Rut}' ");
+                }
+                else
+                {
+                    query.AppendLine($"          AND g.codaux IN ( '{instruction.ParticipantDebtor.Rut}', '{instruction.ParticipantNew.Rut}' )");
+                }
+              
                 query.AppendLine("          AND g.estado = 'V' ");
                 query.AppendLine($"          AND g.fechoracreacion >= '{date}' ");
                 query.AppendLine($"          AND g.tipo = '{tipo}' ");
                 query.AppendLine("ORDER BY  g.folio DESC");
 
 
-                
+
                 conexion.Query = query.ToString();
                 dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count > 0)
@@ -335,13 +357,13 @@ namespace Centralizador.Models.DataBase
 
                 // Execute Transaction
                 if (!string.IsNullOrEmpty(query1.ToString()) || !string.IsNullOrEmpty(query2.ToString()) || !string.IsNullOrEmpty(query3))
-                {    
-                    int res = Convert.ToInt32( await Conexion.ExecuteNonQueryTranAsync(conexion, new List<string> { query1.ToString(), query2.ToString(), query3.ToString() }));              
+                {
+                    int res = Convert.ToInt32(await Conexion.ExecuteNonQueryTranAsync(conexion, new List<string> { query1.ToString(), query2.ToString(), query3.ToString() }));
                     return res;
                 }
                 else
                 {
-                    System.Windows.Forms.MessageBox.Show("ALGUNA QUERY VACÍA!");
+                    return 0;
                 }
 
             }
@@ -350,7 +372,7 @@ namespace Centralizador.Models.DataBase
                 throw;
             }
 
-            return 0; // Error
+            //return 0; // Error
         }
 
     }

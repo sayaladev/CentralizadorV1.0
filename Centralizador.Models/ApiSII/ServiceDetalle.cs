@@ -29,7 +29,7 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
             Data = data;
         }
-        public static async Task<IList<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
+        public static async Task<List<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
         {
             string ns = "", url = "", op = "";
             switch (tipoUser)
@@ -238,7 +238,7 @@ namespace Centralizador.Models.ApiSII
     {
 
         [JsonProperty("detalles")]
-        public IList<Detalle> Detalles { get; set; }
+        public List<Detalle> Detalles { get; set; }
 
         [JsonProperty("totMntExe")]
         public int TotMntExe { get; set; }

@@ -69,6 +69,7 @@ namespace Centralizador.Models.ApiCEN
         public ResultParticipant ParticipantCreditor { get; set; }
         public ResultPaymentMatrix PaymentMatrix { get; set; }
         public ResultDte Dte { get; set; }
+        public ResultParticipant ParticipantNew { get; set; }
 
 
     }

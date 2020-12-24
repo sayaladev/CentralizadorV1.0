@@ -89,14 +89,14 @@ namespace Centralizador.Models.ApiCEN
         public object Previous { get; set; }
 
         [JsonProperty("results")]
-        public IList<ResultPaymentMatrix> Results { get; set; }
+        public List<ResultPaymentMatrix> Results { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
+        public static async Task<List<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
         {
             DateTime createdBefore = date.AddMonths(1);
             try

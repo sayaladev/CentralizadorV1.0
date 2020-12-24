@@ -61,7 +61,7 @@ namespace Centralizador.WinApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("centra")]
+        [global::System.Configuration.DefaultSettingValueAttribute("sa")]
         public string DBUser {
             get {
                 return ((string)(this["DBUser"]));

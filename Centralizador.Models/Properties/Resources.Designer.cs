@@ -19,7 +19,7 @@ namespace Centralizador.Models.Properties {
     // a través de una herramienta como ResGen o Visual Studio.
     // Para agregar o quitar un miembro, edite el archivo .ResX y, a continuación, vuelva a ejecutar ResGen
     // con la opción /str o recompile su proyecto de VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -62,17 +62,40 @@ namespace Centralizador.Models.Properties {
         
         /// <summary>
         ///   Busca una cadena traducida similar a &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot; xmlns:msxsl=&quot;urn:schemas-microsoft-com:xslt&quot; exclude-result-prefixes=&quot;msxsl&quot;&gt;
+        ///&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot; xmlns:sii=&quot;http://www.sii.cl/SiiDte&quot; xmlns:str=&quot;http://exslt.org/strings&quot; version=&quot;1.0&quot; &gt;
         ///  &lt;xsl:output method=&quot;xml&quot; indent=&quot;yes&quot;/&gt;
         ///  &lt;!--&lt;xsl:template match=&quot;@* | node()&quot;&gt; : Atributo + comentarios + Texto nodo y elemento. LO MISMO: attribute::* | child::node()
         ///      &lt;xsl:template match=&quot;@* | *&quot;&gt;      : Atributo y elemento.
         ///      &lt;xsl:template match=&quot;/&quot;&gt;           : Nodo raíz.--&gt;
         ///
-        ///  &lt;!--. Nodo ac [resto de la cadena truncado]&quot;;.
+        ///  &lt;!--. Nodo actu [resto de la cadena truncado]&quot;;.
         /// </summary>
         internal static string EncoderXmlToHtml {
             get {
                 return ResourceManager.GetString("EncoderXmlToHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a IF NOT EXISTS (select * from sys.objects where type = &apos;TR&apos; and name = &apos;[softland].[IW_GSAEN_REF_DTE_CEN]&apos;)
+        ///EXEC dbo.sp_executesql @statement = N&apos;
+        ///
+        ///CREATE TRIGGER [softland].[IW_GSAEN_REF_DTE_CEN] 
+        ///   ON  [softland].[iw_gsaen_refdte]
+        ///   AFTER  INSERT
+        ///AS 
+        ///BEGIN
+        ///	-- SET NOCOUNT ON added to prevent extra result sets from
+        ///	-- interfering with SELECT statements.
+        ///	SET NOCOUNT ON;
+        ///DECLARE @FolioRef varchar(20); -- DE04457A19C47
+        ///DECLARE @RazonRef varchar(20); --SEN_[]
+        ///DECLARE @FchRef DATETIME; 
+        ///declare [resto de la cadena truncado]&quot;;.
+        /// </summary>
+        internal static string sql_insert_Trigger {
+            get {
+                return ResourceManager.GetString("sql_insert_Trigger", resourceCulture);
             }
         }
     }

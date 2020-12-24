@@ -123,7 +123,7 @@ namespace Centralizador.Models.AppFunctions
                 }
 
                 string path = @"C:\Centralizador\Log\";
-               // new CreateTxt(path);
+                new CreateFile(path);
                 workbook.SaveToFile(path + nameFile, FileFormat.Version2016);
                 ProcessStartInfo process = new ProcessStartInfo(path + nameFile)
                 {
