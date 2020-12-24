@@ -11,7 +11,6 @@ using System.Xml.Serialization;
 using System.Xml.Xsl;
 
 using Centralizador.Models.ApiSII;
-using Centralizador.Models.Outlook;
 
 using OpenHtmlToPdf;
 
@@ -147,7 +146,7 @@ namespace Centralizador.Models.AppFunctions
         {
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(DTEDefType), new XmlRootAttribute("DTE"));             
+                XmlSerializer serializer = new XmlSerializer(typeof(DTEDefType), new XmlRootAttribute("DTE"));
                 using (Utf8StringWriter stringWriter = new Utf8StringWriter())
                 {
                     using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
@@ -191,7 +190,7 @@ namespace Centralizador.Models.AppFunctions
                 XmlWriterSettings xmlWriterSettings = new XmlWriterSettings
                 {
                     Indent = true,
-                    OmitXmlDeclaration = false                    
+                    OmitXmlDeclaration = false
                 };
                 using (Utf8StringWriter stringWriter = new Utf8StringWriter())
                 {
@@ -322,7 +321,7 @@ namespace Centralizador.Models.AppFunctions
                     NarrowBarWidth = 2
                 };
                 //encoder.WidthToHeightRatio(1.9);
-                encoder.Encode(TransformObjectToXml(documento.TED).ToString());  
+                encoder.Encode(TransformObjectToXml(documento.TED).ToString());
                 encoder.SaveBarcodeToPngFile(Path.GetTempPath() + "\\timbre.png");
                 XsltArgumentList argumentList = new XsltArgumentList();
                 argumentList.AddParam("timbre", "", Path.GetTempPath() + "\\timbre.png");

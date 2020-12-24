@@ -101,8 +101,8 @@ namespace Centralizador.Models.ApiCEN
         /// <returns></returns>
         public static async Task<ResultDte> SendDteCreditorAsync(Detalle detalle, string tokenCen, string doc)
         {
-            string fileName = detalle.Folio + "_" + detalle.Instruction;
-            string idFile = SendFileAsync(tokenCen, fileName, doc).Result;
+            string fileName = detalle.Folio + "_" + detalle.Instruction.Id;
+            string idFile = await SendFileAsync(tokenCen, fileName, doc);
             if (!string.IsNullOrEmpty(idFile))
             {
                 ResultDte dte = new ResultDte

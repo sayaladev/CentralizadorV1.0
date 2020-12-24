@@ -150,7 +150,7 @@ namespace Centralizador.Models.AppFunctions
                             // Valide Amount 
                             if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
                             {
-                                Flag = LetterFlag.Blue;                     
+                                Flag = LetterFlag.Blue;
                             }
                             // Valide DscItem ex: SEN_[RBPA][Ene18-Dic18][R][V02]
                             //if (dte.Detalle != null && dte.Detalle.Length == 1 && dte.Detalle[0].DscItem != null )
@@ -165,7 +165,7 @@ namespace Centralizador.Models.AppFunctions
                         // Valide excluide
                         // Enel Distribución Chile S.A. & Chilquinta Energía S.A && Cge S.A
                         // 96800570 / 96813520 / 76411321
-                        if ((detalle.RutReceptor == "96800570" || detalle.RutReceptor == "96813520" || detalle.RutReceptor == "76411321") && (isCreditor == false ) )
+                        if ((detalle.RutReceptor == "96800570" || detalle.RutReceptor == "96813520" || detalle.RutReceptor == "76411321") && (isCreditor == false))
                         {
                             Flag = LetterFlag.Clear;
                         }

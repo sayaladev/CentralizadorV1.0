@@ -71,10 +71,10 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
-        
-        
-        
-        
+
+
+
+
         /// <summary>
         /// Get Xml from Softland DB
         /// </summary>
@@ -122,16 +122,17 @@ namespace Centralizador.Models.DataBase
             return null;
 
         }
-        
-        
-        
-        
+
+
+
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="conexion"></param>
         /// <param name="detalle"></param>
-        public static async void UpdateFiles(Conexion conexion, Detalle detalle) {
+        public static async void UpdateFiles(Conexion conexion, Detalle detalle)
+        {
             StringBuilder query = new StringBuilder();
             query.AppendLine("UPDATE softland.dte_doccab ");
             query.AppendLine("SET  aceptadocliente = 1 ");
@@ -141,7 +142,7 @@ namespace Centralizador.Models.DataBase
             query.AppendLine($"     AND nroint = {detalle.NroInt} ");
             query.AppendLine($"     AND rutrecep = '{detalle.Instruction.ParticipantDebtor.Rut}-{detalle.Instruction.ParticipantDebtor.VerificationCode}'");
             conexion.Query = query.ToString();
-            await Conexion.ExecuteNonQueryAsync(conexion);   
+            await Conexion.ExecuteNonQueryAsync(conexion);
         }
     }
 }

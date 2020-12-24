@@ -6,12 +6,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -111,15 +109,6 @@ namespace Centralizador.WinApp.GUI
 
 
 
-            // Worker Insert Nv
-            BgwInsertNv = new BackgroundWorker
-            {
-                WorkerReportsProgress = true,
-                WorkerSupportsCancellation = true
-            };
-            BgwInsertNv.ProgressChanged += BgwInsertNv_ProgressChanged;
-            BgwInsertNv.RunWorkerCompleted += BgwInsertNv_RunWorkerCompleted;
-            BgwInsertNv.DoWork += BgwInsertNv_DoWork;
 
 
             // Worker read email
@@ -335,10 +324,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 if (dic.ContainsKey(UserParticipant.Id.ToString()))
                 {
-                    DataBaseName = dic[UserParticipant.Id.ToString()];
-                    // INSERT TRIGGER
-                    Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-                    DteInfoRef.InsertTriggerRefCen(con, DataBaseName);
+                    DataBaseName = dic[UserParticipant.Id.ToString()];            
                     TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
                     TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
                 }
@@ -414,293 +400,7 @@ namespace Centralizador.WinApp.GUI
 
         }
 
-        #endregion
-
-        #region Insert NV
-        private BackgroundWorker BgwInsertNv { get; set; }
-        private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
-        {
-            if (ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Debtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
-            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            // Sql          
-            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-            List<Detalle> detallesPaso = new List<Detalle>();
-            List<Detalle> detallesFinal = new List<Detalle>();
-
-            // SII file
-            DateTime now = DateTime.Now;
-            string file = $"ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
-            DialogResult resp;
-            while (!File.Exists(path))
-            {
-                resp = MessageBox.Show($"The file '{file}' NOT found, please download...", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                if (resp == DialogResult.OK)
-                {
-                    Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
-                    return;
-                }
-                else if (resp == DialogResult.Cancel)
-                {
-                    return;
-                }
-            }
-            int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(con);
-            int count = DetallePrincipal.Count;
-            //foliosDisp = 10;
-            StringBuilder builder = new StringBuilder();
-            foreach (Detalle item in DetallePrincipal)
-            {
-                if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
-                {
-                    if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
-                    {
-                        detallesPaso.Add(item);
-                    }
-                }
-                else
-                {
-                    if (item.Folio == 0 && item.MntNeto > 9) { detallesPaso.Add(item); } // only > $10
-                }
-            }
-            int c = 0;
-            int foliosDispBefore = foliosDisp;
-            while (foliosDisp > 0 && detallesPaso.Count > c)
-            {
-                detallesFinal.Add(detallesPaso[c]);
-                foliosDisp--;
-                c++;
-            }
-
-            if (detallesFinal.Count > 0)
-            {
-                builder.AppendLine($"There are {foliosDispBefore} F° available, so you can only insert {detallesFinal.Count} of {detallesPaso.Count} NV");
-                builder.AppendLine(); builder.AppendLine();
-                builder.AppendLine("WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.");
-
-                resp = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (resp == DialogResult.Yes) { BgwInsertNv.RunWorkerAsync(detallesFinal); }
-                else { TssLblMensaje.Text = "Cancel."; }
-            }
-            else
-            {
-                if (foliosDisp == 0 && detallesPaso.Count > 0)
-                {
-                    TssLblMensaje.Text = "F° Available: 0, you need get more in SII.";
-                    resp = MessageBox.Show("You will be redirected to the SII site...", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (resp == DialogResult.Yes)
-                    {
-                        Process.Start("https://palena.sii.cl/cvc_cgi/dte/of_solicita_folios");
-                        return;
-                    }
-                }
-                else if (true)
-                {
-                    TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
-                }
-            }
-        }
-        private void BgwInsertNv_DoWork(object sender, DoWorkEventArgs e)
-        {
-            ReportModel.IsRuning = true;
-            IList<Detalle> detallesFinal = e.Argument as List<Detalle>;
-            List<AuxCsv> values = new List<AuxCsv>();
-            int c = 0, result = 0;
-            float porcent = 0;
-            TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-            StringLogging.Clear();
-            DateTime now = DateTime.Now;
-            string file = $"ce_empresas_dwnld_{now.Year}{string.Format("{0:00}", now.Month)}{string.Format("{0:00}", now.Day)}.csv";
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + file;
-
-            BgwInsertNv.ReportProgress(0, "Wait please... Reading SII file.");
-            try
-            {
-                values = File.ReadAllLines(path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
-            }
-            catch (Exception ex)
-            {
-                new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
-            }
-
-            int resultInsertNV;
-            int lastF = 0;
-            //int foliosDisp = 0;
-            List<int> folios = new List<int>();
-            IList<Comuna> comunas = new List<Comuna>();
-            // Sql          
-            Conexion con = new Conexion(DataBaseName, Properties.Settings.Default.DBUser, Properties.Settings.Default.DBPassword);
-            try
-            {
-                // Get comunas                      
-                comunas = Comuna.GetComunasAsync(con).Result;
-            }
-            catch (Exception ex)
-            {
-                new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
-            }
-            foreach (Detalle item in detallesFinal)
-            {
-                // Checks if exists NV for this instruction   
-                //if (item.FolioNVInsertada > 0)
-                //{
-                //    folios.Add(item.FolioNVInsertada);
-                //    continue;
-                //}
-                //int F = NotaVenta.GetNvIfExistsAsync(item.Instruction, con).Result;
-                //if (F == 0)
-                //{
-                try
-                {
-                    AuxCsv a = values.FirstOrDefault(x => x.Rut == item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode);
-                    if (a != null)
-                    {
-                        // Info from CSV file
-                        string name = ti.ToTitleCase(a.Name.ToLower());
-                        item.Instruction.ParticipantDebtor.BusinessName = name;
-                        item.Instruction.ParticipantDebtor.DteReceptionEmail = a.Email;
-                        item.Instruction.ParticipantDebtor.Name = item.Instruction.ParticipantDebtor.Name.ToUpper();
-                    }
-                }
-                catch (Exception)
-                {
-                    StringLogging.AppendLine($"{item.Instruction.Id}\tUpdate email\t\tError in CSV file.");
-                    continue;
-                }
-                try
-                {
-                    Auxiliar aux = new Auxiliar
-                    {
-                        //RutAux = item.Instruction.ParticipantDebtor.Rut + "-" + item.Instruction.ParticipantDebtor.VerificationCode,
-                        //CodAux = item.Instruction.ParticipantDebtor.Rut
-                    };
-                    Auxiliar auxiliar = aux.GetAuxiliarAsync(item.Instruction, con).Result;
-                    Comuna comunaobj = null;
-                    string promptValue;
-                    if (auxiliar == null)  // Insert New Auxiliar
-                    {
-                        // Get Comuna
-                        do
-                        {
-                            promptValue = ComunaInput.ShowDialog(Application.ProductName,
-                                $"'Comuna' not found, please input below:",
-                                item.Instruction.ParticipantDebtor.BusinessName,
-                                item.RutReceptor,
-                                item.Instruction.ParticipantDebtor.CommercialAddress,
-                                comunas);
-
-                            comunaobj = comunas.FirstOrDefault(x => aux.RemoveDiacritics(x.ComDes).ToLower() == aux.RemoveDiacritics(promptValue.ToLower()));
-                        } while (comunaobj == null);
-                        // Sending porperty for show DirAux in Log
-                        result = aux.InsertAuxiliarAsync(item.Instruction, con, aux, comunaobj).Result;
-                        if (result == 2) { StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.DirAux} / {aux.ComAux}"); }
-                    }
-                    else
-                    {
-                        // Update Aux
-                        if (auxiliar.ComAux == null) // Checks Aux
-                        {
-                            // Get Comuna
-                            do
-                            {
-                                promptValue = ComunaInput.ShowDialog(Application.ProductName,
-                                    $"'Comuna' not found, please input below:",
-                                    item.Instruction.ParticipantDebtor.BusinessName,
-                                    item.RutReceptor,
-                                    item.Instruction.ParticipantDebtor.CommercialAddress,
-                                    comunas);
-
-                                comunaobj = comunas.FirstOrDefault(x => aux.RemoveDiacritics(x.ComDes).ToLower() == aux.RemoveDiacritics(promptValue.ToLower()));
-                            } while (comunaobj == null);
-                        }
-                        else
-                        {
-                            comunaobj = new Comuna { ComCod = auxiliar.ComAux };
-                        }
-                        result = aux.UpdateAuxiliarAsync(item.Instruction, con, comunaobj).Result;
-                        // 1= update ok 2= update ok (en algunos escenarios)
-                        if (result == 0)
-                        {
-                            StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Update:\tError Sql: {item.Instruction.ParticipantDebtor.Rut}");
-                            continue;
-                        }
-                    }
-                    // Insert NV   
-                    lastF = NotaVenta.GetLastNv(con);
-                    string prod = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
-                    resultInsertNV = NotaVenta.InsertNvAsync(item.Instruction, lastF, prod, con).Result;
-                    if (resultInsertNV == 0)
-                    {
-                        StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tError Sql");
-                    }
-                    else if (resultInsertNV == 1)
-                    {
-                        // Success
-                        if (item.Instruction.ParticipantNew == null)
-                        {
-                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tF°: {lastF}");
-                        }
-                        else
-                        {
-                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tF°: {lastF}  **** change RUT by absorbed {item.Instruction.ParticipantDebtor.Rut} by {item.Instruction.ParticipantNew.Rut}   ****");
-                        }
-
-                        folios.Add(lastF);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop); e.Cancel = true;
-                }
-                //}
-                //else
-                //{
-                //    // NO DEBERÍA ENCONTRAR FOLIOS, SE ELIMINAN LOS SIN USAR AL CARGAR GRILLA
-                //    MessageBox.Show("Test");
-                //}
-                c++;
-                porcent = (float)(100 * c) / detallesFinal.Count;
-                BgwInsertNv.ReportProgress((int)porcent, $"Inserting NV, wait please...   ({c}/{detallesFinal.Count})  F°: {lastF}");
-            }
-            e.Result = folios;
-        }
-        private void BgwInsertNv_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            List<int> folios = e.Result as List<int>;
-            if (e.Cancelled == true)
-            {
-                TssLblMensaje.Text = "Error!";
-            }
-            //else
-            //{
-
-            //    TssLblMensaje.Text = "Check the log file.";
-            //}
-            TssLblProgBar.Value = 0;
-            //IsCreditor = true; //////////////////////////// REVISAR
-            ReportModel.IsRuning = false;
-            BtnInsertNv.Enabled = false;
-            string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
-            if (folios != null && folios.Count > 0)
-            {
-                int menor = folios.Min();
-                int mayor = folios.Max();
-                StringLogging.AppendLine("");
-                StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
-                TssLblMensaje.Text = $"Check the log file:   => Summary: From {menor} To-{mayor}";
-                new CreateFile(@"C:\Centralizador\Log\", StringLogging, nameFile);
-            }
-        }
-        private void BgwInsertNv_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
-
-        #endregion
-
-          
+        #endregion   
 
         #region Convert PDF
 
@@ -755,10 +455,127 @@ namespace Centralizador.WinApp.GUI
 
         #endregion
 
-
         #region INSERTNV
 
+        private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
+        {
+            if (ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Debtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
+            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }    
+            List<Detalle> detallesPaso = new List<Detalle>();
+            List<Detalle> detallesFinal = new List<Detalle>();
 
+            // DOWNLOAD SII FILE IF NOT EXISTS.
+            DialogResult resp;
+            while (!new FileSii().ExistsFile)
+            {
+                resp = MessageBox.Show($"The file '{FileSii.Path}' NOT found, please download...", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (resp == DialogResult.OK)
+                {
+                    Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
+                    return;
+                }
+                else if (resp == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+            int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(new Conexion(DataBaseName));
+            // TESTER
+            foliosDisp = 100;
+            int count = DetallePrincipal.Count;
+            StringBuilder builder = new StringBuilder();
+            foreach (Detalle item in DetallePrincipal)
+            {
+                if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
+                {
+                    if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
+                    {
+                        detallesPaso.Add(item);
+                    }
+                }
+                else
+                {
+                    if (item.Folio == 0 && item.MntNeto > 9) { detallesPaso.Add(item); } // only > $10
+                }
+            }
+            int c = 0;
+            int foliosDispBefore = foliosDisp;
+            while (foliosDisp > 0 && detallesPaso.Count > c)
+            {
+                detallesFinal.Add(detallesPaso[c]);
+                foliosDisp--;
+                c++;
+            }
+
+            if (detallesFinal.Count > 0)
+            {
+                builder.AppendLine($"There are {foliosDispBefore} F° available, so you can only insert {detallesFinal.Count} of {detallesPaso.Count} NV");
+                builder.AppendLine(); builder.AppendLine();
+                builder.AppendLine("WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.");
+
+                resp = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (resp == DialogResult.Yes)
+                {
+                    Stopwatch watch = Stopwatch.StartNew();
+                    try
+                    {
+                        watch.Start();
+                        ReportModel = new ProgressReportModel(TipoDetalle.Creditor, TipoTask.InsertNV)
+                        {
+                            IsRuning = true,
+                            StopWatch = watch
+                        };
+                        ProgressReport = new Progress<ProgressReportModel>();
+                        ProgressReport.ProgressChanged += ReportProgress;
+                        TssLblMensaje.Text = "Reading SII file, be patient...";
+                        FileSii.GetValues(); // GET VALUES LIST FROM CSV.
+                        DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
+                        List<int> folios = await detalleI.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
+                        if (folios != null)
+                        { 
+                            string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
+                            if (folios != null && folios.Count > 0)
+                            {
+                                int menor = folios.Min();
+                                int mayor = folios.Max();
+                                detalleI.StringLogging.AppendLine("");
+                                detalleI.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");                                
+                                new CreateFile(@"C:\Centralizador\Log\", detalleI.StringLogging, nameFile);                                
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        new ErrorMsgCen("There was an error insert into the DB.", ex, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    finally
+                    {
+                        ReportModel.IsRuning = false;                       
+                    }
+
+                }
+                else { TssLblMensaje.Text = "Cancel."; }
+            }
+            else
+            {
+                if (foliosDisp == 0 && detallesPaso.Count > 0)
+                {
+                    TssLblMensaje.Text = "F° Available: 0, you need get more in SII.";
+                    resp = MessageBox.Show("You will be redirected to the SII site...", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (resp == DialogResult.Yes)
+                    {
+                        Process.Start("https://palena.sii.cl/cvc_cgi/dte/of_solicita_folios");
+                        return;
+                    }
+                }
+                else if (true)
+                {
+                    TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
+                }
+            }
+        }
         #endregion
 
         #region CREDITOR
@@ -780,12 +597,12 @@ namespace Centralizador.WinApp.GUI
                 CancellationTk = new CancellationTokenSource();
                 List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
                 if (matrices != null)
-                {                    
-                    // DetallePrincipal = await GetCreditor(matrices, ProgressReport, CancellationTk.Token);
+                {
                     DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
-                    detalleI.DeleteNV();
+                    detalleI.DeleteNV(); // DELETE NV.
+                    DteInfoRef.InsertTriggerRefCen(new Conexion(DataBaseName));  // INSERT TRIGGER.
                     DetallePrincipal = await detalleI.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
-                    if (DetallePrincipal != null) { IGridFill(); }
+                    if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
                 }
                 else
                 {
@@ -802,7 +619,7 @@ namespace Centralizador.WinApp.GUI
                 ReportModel.IsRuning = false;
             }
         }
-       
+
         #endregion
 
         #region DEBTOR
@@ -825,10 +642,10 @@ namespace Centralizador.WinApp.GUI
                 CancellationTk = new CancellationTokenSource();
                 List<Detalle> detalles = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
                 if (detalles != null)
-                {                    
+                {
                     DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
-                    DetallePrincipal =  await detalleI.GetDetalleDebtor(detalles, ProgressReport, CancellationTk.Token, nameFile);
-                    if (DetallePrincipal != null) { IGridFill(); }
+                    DetallePrincipal = await detalleI.GetDetalleDebtor(detalles, ProgressReport, CancellationTk.Token, nameFile);
+                    if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
                 }
             }
             catch (Exception ex)
@@ -840,7 +657,7 @@ namespace Centralizador.WinApp.GUI
                 ReportModel.IsRuning = false;
             }
         }
-     
+
         #endregion
 
         #region COMMON
@@ -856,8 +673,7 @@ namespace Centralizador.WinApp.GUI
                 BtnCancelTak.Enabled = false;
                 TssLblProgBar.Value = 0;
                 TssLblDBName.Text = "|DB: " + DataBaseName;
-                TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
-                TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
+             
 
 
                 // VER ESTO LUEGO
@@ -871,16 +687,18 @@ namespace Centralizador.WinApp.GUI
                     case TipoTask.GetDebtor:
                         BtnPagar.Enabled = true;
                         BtnInsertNv.Enabled = false;
-                        TssLblMensaje.Text += "  [DEBTOR]";
+                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";                      
                         break;
 
                     case TipoTask.GetCreditor:
                         BtnPagar.Enabled = false;
                         BtnInsertNv.Enabled = true;
-                        TssLblMensaje.Text += "  [CREDITOR]";
+                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
                         break;
 
                     case TipoTask.InsertNV:
+                        BtnInsertNv.Enabled = false;
+                        TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
                         break;
 
                     case TipoTask.ConvertToPdf:
@@ -889,6 +707,7 @@ namespace Centralizador.WinApp.GUI
                     default:
                         break;
                 }
+                TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
             }
         }
         private void BtnCancelTak_Click(object sender, EventArgs e)
@@ -917,7 +736,7 @@ namespace Centralizador.WinApp.GUI
                 throw;
             }
         }
-        private void IGridFill()
+        private void IGridFill(List<ResultBilingType> types)
         {
             try
             {
@@ -937,7 +756,7 @@ namespace Centralizador.WinApp.GUI
                     if (item.Instruction != null)
                     {
                         myRow.Cells["inst"].Value = item.Instruction.Id;
-                        myRow.Cells["codProd"].Value = BillingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                        myRow.Cells["codProd"].Value = types.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     }
                     else
                     {
@@ -960,15 +779,25 @@ namespace Centralizador.WinApp.GUI
                         {
                             myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.Instruction.ParticipantCreditor.Name.ToLower());
                         }
-
-                        myRow.Cells["rznsocial"].ImageList = fImageListSmall;
-                        myRow.Cells["rznsocial"].ImageIndex = 0;
-                        myRow.Cells["rznsocial"].ImageAlign = iGContentAlignment.MiddleLeft;
+                        if (item.Instruction.ParticipantNew != null)
+                        {
+                            myRow.Cells["rznsocial"].ImageList = fImageListSmall;
+                            myRow.Cells["rznsocial"].ImageIndex = 3;
+                            myRow.Cells["rznsocial"].ImageAlign = iGContentAlignment.MiddleLeft;
+                            myRow.Cells["rznsocial"].Value +=  "   ***  BILLED TO: " + item.Instruction.ParticipantNew.Name.ToLower();
+                        }
+                        else
+                        {
+                            myRow.Cells["rznsocial"].ImageList = fImageListSmall;
+                            myRow.Cells["rznsocial"].ImageIndex = 0;
+                            myRow.Cells["rznsocial"].ImageAlign = iGContentAlignment.MiddleLeft;
+                        }
+                    
                     }
-                    else
-                    {
-                        myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
-                    }
+                    //else
+                    //{
+                    //    myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
+                    //}
 
                     myRow.Cells["neto"].Value = item.MntNeto;
                     myRow.Cells["exento"].Value = item.MntExento;
@@ -1656,13 +1485,13 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void BgwPay_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void BgwPay_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TssLblProgBar.Value = 0;
             if (e.Result != null)
             {
                 TssLblMensaje.Text = "Success, check the Excel file.";
-                IGridFill();
+                IGridFill(await BilingType.GetBilinTypesAsync());
             }
             else
             {

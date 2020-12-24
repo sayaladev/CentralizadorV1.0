@@ -53,11 +53,11 @@ namespace Centralizador.Models.DataBase
 
         #endregion
 
-        public static void InsertTriggerRefCen(Conexion conexion, string db)
+        public static void InsertTriggerRefCen(Conexion conexion)
         {
             try
             {
-                conexion.Query = $"USE [{db}] { Properties.Resources.sql_insert_Trigger}";
+                conexion.Query = $"USE [{conexion.DBName}] { Properties.Resources.sql_insert_Trigger}";
                 Conexion.ExecuteNonQueryAsyncTG(conexion);
             }
             catch (Exception)
@@ -151,7 +151,7 @@ namespace Centralizador.Models.DataBase
                 {
                     query.AppendLine($"          AND g.codaux IN ( '{instruction.ParticipantDebtor.Rut}', '{instruction.ParticipantNew.Rut}' )");
                 }
-              
+
                 query.AppendLine("          AND g.estado = 'V' ");
                 query.AppendLine($"          AND g.fechoracreacion >= '{date}' ");
                 query.AppendLine($"          AND g.tipo = '{tipo}' ");

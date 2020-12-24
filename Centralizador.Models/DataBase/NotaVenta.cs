@@ -16,12 +16,12 @@ namespace Centralizador.Models.DataBase
         /// </summary>
         /// <param name="conexion"></param>
         /// <returns></returns>
-        public static int GetLastNv(Conexion conexion)
+        public static async Task<int> GetLastNv(Conexion conexion)
         {
             try
             {
                 conexion.Query = "select MAX(NVNumero) + 1  from softland.nw_nventa";
-                object result = Conexion.ExecuteScalarAsync(conexion).Result;
+                object result = await Conexion.ExecuteScalarAsync(conexion);
                 if (result != null)
                 {
                     return Convert.ToInt32(result);
@@ -121,12 +121,12 @@ namespace Centralizador.Models.DataBase
                 if (Environment.MachineName == "DEVELOPER")
                 {
                     // Developer
-                    now = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+                    now = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                     date = instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    now = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                     date = instruction.PaymentMatrix.PublishDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
 

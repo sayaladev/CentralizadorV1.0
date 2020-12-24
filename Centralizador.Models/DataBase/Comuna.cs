@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+using Centralizador.Models.ApiSII;
+using Centralizador.Models.AppFunctions;
 
 namespace Centralizador.Models.DataBase
 {
@@ -11,7 +17,7 @@ namespace Centralizador.Models.DataBase
         public string ComDes { get; set; }
         public int Id_Region { get; set; }
 
-        public static async System.Threading.Tasks.Task<IList<Comuna>> GetComunasAsync(Conexion conexion)
+        private static async Task<List<Comuna>> GetComunasAsync(Conexion conexion)
         {
             try
             {
@@ -20,7 +26,7 @@ namespace Centralizador.Models.DataBase
                 dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-                    IList<Comuna> comunas = new List<Comuna>();
+                    List<Comuna> comunas = new List<Comuna>();
                     foreach (DataRow item in dataTable.Rows)
                     {
                         Comuna comuna = new Comuna
@@ -40,5 +46,41 @@ namespace Centralizador.Models.DataBase
             }
             return null;
         }
+
+        public static async Task<Comuna> GetComunaFromInput(Detalle detalle, Conexion con, bool isNew)
+        {
+
+            string promptValue;
+            Comuna comunaobj = null;
+            List<Comuna> comunas = await GetComunasAsync(con);
+            do
+            {
+                if (isNew)
+                {
+                    promptValue = ComunaInput.ShowDialog("New Auxiliar, be careful.",
+                   $"'Comuna' not found, please input below:",
+                   detalle.Instruction.ParticipantDebtor.BusinessName,
+                   detalle.RutReceptor,
+                   detalle.Instruction.ParticipantDebtor.CommercialAddress,
+                   comunas);
+                }
+                else
+                {
+                    promptValue = ComunaInput.ShowDialog("Update Auxiliar, be careful.",
+                                       $"'Comuna' not found, please input below:",
+                                       detalle.Instruction.ParticipantDebtor.BusinessName,
+                                       detalle.RutReceptor,
+                                       detalle.Instruction.ParticipantDebtor.CommercialAddress,
+                                       comunas);
+                }
+               
+                // 
+                comunaobj = comunas.FirstOrDefault(x => Auxiliar.RemoveDiacritics(x.ComDes).ToLower() == Auxiliar.RemoveDiacritics(promptValue.ToLower()));
+            } while (comunaobj == null);
+
+            return await Task.FromResult(comunaobj);
+
+        }
+
     }
 }

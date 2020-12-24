@@ -97,13 +97,13 @@ namespace Centralizador.Models.AppFunctions
                         }
                     }
                 }
-                if (item.Instruction != null && item.Instruction.PaymentMatrix != null )
+                if (item.Instruction != null && item.Instruction.PaymentMatrix != null)
                 {
                     row[14] = item.Instruction.PaymentMatrix.NaturalKey;
                     row[15] = item.Instruction.PaymentMatrix.ReferenceCode;
                     row[16] = item.Instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy");
                 }
-   
+
                 table.Rows.Add(row);
             }
             // Save Excel

@@ -180,17 +180,17 @@ namespace Centralizador.Models.ApiCEN
         }
 
 
-        public static List<ResultParticipant> GetParticipants(string userCEN)
+        public static async Task<List<ResultParticipant>> GetParticipants(string userCEN)
         {
             try
             {
-                ResultAgent agent = Agent.GetAgetByEmailAsync(userCEN).Result;
+                ResultAgent agent = await Agent.GetAgetByEmailAsync(userCEN);
                 if (agent != null)
                 {
                     List<ResultParticipant> participants = new List<ResultParticipant>();
                     foreach (ResultParticipant item in agent.Participants)
                     {
-                        ResultParticipant participant = GetParticipantByIdAsync(item.ParticipantId).Result;
+                        ResultParticipant participant = await GetParticipantByIdAsync(item.ParticipantId);
                         participants.Add(participant);
                     }
                     // Add Cve 76.532.358-4  

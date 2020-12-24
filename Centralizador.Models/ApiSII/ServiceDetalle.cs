@@ -96,7 +96,7 @@ namespace Centralizador.Models.ApiSII
             }
             return null;
         }
-       
+
         public enum StatusDetalle
         {
             Accepted,
@@ -147,9 +147,9 @@ namespace Centralizador.Models.ApiSII
                 }
                 else
                 {
-                   return StatusDetalle.Pending;
+                    return StatusDetalle.Pending;
                 }
-            }          
+            }
         }
     }
 
@@ -204,7 +204,7 @@ namespace Centralizador.Models.ApiSII
         public int Nro { get; set; }
         public ResultInstruction Instruction { get; set; }
         public DteInfoRef DteInfoRefLast { get; set; }
-        public IList<DteInfoRef> DteInfoRefs  { get; set; }
+        public IList<DteInfoRef> DteInfoRefs { get; set; }
         public DTEDefType DTEDef { get; set; }
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }
@@ -212,9 +212,11 @@ namespace Centralizador.Models.ApiSII
         public StatusDetalle StatusDetalle { get; set; }
         public ValidatorFlag ValidatorFlag { get; set; } // CEN requeriment validator.
         public int NroInt { get; set; }
-        public bool RefMissing { get; set; }       
-       // public int FolioNVInsertada { get; set; }
-       
+        public bool RefMissing { get; set; }
+
+        public string DTEFile { get; set; }
+        // public int FolioNVInsertada { get; set; }
+
 
         // Constructor
         public Detalle(string rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)

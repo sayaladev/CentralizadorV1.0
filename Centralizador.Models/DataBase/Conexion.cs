@@ -12,6 +12,8 @@ namespace Centralizador.Models.DataBase
         public string Query { get; set; }
         private static SqlDataReader SqlDataReader { get; set; }
 
+        public string DBName { get; set; }
+
 
         /// <summary>
         /// Constructor Clase Conexión Softland
@@ -19,10 +21,10 @@ namespace Centralizador.Models.DataBase
         /// <param name="dataBaseName"></param>
         /// <param name="dbUser"></param>
         /// <param name="dbPassword"></param>
-        public Conexion(string dataBaseName, string dbUser, string dbPassword)
+        public Conexion(string dataBaseName)
         {
             // change server name 
-            string serverName;
+            string serverName;           
             if (Environment.MachineName == "DEVELOPER")
             {
                 serverName = "DEVELOPER";
@@ -31,12 +33,13 @@ namespace Centralizador.Models.DataBase
             {
                 serverName = Properties.Settings.Default.ServerName;
             }
+            DBName = serverName;
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder
             {
                 DataSource = serverName,
                 InitialCatalog = dataBaseName,
-                UserID = dbUser,
-                Password = dbPassword
+                UserID = Properties.Settings.Default.DBUser,
+                Password = Properties.Settings.Default.DBPassword
             };
             Cnn = builder.ToString();
         }

@@ -18,12 +18,12 @@ namespace Centralizador.Models.DataBase
         public string DirAux { get; set; }
         public string ComAux { get; set; }
 
-        public async Task<int> InsertAuxiliarAsync(ResultInstruction instruction, Conexion conexion, Auxiliar aux, Comuna comuna)
+        public  static async Task<Auxiliar> InsertAuxiliarAsync(ResultInstruction instruction, Conexion conexion, Comuna comuna)
         {
             string acteco = null;
-            CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
+
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-            string time = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", DateTime.Now);
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             string adressTemp = ti.ToTitleCase(instruction.ParticipantDebtor.CommercialAddress.ToLower());
             if (instruction.ParticipantDebtor.CommercialAddress.Contains(','))
             {
@@ -43,12 +43,12 @@ namespace Centralizador.Models.DataBase
                     acteco = instruction.ParticipantDebtor.CommercialBusiness;
                 }
                 // Insert new Acteco
-               await Acteco.InsertActecoAsync(acteco, conexion);
+                await Acteco.InsertActecoAsync(acteco, conexion);
 
                 // Production:
                 if (Environment.MachineName == "DEVELOPER")
                 {
-                    time = string.Format(cultureInfo, "{0:g}", DateTime.Now);
+                    time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                 }
             }
             try
@@ -64,17 +64,26 @@ namespace Centralizador.Models.DataBase
                 query.Append($"'{adressTemp}','S', 'S','N', 'N', 'S','{instruction.ParticipantDebtor.DteReceptionEmail}' ");
                 query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}, '{time}') END");
                 conexion.Query = query.ToString();
-                aux.DirAux = adressTemp;
-                aux.ComAux = comuna.ComDes;
-                return Conexion.ExecuteNonQueryAsync(conexion).Result;
+                //aux.DirAux = adressTemp;
+                //aux.ComAux = comuna.ComDes;
+                //await Conexion.ExecuteNonQueryAsync(conexion);
+                if (await Conexion.ExecuteNonQueryAsync(conexion) == 2)
+                {
+                    return new Auxiliar()
+                    {
+                        DirAux = adressTemp,
+                        ComAux = comuna.ComDes
+                    };
+                }
             }
             catch (Exception)
             {
                 throw;
             }
+            return null;
         }
 
-        public async Task<Auxiliar> GetAuxiliarAsync(ResultInstruction instruction, Conexion conexion)
+        public static async Task<Auxiliar> GetAuxiliarAsync(ResultInstruction instruction, Conexion conexion)
         {
             try
             {
@@ -156,7 +165,7 @@ namespace Centralizador.Models.DataBase
                     acteco = instruction.ParticipantDebtor.CommercialBusiness;
                 }
                 // Insert new Acteco
-               await Acteco.InsertActecoAsync(acteco, conexion);
+                await Acteco.InsertActecoAsync(acteco, conexion);
             }
 
             // Production:
@@ -175,7 +184,7 @@ namespace Centralizador.Models.DataBase
                 query.Append($"DirAux = '{adressTemp}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 conexion.Query = query.ToString();
-                int res = Conexion.ExecuteNonQueryAsync(conexion).Result;
+                int res = await Conexion.ExecuteNonQueryAsync(conexion);
                 return res;
             }
             catch (Exception)
@@ -184,7 +193,7 @@ namespace Centralizador.Models.DataBase
             }
         }
 
-        public string RemoveDiacritics(string text)
+        public static string RemoveDiacritics(string text)
         {
             string normalizedString = text.Normalize(NormalizationForm.FormD);
             StringBuilder stringBuilder = new StringBuilder();
@@ -204,43 +213,6 @@ namespace Centralizador.Models.DataBase
 
 
 
-    public class AuxCsv
-    {
-        public string Rut { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
 
-        public static AuxCsv GetFronCsv(string csvLine)
-        {
-            try
-            {
-                string[] values = csvLine.Split(';');
-                if (values.Count() == 6)
-                {
-                    AuxCsv aux = new AuxCsv
-                    {
-                        Rut = values[0],
-                        Name = values[1],
-                        Email = values[4]
-                    };
-                    return aux;
-                }
-                else
-                {
-                    AuxCsv aux = new AuxCsv
-                    {
-                        Rut = "0",
-                        Name = "0",
-                        Email = "0"
-                    };
-                    return aux;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-    }
 
 }

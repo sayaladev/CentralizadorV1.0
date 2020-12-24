@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
@@ -17,15 +17,14 @@ namespace Centralizador.WinApp
     {
 
         [STAThread]
-        private static void Main()
-        {         
+        private static async Task Main()
+        {
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
 
             // Variables 
-            List<ResultBilingType> billingTypes;
             List<ResultParticipant> participants;
             string tokenSii;
             string tokenCen;
@@ -34,11 +33,9 @@ namespace Centralizador.WinApp
             {
                 tokenSii = ServiceSoap.GETTokenFromSii(Properties.Settings.Default.SerialDigitalCert);
                 // Get Participants
-                participants = Participant.GetParticipants(Properties.Settings.Default.UserCEN);
-                // Get Biling types
-                billingTypes = BilingType.GetBilinTypesAsync().Result;
+                participants = await Participant.GetParticipants(Properties.Settings.Default.UserCEN);
 
-                tokenCen = Agent.GetTokenCenAsync(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN).Result;     
+                tokenCen = Agent.GetTokenCenAsync(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN).Result;
 
             }
             catch (Exception ex)
@@ -64,7 +61,7 @@ namespace Centralizador.WinApp
                     new ErrorMsgCen("The token has not been obtained from SII.", "Impossible to start the Application.", MessageBoxIcon.Stop);
                     return;
                 }
-                else if (string.IsNullOrEmpty(tokenCen) || participants == null || billingTypes == null)
+                else if (string.IsNullOrEmpty(tokenCen) || participants == null)
                 {
                     new ErrorMsgCen("The token has not been obtained from CEN.", "Impossible to start the Application.", MessageBoxIcon.Stop);
                     return;
@@ -75,8 +72,8 @@ namespace Centralizador.WinApp
                     return;
                 }
                 // Open Form
-              
-                FormMain main = new FormMain() { TokenCen = tokenCen, TokenSii = tokenSii, Participants = participants, BillingTypes = billingTypes };
+
+                FormMain main = new FormMain() { TokenCen = tokenCen, TokenSii = tokenSii, Participants = participants };
                 main.WindowState = FormWindowState.Normal;
                 main.BringToFront();
                 //main.TopMost = true;
@@ -87,7 +84,7 @@ namespace Centralizador.WinApp
                 }
                 catch (Exception)
                 {
-                   throw;
+                    throw;
                 }
             }
             mutex.ReleaseMutex();

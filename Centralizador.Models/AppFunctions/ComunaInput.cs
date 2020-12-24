@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 using Centralizador.Models.DataBase;
 
-namespace Centralizador.WinApp.GUI
+namespace Centralizador.Models.AppFunctions
 {
     internal class ComunaInput
     {

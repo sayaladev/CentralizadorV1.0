@@ -38,7 +38,7 @@ namespace Centralizador.Models.Outlook
         public void GetXmlFromEmail(BackgroundWorker BgwReadEmail)
         {
             BgwReadEmail.DoWork += BgwReadEmail_DoWork;
-            BgwReadEmail.RunWorkerAsync();        
+            BgwReadEmail.RunWorkerAsync();
         }
 
         private void BgwReadEmail_DoWork(object sender, DoWorkEventArgs e)
@@ -46,7 +46,7 @@ namespace Centralizador.Models.Outlook
             BackgroundWorker bgw = sender as BackgroundWorker;
             int c = 0;
             string pathTemp = @"C:\Centralizador\Temp\";
-            new CreateFile(pathTemp);          
+            new CreateFile(pathTemp);
             MailServer oServer = new MailServer("outlook.office365.com", Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword, ServerProtocol.Imap4)
             {
                 SSLConnection = true,
