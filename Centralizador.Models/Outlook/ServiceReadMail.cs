@@ -26,21 +26,16 @@ namespace Centralizador.Models.Outlook
     /// </summary>
     public class ServiceReadMail
     {
-        public string TokenSii { get; set; }
-        private readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfo("es-CL");
+        private static string TokenSii { get; set; }
 
-        public ServiceReadMail(string tokenSii)
-        {
-            TokenSii = tokenSii;
-        }
-
-        public void GetXmlFromEmail(BackgroundWorker BgwReadEmail)
+        public static void GetXmlFromEmail(BackgroundWorker BgwReadEmail, string tokenSii)
         {
             BgwReadEmail.DoWork += BgwReadEmail_DoWork;
             BgwReadEmail.RunWorkerAsync();
+            TokenSii = tokenSii;
         }
 
-        private void BgwReadEmail_DoWork(object sender, DoWorkEventArgs e)
+        private static void BgwReadEmail_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker bgw = sender as BackgroundWorker;
             int c = 0;
@@ -126,7 +121,7 @@ namespace Centralizador.Models.Outlook
                                 Properties.Settings.Default.UIDRange = info.UIDL;
                                 c++;
                                 float porcent = (float)(100 * c) / infos.Length;
-                                bgw.ReportProgress((int)porcent, $"Dowloading messages... [{string.Format(CultureInfo, "{0:g}", oMail.ReceivedDate)}] ({c}/{infos.Length})  Subject: {oMail.Subject} ");
+                                bgw.ReportProgress((int)porcent, $"Dowloading messages... [{string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", oMail.ReceivedDate)}] ({c}/{infos.Length})  Subject: {oMail.Subject} ");
                             }
 
                             // CANCEL
@@ -158,7 +153,7 @@ namespace Centralizador.Models.Outlook
             Properties.Settings.Default.Save();
         }
 
-        private int SaveFiles(string path)
+        private static int SaveFiles(string path)
         {
             string response = "";
             string nameFolder;
@@ -194,7 +189,7 @@ namespace Centralizador.Models.Outlook
 
                         if (response.Length != 0)
                         {
-                            DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo, "{0:D}", response));
+                            DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo.InvariantCulture, "{0:D}", response));
                             // 2020\06\76470581-5
                             nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
 
@@ -222,7 +217,7 @@ namespace Centralizador.Models.Outlook
             return 0;
         }
 
-        private void Save(string nameFolder, string nameFile, DTEDefType dte)
+        private static void Save(string nameFolder, string nameFile, DTEDefType dte)
         {
             try
             {

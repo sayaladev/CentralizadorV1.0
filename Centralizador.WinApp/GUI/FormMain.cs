@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+
 //using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -23,14 +24,12 @@ using Centralizador.Models.registroreclamodteservice;
 
 using TenTec.Windows.iGridLib;
 
-
 using static Centralizador.Models.ApiSII.ServiceDetalle;
 using static Centralizador.Models.AppFunctions.ValidatorFlag;
 using static Centralizador.Models.ProgressReportModel;
 
 namespace Centralizador.WinApp.GUI
 {
-
     public partial class FormMain : Form
     {
         //General
@@ -40,18 +39,19 @@ namespace Centralizador.WinApp.GUI
         public List<ResultParticipant> Participants { get; set; }
 
         #region VARIABLES
+
         public CancellationTokenSource CancellationTk { get; set; }
         private Progress<ProgressReportModel> ProgressReport { get; set; }
         private List<Detalle> DetallePrincipal { get; set; }
         public ProgressReportModel ReportModel { get; set; }
 
-        #endregion
+        #endregion VARIABLES
 
         // Init
         public string TokenSii { get; set; }
+
         public string TokenCen { get; set; }
 
-        public ServiceReadMail ServiceOutlook { get; set; }
         public BackgroundWorker BgwConvertPdf { get; private set; }
         public StringBuilder StringLogging { get; set; }
         public string DataBaseName { get; set; }
@@ -59,18 +59,16 @@ namespace Centralizador.WinApp.GUI
         public BackgroundWorker BgwPay { get; private set; }
         public ServiceSendMail Mail { get; private set; }
 
-
-
-
         #region FormMain methods
 
         public FormMain()
         {
             InitializeComponent();
         }
+
         private void FormMain_Load(object sender, EventArgs e)
         {
-            // VERSION            
+            // VERSION
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
             if (Environment.Is64BitProcess)
             {
@@ -82,12 +80,6 @@ namespace Centralizador.WinApp.GUI
             }
             // BUTTONS
             BtnCancelTak.Enabled = false;
-
-
-
-
-
-
 
             //Load ComboBox participants
             CboParticipants.DisplayMember = "Name";
@@ -101,15 +93,8 @@ namespace Centralizador.WinApp.GUI
             CboYears.DataSource = Enumerable.Range(2019, 2).ToList();
             CboYears.SelectedItem = DateTime.Today.Year;
 
-
-
             // User email
             TssLblUserEmail.Text = "|  " + Properties.Settings.Default.UserCEN;
-
-
-
-
-
 
             // Worker read email
             BgwReadEmail = new BackgroundWorker
@@ -128,28 +113,22 @@ namespace Centralizador.WinApp.GUI
             BgwPay.ProgressChanged += BgwPay_ProgressChanged;
             BgwPay.RunWorkerCompleted += BgwPay_RunWorkerCompleted;
 
-
             // Logging file
             StringLogging = new StringBuilder();
 
             // Date Time Outlook
             BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ServiceReadMail.GetLastDateTime());
 
-
             // Timer Hour (every hour)
             System.Timers.Timer timerHour = new System.Timers.Timer(3600000);
             timerHour.Elapsed += TimerHour_Elapsed;
             timerHour.Enabled = true;
             timerHour.AutoReset = true;
-
         }
+
         private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             TokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
-            if (ServiceOutlook != null)
-            {
-                ServiceOutlook.TokenSii = TokenSii;
-            }
         }
 
         private void FormMain_Shown(object sender, EventArgs e)
@@ -215,8 +194,6 @@ namespace Centralizador.WinApp.GUI
             //colflagxml.CellStyle = cellStyleFlag;
             //colflagxml.CellStyle = new iGCellStyle();
 
-
-
             IGridMain.Cols.Add("inst", "Instructions", 47, pattern).CellStyle = cellStyleCommon;
             IGridMain.Cols.Add("codProd", "Code", 35, pattern).CellStyle = cellStyleCommon;
 
@@ -258,12 +235,9 @@ namespace Centralizador.WinApp.GUI
             Btn.CellButtonClick += Bcm_CellButtonClick;
             Btn.Attach(IGridMain);
 
-
-
             // Header
             IGridMain.Header.Cells[0, "inst"].SpanCols = 3;
             //IGridMain.Header.Cells[0, "P1"].SpanCols = 4;
-
 
             // Footer freezer section
             IGridMain.Footer.Visible = true;
@@ -290,17 +264,15 @@ namespace Centralizador.WinApp.GUI
             fooDown.Value = "Totals:";
             fooDown.Style = style;
 
-
-            // Scroll          
+            // Scroll
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Near, iGActions.GoFirstRow, "Go to first row");
             IGridMain.VScrollBar.CustomButtons.Add(iGScrollBarCustomButtonAlign.Far, iGActions.GoLastRow, "Go to last row");
             IGridMain.VScrollBar.Visibility = iGScrollBarVisibility.Always;
             IGridMain.HScrollBar.Visibility = iGScrollBarVisibility.Hide;
 
-
-
             IGridMain.EndUpdate();
         }
+
         private void CboParticipants_SelectionChangeCommittedAsync(object sender, EventArgs e)
         {
             TxtCtaCteParticipant.Text = "";
@@ -324,7 +296,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 if (dic.ContainsKey(UserParticipant.Id.ToString()))
                 {
-                    DataBaseName = dic[UserParticipant.Id.ToString()];            
+                    DataBaseName = dic[UserParticipant.Id.ToString()];
                     TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
                     TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
                 }
@@ -336,6 +308,7 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
+
         private void BtnHiperLink_Click(object sender, EventArgs e)
         {
             if (IGridMain.CurRow == null || ReportModel.IsRuning)
@@ -351,8 +324,8 @@ namespace Centralizador.WinApp.GUI
             {
                 Process.Start($"https://ppagos-sen.coordinador.cl/pagos/instrucciones/{detalle.Instruction.Id}/");
             }
-
         }
+
         private void BtnHiperLink_MouseHover(object sender, EventArgs e)
         {
             try
@@ -388,19 +361,18 @@ namespace Centralizador.WinApp.GUI
             }
             catch (Exception)
             {
-
             }
         }
+
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {   // Send email                                      
+        {   // Send email
             ServiceSendMail.BatchSendMail();
             ServiceReadMail.SaveParam();
             if (BgwReadEmail.IsBusy) { BgwReadEmail.CancelAsync(); }
             if (CancellationTk != null && !CancellationTk.IsCancellationRequested) { CancellationTk.Cancel(); }
-
         }
 
-        #endregion   
+        #endregion FormMain methods
 
         #region Convert PDF
 
@@ -435,11 +407,13 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
+
         private void BgwConvertPdf_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
+
         private void BgwConvertPdf_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled == true)
@@ -453,7 +427,7 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Focus();
         }
 
-        #endregion
+        #endregion Convert PDF
 
         #region INSERTNV
 
@@ -461,7 +435,7 @@ namespace Centralizador.WinApp.GUI
         {
             if (ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
             if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Debtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
-            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }    
+            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
             List<Detalle> detallesPaso = new List<Detalle>();
             List<Detalle> detallesFinal = new List<Detalle>();
 
@@ -533,15 +507,15 @@ namespace Centralizador.WinApp.GUI
                         DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
                         List<int> folios = await detalleI.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
                         if (folios != null)
-                        { 
+                        {
                             string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
                             if (folios != null && folios.Count > 0)
                             {
                                 int menor = folios.Min();
                                 int mayor = folios.Max();
                                 detalleI.StringLogging.AppendLine("");
-                                detalleI.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");                                
-                                new CreateFile(@"C:\Centralizador\Log\", detalleI.StringLogging, nameFile);                                
+                                detalleI.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
+                                new CreateFile(@"C:\Centralizador\Log\", detalleI.StringLogging, nameFile);
                             }
                         }
                     }
@@ -552,9 +526,8 @@ namespace Centralizador.WinApp.GUI
                     }
                     finally
                     {
-                        ReportModel.IsRuning = false;                       
+                        ReportModel.IsRuning = false;
                     }
-
                 }
                 else { TssLblMensaje.Text = "Cancel."; }
             }
@@ -576,9 +549,11 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
-        #endregion
+
+        #endregion INSERTNV
 
         #region CREDITOR
+
         private async void BtnCreditor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
@@ -620,9 +595,10 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        #endregion
+        #endregion CREDITOR
 
         #region DEBTOR
+
         private async void BtnDebtor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
@@ -658,12 +634,13 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        #endregion
+        #endregion DEBTOR
 
         #region COMMON
+
         private void ReportProgress(object sender, ProgressReportModel e)
         {
-            // Progress Bar           
+            // Progress Bar
             TssLblProgBar.Value = e.PercentageComplete;
             TssLblMensaje.Text = e.Message;
             BtnCancelTak.Enabled = true;
@@ -673,13 +650,10 @@ namespace Centralizador.WinApp.GUI
                 BtnCancelTak.Enabled = false;
                 TssLblProgBar.Value = 0;
                 TssLblDBName.Text = "|DB: " + DataBaseName;
-             
-
 
                 // VER ESTO LUEGO
-                //    // Send email                                      
+                //    // Send email
                 //    ServiceSendMail.BatchSendMail();
-
 
                 // Para controlar !!!
                 switch (e.TaskType)
@@ -687,7 +661,7 @@ namespace Centralizador.WinApp.GUI
                     case TipoTask.GetDebtor:
                         BtnPagar.Enabled = true;
                         BtnInsertNv.Enabled = false;
-                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";                      
+                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
                         break;
 
                     case TipoTask.GetCreditor:
@@ -710,6 +684,7 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
             }
         }
+
         private void BtnCancelTak_Click(object sender, EventArgs e)
         {
             try
@@ -729,13 +704,13 @@ namespace Centralizador.WinApp.GUI
                 //}
 
                 //  CancellationTk.Dispose();
-
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
         private void IGridFill(List<ResultBilingType> types)
         {
             try
@@ -784,7 +759,7 @@ namespace Centralizador.WinApp.GUI
                             myRow.Cells["rznsocial"].ImageList = fImageListSmall;
                             myRow.Cells["rznsocial"].ImageIndex = 3;
                             myRow.Cells["rznsocial"].ImageAlign = iGContentAlignment.MiddleLeft;
-                            myRow.Cells["rznsocial"].Value +=  "   ***  BILLED TO: " + item.Instruction.ParticipantNew.Name.ToLower();
+                            myRow.Cells["rznsocial"].Value += "   ***  BILLED TO: " + item.Instruction.ParticipantNew.Name.ToLower();
                         }
                         else
                         {
@@ -792,7 +767,6 @@ namespace Centralizador.WinApp.GUI
                             myRow.Cells["rznsocial"].ImageIndex = 0;
                             myRow.Cells["rznsocial"].ImageAlign = iGContentAlignment.MiddleLeft;
                         }
-                    
                     }
                     //else
                     //{
@@ -820,7 +794,6 @@ namespace Centralizador.WinApp.GUI
                         rejectedExento += item.MntExento;
                         rejectedIva += item.MntIva;
                         rejectedTotal += item.MntTotal;
-
                     }
                     if (item.FechaEmision != null) { myRow.Cells["fechaEmision"].Value = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaEmision)); }
                     if (item.FechaRecepcion != null)
@@ -864,14 +837,14 @@ namespace Centralizador.WinApp.GUI
                             }
                         }
                     }
-                    // Flags 
+                    // Flags
                     if (item.ValidatorFlag != null)
                     {
                         myRow.Cells["flagRef"].ImageIndex = GetFlagImageIndex(item.ValidatorFlag.Flag);
                         myRow.Cells["flagRef"].BackColor = GetFlagBackColor(item.ValidatorFlag.Flag);
                     }
 
-                    // Status      
+                    // Status
                     switch (item.StatusDetalle)
                     {
                         case StatusDetalle.Accepted:
@@ -881,6 +854,7 @@ namespace Centralizador.WinApp.GUI
                             myRow.Cells["btnRejected"].Enabled = iGBool.False;
                             myRow.Cells["btnRejected"].ImageIndex = 15;
                             break;
+
                         case StatusDetalle.Rejected:
                             // Col Status
                             myRow.Cells["status"].Value = item.StatusDetalle;
@@ -904,8 +878,9 @@ namespace Centralizador.WinApp.GUI
                                 myRow.Cells["status"].ImageAlign = iGContentAlignment.MiddleRight;
                             }
                             break;
+
                         case StatusDetalle.Pending:
-                            // Col Status                         
+                            // Col Status
                             if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && ReportModel != null && ReportModel.DetalleType == TipoDetalle.Debtor && item.Folio > 0) // Debtor
                             {
                                 myRow.Cells["btnRejected"].ImageIndex = 6;
@@ -918,11 +893,13 @@ namespace Centralizador.WinApp.GUI
                                 if (item.Folio > 0 && item.FechaRecepcion != null) { myRow.Cells["status"].Value = "P"; }
                             }
                             break;
+
                         case StatusDetalle.Factoring:
                             myRow.Cells["status"].Value = item.StatusDetalle;
                             myRow.Cells["btnRejected"].Enabled = iGBool.False;
                             myRow.Cells["btnRejected"].ImageIndex = 5;
                             break;
+
                         default:
                             break;
                     }
@@ -934,7 +911,7 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Footer.Cells[0, "exento"].Value = rejectedExento;
                 IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
                 IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
-                // Footer Status 
+                // Footer Status
                 if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Creditor && rejNc > 0)
                 {
                     IGridMain.Footer.Cells[0, "status"].ImageList = fImageListSmall;
@@ -954,6 +931,7 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Focus();
             }
         }
+
         private void CleanControls()
         {
             TxtNmbItem.Text = "";
@@ -963,22 +941,19 @@ namespace Centralizador.WinApp.GUI
             //TxtDscItem.Text = "";
             TxtTpoDocRef.Text = "";
 
-
             // Clean Colors
             TxtFolioRef.BackColor = Color.Empty;
             TxtFmaPago.BackColor = Color.Empty;
             TxtRznRef.BackColor = Color.Empty;
             TxtTpoDocRef.BackColor = Color.Empty;
-
         }
-        #endregion
+
+        #endregion COMMON
 
         #region EXCEL CONVERT
 
-
         private void BtnExcelConvert_Click(object sender, EventArgs e)
         {
-
             if (!ReportModel.IsRuning && DetallePrincipal != null && DetallePrincipal.Count > 0)
             {
                 ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
@@ -992,7 +967,8 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
-        #endregion
+
+        #endregion EXCEL CONVERT
 
         #region IGRID
 
@@ -1018,8 +994,8 @@ namespace Centralizador.WinApp.GUI
                     e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
                 }
             }
-
         }
+
         private void IGridMain_ColHdrMouseDown(object sender, iGColHdrMouseDownEventArgs e)
         {
             // Prohibit sorting by the hot and current row indicator columns and by the row number column.
@@ -1028,6 +1004,7 @@ namespace Centralizador.WinApp.GUI
                 e.DoDefault = false;
             }
         }
+
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
             if (!ReportModel.IsRuning && IGridMain.CurRow.Type != iGRowType.AutoGroupRow && IGridMain.CurRow != null)
@@ -1120,6 +1097,7 @@ namespace Centralizador.WinApp.GUI
                 //IGridMain.EndUpdate();
             }
         }
+
         private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
         {
             if (!ReportModel.IsRuning)
@@ -1147,10 +1125,10 @@ namespace Centralizador.WinApp.GUI
                         string nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower() + ".pdf");
                         new ErrorMsgCen($"The process cannot access the file '{nomenclatura}' because it is being used by another process.", MessageBoxIcon.Warning);
                     }
-
                 }
             }
         }
+
         private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
         {
             if (!ReportModel.IsRuning && e.ColIndex == 19) // Sii Events
@@ -1170,11 +1148,9 @@ namespace Centralizador.WinApp.GUI
                         {
                             builder.AppendLine($"{item.FechaEvento:dd-MM-yyyy}");
                             builder.AppendLine($" - {item.CodEvento}: {item.DescEvento}");
-
                         }
                         e.Text = builder.ToString();
                     }
-
                 }
             }
             else if (!ReportModel.IsRuning && e.ColIndex == 18) // Email Aux send Xml
@@ -1195,9 +1171,7 @@ namespace Centralizador.WinApp.GUI
                             e.Text = builder.ToString();
                         }
                     }
-
                 }
-
             }
             else if (!ReportModel.IsRuning && e.ColIndex == 2) // History DTE
             {
@@ -1222,17 +1196,16 @@ namespace Centralizador.WinApp.GUI
                                     builder.AppendLine($"F° {item.Folio}-{item.Fecha:dd-MM-yyyy} / [{item.FolioRef}-{item.Glosa}] / NC:");
                                 }
                             }
-
                         }
                         if (builder.Length > 10)
                         {
                             e.Text = builder.ToString();
                         }
-
                     }
                 }
             }
         }
+
         private void IGridMain_CustomDrawCellEllipsisButtonForeground(object sender, iGCustomDrawEllipsisButtonEventArgs e)
         {
             if (e.ColIndex == 6)
@@ -1245,10 +1218,12 @@ namespace Centralizador.WinApp.GUI
                         myColor1 = SystemColors.ControlDark;
                         myColor2 = SystemColors.ControlLightLight;
                         break;
+
                     case iGControlState.Hot:
                         myColor1 = SystemColors.ControlLightLight;
                         myColor2 = SystemColors.ControlDark;
                         break;
+
                     default:
                         myColor1 = SystemColors.ControlLightLight;
                         myColor2 = SystemColors.Control;
@@ -1262,6 +1237,7 @@ namespace Centralizador.WinApp.GUI
                 //e.DoDefault = false;
             }
         }
+
         private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
             if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Creditor)
@@ -1290,7 +1266,6 @@ namespace Centralizador.WinApp.GUI
                         if (Mail == null)
                         {
                             Mail = new ServiceSendMail(3, UserParticipant); // 3 Threads
-
                         }
                         // Reject in Sii
                         // ACD: Acepta Contenido del Documento
@@ -1310,14 +1285,13 @@ namespace Centralizador.WinApp.GUI
                             builder.AppendLine("Rejected in SII: Yes");
                             if (detalle.IsParticipant && detalle.Instruction != null)
                             {
-
                                 switch (resp.codResp)
                                 {
-                                    case 0: // Acción Completada OK. 
+                                    case 0: // Acción Completada OK.
                                         detalle.StatusDetalle = StatusDetalle.Rejected;
                                         // Send email
                                         Mail.SendEmailToParticipant(detalle);
-                                        // Reject in CEN                                
+                                        // Reject in CEN
                                         ResultDte doc = Dte.SendDteDebtorAsync(detalle, TokenCen).Result;
                                         if (doc != null)
                                         {
@@ -1331,16 +1305,18 @@ namespace Centralizador.WinApp.GUI
                                         }
                                         builder.AppendLine("Email Send: Yes");
 
-
                                         break;
+
                                     case 7: // Evento registrado previamente
                                         break;
+
                                     case 8: // Pasados 8 días después de la recepción no es posible registrar reclamos o eventos.
                                         break;
+
                                     default:
                                         break;
                                 }
-                                //IGridFill(DetallesDebtor); 
+                                //IGridFill(DetallesDebtor);
                             }
                             else
                             {
@@ -1360,6 +1336,7 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
+
         private void ChkIncludeCEN_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox chk = sender as CheckBox;
@@ -1368,6 +1345,7 @@ namespace Centralizador.WinApp.GUI
                 ChkNoIncludeCEN.Checked = false;
             }
         }
+
         private void ChkNoIncludeCEN_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox chk = sender as CheckBox;
@@ -1376,7 +1354,8 @@ namespace Centralizador.WinApp.GUI
                 ChkIncludeCEN.Checked = false;
             }
         }
-        #endregion
+
+        #endregion IGRID
 
         #region OUTLOOK
 
@@ -1384,16 +1363,18 @@ namespace Centralizador.WinApp.GUI
         {
             if (!BgwReadEmail.IsBusy)
             {
+                BtnCancelTak.Enabled = true;
                 TssLblMensaje.Text = "Connecting to the mail server... Please wait.";
-                ServiceOutlook = new ServiceReadMail(TokenSii);
-                ServiceOutlook.GetXmlFromEmail(BgwReadEmail);
+                ServiceReadMail.GetXmlFromEmail(BgwReadEmail, TokenSii);
             }
         }
+
         private void BgwReadEmail_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             TssLblProgBar.Value = e.ProgressPercentage;
             TssLblMensaje.Text = e.UserState.ToString();
         }
+
         private void BgwReadEmail_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TssLblProgBar.Value = 0;
@@ -1410,13 +1391,12 @@ namespace Centralizador.WinApp.GUI
             }
 
             IGridMain.Focus();
-
-
         }
 
-        #endregion
+        #endregion OUTLOOK
 
         #region Pagar
+
         private void BtnPagar_Click(object sender, EventArgs e)
         {
             string monto;
@@ -1476,7 +1456,6 @@ namespace Centralizador.WinApp.GUI
                         ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, UserParticipant, TokenCen);
                         serviceExcel.CreateNomina(BgwPay);
                     }
-
                 }
                 else if (detallesFinal.Count == 0)
                 {
@@ -1507,16 +1486,6 @@ namespace Centralizador.WinApp.GUI
             TssLblMensaje.Text = e.UserState.ToString();
         }
 
-
-
-
-
-
-
-
-        #endregion
-
-
+        #endregion Pagar
     }
 }
-
