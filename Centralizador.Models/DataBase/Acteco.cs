@@ -31,7 +31,7 @@ namespace Centralizador.Models.DataBase
         public string RazonSocial { get; set; }
 
         [JsonProperty("actividades")]
-        public IList<Actividade> Actividades { get; set; }
+        public List<Actividade> Actividades { get; set; }
 
         public static async Task<int> InsertActecoAsync(string descripcion, Conexion conexion)
         {
@@ -49,9 +49,5 @@ namespace Centralizador.Models.DataBase
                 throw;
             }
         }
-
     }
 }
-
-
-

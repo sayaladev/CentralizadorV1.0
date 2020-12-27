@@ -39,7 +39,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="ApiCEN\Agent.cs" />
     <Compile Include="ApiCEN\AuxiliaryData.cs" />
+    <Compile Include="ApiCEN\CustomHead.cs" />
     <Compile Include="ApiCEN\Pay.cs" />
     <Compile Include="ApiCEN\TableBillingType.cs" />
     <Compile Include="ApiCEN\BillingWindow.cs" />
@@ -101,7 +102,7 @@
     <Compile Include="ApiCEN\Instruction.cs" />
     <Compile Include="ApiCEN\Participant.cs" />
     <Compile Include="ApiCEN\PaymentMatrix.cs" />
-    <Compile Include="ApiCEN\WebClientCustom.cs">
+    <Compile Include="ApiCEN\CustomWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ApiSII\Data.cs" />
@@ -121,7 +122,6 @@
     <Compile Include="DataBase\Comuna.cs" />
     <Compile Include="DataBase\Conexion.cs" />
     <Compile Include="DataBase\DteFiles.cs" />
-    <Compile Include="DataBase\DteLog.cs" />
     <Compile Include="DataBase\NotaVenta.cs" />
     <Compile Include="DataBase\DteInfoRef.cs" />
     <Compile Include="DetalleI.cs" />

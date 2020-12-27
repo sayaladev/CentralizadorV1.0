@@ -26,7 +26,6 @@ namespace Centralizador.Models.DataBase
                 {
                     return Convert.ToInt32(result);
                 }
-
             }
             catch (Exception)
             {
@@ -130,7 +129,6 @@ namespace Centralizador.Models.DataBase
                     date = instruction.PaymentMatrix.PublishDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
 
-
                 int neto = instruction.Amount;
                 double iva = neto * 0.19;
                 double total = Math.Ceiling(neto + iva);
@@ -155,7 +153,6 @@ namespace Centralizador.Models.DataBase
 
                 query3.Append("INSERT INTO softland.NW_Impto (nvNumero, CodImpto, ValPctIni, AfectoImpto, Impto)  VALUES ( ");
                 query3.Append($"{folioNV},'IVA',19,{neto},{iva})");
-
 
                 // Execute Transaction
                 if (!string.IsNullOrEmpty(query1.ToString()) || !string.IsNullOrEmpty(query2.ToString()) || !string.IsNullOrEmpty(query3.ToString()))

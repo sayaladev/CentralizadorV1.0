@@ -11,19 +11,18 @@ using Centralizador.Models.registroreclamodteservice;
 
 using EAGetMail;
 
-
 namespace Centralizador.Models.Outlook
 {
     /// <summary>
     /// Get EMail with "EAGetMail" Tool.
     /// https://www.emailarchitect.net/eagetmail/sdk/
-    /// 
+    ///
     /// Config IMAP
     /// Nombre de servidor: outlook.office365.com
     /// Puerto: 993
     /// Método de cifrado: TLS
-    /// 
-    /// 
+    ///
+    ///
     /// </summary>
     public class ServiceReadMail
     {
@@ -60,7 +59,6 @@ namespace Centralizador.Models.Outlook
                 oClient.GetMailInfosParam.Reset();
                 oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
                 oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
-
 
                 Imap4Folder[] imap4Folders = oClient.GetFolders();
                 //oClient.SelectFolder(imap4Folders[1]); // spam
@@ -104,6 +102,7 @@ namespace Centralizador.Models.Outlook
                                                 case 1: // Error in Sii (exit funcion)
                                                     MessageBox.Show("Sii: Application with Momentary Suspension", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                                     return;
+
                                                 case 2: // Error in serialization
                                                     continue;
                                                 case 3: // Error in query in Sii: folio wrong example.
@@ -136,8 +135,6 @@ namespace Centralizador.Models.Outlook
                                 e.Cancel = true;
                                 return;
                             }
-
-
                         }
                     }
                 }
@@ -146,7 +143,6 @@ namespace Centralizador.Models.Outlook
             {
                 //if (ex.ErrorCode == 0)
                 //{
-
                 //}
                 throw;
             }
@@ -161,6 +157,7 @@ namespace Centralizador.Models.Outlook
         {
             Properties.Settings.Default.Save();
         }
+
         private int SaveFiles(string path)
         {
             string response = "";
@@ -177,7 +174,7 @@ namespace Centralizador.Models.Outlook
                     // Only process TipoDTE 33 & 34.
                     if (document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item33 || document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item34)
                     {
-                        // Remove zeros at left 
+                        // Remove zeros at left
                         document.Encabezado.IdDoc.Folio = document.Encabezado.IdDoc.Folio.TrimStart(new char[] { '0' });
                         try
                         {
@@ -224,6 +221,7 @@ namespace Centralizador.Models.Outlook
             }
             return 0;
         }
+
         private void Save(string nameFolder, string nameFile, DTEDefType dte)
         {
             try
@@ -244,5 +242,3 @@ namespace Centralizador.Models.Outlook
         }
     }
 }
-
-

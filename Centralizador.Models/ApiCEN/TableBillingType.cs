@@ -9,7 +9,6 @@ namespace Centralizador.Models.ApiCEN
 {
     public class ResultBilingType
     {
-
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -35,30 +34,16 @@ namespace Centralizador.Models.ApiCEN
         public bool Enabled { get; set; }
     }
 
-    public class BilingType
+    public class BilingType : CustomHead
     {
-
-        [JsonProperty("count")]
-        public int Count { get; set; }
-
-        [JsonProperty("next")]
-        public object Next { get; set; }
-
-        [JsonProperty("previous")]
-        public object Previous { get; set; }
-
         [JsonProperty("results")]
         public List<ResultBilingType> Results { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public static async Task<List<ResultBilingType>> GetBilinTypesAsync()
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-types");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -77,6 +62,4 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
     }
-
-
 }

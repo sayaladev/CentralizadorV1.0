@@ -123,7 +123,7 @@
             // TssLblDBName
             // 
             this.TssLblDBName.AutoSize = false;
-            this.TssLblDBName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.TssLblDBName.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.TssLblDBName.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TssLblDBName.Name = "TssLblDBName";
             this.TssLblDBName.Size = new System.Drawing.Size(100, 17);

@@ -14,16 +14,15 @@ namespace Centralizador.Models.Outlook
     /// <summary>
     /// Send EMail with "EASendMail" tool.
     /// https://www.emailarchitect.net/easendmail/sdk/
-    /// 
+    ///
     /// Config SMTP
     /// Nombre de servidor: smtp.office365.com
     /// Puerto: 587
     /// Método de cifrado: STARTTLS
-    /// 
+    ///
     /// </summary>
     public class ServiceSendMail
     {
-
         private SmtpServer OServer { get; set; }
         private static SmtpMail[] OMails { get; set; }
         private static SmtpServer[] OServers { get; set; }
@@ -38,7 +37,6 @@ namespace Centralizador.Models.Outlook
             OServers = new SmtpServer[count];
             OSmtp = new SmtpClient();
             OSmtp.OnBatchSendMail += OSmtp_OnBatchSendMail;
-
 
             OServer = new SmtpServer("smtp.office365.com")
             {
@@ -164,11 +162,11 @@ namespace Centralizador.Models.Outlook
             {
                 SmtpMail OMail = new SmtpMail("TryIt")
                 {
-                    // Set 
+                    // Set
                     From = new MailAddress(detalle.Instruction.ParticipantDebtor.BusinessName, Properties.Settings.Default.UserEmail),
                     //To = "sergiokml@outlook.com",
                     Subject = "Notifica rechazo factura CEN",
-                    //TextBody = "this is a test email sent from c# project, do not reply",               
+                    //TextBody = "this is a test email sent from c# project, do not reply",
                     HtmlBody = builder.ToString(),
                     Priority = MailPriority.High,
                     ReplyTo = detalle.Instruction.ParticipantDebtor.BillsContact.Email
@@ -189,7 +187,7 @@ namespace Centralizador.Models.Outlook
                 OServers[Count] = OServer;
                 Count++;
 
-                // if you want to catch the result in OnBatchSendMail event, please add the following code 
+                // if you want to catch the result in OnBatchSendMail event, please add the following code
                 // oSmtp.OnBatchSendMail += new EASendMail.SmtpClient.OnBatchSendMailEventHandler(OnBatchSendMail);
 
                 if (Count == OMails.Length)
@@ -210,10 +208,6 @@ namespace Centralizador.Models.Outlook
                 OSmtp.BatchSendMail(OMails.Length, OServers, OMails);
                 Count = 0;
             }
-
         }
-
     }
 }
-
-

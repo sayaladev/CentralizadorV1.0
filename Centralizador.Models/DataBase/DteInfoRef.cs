@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using Centralizador.Models.ApiCEN;
-using Centralizador.Models.ApiSII;
-using Centralizador.Models.AppFunctions;
 
 namespace Centralizador.Models.DataBase
 {
     public class DteInfoRef
     {
         #region Properties
-
 
         public int NroInt { get; set; }
         public int Folio { get; set; }
@@ -49,9 +45,9 @@ namespace Centralizador.Models.DataBase
         public string FirmaDTE { get; set; }
         public int IDXMLDoc { get; set; }
         public string TrackID { get; set; }
-        public IList<DteFiles> DteFiles { get; set; }
+        public List<DteFiles> DteFiles { get; set; }
 
-        #endregion
+        #endregion Properties
 
         public static void InsertTriggerRefCen(Conexion conexion)
         {
@@ -62,17 +58,16 @@ namespace Centralizador.Models.DataBase
             }
             catch (Exception)
             {
-
                 throw;
             }
-
         }
-        public static async Task<IList<DteInfoRef>> GetInfoRefAsync(ResultInstruction instruction, Conexion conexion, string tipo)
+
+        public static async Task<List<DteInfoRef>> GetInfoRefAsync(ResultInstruction instruction, Conexion conexion, string tipo)
         {
             try
             {
                 StringBuilder query = new StringBuilder();
-                IList<DteInfoRef> lista = new List<DteInfoRef>();
+                List<DteInfoRef> lista = new List<DteInfoRef>();
                 DataTable dataTable = new DataTable();
                 int monto = 0;
                 string date = null;
@@ -85,7 +80,6 @@ namespace Centralizador.Models.DataBase
                 {
                     date = instruction.PaymentMatrix.PublishDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
-
 
                 if (tipo == "NC")
                 {
@@ -157,8 +151,6 @@ namespace Centralizador.Models.DataBase
                 query.AppendLine($"          AND g.tipo = '{tipo}' ");
                 query.AppendLine("ORDER BY  g.folio DESC");
 
-
-
                 conexion.Query = query.ToString();
                 dataTable = await Conexion.ExecuteReaderAsync(conexion);
                 if (dataTable != null && dataTable.Rows.Count > 0)
@@ -198,6 +190,19 @@ namespace Centralizador.Models.DataBase
                         if (item[29] != DBNull.Value) { reference.FirmaDTE = Convert.ToString(item[29]); }
                         if (item[30] != DBNull.Value) { reference.IDXMLDoc = Convert.ToInt32(item[30]); }
                         if (item[31] != DBNull.Value) { reference.TrackID = Convert.ToString(item[31]); }
+
+                        // SEARCH & ATTACH FILES REF.
+                        List<DteFiles> files = await DataBase.DteFiles.GetDteFilesAsync(conexion, reference.NroInt, reference.Folio);
+                        if (files != null)
+                        {
+                            reference.DteFiles = files;
+                        }
+                        else
+                        {
+                            files = await DataBase.DteFiles.GetDteFilesAsync(conexion, reference.IDXMLDoc);
+                            reference.DteFiles = files;
+                        }
+
                         lista.Add(reference);
                     }
                     return lista;
@@ -209,171 +214,5 @@ namespace Centralizador.Models.DataBase
             }
             return null;
         }
-
-        public static async Task<int> InsertReferenceAsync(ResultInstruction instruction, int nroInt, Conexion conexion)
-        {
-            // FALTA INSERT DE DTE_DocRef
-            // Manipular el Xml  UPDATE
-            try
-            {
-                StringBuilder query = new StringBuilder();
-                CultureInfo cultureInfo = CultureInfo.GetCultureInfo("es-CL");
-                //string date = string.Format(cultureInfo, "{0:yyyy-MM-dd HH:mm:ss}", instruction.PaymentMatrix.PublishDate);
-                string date = instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
-                query.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {nroInt} ");
-                query.Append("  AND Tipo = 'F' ");
-                query.Append("  AND CodRefSII = 'SEN') ");
-                query.Append("BEGIN ");
-                query.Append("  INSERT INTO softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) ");
-                query.Append($"  VALUES ('F', {nroInt}, 2, 'SEN', '{instruction.PaymentMatrix.ReferenceCode}', '{date}', '{instruction.PaymentMatrix.NaturalKey}') ");
-                query.Append("  UPDATE softland.iw_gmovi ");
-                query.Append($" SET DetProd = '{instruction.PaymentMatrix.NaturalKey}' ");
-                query.Append($" WHERE NroInt = {nroInt} ");
-                query.Append("  AND Tipo = 'F' ");
-                query.Append("END ");
-
-                conexion.Query = query.ToString();
-                return Convert.ToInt32(await Conexion.ExecuteNonQueryAsync(conexion)); // Return 1 if ok!
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public static async Task<int> InsertReferenceTransAsync(Conexion conexion, Detalle detalle, ResultParticipant participant)
-        {
-            string date = null;
-            StringBuilder query1 = new StringBuilder();
-            StringBuilder query2 = new StringBuilder();
-            string query3 = null;
-            //string query4 = null;
-
-            if (Environment.MachineName == "DEVELOPER")
-            {
-                // Developer
-                date = detalle.Instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                date = detalle.Instruction.PaymentMatrix.PublishDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-            }
-
-            // 1 softland.IW_GSaEn_RefDTE
-            query1.Append($"IF NOT EXISTS (SELECT * FROM softland.IW_GSaEn_RefDTE WHERE NroInt = {detalle.NroInt} ");
-            query1.Append("  AND Tipo = 'F' ");
-            query1.Append("  AND CodRefSII = 'SEN') ");
-            query1.Append("BEGIN ");
-            query1.Append("  INSERT INTO softland.IW_GSaEn_RefDTE (Tipo, NroInt, LineaRef, CodRefSII, FolioRef, FechaRef, Glosa) ");
-            query1.Append($"  VALUES ('F', {detalle.NroInt}, 2, 'SEN', '{detalle.Instruction.PaymentMatrix.ReferenceCode}', '{date}', '{detalle.Instruction.PaymentMatrix.NaturalKey}') ");
-            query1.Append("  UPDATE softland.iw_gmovi ");
-            query1.Append($" SET DetProd = '{detalle.Instruction.PaymentMatrix.NaturalKey}' ");
-            query1.Append($" WHERE NroInt = {detalle.NroInt} ");
-            query1.Append("  AND Tipo = 'F' ");
-            query1.Append("END ");
-
-            // 2 softland.DTE_DocRef
-            query2.Append($"IF NOT EXISTS (SELECT * FROM softland.DTE_DocRef WHERE  Folio = {detalle.Folio} ");
-            query2.Append("  AND TipoDTE = 33 ");
-            query2.Append("  AND TpoDocRef = 'SEN') ");
-            query2.Append("BEGIN ");
-            query2.Append("  INSERT INTO softland.DTE_DocRef (RUTEmisor, TipoDTE, Folio, NroLinRef,TpoDocRef, FolioRef, FchRef, RazonRef) ");
-            query2.Append($"  VALUES ('{participant.Rut}-{participant.VerificationCode}',33, {detalle.Folio}, 2, 'SEN', '{detalle.Instruction.PaymentMatrix.ReferenceCode}', '{date}', '{detalle.Instruction.PaymentMatrix.NaturalKey}') ");
-            query2.Append("END ");
-
-
-            // 3 Update File     
-            DTEDefTypeDocumento dte = null;
-            DTEDefTypeDocumentoReferencia[] references = null;
-            DTEDefTypeDocumentoReferencia reference = null;
-
-            try
-            {
-
-                if (detalle.DTEDef != null)
-                {
-                    dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-                    DTEDefTypeDocumentoReferencia[] listNew = null;
-                    references = dte.Referencia;
-                    if (references != null)
-                    {
-                        reference = references.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
-                        if (reference == null)
-                        {
-                            // Update here
-                            DTEDefTypeDocumentoReferencia referenciaCen = new DTEDefTypeDocumentoReferencia
-                            {
-                                NroLinRef = "2",
-                                TpoDocRef = "SEN",
-                                FolioRef = detalle.Instruction.PaymentMatrix.ReferenceCode, // DE04457A19C47
-                                FchRef = detalle.Instruction.PaymentMatrix.PublishDate,
-                                RazonRef = detalle.Instruction.PaymentMatrix.NaturalKey // SEN_[]
-                            };
-                            listNew = new List<DTEDefTypeDocumentoReferencia>() { references[0], referenciaCen }.ToArray();
-                            dte.Referencia = listNew;
-                            // Serialize To string
-                            string result = ServicePdf.TransformObjectToXmlDte(detalle.DTEDef);
-                            // PARA VERSIONES ANTIGUAS 
-                            //string query = $"UPDATE softland.DTE_Archivos WHERE ID_Archivo = {1}";
-                            query3 = $"UPDATE softland.DTE_Archivos SET Archivo = '{result}' WHERE Tipo = 'F' AND NroInt = {detalle.NroInt} AND Folio = {detalle.Folio} AND TipoXML = 'D' ";
-                        }
-
-
-                        // Update "SS"
-                        //DteInfoRef infoLastF = detalle.DteInfoRef.OrderByDescending(x => x.Folio).First();
-                        //string file = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "SS").Archivo;
-                        //EnvioDTE res = ServicePdf.TransformStringDTEDefTypeToObjectDTE2(file);
-                        //EnvioDTESetDTE ee = res.SetDTE;
-                        //int c = 0;
-                        //foreach (DTEDefType item in res.SetDTE.DTE)
-                        //{
-                        //    dte = (DTEDefTypeDocumento)item.Item;
-                        //    if (dte.Encabezado.IdDoc.Folio == detalle.Folio.ToString())
-                        //    {
-                        //        references = dte.Referencia;
-                        //        if (references != null)
-                        //        {
-                        //            reference = references.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
-                        //            if (reference == null)
-                        //            {
-                        //                dte.Referencia = listNew;
-                        //            }
-
-                        //            //Update
-                        //            ee.DTE[c] = item;
-                        //            res.SetDTE = ee;
-
-                        //            string resultado = ServicePdf.TransformObjectToXml2(res);
-                        //            query4 = $"UPDATE softland.DTE_Archivos SET Archivo = '{resultado}' WHERE Tipo = 'F' AND NroInt = {detalle.NroInt} AND Folio = {detalle.Folio} AND TipoXML = 'SS' ";
-                        //        }
-                        //    }
-                        //    c++;
-                        //}
-
-
-                    }
-
-                }
-
-                // Execute Transaction
-                if (!string.IsNullOrEmpty(query1.ToString()) || !string.IsNullOrEmpty(query2.ToString()) || !string.IsNullOrEmpty(query3))
-                {
-                    int res = Convert.ToInt32(await Conexion.ExecuteNonQueryTranAsync(conexion, new List<string> { query1.ToString(), query2.ToString(), query3.ToString() }));
-                    return res;
-                }
-                else
-                {
-                    return 0;
-                }
-
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            //return 0; // Error
-        }
-
     }
 }

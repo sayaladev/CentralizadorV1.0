@@ -25,19 +25,9 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tipoUser"></param>
-        /// <param name="token"></param>
-        /// <param name="tipoDoc"></param>
-        /// <param name="detalle"></param>
-        /// <param name="userParticipant"></param>
-        /// <param name="serialDigitalCert"></param>
-        /// <returns></returns>
         public static async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant, string serialDigitalCert)
         {
-            // Get digital cert  
+            // Get digital cert
             X509Certificate2 cert = null;
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
@@ -108,7 +98,6 @@ namespace Centralizador.Models.ApiSII
 
     public class ListEvenHistDoc
     {
-
         [JsonProperty("codigoDoc")]
         public object CodigoDoc { get; set; }
 
@@ -143,10 +132,8 @@ namespace Centralizador.Models.ApiSII
         public object DvReceptor { get; set; }
     }
 
-
     public class DataEvento
     {
-
         [JsonProperty("dhdrCodigo")]
         public long DhdrCodigo { get; set; }
 
@@ -220,17 +207,15 @@ namespace Centralizador.Models.ApiSII
         public object MsgDteCedible { get; set; }
 
         [JsonProperty("listEvenHistDoc")]
-        public IList<ListEvenHistDoc> ListEvenHistDoc { get; set; }
+        public List<ListEvenHistDoc> ListEvenHistDoc { get; set; }
     }
 
     public class ResultEvent
     {
-
         [JsonProperty("data")]
         public DataEvento DataEvento { get; set; }
 
         [JsonProperty("metaData")]
         public MetaData MetaData { get; set; }
     }
-
 }

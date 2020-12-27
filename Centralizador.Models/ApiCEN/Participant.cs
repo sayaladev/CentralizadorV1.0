@@ -9,7 +9,6 @@ namespace Centralizador.Models.ApiCEN
 {
     public class PaymentsContact
     {
-
         [JsonProperty("first_name")]
         public string FirstName { get; set; }
 
@@ -28,7 +27,6 @@ namespace Centralizador.Models.ApiCEN
 
     public class BillsContact
     {
-
         [JsonProperty("first_name")]
         public string FirstName { get; set; }
 
@@ -47,12 +45,11 @@ namespace Centralizador.Models.ApiCEN
 
     public class ResultParticipant
     {
-
         [JsonProperty("is_coordinator")]
-        public bool IsCoordinator { get; set; } //Agent
+        public bool IsCoordinator { get; set; } // AGENT.
 
         [JsonProperty("participant")]
-        public int ParticipantId { get; set; } //Agent
+        public int ParticipantId { get; set; } // AGENT.
 
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -101,35 +98,18 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
-
-
     }
 
-    public class Participant
+    public class Participant : CustomHead
     {
-
-        [JsonProperty("count")]
-        public int Count { get; set; }
-
-        [JsonProperty("next")]
-        public object Next { get; set; }
-
-        [JsonProperty("previous")]
-        public object Previous { get; set; }
-
         [JsonProperty("results")]
         public List<ResultParticipant> Results { get; set; }
 
-        /// <summary>
-        /// Get 1 'Participante' from CEN API
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public static async Task<ResultParticipant> GetParticipantByIdAsync(int id)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/participants/?id={id}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -148,16 +128,11 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rut"></param>
-        /// <returns></returns>
         public static async Task<ResultParticipant> GetParticipantByRutAsync(string rut)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/participants/?rut={rut}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -179,7 +154,6 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-
         public static async Task<List<ResultParticipant>> GetParticipants(string userCEN)
         {
             try
@@ -193,7 +167,7 @@ namespace Centralizador.Models.ApiCEN
                         ResultParticipant participant = await GetParticipantByIdAsync(item.ParticipantId);
                         participants.Add(participant);
                     }
-                    // Add Cve 76.532.358-4  
+                    // Add Cve 76.532.358-4
                     participants.Insert(0, new ResultParticipant { Name = "Please select a Company" });
                     participants.Insert(1, new ResultParticipant { Name = "CVE Renovable", Rut = "76532358", VerificationCode = "4", Id = 999, IsCoordinator = false });
 
@@ -207,6 +181,4 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
     }
-
-
 }

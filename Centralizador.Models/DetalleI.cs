@@ -21,7 +21,6 @@ namespace Centralizador.Models
 {
     public class DetalleI : IDetalle
     {
-
         public DetalleI(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen, ProgressReportModel reportModel)
         {
             DataBaseName = dataBaseName;
@@ -50,7 +49,7 @@ namespace Centralizador.Models
                 // GET BILLING WINDOW.
                 int d = 0;
                 m.BillingWindow = await BillingWindow.GetBillingWindowByIdAsync(m);
-                IList<ResultInstruction> InstructionsList = await Instruction.GetInstructionCreditorAsync(m, UserParticipant);
+                List<ResultInstruction> InstructionsList = await Instruction.GetInstructionCreditorAsync(m, UserParticipant);
                 if (InstructionsList != null)
                 {
                     try
@@ -69,7 +68,7 @@ namespace Centralizador.Models
                             // ROOT CLASS.
                             Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
                             // GET INFO OF INVOICES.
-                            IList<DteInfoRef> dteInfos = await DteInfoRef.GetInfoRefAsync(instruction, con, "F");
+                            List<DteInfoRef> dteInfos = await DteInfoRef.GetInfoRefAsync(instruction, con, "F");
                             List<DteInfoRef> dteInfoRefs = new List<DteInfoRef>();
                             if (dteInfos != null)
                             {
@@ -80,24 +79,12 @@ namespace Centralizador.Models
                                         dteInfoRefs.Add(item);
                                     }
                                 }
-                                detalle.DteInfoRefs = dteInfoRefs; // ATTACH FILES
-                                foreach (DteInfoRef item in detalle.DteInfoRefs) // HACER ESTO DONDE CORRESPONDE!***************************************
-                                {
-                                    IList<DteFiles> files = await DteFiles.GetDteFilesAsync(con, item.NroInt, item.Folio);
-                                    if (files != null)
-                                    {
-                                        item.DteFiles = files;
-                                    }
-                                    else
-                                    {
-                                        files = await DteFiles.GetDteFilesAsync(con, item.IDXMLDoc);
-                                        item.DteFiles = files;
-                                    }
-                                }
+                                // ATTACH FILES.
+                                detalle.DteInfoRefs = dteInfoRefs;
                                 // ATTACH PRINCIPAL DOC.
                                 if (detalle.DteInfoRefs.Count >= 1)
                                 {
-                                    infoLastF = detalle.DteInfoRefs.First(); // SHOW THE LAST DOC.                                    
+                                    infoLastF = detalle.DteInfoRefs.First(); // SHOW THE LAST DOC.
                                     switch (detalle.DteInfoRefs.First().DteFiles.Count)
                                     {
                                         case 1:
@@ -107,8 +94,9 @@ namespace Centralizador.Models
                                                 detalle.DTEFile = infoLastF.DteFiles[0].Archivo;
                                             }
                                             break;
+
                                         default:
-                                            {                                                                     
+                                            {
                                                 detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
                                                 detalle.DTEFile = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo;
                                                 break;
@@ -129,7 +117,7 @@ namespace Centralizador.Models
                                     detalle.MntNeto = infoLastF.NetoAfecto;
                                     detalle.MntIva = infoLastF.IVA;
                                     detalle.MntTotal = infoLastF.Total;
-                                    // GET INFO FROM SII                         
+                                    // GET INFO FROM SII
                                     if (infoLastF.EnviadoSII == 1 && infoLastF.AceptadoCliente == 0) // 1 Enviado / 0 No enviado
                                     {
                                         detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
@@ -233,12 +221,12 @@ namespace Centralizador.Models
                         DTEDefTypeDocumentoReferencia r = new GetReferenceCen(item).DocumentoReferencia;
                         if (r != null && r.RazonRef != null)
                         {
-                            // Get Window                       
+                            // Get Window
                             ResultBillingWindow window = await BillingWindow.GetBillingWindowByNaturalKeyAsync(r);
                             // Get Matrix
                             if (window != null && window.Id > 0)
                             {
-                                IList<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
+                                List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
                                 if (matrices != null && matrices.Count > 0)
                                 {
                                     ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(r.RazonRef.Trim(), StringComparison.OrdinalIgnoreCase));
@@ -255,12 +243,11 @@ namespace Centralizador.Models
                                 }
                             }
                         }
-
                     }
                     // FLAGS IF EXISTS XML FILE
                     bool validaCreditor = false;
                     item.ValidatorFlag = new ValidatorFlag(item, validaCreditor);
-                    // EVENTS FROM SII  
+                    // EVENTS FROM SII
                     item.DataEvento = await ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert);
                     // STATUS DOC
                     if (item.DataEvento != null) { item.StatusDetalle = GetStatus(item); }
@@ -269,7 +256,7 @@ namespace Centralizador.Models
                     {
                         // 1 No Facturado y cuando hay más de 1 dte informado
                         // 2 Facturado
-                        // 3 Facturado con retraso    
+                        // 3 Facturado con retraso
                         // Existe el DTE?
                         ResultDte doc = await Dte.GetDteAsync(item, false);
                         if (doc == null)
@@ -307,17 +294,17 @@ namespace Centralizador.Models
 
         public async Task<List<int>> InsertNv(List<Detalle> detalles, IProgress<ProgressReportModel> progress, List<ResultBilingType> types)
         {
-            int c = 0, result = 0;
+            int c = 0;
             float porcent = 0;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             Conexion con = new Conexion(DataBaseName);
             int resultInsertNV;
             int lastF = 0;
-            List<int> folios = new List<int>();           
-          
+            List<int> folios = new List<int>();
+
             foreach (Detalle item in detalles)
-            {                
-                AuxCsv a = FileSii.GetAuxCvsFromFile(item); // INFORMATION UPDATE FROM CSV FILE. 
+            {
+                AuxCsv a = FileSii.GetAuxCvsFromFile(item); // INFORMATION UPDATE FROM CSV FILE.
                 if (a != null)
                 {
                     string name = ti.ToTitleCase(a.Name.ToLower());
@@ -338,7 +325,8 @@ namespace Centralizador.Models
                     {
                         comunaobj = await Comuna.GetComunaFromInput(item, con, true);
                         aux = await Auxiliar.InsertAuxiliarAsync(item.Instruction, con, comunaobj);
-                        if (aux != null) {
+                        if (aux != null)
+                        {
                             StringLogging.AppendLine($"{item.Instruction.Id}\tAuxiliar Insert:\tOk: {item.Instruction.ParticipantDebtor.Rut} / {aux.DirAux} / {aux.ComAux}");
                         }
                         else
@@ -350,7 +338,7 @@ namespace Centralizador.Models
                     {
                         if (aux.ComAux == null)
                         {
-                            comunaobj = await Comuna.GetComunaFromInput(item, con ,false);
+                            comunaobj = await Comuna.GetComunaFromInput(item, con, false);
                         }
                         else
                         {
@@ -388,7 +376,7 @@ namespace Centralizador.Models
                     new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop);
                 }
                 c++;
-                porcent = (float)(100 * c) / detalles.Count;           
+                porcent = (float)(100 * c) / detalles.Count;
                 ReportModel.PercentageComplete = (int)porcent;
                 ReportModel.Message = $"Inserting NV, wait please...   ({c}/{detalles.Count})  F°: {lastF})";
                 progress.Report(ReportModel);
@@ -396,6 +384,4 @@ namespace Centralizador.Models
             return folios;
         }
     }
-
-
 }

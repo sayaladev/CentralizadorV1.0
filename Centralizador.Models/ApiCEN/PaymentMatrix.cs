@@ -7,10 +7,8 @@ using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
 {
-
     public class ResultPaymentMatrix
     {
-
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -71,37 +69,21 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("payment_due_type")]
         public int PaymentDueType { get; set; }
 
-        //New 
+        // NEW PROPERTIES.
         public ResultBillingWindow BillingWindow { get; set; }
-
     }
 
-    public class PaymentMatrix
+    public class PaymentMatrix : CustomHead
     {
-
-        [JsonProperty("count")]
-        public int Count { get; set; }
-
-        [JsonProperty("next")]
-        public object Next { get; set; }
-
-        [JsonProperty("previous")]
-        public object Previous { get; set; }
-
         [JsonProperty("results")]
         public List<ResultPaymentMatrix> Results { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="date"></param>
-        /// <returns></returns>
         public static async Task<List<ResultPaymentMatrix>> GetPaymentMatrixAsync(DateTime date)
         {
             DateTime createdBefore = date.AddMonths(1);
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?created_after={string.Format("{0:yyyy-MM-dd}", date)}&created_before={string.Format("{0:yyyy-MM-dd}", createdBefore)}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -120,16 +102,11 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="window"></param>
-        /// <returns></returns>
-        public static async Task<IList<ResultPaymentMatrix>> GetPaymentMatrixByBillingWindowIdAsync(ResultBillingWindow window)
+        public static async Task<List<ResultPaymentMatrix>> GetPaymentMatrixByBillingWindowIdAsync(ResultBillingWindow window)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/payment-matrices/?billing_window={window.Id}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -151,6 +128,5 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
         }
-
     }
 }

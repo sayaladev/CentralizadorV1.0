@@ -18,7 +18,7 @@ namespace Centralizador.Models.DataBase
         public string DirAux { get; set; }
         public string ComAux { get; set; }
 
-        public  static async Task<Auxiliar> InsertAuxiliarAsync(ResultInstruction instruction, Conexion conexion, Comuna comuna)
+        public static async Task<Auxiliar> InsertAuxiliarAsync(ResultInstruction instruction, Conexion conexion, Comuna comuna)
         {
             string acteco = null;
 
@@ -210,9 +210,4 @@ namespace Centralizador.Models.DataBase
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
     }
-
-
-
-
-
 }

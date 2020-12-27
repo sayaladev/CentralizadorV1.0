@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 using Centralizador.Models.ApiSII;
 using Centralizador.Models.AppFunctions;
@@ -12,7 +11,6 @@ namespace Centralizador.Models.DataBase
 {
     public class Comuna
     {
-
         public string ComCod { get; set; }
         public string ComDes { get; set; }
         public int Id_Region { get; set; }
@@ -49,7 +47,6 @@ namespace Centralizador.Models.DataBase
 
         public static async Task<Comuna> GetComunaFromInput(Detalle detalle, Conexion con, bool isNew)
         {
-
             string promptValue;
             Comuna comunaobj = null;
             List<Comuna> comunas = await GetComunasAsync(con);
@@ -73,14 +70,12 @@ namespace Centralizador.Models.DataBase
                                        detalle.Instruction.ParticipantDebtor.CommercialAddress,
                                        comunas);
                 }
-               
-                // 
+
+                //
                 comunaobj = comunas.FirstOrDefault(x => Auxiliar.RemoveDiacritics(x.ComDes).ToLower() == Auxiliar.RemoveDiacritics(promptValue.ToLower()));
             } while (comunaobj == null);
 
             return await Task.FromResult(comunaobj);
-
         }
-
     }
 }

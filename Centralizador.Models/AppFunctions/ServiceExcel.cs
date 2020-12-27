@@ -16,8 +16,7 @@ namespace Centralizador.Models.AppFunctions
 {
     public class ServiceExcel
     {
-
-        private IList<Detalle> Detalles { get; set; }
+        private List<Detalle> Detalles { get; set; }
         private ResultParticipant UserParticipant { get; set; }
         private string TokenCen { get; set; }
 
@@ -26,7 +25,7 @@ namespace Centralizador.Models.AppFunctions
             UserParticipant = userParticipant;
         }
 
-        public ServiceExcel(IList<Detalle> detalles, ResultParticipant userParticipant, string tokenCen)
+        public ServiceExcel(List<Detalle> detalles, ResultParticipant userParticipant, string tokenCen)
         {
             Detalles = detalles;
             UserParticipant = userParticipant;
@@ -37,10 +36,9 @@ namespace Centralizador.Models.AppFunctions
         {
             BgwPay.DoWork += BgwPay_DoWork;
             BgwPay.RunWorkerAsync();
-
         }
 
-        public void ExportToExcel(IList<Detalle> detalles, bool isCreditor, object month)
+        public void ExportToExcel(List<Detalle> detalles, bool isCreditor, object month)
         {
             int c = 0;
             DataTable table = new DataTable();
@@ -142,7 +140,7 @@ namespace Centralizador.Models.AppFunctions
 
             DataTable table = new DataTable();
             table.Columns.Add("1"); //2
-            table.Columns.Add("2"); //rut sin guión 
+            table.Columns.Add("2"); //rut sin guión
             table.Columns.Add("3"); //razón social
             table.Columns.Add("4"); //nro cta
             table.Columns.Add("5"); //monto
@@ -158,10 +156,10 @@ namespace Centralizador.Models.AppFunctions
                     DataRow row = table.NewRow();
                     row["1"] = "2";
                     row["2"] = item.RutReceptor; // Rut sin guión
-                    row["3"] = ti.ToTitleCase(item.RznSocRecep.ToLower());  // Rzn Social                     
+                    row["3"] = ti.ToTitleCase(item.RznSocRecep.ToLower());  // Rzn Social
                     if (item.Instruction != null && item.Instruction.ParticipantCreditor != null)
                     {
-                        row["4"] = item.Instruction.ParticipantCreditor.BankAccount.TrimStart(new char[] { '0' }).Replace("-", ""); // Nro 
+                        row["4"] = item.Instruction.ParticipantCreditor.BankAccount.TrimStart(new char[] { '0' }).Replace("-", ""); // Nro
                     }
                     row["5"] = item.MntTotal; // Amount
                     row["6"] = "1";
@@ -172,45 +170,59 @@ namespace Centralizador.Models.AppFunctions
                             case 1: // Chile
                                 row["7"] = "1";
                                 break;
+
                             case 2: // International
                                 row["7"] = "9";
                                 break;
+
                             case 3: // Scotiabank
                                 row["7"] = "14";
                                 break;
+
                             case 4: // Bci
                                 row["7"] = "16";
                                 break;
+
                             case 5: // Bice
                                 row["7"] = "28";
                                 break;
+
                             case 6: // Hsbc
                                 row["7"] = "31";
                                 break;
+
                             case 7: // Santander
                                 row["7"] = "37";
                                 break;
+
                             case 8: // Itau/CorpBanca
                                 row["7"] = "39"; // Itau
                                 break;
+
                             case 9: // Security
                                 row["7"] = "49";
                                 break;
+
                             case 10: // Falabella
                                 row["7"] = "51";
                                 break;
+
                             case 11: // Ripley
                                 row["7"] = "53";
                                 break;
+
                             case 12: // Rabobank
                                 row["7"] = "54";
                                 break;
+
                             case 13: // Concorcio
                                 row["7"] = "55";
                                 break;
+
                             case 16: // Bbva
                                 row["7"] = "504";
                                 break;
+
                             case 18: // Estado
                                 row["7"] = "12";
                                 break;
@@ -233,7 +245,7 @@ namespace Centralizador.Models.AppFunctions
                         }
                     }
                     table.Rows.Add(row);
-                    // Insert pay to CEN            
+                    // Insert pay to CEN
                     if (item.Instruction != null && item.Instruction.Dte != null && !item.Instruction.IsPaid)
                     {
                         ResultPay pay = new ResultPay
@@ -285,8 +297,6 @@ namespace Centralizador.Models.AppFunctions
                 Process.Start(process);
                 e.Result = table;
             }
-
         }
     }
 }
-

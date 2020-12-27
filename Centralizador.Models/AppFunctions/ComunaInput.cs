@@ -10,9 +10,10 @@ namespace Centralizador.Models.AppFunctions
 {
     internal class ComunaInput
     {
-        public static IList<Comuna> Comunas { get; set; }
+        public static List<Comuna> Comunas { get; set; }
         public static TextBox TextBox { get; set; }
-        public static string ShowDialog(string title, string promptText, string rzn, string rut, string add, IList<Comuna> comunas)
+
+        public static string ShowDialog(string title, string promptText, string rzn, string rut, string add, List<Comuna> comunas)
         {
             Comunas = comunas;
             Form form = new Form();

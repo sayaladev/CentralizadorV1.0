@@ -10,7 +10,6 @@ namespace Centralizador.Models.ApiCEN
 {
     public class ResultBillingWindow
     {
-
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -21,7 +20,7 @@ namespace Centralizador.Models.ApiCEN
         public int BillingType { get; set; }
 
         [JsonProperty("periods")]
-        public IList<string> Periods { get; set; }
+        public List<string> Periods { get; set; }
 
         [JsonIgnore]
         public DateTime CreatedTs { get; set; }
@@ -30,31 +29,16 @@ namespace Centralizador.Models.ApiCEN
         public DateTime UpdatedTs { get; set; }
     }
 
-    public class BillingWindow
+    public class BillingWindow : CustomHead
     {
-
-        [JsonProperty("count")]
-        public int Count { get; set; }
-
-        [JsonProperty("next")]
-        public object Next { get; set; }
-
-        [JsonProperty("previous")]
-        public object Previous { get; set; }
-
         [JsonProperty("results")]
-        public IList<ResultBillingWindow> Results { get; set; }
+        public List<ResultBillingWindow> Results { get; set; }
 
-        /// <summary>
-        /// Get 1 'Ventana de Facturación' from CEN API
-        /// </summary>
-        /// <param name="matrix"></param>
-        /// <returns></returns>
         public static async Task<ResultBillingWindow> GetBillingWindowByIdAsync(ResultPaymentMatrix matrix)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-windows/?id={matrix.BillingWindowId}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -73,12 +57,6 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-
-        /// <summary>
-        /// Get 1 'Ventana de Facturación' from CEN API
-        /// </summary>
-        /// <param name="referencia"></param>
-        /// <returns></returns>
         public static async Task<ResultBillingWindow> GetBillingWindowByNaturalKeyAsync(DTEDefTypeDocumentoReferencia referencia)
         {
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
@@ -91,7 +69,7 @@ namespace Centralizador.Models.ApiCEN
 
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-windows/?natural_key={r1 + rznRef}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";

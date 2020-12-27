@@ -6,7 +6,6 @@ namespace Centralizador.Models.ApiSII
 {
     public class MetaData
     {
-
         [JsonProperty("conversationId")]
         public object ConversationId { get; set; }
 
@@ -20,7 +19,6 @@ namespace Centralizador.Models.ApiSII
         [JsonProperty("info")]
         public object Info { get; set; }
 
-        //[JsonIgnore]
         [JsonProperty("errors")]
         public List<Error> Errors { get; set; }
 

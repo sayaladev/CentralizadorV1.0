@@ -14,11 +14,11 @@ namespace Centralizador.Models.AppFunctions
         private static List<AuxCsv> AuxCsvsList { get; set; }
 
         public static string Path => $"ce_empresas_dwnld_{DateTime.Now.Year}{string.Format("{0:00}", DateTime.Now.Month)}{string.Format("{0:00}", DateTime.Now.Day)}.csv";
+
         public FileSii()
         {
             ExistsFile = GetFile();
         }
-
 
         private bool GetFile()
         {
@@ -30,7 +30,6 @@ namespace Centralizador.Models.AppFunctions
             {
                 return false;
             }
-
         }
 
         public static AuxCsv GetAuxCvsFromFile(Detalle detalle)
@@ -38,14 +37,12 @@ namespace Centralizador.Models.AppFunctions
             AuxCsv auxCsv = new AuxCsv();
             try
             {
-               // List<AuxCsv> res = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+                // List<AuxCsv> res = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
                 auxCsv = AuxCsvsList.FirstOrDefault(x => x.Rut == detalle.Instruction.ParticipantDebtor.Rut + "-" + detalle.Instruction.ParticipantDebtor.VerificationCode);
                 return auxCsv;
                 //Task.Run(() =>
                 //{
                 //    List<AuxCsv> res = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
-
-
 
                 //    auxCsv = res.FirstOrDefault(x => x.Rut == detalle.Instruction.ParticipantDebtor.Rut + "-" + detalle.Instruction.ParticipantDebtor.VerificationCode);
                 //    return auxCsv;
@@ -59,11 +56,10 @@ namespace Centralizador.Models.AppFunctions
             //return null;
         }
 
-        public static void GetValues() {
-
+        public static void GetValues()
+        {
             AuxCsvsList = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
         }
-
     }
 
     public class AuxCsv

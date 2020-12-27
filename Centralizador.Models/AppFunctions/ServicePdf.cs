@@ -16,15 +16,13 @@ using OpenHtmlToPdf;
 
 using Pdf417EncoderLibrary;
 
-
-
 namespace Centralizador.Models.AppFunctions
 {
     public class ServicePdf
     {
-        private IList<Detalle> Detalles { get; set; }
+        private List<Detalle> Detalles { get; set; }
 
-        public ServicePdf(IList<Detalle> detalles)
+        public ServicePdf(List<Detalle> detalles)
         {
             Detalles = detalles;
         }
@@ -33,7 +31,7 @@ namespace Centralizador.Models.AppFunctions
         /// Method return a object (Xml 'EnvioDTE' to object).
         /// </summary>
         /// <param name="pathFile"></param>
-        /// <returns>Sergio Ayala</returns>        
+        /// <returns>Sergio Ayala</returns>
         public static EnvioDTE TransformXmlEnvioDTEToObject(string pathFile)
         {
             try
@@ -49,7 +47,6 @@ namespace Centralizador.Models.AppFunctions
             {
                 return null;
             }
-
         }
 
         //public static RespuestaDTE TransformXmlRespuestaDTEToObject(string pathFile)
@@ -90,7 +87,7 @@ namespace Centralizador.Models.AppFunctions
         //}
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns>Method return a object (Xml 'DTE' to object).</returns>
@@ -109,8 +106,8 @@ namespace Centralizador.Models.AppFunctions
             {
                 return null;
             }
-
         }
+
         /// <summary>
         /// Method return a object (Xml 'DTE' to object).
         /// </summary>
@@ -134,7 +131,6 @@ namespace Centralizador.Models.AppFunctions
             {
                 return null;
             }
-
         }
 
         /// <summary>
@@ -161,6 +157,7 @@ namespace Centralizador.Models.AppFunctions
                 return null;
             }
         }
+
         public static string TransformObjectToXml(DTEDefType obj)
         {
             try
@@ -236,6 +233,7 @@ namespace Centralizador.Models.AppFunctions
                 return null;
             }
         }
+
         public static void ConvertToPdf(Detalle detalle)
         {
             IPdfDocument document;
@@ -243,7 +241,7 @@ namespace Centralizador.Models.AppFunctions
             document = ConvertXmlToPdf(detalle);
 
             //nomenclatura = detalle.RutReceptor + "_" + detalle.Folio;
-            //nomenclatura = detalle.Folio + "_" + detalle.RutReceptor;  
+            //nomenclatura = detalle.Folio + "_" + detalle.RutReceptor;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower());
             byte[] content = document.Content();
@@ -257,6 +255,7 @@ namespace Centralizador.Models.AppFunctions
                 throw;
             }
         }
+
         public void ConvertToPdf(BackgroundWorker bgw)
         {
             bgw.DoWork += Bgw_DoWork;
@@ -271,8 +270,8 @@ namespace Centralizador.Models.AppFunctions
                     bgw.RunWorkerAsync(dialog);
                 }
             }
-
         }
+
         private void Bgw_DoWork(object sender, DoWorkEventArgs e)
         {
             FolderBrowserDialog dialog = e.Argument as FolderBrowserDialog;
@@ -304,9 +303,10 @@ namespace Centralizador.Models.AppFunctions
             }
             Process.Start(dialog.SelectedPath);
         }
+
         private static IPdfDocument ConvertXmlToPdf(Detalle obj)
         {
-            // Timbre Pdf417            
+            // Timbre Pdf417
             DTEDefTypeDocumento documento = (DTEDefTypeDocumento)obj.DTEDef.Item;
             try
             {

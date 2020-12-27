@@ -9,8 +9,6 @@ using static Centralizador.Models.ApiCEN.Pay;
 
 namespace Centralizador.Models.ApiCEN
 {
-
-
     public class ResultInstruction
     {
         [JsonProperty("id")]
@@ -64,42 +62,25 @@ namespace Centralizador.Models.ApiCEN
         [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
 
-        //Mapping (new properties)    
+        // NEW PROPERTIES.
         public ResultParticipant ParticipantDebtor { get; set; }
+
         public ResultParticipant ParticipantCreditor { get; set; }
         public ResultPaymentMatrix PaymentMatrix { get; set; }
         public ResultDte Dte { get; set; }
         public ResultParticipant ParticipantNew { get; set; }
-
-
     }
 
-    public class Instruction
+    public class Instruction : CustomHead
     {
-
-        [JsonProperty("count")]
-        public int Count { get; set; }
-
-        [JsonProperty("next")]
-        public object Next { get; set; }
-
-        [JsonProperty("previous")]
-        public object Previous { get; set; }
-
         [JsonProperty("results")]
-        public IList<ResultInstruction> Results { get; set; }
+        public List<ResultInstruction> Results { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="matrix"></param>
-        /// <param name="Userparticipant"></param>
-        /// <returns></returns>
-        public static async Task<IList<ResultInstruction>> GetInstructionCreditorAsync(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
+        public static async Task<List<ResultInstruction>> GetInstructionCreditorAsync(ResultPaymentMatrix matrix, ResultParticipant Userparticipant)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={Userparticipant.Id}&status=Publicado");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -126,18 +107,11 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="idMatrix"></param>
-        /// <param name="idCReditor"></param>
-        /// <param name="idDebtor"></param>
-        /// <returns></returns>
         public static async Task<ResultInstruction> GetInstructionDebtorAsync(ResultPaymentMatrix matrix, ResultParticipant participant, ResultParticipant userPart)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/instructions/?payment_matrix={matrix.Id}&creditor={participant.Id}&debtor={userPart.Id}&status=Publicado");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -162,23 +136,11 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-
-
-        /// <summary>
-        /// 
-        /// </summary>
         public enum StatusBilled
         {
-            // 1 No Facturado y cuando hay más de 1 dte informado
-            // 2 Facturado
-            // 3 Facturado con retraso
-            NoFacturado = 1,
+            NoFacturado = 1, // + DE 1 DTE TOO.
             Facturado = 2,
             ConRetraso = 3
         }
     }
 }
-
-
-
-

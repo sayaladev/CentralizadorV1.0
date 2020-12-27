@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Centralizador.WinApp.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="SerialDigitalCert" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">04E4E7</Value>
-    </Setting>
     <Setting Name="UserCEN" Type="System.String" Scope="Application">
       <Value Profile="(Default)">german.gomez@cvegroup.com</Value>
     </Setting>

@@ -145,7 +145,7 @@ namespace Centralizador.WinApp.GUI
         }
         private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            TokenSii = ServiceSoap.GETTokenFromSii(Properties.Settings.Default.SerialDigitalCert);
+            TokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
             if (ServiceOutlook != null)
             {
                 ServiceOutlook.TokenSii = TokenSii;

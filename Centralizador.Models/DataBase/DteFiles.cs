@@ -18,8 +18,7 @@ namespace Centralizador.Models.DataBase
         public DateTime FechaGenDTE { get; set; }
         public string TipoXML { get; set; }
 
-
-        #endregion
+        #endregion Properties
 
         /// <summary>
         /// Get Xml from Softland DB (Versión Update Softland 26-11-2020)
@@ -28,12 +27,12 @@ namespace Centralizador.Models.DataBase
         /// <param name="nroInt"></param>
         /// <param name="Folio"></param>
         /// <returns></returns>
-        public static async Task<IList<DteFiles>> GetDteFilesAsync(Conexion conexion, int nroInt, int Folio)
+        public static async Task<List<DteFiles>> GetDteFilesAsync(Conexion conexion, int nroInt, int Folio)
         {
             try
             {
                 StringBuilder query = new StringBuilder();
-                IList<DteFiles> lista = new List<DteFiles>();
+                List<DteFiles> lista = new List<DteFiles>();
                 DataTable dataTable;
 
                 query.Append("SELECT TOP 2 ID_Archivo ");
@@ -71,22 +70,18 @@ namespace Centralizador.Models.DataBase
             return null;
         }
 
-
-
-
-
         /// <summary>
         /// Get Xml from Softland DB
         /// </summary>
         /// <param name="conexion"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static async Task<IList<DteFiles>> GetDteFilesAsync(Conexion conexion, int id)
+        public static async Task<List<DteFiles>> GetDteFilesAsync(Conexion conexion, int id)
         {
             try
             {
                 StringBuilder query = new StringBuilder();
-                IList<DteFiles> lista = new List<DteFiles>();
+                List<DteFiles> lista = new List<DteFiles>();
                 DataTable dataTable;
 
                 query.Append("SELECT ID_Archivo ");
@@ -120,14 +115,10 @@ namespace Centralizador.Models.DataBase
                 throw;
             }
             return null;
-
         }
 
-
-
-
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="conexion"></param>
         /// <param name="detalle"></param>

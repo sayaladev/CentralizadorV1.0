@@ -5,18 +5,16 @@ using System.Windows.Forms;
 
 namespace Centralizador.Models
 {
-
     [Serializable()]
     public class ErrorMsgCen : Exception
     {
-
         // Constructors
         public ErrorMsgCen() : base()
         {
-
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="message"></param>
         /// <param name="msgIcon"></param>
@@ -27,6 +25,7 @@ namespace Centralizador.Models
             builder.AppendLine("");
             MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, msgIcon);
         }
+
         public ErrorMsgCen(string msgTitle, string msgDetail, MessageBoxIcon msgIcon) : base(msgTitle)
         {
             StringBuilder builder = new StringBuilder();
@@ -35,8 +34,9 @@ namespace Centralizador.Models
             builder.AppendLine(msgDetail);
             MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, msgIcon);
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="message"></param>
         /// <param name="innerException"></param>
@@ -59,10 +59,10 @@ namespace Centralizador.Models
 
             MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, msgIcon);
         }
+
         protected ErrorMsgCen(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             // Implement type-specific serialization constructor logic.
         }
-
     }
 }

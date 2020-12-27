@@ -1,6 +1,4 @@
-﻿
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Centralizador.Models
 {
@@ -32,6 +30,5 @@ namespace Centralizador.Models
             InsertNV,
             ConvertToPdf
         }
-
     }
 }

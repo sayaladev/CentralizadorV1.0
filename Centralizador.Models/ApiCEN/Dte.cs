@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
@@ -16,7 +15,6 @@ namespace Centralizador.Models.ApiCEN
 {
     public class ResultDte
     {
-
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -27,7 +25,7 @@ namespace Centralizador.Models.ApiCEN
         public int Type { get; set; }
 
         [JsonProperty("type_sii_code")]
-        public int TypeSiiCode { get; set; } // Especial for POST 
+        public int TypeSiiCode { get; set; } // FOR POST.
 
         [JsonProperty("folio")]
         public int Folio { get; set; }
@@ -73,32 +71,13 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonIgnore]
         public DateTime UpdatedTs { get; set; }
-
-
     }
 
-    public class Dte
+    public class Dte : CustomHead
     {
-
-        [JsonProperty("count")]
-        public int Count { get; set; }
-
-        [JsonProperty("next")]
-        public object Next { get; set; }
-
-        [JsonProperty("previous")]
-        public object Previous { get; set; }
-
         [JsonProperty("results")]
-        public IList<ResultDte> Results { get; set; }
+        public List<ResultDte> Results { get; set; }
 
-
-        /// <summary>
-        /// Send 1 Dte to CEN API (Creditor)
-        /// </summary>
-        /// <param name="detalle"></param>
-        /// <param name="tokenCen"></param>
-        /// <returns></returns>
         public static async Task<ResultDte> SendDteCreditorAsync(Detalle detalle, string tokenCen, string doc)
         {
             string fileName = detalle.Folio + "_" + detalle.Instruction.Id;
@@ -119,7 +98,7 @@ namespace Centralizador.Models.ApiCEN
                 };
                 try
                 {
-                    using (WebClientCustom wc = new WebClientCustom())
+                    using (CustomWebClient wc = new CustomWebClient())
                     {
                         Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/operations/dtes/create/");
                         string d = JsonConvert.SerializeObject(dte);
@@ -145,12 +124,6 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        /// <summary>
-        /// Send 1 Dte to CEN API (Debtor)
-        /// </summary>
-        /// <param name="detalle"></param>
-        /// <param name="tokenCen"></param>
-        /// <returns></returns>
         public static async Task<ResultDte> SendDteDebtorAsync(Detalle detalle, string tokenCen)
         {
             ResultDte dte = new ResultDte
@@ -168,17 +141,20 @@ namespace Centralizador.Models.ApiCEN
                 case StatusDetalle.Accepted:
                     dte.AcceptanceStatus = 1;
                     break;
+
                 case StatusDetalle.Rejected:
                     dte.AcceptanceStatus = 2;
                     break;
+
                 case StatusDetalle.Pending:
                     break;
+
                 default:
                     break;
             }
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/operations/dtes/create/");
                     string d = JsonConvert.SerializeObject(dte);
@@ -205,18 +181,11 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        /// <summary>
-        /// Send 1 file for Insert into Dte CEN API
-        /// </summary>
-        /// <param name="tokenCen"></param>
-        /// <param name="fileName"></param>
-        /// <param name="doc"></param>
-        /// <returns></returns>
         private static async Task<string> SendFileAsync(string tokenCen, string fileName, string doc)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/resources/auxiliary-files/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
@@ -236,11 +205,12 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
         }
+
         public static async Task<ResultDte> GetDteAsync(Detalle detalle, bool isCreditor)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&folio={detalle.Folio}&instruccion={detalle.Instruction.Id}&creditor={detalle.Instruction.Creditor}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -265,15 +235,13 @@ namespace Centralizador.Models.ApiCEN
 
     public class InsertDTe
     {
-
         [JsonProperty("result")]
         public ResultDte ResultDte { get; set; }
 
         [JsonProperty("errors")]
-        public IList<object> Errors { get; set; }
+        public List<object> Errors { get; set; }
 
         [JsonProperty("operation")]
         public int Operation { get; set; }
     }
-
 }

@@ -8,23 +8,9 @@ namespace Centralizador.Models.DataBase
 {
     public class Conexion
     {
-        private string Cnn { get; set; }
-        public string Query { get; set; }
-        private static SqlDataReader SqlDataReader { get; set; }
-
-        public string DBName { get; set; }
-
-
-        /// <summary>
-        /// Constructor Clase Conexión Softland
-        /// </summary>
-        /// <param name="dataBaseName"></param>
-        /// <param name="dbUser"></param>
-        /// <param name="dbPassword"></param>
         public Conexion(string dataBaseName)
         {
-            // change server name 
-            string serverName;           
+            string serverName;
             if (Environment.MachineName == "DEVELOPER")
             {
                 serverName = "DEVELOPER";
@@ -33,7 +19,7 @@ namespace Centralizador.Models.DataBase
             {
                 serverName = Properties.Settings.Default.ServerName;
             }
-            DBName = serverName;
+            DBName = dataBaseName;
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder
             {
                 DataSource = serverName,
@@ -44,36 +30,10 @@ namespace Centralizador.Models.DataBase
             Cnn = builder.ToString();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="conn"></param>
-        /// <returns>CONJUNTO DE FILAS</returns>
-        public static async Task<DataTable> ExecuteReaderAsync(Conexion conn)
-        {
-            using (SqlConnection cnn = new SqlConnection(conn.Cnn))
-            {
-                try
-                {
-                    cnn.Open();
-                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
-                    {
-                        using (SqlDataReader)
-                        {
-                            SqlDataReader = await cmd.ExecuteReaderAsync();
-                            DataTable dataTable = new DataTable();
-                            dataTable.Load(SqlDataReader);
-                            return dataTable;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
+        public string DBName { get; set; }
+        public string Query { get; set; }
+        private static SqlDataReader SqlDataReader { get; set; }
+        private string Cnn { get; set; }
 
         /// <summary>
         /// INSERT / UPDATE / DELETE
@@ -104,6 +64,11 @@ namespace Centralizador.Models.DataBase
             }
         }
 
+        /// <summary>
+        /// INSERT / UPDATE / DELETE
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <returns></returns>
         public static async void ExecuteNonQueryAsyncTG(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -119,10 +84,11 @@ namespace Centralizador.Models.DataBase
                 }
                 catch (Exception)
                 {
-                    //throw;
+                    throw;
                 }
             }
         }
+
         public static async Task<int> ExecuteNonQueryTranAsync(Conexion conn, List<string> listQ)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
@@ -143,15 +109,6 @@ namespace Centralizador.Models.DataBase
                         sqlCommand.CommandText = item;
                         await sqlCommand.ExecuteNonQueryAsync();
                     }
-                    //sqlCommand.CommandText = q1;
-                    //await sqlCommand.ExecuteNonQueryAsync();
-                    //sqlCommand.CommandText = q2;
-                    //await sqlCommand.ExecuteNonQueryAsync();
-                    //sqlCommand.CommandText = q3;
-                    //await sqlCommand.ExecuteNonQueryAsync();
-                    //sqlCommand.CommandText = q4;
-                    //await sqlCommand.ExecuteNonQueryAsync();
-
                     sqlTransaction.Commit();
                     return 1; // Success
                 }
@@ -161,12 +118,41 @@ namespace Centralizador.Models.DataBase
                     return 0;
                     throw;
                 }
-
             }
         }
 
         /// <summary>
-        /// 
+        /// SELECT
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <returns>CONJUNTO DE FILAS</returns>
+        public static async Task<DataTable> ExecuteReaderAsync(Conexion conn)
+        {
+            using (SqlConnection cnn = new SqlConnection(conn.Cnn))
+            {
+                try
+                {
+                    cnn.Open();
+                    using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
+                    {
+                        using (SqlDataReader)
+                        {
+                            SqlDataReader = await cmd.ExecuteReaderAsync();
+                            DataTable dataTable = new DataTable();
+                            dataTable.Load(SqlDataReader);
+                            return dataTable;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        ///
         /// </summary>
         /// <param name="conn"></param>
         /// <returns>UN ÚNICO VALOR</returns>

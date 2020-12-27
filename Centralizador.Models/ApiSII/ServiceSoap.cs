@@ -16,7 +16,7 @@ namespace Centralizador.Models.ApiSII
     {
         public static string GETTokenFromSii(string serialDigitalCert)
         {
-            // Get digital cert                  
+            // GET DIGITAL CERT.
             DateTime now = DateTime.Now;
             X509Certificate2 cert = null;
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
@@ -71,8 +71,8 @@ namespace Centralizador.Models.ApiSII
             {
                 return null;
             }
-
         }
+
         private static string FirmarSeedDigital(string documento, X509Certificate2 certificado)
         {
             try
@@ -98,7 +98,6 @@ namespace Centralizador.Models.ApiSII
                 keyInfo.AddClause(new RSAKeyValue((System.Security.Cryptography.RSA)certificado.PrivateKey));
                 keyInfo.AddClause(new KeyInfoX509Data(certificado));
 
-
                 XMLSignature.KeyInfo = keyInfo;
                 signedXml.ComputeSignature();
                 XmlElement xmlDigitalSignature = signedXml.GetXml();
@@ -116,6 +115,7 @@ namespace Centralizador.Models.ApiSII
                 throw;
             }
         }
+
         public static respuestaTo SendActionToSii(string token, Detalle detalle, string accionDoc)
         {
             respuestaTo respuesta = new respuestaTo();
@@ -135,7 +135,6 @@ namespace Centralizador.Models.ApiSII
         }
     }
 
-
     // NOTA: El código generado puede requerir, como mínimo, .NET Framework 4.5 o .NET Core/Standard 2.0.
     /// <remarks/>
     [System.Serializable()]
@@ -144,7 +143,6 @@ namespace Centralizador.Models.ApiSII
     [XmlRoot(Namespace = "http://www.sii.cl/XMLSchema", IsNullable = false)]
     public partial class RESPUESTA
     {
-
         /// <remarks/>
         public RESPUESTARESP_BODY RESP_BODY { get; set; }
 
@@ -158,7 +156,6 @@ namespace Centralizador.Models.ApiSII
     [XmlType(AnonymousType = true, Namespace = "http://www.sii.cl/XMLSchema")]
     public partial class RESPUESTARESP_BODY
     {
-
         /// <remarks/>
         [XmlElement(Namespace = "")]
         public string SEMILLA { get; set; }
@@ -174,7 +171,6 @@ namespace Centralizador.Models.ApiSII
     [XmlType(AnonymousType = true, Namespace = "http://www.sii.cl/XMLSchema")]
     public partial class RESPUESTARESP_HDR
     {
-
         /// <remarks/>
         [XmlElement(Namespace = "")]
         public string ESTADO { get; set; }
@@ -183,6 +179,4 @@ namespace Centralizador.Models.ApiSII
         [XmlElement(Namespace = "")]
         public string GLOSA { get; set; }
     }
-
-
 }

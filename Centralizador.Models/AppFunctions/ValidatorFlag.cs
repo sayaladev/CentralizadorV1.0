@@ -10,6 +10,7 @@ namespace Centralizador.Models.AppFunctions
     {
         //Reference (DTEDefTypeDocumentoReferencia)
         public bool NroLinRef { get; set; }
+
         public bool TpoDocRef { get; set; }
         public bool FolioRef { get; set; }
         public bool FchRef { get; set; }
@@ -34,46 +35,55 @@ namespace Centralizador.Models.AppFunctions
         {
         }
 
-
-
         // Functions
         public static int GetFlagImageIndex(LetterFlag flag)
         {
-
             switch (flag)
             {
                 case LetterFlag.Red:
                     return 11;
+
                 case LetterFlag.Blue:
                     return 12;
+
                 case LetterFlag.Yellow:
                     return 13;
+
                 case LetterFlag.Green:
                     return 14;
+
                 case LetterFlag.Complete:
                     return 15;
+
                 default:
                     return 16;
             }
         }
+
         public static Color GetFlagBackColor(LetterFlag flag)
         {
             switch (flag)
             {
                 case LetterFlag.Red:
                     return Color.FromArgb(207, 93, 96);
+
                 case LetterFlag.Blue:
                     return Color.FromArgb(92, 131, 180);
+
                 case LetterFlag.Yellow:
                     return Color.FromArgb(255, 193, 96);
+
                 case LetterFlag.Green:
                     return Color.FromArgb(139, 180, 103);
+
                 case LetterFlag.Complete:
                     return Color.White;
+
                 default:
                     return Color.Empty;
             }
         }
+
         private void ValidateCen(Detalle detalle, bool isCreditor)
         {
             try
@@ -147,7 +157,7 @@ namespace Centralizador.Models.AppFunctions
                         }
                         else
                         {
-                            // Valide Amount 
+                            // Valide Amount
                             if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
                             {
                                 Flag = LetterFlag.Blue;
@@ -186,6 +196,7 @@ namespace Centralizador.Models.AppFunctions
                 throw;
             }
         }
+
         public enum LetterFlag
         {
             Red,

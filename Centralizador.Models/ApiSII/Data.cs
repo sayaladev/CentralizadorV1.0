@@ -4,7 +4,6 @@ namespace Centralizador.Models.ApiSII
 {
     public class Data
     {
-
         [JsonProperty("tipoDoc")]
         public string TipoDoc { get; set; }
 
@@ -26,7 +25,7 @@ namespace Centralizador.Models.ApiSII
         [JsonProperty("refNCD")]
         public string RefNCD { get; set; }
 
-        // ServiceEvento
+        // SERVICES EVENT.
         [JsonProperty("dvEmisor")]
         public string DvEmisor { get; set; }
 

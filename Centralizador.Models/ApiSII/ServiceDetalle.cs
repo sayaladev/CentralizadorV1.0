@@ -29,6 +29,7 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
             Data = data;
         }
+
         public static async Task<List<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
         {
             string ns = "", url = "", op = "";
@@ -39,6 +40,7 @@ namespace Centralizador.Models.ApiSII
                     op = "2";
                     url = "https://www4.sii.cl/consemitidosinternetui/services/data/facadeService/getDetalleRecibidos";
                     break;
+
                 case "Creditor":
                     ns = "cl.sii.sdi.lob.diii.consemitidos.data.api.interfaces.FacadeService/getDetalle";
                     op = "1";
@@ -78,11 +80,14 @@ namespace Centralizador.Models.ApiSII
                             case 2:
                                 MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return null;
+
                             case 0:
                                 return detalleLibro.DataResp.Detalles;
+
                             case 99:
                                 MessageBox.Show($"{detalleLibro.RespEstado.MsgeRespuesta}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
+
                             case 1:
                                 MessageBox.Show("This option only maintains the detail of the last six months", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Stop);
                                 break;
@@ -103,7 +108,6 @@ namespace Centralizador.Models.ApiSII
             Rejected,
             Pending,
             Factoring
-
         }
 
         public static StatusDetalle GetStatus(Detalle detalle)
@@ -112,29 +116,38 @@ namespace Centralizador.Models.ApiSII
             if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
             {
                 // Ordeno por el evento más reciente
-                IList<ListEvenHistDoc> eventos = detalle.DataEvento.ListEvenHistDoc.OrderByDescending(x => x.FechaEvento).ToList();
+                List<ListEvenHistDoc> eventos = detalle.DataEvento.ListEvenHistDoc.OrderByDescending(x => x.FechaEvento).ToList();
                 ListEvenHistDoc res = eventos.FirstOrDefault();
 
                 switch (res.CodEvento)
                 {
                     case "ACD": // Acepta Contenido del Documento
                         return StatusDetalle.Accepted;
+
                     case "RCD": // Reclamo al Contenido del Documento
                         return StatusDetalle.Rejected;
+
                     case "PAG": // Pago Contado
                         return StatusDetalle.Accepted;
+
                     case "ERM": // Acuse de  Recibo de Mercaderías y Servicios Ley 19.983
                         return StatusDetalle.Accepted;
+
                     case "ENC": // Recepción de NC, distinta de anulación, que referencia al documento.
                         return StatusDetalle.Accepted;
+
                     case "RFT": // Receclamo por falta total de mercaderías.
                         return StatusDetalle.Rejected;
+
                     case "RFP": // Receclamo por falta parcial de mercaderías.
                         return StatusDetalle.Rejected;
+
                     case "NCA": // Recepción de NC de anulación que referencia al documento.
                         return StatusDetalle.Rejected;
+
                     case "CED": // DTE Cedido.
                         return StatusDetalle.Factoring;
+
                     default:
                         return StatusDetalle.Pending;
                 }
@@ -200,25 +213,21 @@ namespace Centralizador.Models.ApiSII
         [JsonProperty("dhdrCodigo")]
         public object DhdrCodigo { get; set; }
 
-        // New properties
+        // PROPERTIES.
         public int Nro { get; set; }
+
         public ResultInstruction Instruction { get; set; }
         public DteInfoRef DteInfoRefLast { get; set; }
-        public IList<DteInfoRef> DteInfoRefs { get; set; }
+        public List<DteInfoRef> DteInfoRefs { get; set; }
         public DTEDefType DTEDef { get; set; }
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }
-        //public LetterFlag Flag { get; set; } // Exigencias CEN si están correctas.
         public StatusDetalle StatusDetalle { get; set; }
-        public ValidatorFlag ValidatorFlag { get; set; } // CEN requeriment validator.
+        public ValidatorFlag ValidatorFlag { get; set; }
         public int NroInt { get; set; }
         public bool RefMissing { get; set; }
-
         public string DTEFile { get; set; }
-        // public int FolioNVInsertada { get; set; }
 
-
-        // Constructor
         public Detalle(string rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)
         {
             RutReceptor = rutReceptor;
@@ -229,16 +238,14 @@ namespace Centralizador.Models.ApiSII
             IsParticipant = isParticipant;
             StatusDetalle = StatusDetalle.Pending;
         }
+
         public Detalle()
         {
-
         }
     }
 
-
     public class DataResp
     {
-
         [JsonProperty("detalles")]
         public List<Detalle> Detalles { get; set; }
 
@@ -257,7 +264,6 @@ namespace Centralizador.Models.ApiSII
 
     public class RespEstado
     {
-
         [JsonProperty("codRespuesta")]
         public int CodRespuesta { get; set; }
 
@@ -296,17 +302,14 @@ namespace Centralizador.Models.ApiSII
 
         [JsonProperty("respEstado")]
         public RespEstado RespEstado { get; set; }
-
     }
 
     public class Error
     {
-
         [JsonProperty("id")]
         public string Id { get; set; }
 
         [JsonProperty("descripcion")]
         public string Descripcion { get; set; }
     }
-
 }

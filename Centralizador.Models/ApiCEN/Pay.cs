@@ -40,35 +40,18 @@ namespace Centralizador.Models.ApiCEN
 
         [JsonProperty("dtes")]
         public List<long> Dtes { get; set; }
-
-
     }
-    public class Pay
+
+    public class Pay : CustomHead
     {
-
-        [JsonProperty("count")]
-        public int Count { get; set; }
-
-        [JsonProperty("next")]
-        public object Next { get; set; }
-
-        [JsonProperty("previous")]
-        public object Previous { get; set; }
-
         [JsonProperty("result")]
         public ResultPay Result { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pay"></param>
-        /// <param name="tokenCen"></param>
-        /// <returns></returns>
         public static async Task<ResultPay> SendPayAsync(ResultPay pay, string tokenCen)
         {
             try
             {
-                using (WebClientCustom wc = new WebClientCustom())
+                using (CustomWebClient wc = new CustomWebClient())
                 {
                     Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/operations/payments/create/");
                     string d = JsonConvert.SerializeObject(pay);
@@ -93,12 +76,12 @@ namespace Centralizador.Models.ApiCEN
             }
             return null;
         }
+
         public enum StatusPay
         {
             NoPagado = 1,
             Pagado = 2,
             PagadoAtraso = 3
-
         }
     }
 }
