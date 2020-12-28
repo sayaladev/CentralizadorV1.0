@@ -8,20 +8,20 @@ namespace Centralizador.Models
         public string Message { get; set; }
         public bool IsRuning { get; set; }
         public Stopwatch StopWatch { get; set; }
-        public TipoDetalle DetalleType { get; set; }
+
+        //public TipoDetalle DetalleType { get; set; }
         public TipoTask TaskType { get; set; }
 
-        public ProgressReportModel(TipoDetalle detalleType, TipoTask taskType)
+        public ProgressReportModel(TipoTask taskType)
         {
-            DetalleType = detalleType;
             TaskType = taskType;
         }
 
-        public enum TipoDetalle
-        {
-            Creditor,
-            Debtor
-        }
+        //public enum TipoDetalle
+        //{
+        //    Creditor,
+        //    Debtor
+        //}
 
         public enum TipoTask
         {

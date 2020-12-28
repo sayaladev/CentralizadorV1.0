@@ -140,5 +140,14 @@ namespace Centralizador.Models.Properties {
                 return ((string)(this["SerialDigitalCert"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("francisca.negron@cvegroup.com")]
+        public string CCEmail {
+            get {
+                return ((string)(this["CCEmail"]));
+            }
+        }
     }
 }

@@ -15,13 +15,22 @@ namespace Centralizador.Models.AppFunctions
 
         private DTEDefTypeDocumentoReferencia GetRef(Detalle detalle)
         {
-            DTEDefTypeDocumento obj = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-            DTEDefTypeDocumentoReferencia[] refr = obj.Referencia;
-            DTEDefTypeDocumentoReferencia r = refr.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
-            if (r != null)
+            try
             {
-                return r;
+                DTEDefTypeDocumento obj = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                DTEDefTypeDocumentoReferencia[] refr = obj.Referencia;
+                DTEDefTypeDocumentoReferencia r = refr.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
+                if (r != null)
+                {
+                    return r;
+                }
             }
+            catch (System.Exception)
+            {
+                return null;
+                throw;
+            }
+
             return null;
         }
     }

@@ -38,7 +38,7 @@ namespace Centralizador.Models
         public ProgressReportModel ReportModel { get; set; }
         public StringBuilder StringLogging { get; set; }
 
-        public async Task<List<Detalle>> GetDetalleCreditor(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress, CancellationToken cancellationToken)
+        public async Task<List<Detalle>> GetDetalleCreditor(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress, CancellationToken token)
         {
             int c = 0;
             float porcent;
@@ -103,13 +103,13 @@ namespace Centralizador.Models
                                             }
                                     }
                                     // SET REF MISSING
-                                    if (infoLastF.EnviadoSII == 0) // No ha sido enviado a SII
-                                    {
-                                        if (new GetReferenceCen(detalle).DocumentoReferencia == null || string.IsNullOrEmpty(infoLastF.Glosa) || string.IsNullOrEmpty(infoLastF.FolioRef))
-                                        {
-                                            detalle.RefMissing = true; // NO REF IN DTE
-                                        }
-                                    }
+                                    //if (infoLastF.EnviadoSII == 0) // No ha sido enviado a SII
+                                    //{
+                                    //    if (new GetReferenceCen(detalle).DocumentoReferencia == null || string.IsNullOrEmpty(infoLastF.Glosa) || string.IsNullOrEmpty(infoLastF.FolioRef))
+                                    //    {
+                                    //        detalle.RefMissing = true; // NO REF IN DTE
+                                    //    }
+                                    //}
                                     detalle.DteInfoRefLast = infoLastF;
                                     detalle.NroInt = infoLastF.NroInt;
                                     detalle.FechaEmision = infoLastF.Fecha.ToString();
@@ -142,7 +142,6 @@ namespace Centralizador.Models
                                 // SEND DTE TO CEN.
                                 if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
                                 {
-                                    //string xmlDoc = ServicePdf.TransformObjectToXmlForCen(detalle.DTEDef);
                                     ResultDte resultDte = await Dte.SendDteCreditorAsync(detalle, TokenCen, detalle.DTEFile);
                                     if (resultDte != null)
                                     {
@@ -159,14 +158,13 @@ namespace Centralizador.Models
                             }
                             detalles.Add(detalle);
                             d++;
-                            ReportModel.Message = $"Retrieving information from SOFTLAND & SII, wait please.  ({c}/{matrices.Count}) => ({d}/{InstructionsList.Count})";
+                            ReportModel.Message = $"Retrieving information from SOFTLAND and SII, wait please.  ({c}/{matrices.Count}) => ({d}/{InstructionsList.Count})";
                             progress.Report(ReportModel);
-                            if (cancellationToken.IsCancellationRequested) { cancellationToken.ThrowIfCancellationRequested(); }
+                            if (token.IsCancellationRequested) { token.ThrowIfCancellationRequested(); }
                         }
                     }
-                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    catch (OperationCanceledException) when (token.IsCancellationRequested)
                     {
-                        //ReportModel.Message = "Canceling Task...  !";
                         ReportModel.PercentageComplete = 100;
                         progress.Report(ReportModel);
                         break;
@@ -201,7 +199,7 @@ namespace Centralizador.Models
             await NotaVenta.DeleteNvAsync(new Conexion(DataBaseName));
         }
 
-        public async Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken cancellationToken, string p)
+        public async Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken token, string p)
         {
             int c = 0;
             List<Detalle> detallesFinal = new List<Detalle>();
@@ -218,6 +216,7 @@ namespace Centralizador.Models
                     if (participant != null && participant.Id > 0) { item.IsParticipant = true; }
                     if (xmlObjeto != null)
                     {
+                        item.DTEDef = xmlObjeto;
                         DTEDefTypeDocumentoReferencia r = new GetReferenceCen(item).DocumentoReferencia;
                         if (r != null && r.RazonRef != null)
                         {
@@ -279,9 +278,9 @@ namespace Centralizador.Models
                     ReportModel.PercentageComplete = (int)porcent;
                     ReportModel.Message = $"Retrieving information from SII, wait please.  ({c}/{detalles.Count})";
                     progress.Report(ReportModel);
-                    if (cancellationToken.IsCancellationRequested) { cancellationToken.ThrowIfCancellationRequested(); }
+                    if (token.IsCancellationRequested) { token.ThrowIfCancellationRequested(); }
                 }
-                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                catch (OperationCanceledException) when (token.IsCancellationRequested)
                 {
                     //ReportModel.Message = "Canceling Task...  !";
                     ReportModel.PercentageComplete = 100;
@@ -366,7 +365,7 @@ namespace Centralizador.Models
                         }
                         else
                         {
-                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tF°: {lastF}  **** change RUT by absorbed {item.Instruction.ParticipantDebtor.Rut} by {item.Instruction.ParticipantNew.Rut}   ****");
+                            StringLogging.AppendLine($"{item.Instruction.Id}\tInsert NV:\tF°: {lastF}  *Change RUT {item.Instruction.ParticipantDebtor.Rut} by {item.Instruction.ParticipantNew.Rut}");
                         }
                         folios.Add(lastF);
                     }

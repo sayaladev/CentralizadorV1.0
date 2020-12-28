@@ -68,6 +68,7 @@
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.fImageListSmall = new System.Windows.Forms.ImageList(this.components);
+            this.button1 = new System.Windows.Forms.Button();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -389,6 +390,7 @@
             // 
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBox1.Controls.Add(this.button1);
             this.GroupBox1.Controls.Add(this.BtnCancelTak);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.BtnDebtor);
@@ -563,6 +565,16 @@
             this.fImageListSmall.Images.SetKeyName(5, "");
             this.fImageListSmall.Images.SetKeyName(6, "");
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(10, 179);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(39, 26);
+            this.button1.TabIndex = 13;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -637,5 +649,6 @@
         private System.Windows.Forms.Button BtnCancelTak;
         private System.Windows.Forms.ImageList fImageListSmall;
         private System.Windows.Forms.ToolStripStatusLabel TssLblDBName;
+        private System.Windows.Forms.Button button1;
     }
 }

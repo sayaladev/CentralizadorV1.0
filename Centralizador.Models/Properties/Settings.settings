@@ -38,5 +38,8 @@
     <Setting Name="SerialDigitalCert" Type="System.String" Scope="Application">
       <Value Profile="(Default)">04E4E7</Value>
     </Setting>
+    <Setting Name="CCEmail" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">francisca.negron@cvegroup.com</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

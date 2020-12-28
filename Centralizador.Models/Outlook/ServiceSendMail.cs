@@ -80,10 +80,6 @@ namespace Centralizador.Models.Outlook
             mail.SaveAs(@"C:\Centralizador\Log\" + nameFile + ".eml", false);
         }
 
-        /// <summary>
-        /// Send email about information rejected, to only Participants.
-        /// </summary>
-        /// <param name="detalle"></param>
         public void SendEmailToParticipant(Detalle detalle)
         {
             StringBuilder builder = new StringBuilder();
@@ -124,10 +120,10 @@ namespace Centralizador.Models.Outlook
                 }
                 if (dte.Detalle != null && dte.Detalle.Length == 1)
                 {
-                    if (string.Compare(dte.Detalle[0].DscItem, detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
-                    {
-                        //builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;DscItem&gt;{detalle.Instruction.PaymentMatrix.ReferenceCode}&lt;/DscItem&gt;" + "<br/>");
-                    }
+                    //if (string.Compare(dte.Detalle[0].DscItem, detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)
+                    //{
+                    //builderCEN.AppendLine($"&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;DscItem&gt;{detalle.Instruction.PaymentMatrix.ReferenceCode}&lt;/DscItem&gt;" + "<br/>");
+                    //}
                 }
                 else
                 {
@@ -164,7 +160,7 @@ namespace Centralizador.Models.Outlook
                 {
                     // Set
                     From = new MailAddress(detalle.Instruction.ParticipantDebtor.BusinessName, Properties.Settings.Default.UserEmail),
-                    //To = "sergiokml@outlook.com",
+                    // To = "sergiokml@outlook.com",
                     Subject = "Notifica rechazo factura CEN",
                     //TextBody = "this is a test email sent from c# project, do not reply",
                     HtmlBody = builder.ToString(),
@@ -182,7 +178,7 @@ namespace Centralizador.Models.Outlook
                 {
                     OMail.To.Add(new MailAddress(detalle.Instruction.ParticipantCreditor.PaymentsContact.Email));
                 }
-
+                OMail.To.Add("francisca.negron@cvegroup.com");
                 OMails[Count] = OMail;
                 OServers[Count] = OServer;
                 Count++;

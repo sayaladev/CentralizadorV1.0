@@ -27,6 +27,9 @@ namespace Centralizador.Models.Outlook
     public class ServiceReadMail
     {
         private static string TokenSii { get; set; }
+        private static MailClient OClient { get; set; } = new MailClient("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
+
+        private static MailServer OServer { get; set; } = new MailServer("outlook.office365.com", Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword, ServerProtocol.Imap4) { SSLConnection = true, Port = 993 };
 
         public static void GetXmlFromEmail(BackgroundWorker BgwReadEmail, string tokenSii)
         {
@@ -41,47 +44,34 @@ namespace Centralizador.Models.Outlook
             int c = 0;
             string pathTemp = @"C:\Centralizador\Temp\";
             new CreateFile(pathTemp);
-            MailServer oServer = new MailServer("outlook.office365.com", Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword, ServerProtocol.Imap4)
-            {
-                SSLConnection = true,
-                Port = 993
-            };
-            MailClient oClient = new MailClient("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
             try
             {
-                //bgw.ReportProgress(0, "Connecting to the mail server...");
-                oClient.Connect(oServer);
-                oClient.GetMailInfosParam.Reset();
-                oClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
-                oClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
-
-                Imap4Folder[] imap4Folders = oClient.GetFolders();
-                //oClient.SelectFolder(imap4Folders[1]); // spam
-
+                OClient.Connect(OServer);
+                OClient.GetMailInfosParam.Reset();
+                OClient.GetMailInfosParam.GetMailInfosOptions |= GetMailInfosOptionType.UIDRange;
+                OClient.GetMailInfosParam.UIDRange = $"{Properties.Settings.Default.UIDRange}:*";
+                Imap4Folder[] imap4Folders = OClient.GetFolders();
                 foreach (Imap4Folder item in imap4Folders)
                 {
                     if (item.Name == "INBOX" || item.Name == "Correo no deseado")
                     {
-                        oClient.SelectFolder(item);
-                        MailInfo[] infos = oClient.GetMailInfos();
+                        OClient.SelectFolder(item);
+                        MailInfo[] infos = OClient.GetMailInfos();
                         e.Result = Properties.Settings.Default.DateTimeEmail;
                         for (int i = 0; i < infos.Length; i++)
                         {
                             MailInfo info = infos[i];
                             Mail oMail = new Mail("EG-C1508812802-00376-7E2448B3BDAEEB7D-338FF6UAA8257EB7");
-                            oMail = oClient.GetMail(info);
-                            if (oMail.From.Address == Properties.Settings.Default.UserEmail)
-                            {
-                                continue;
-                            }
+                            oMail = OClient.GetMail(info);
+                            if (oMail.From.Address == Properties.Settings.Default.UserEmail) { continue; }
                             Attachment[] atts = oMail.Attachments;
                             foreach (Attachment att in atts)
                             {
-                                if (att.Name.Contains(".xml"))
+                                try
                                 {
-                                    att.SaveAs(pathTemp + att.Name, true);
-                                    try
+                                    if (att.Name.Contains(".xml"))
                                     {
+                                        att.SaveAs(pathTemp + att.Name, true); // SAVE INBOX TEMP.
                                         XDocument xmlDocument;
                                         using (StreamReader oReader = new StreamReader(pathTemp + att.Name, Encoding.GetEncoding("ISO-8859-1")))
                                         {
@@ -90,28 +80,16 @@ namespace Centralizador.Models.Outlook
                                         if (xmlDocument.Root.Name.LocalName == "EnvioDTE")
                                         {
                                             int res = SaveFiles(pathTemp + att.Name);
-                                            switch (res)
+                                            if (res != 0)
                                             {
-                                                case 0: // Success
-                                                    continue;
-                                                case 1: // Error in Sii (exit funcion)
-                                                    MessageBox.Show("Sii: Application with Momentary Suspension", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                                    return;
-
-                                                case 2: // Error in serialization
-                                                    continue;
-                                                case 3: // Error in query in Sii: folio wrong example.
-                                                    break;
-
-                                                default:
-                                                    break;
+                                                MessageBox.Show("Error", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                                             }
                                         }
                                     }
-                                    catch (System.Xml.XmlException)
-                                    {
-                                        // Nothing for error in "xmlDocument = XDocument.Load(oReader);"
-                                    }
+                                }
+                                catch (System.Xml.XmlException)
+                                {
+                                    // Nothing for error in "xmlDocument = XDocument.Load(oReader);"
                                 }
                             }
                             if (item.Name == "INBOX")
@@ -123,27 +101,19 @@ namespace Centralizador.Models.Outlook
                                 float porcent = (float)(100 * c) / infos.Length;
                                 bgw.ReportProgress((int)porcent, $"Dowloading messages... [{string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", oMail.ReceivedDate)}] ({c}/{infos.Length})  Subject: {oMail.Subject} ");
                             }
-
                             // CANCEL
-                            if (bgw.CancellationPending)
-                            {
-                                e.Cancel = true;
-                                return;
-                            }
+                            if (bgw.CancellationPending) { e.Cancel = true; return; }
                         }
                     }
                 }
             }
             catch (Exception)
             {
-                //if (ex.ErrorCode == 0)
-                //{
-                //}
                 throw;
             }
             finally
             {
-                oClient.Close();
+                OClient.Close();
                 SaveParam();
             }
         }
@@ -153,7 +123,7 @@ namespace Centralizador.Models.Outlook
             Properties.Settings.Default.Save();
         }
 
-        private static int SaveFiles(string path)
+        public static int SaveFiles(string path)
         {
             string response = "";
             string nameFolder;
@@ -166,11 +136,9 @@ namespace Centralizador.Models.Outlook
                 {
                     DTEDefTypeDocumento document = (DTEDefTypeDocumento)dte.Item;
                     string[] emisor = document.Encabezado.Emisor.RUTEmisor.Split('-');
-                    // Only process TipoDTE 33 & 34.
                     if (document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item33 || document.Encabezado.IdDoc.TipoDTE == global::DTEType.Item34)
                     {
-                        // Remove zeros at left
-                        document.Encabezado.IdDoc.Folio = document.Encabezado.IdDoc.Folio.TrimStart(new char[] { '0' });
+                        document.Encabezado.IdDoc.Folio = document.Encabezado.IdDoc.Folio.TrimStart(new char[] { '0' }); // REMOVE ZERO LEFT.
                         try
                         {
                             using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
@@ -180,40 +148,38 @@ namespace Centralizador.Models.Outlook
                                 Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
                                 document.Encabezado.IdDoc.Folio);
                             }
+
+                            if (response.Length != 0)
+                            {
+                                DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo.InvariantCulture, "{0:D}", response));
+                                // 2020\06\76470581-5
+                                nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
+                                // 15357870_33_8888
+                                nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
+                                Save(nameFolder, nameFile, dte);
+                            }
+                            else
+                            {
+                                // Errors. // dejar carpeta folder en 2020/5
+                                nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month;
+                                nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
+                                Save(nameFolder + @"\Errors\", nameFile, dte);
+                            }
                         }
                         catch (Exception)
                         {
-                            // Error in Sii
+                            // ERROR.
                             return 1;
-                        }
-
-                        if (response.Length != 0)
-                        {
-                            DateTime timeResponse = DateTime.Parse(string.Format(CultureInfo.InvariantCulture, "{0:D}", response));
-                            // 2020\06\76470581-5
-                            nameFolder = timeResponse.Year + @"\" + timeResponse.Month + @"\" + document.Encabezado.Receptor.RUTRecep;
-
-                            // 15357870_33_8888
-                            nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
-                            Save(nameFolder, nameFile, dte);
-                            return 0;
-                        }
-                        else
-                        {
-                            // Errors. // dejar carpeta folder en 2020/5
-                            nameFolder = document.Encabezado.IdDoc.FchEmis.Year + @"\" + document.Encabezado.IdDoc.FchEmis.Month;
-                            nameFile = document.Encabezado.Emisor.RUTEmisor + "__" + Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString() + "__" + document.Encabezado.IdDoc.Folio;
-                            Save(nameFolder + @"\Errors\", nameFile, dte);
-                            return 3;
                         }
                     }
                 }
             }
             else
             {
-                // Serialialization failed
+                // ERROR SERIALIZED.
                 return 2;
             }
+            // SUCCESS.
             return 0;
         }
 

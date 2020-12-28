@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-//using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -32,38 +32,130 @@ namespace Centralizador.WinApp.GUI
 {
     public partial class FormMain : Form
     {
-        //General
-
-        private ResultParticipant UserParticipant { get; set; }
-        public IEnumerable<ResultBilingType> BillingTypes { get; set; }
-        public List<ResultParticipant> Participants { get; set; }
-
         #region VARIABLES
 
+        public BackgroundWorker BgwConvertPdf { get; private set; }
+        public BackgroundWorker BgwPay { get; private set; }
+        public BackgroundWorker BgwReadEmail { get; private set; }
+        public IEnumerable<ResultBilingType> BillingTypes { get; set; }
         public CancellationTokenSource CancellationTk { get; set; }
-        private Progress<ProgressReportModel> ProgressReport { get; set; }
-        private List<Detalle> DetallePrincipal { get; set; }
+        public string DataBaseName { get; set; }
+        public ServiceSendMail Mail { get; private set; }
+        public List<ResultParticipant> Participants { get; set; }
         public ProgressReportModel ReportModel { get; set; }
+        public StringBuilder StringLogging { get; set; }
+        public string TokenCen { get; set; }
+        public string TokenSii { get; set; }
+        private List<Detalle> DetallePrincipal { get; set; }
+        private Progress<ProgressReportModel> ProgressReport { get; set; }
+        private ResultParticipant UserParticipant { get; set; }
 
         #endregion VARIABLES
 
-        // Init
-        public string TokenSii { get; set; }
-
-        public string TokenCen { get; set; }
-
-        public BackgroundWorker BgwConvertPdf { get; private set; }
-        public StringBuilder StringLogging { get; set; }
-        public string DataBaseName { get; set; }
-        public BackgroundWorker BgwReadEmail { get; private set; }
-        public BackgroundWorker BgwPay { get; private set; }
-        public ServiceSendMail Mail { get; private set; }
-
-        #region FormMain methods
+        #region METHODS
 
         public FormMain()
         {
             InitializeComponent();
+        }
+
+        private void BtnHiperLink_Click(object sender, EventArgs e)
+        {
+            if (IGridMain.CurRow == null || ReportModel.IsRuning)
+            {
+                return;
+            }
+            Detalle detalle = null;
+            if (DetallePrincipal != null)
+            {
+                detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+            }
+            if (detalle != null && detalle.Instruction != null)
+            {
+                Process.Start($"https://ppagos-sen.coordinador.cl/pagos/instrucciones/{detalle.Instruction.Id}/");
+            }
+        }
+
+        private void BtnHiperLink_MouseHover(object sender, EventArgs e)
+        {
+            try
+            {
+                if (IGridMain.CurRow == null && ReportModel.IsRuning)
+                {
+                    return;
+                }
+                Detalle detalle = null;
+                if (DetallePrincipal != null)
+                {
+                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                }
+                if (detalle != null && detalle.Instruction != null && !ReportModel.IsRuning)
+                {
+                    ToolTip tip = new ToolTip();
+                    StringBuilder builder = new StringBuilder();
+                    builder.AppendLine($"Publication date: {Convert.ToDateTime(detalle.Instruction.PaymentMatrix.PublishDate):dd-MM-yyyy}");
+                    builder.AppendLine($"Max billing: {Convert.ToDateTime(detalle.Instruction.PaymentMatrix.BillingDate):dd-MM-yyyy}");
+                    if (detalle.Instruction.MaxPaymentDate != null)
+                    {
+                        builder.AppendLine($" / Max payment: {Convert.ToDateTime(detalle.Instruction.MaxPaymentDate):dd-MM-yyyy}");
+                    }
+                    builder.Append(Environment.NewLine);
+                    builder.AppendLine($"Payment matrix: {detalle.Instruction.PaymentMatrix.NaturalKey}");
+                    builder.AppendLine($"Reference code: {detalle.Instruction.PaymentMatrix.ReferenceCode}");
+                    tip.ToolTipTitle = "Instruction Information";
+                    tip.IsBalloon = true;
+                    tip.InitialDelay = 100;
+                    tip.AutoPopDelay = 20000;
+                    tip.SetToolTip(sender as Button, builder.ToString());
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void CboParticipants_SelectionChangeCommittedAsync(object sender, EventArgs e)
+        {
+            TxtCtaCteParticipant.Text = "";
+            TxtRutParticipant.Text = "";
+            TssLblMensaje.Text = "";
+            if (CboParticipants.SelectedIndex != 0)
+            {
+                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
+                // READ 'DATABASES' FILE.
+                Dictionary<string, string> dic = new Dictionary<string, string>();
+                try
+                {
+                    XDocument doc = XDocument.Load(@"C:\Centralizador\Softland_DB_Names.xml");
+                    dic = doc.Descendants("Empresa").ToDictionary(d => (string)d.Attribute("id"), d => (string)d);
+                }
+                catch (Exception ex)
+                {
+                    new ErrorMsgCen(@"The file 'C:\Centralizador\Softland_DB_Names.xml' has problems.", ex, MessageBoxIcon.Stop);
+                    CboParticipants.SelectedIndex = 0;
+                    return;
+                }
+                if (dic.ContainsKey(UserParticipant.Id.ToString()))
+                {
+                    DataBaseName = dic[UserParticipant.Id.ToString()];
+                    TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
+                    TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
+                }
+                else
+                {
+                    MessageBox.Show("This company does not have an associated database in the config file (Xml)", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    TssLblMensaje.Text = @"Please, edit 'C:\Centralizador\Softland_DB_Names.xml' file with ID => " + UserParticipant.Id.ToString();
+                    CboParticipants.SelectedIndex = 0;
+                }
+            }
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {   // Send email
+            ServiceSendMail.BatchSendMail();
+            ServiceReadMail.SaveParam();
+            if (BgwReadEmail.IsBusy) { BgwReadEmail.CancelAsync(); }
+            if (CancellationTk != null && !CancellationTk.IsCancellationRequested) { CancellationTk.Cancel(); }
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -124,11 +216,6 @@ namespace Centralizador.WinApp.GUI
             timerHour.Elapsed += TimerHour_Elapsed;
             timerHour.Enabled = true;
             timerHour.AutoReset = true;
-        }
-
-        private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            TokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
         }
 
         private void FormMain_Shown(object sender, EventArgs e)
@@ -273,108 +360,33 @@ namespace Centralizador.WinApp.GUI
             IGridMain.EndUpdate();
         }
 
-        private void CboParticipants_SelectionChangeCommittedAsync(object sender, EventArgs e)
+        private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            TxtCtaCteParticipant.Text = "";
-            TxtRutParticipant.Text = "";
-            TssLblMensaje.Text = "";
-            if (CboParticipants.SelectedIndex != 0)
-            {
-                UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
-                // READ 'DATABASES' FILE.
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                try
-                {
-                    XDocument doc = XDocument.Load(@"C:\Centralizador\Softland_DB_Names.xml");
-                    dic = doc.Descendants("Empresa").ToDictionary(d => (string)d.Attribute("id"), d => (string)d);
-                }
-                catch (Exception ex)
-                {
-                    new ErrorMsgCen(@"The file 'C:\Centralizador\Softland_DB_Names.xml' has problems.", ex, MessageBoxIcon.Stop);
-                    CboParticipants.SelectedIndex = 0;
-                    return;
-                }
-                if (dic.ContainsKey(UserParticipant.Id.ToString()))
-                {
-                    DataBaseName = dic[UserParticipant.Id.ToString()];
-                    TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
-                    TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
-                }
-                else
-                {
-                    MessageBox.Show("This company does not have an associated database in the config file (Xml)", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    TssLblMensaje.Text = @"Please, edit 'C:\Centralizador\Softland_DB_Names.xml' file with ID => " + UserParticipant.Id.ToString();
-                    CboParticipants.SelectedIndex = 0;
-                }
-            }
+            TokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
         }
 
-        private void BtnHiperLink_Click(object sender, EventArgs e)
+        #endregion METHODS
+
+        #region PDF
+
+        private void BgwConvertPdf_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (IGridMain.CurRow == null || ReportModel.IsRuning)
-            {
-                return;
-            }
-            Detalle detalle = null;
-            if (DetallePrincipal != null)
-            {
-                detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
-            }
-            if (detalle != null && detalle.Instruction != null)
-            {
-                Process.Start($"https://ppagos-sen.coordinador.cl/pagos/instrucciones/{detalle.Instruction.Id}/");
-            }
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
         }
 
-        private void BtnHiperLink_MouseHover(object sender, EventArgs e)
+        private void BgwConvertPdf_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            try
+            if (e.Cancelled == true)
             {
-                if (IGridMain.CurRow == null && ReportModel.IsRuning)
-                {
-                    return;
-                }
-                Detalle detalle = null;
-                if (DetallePrincipal != null)
-                {
-                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
-                }
-                if (detalle != null && detalle.Instruction != null && !ReportModel.IsRuning)
-                {
-                    ToolTip tip = new ToolTip();
-                    StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"Publication date: {Convert.ToDateTime(detalle.Instruction.PaymentMatrix.PublishDate):dd-MM-yyyy}");
-                    builder.AppendLine($"Max billing: {Convert.ToDateTime(detalle.Instruction.PaymentMatrix.BillingDate):dd-MM-yyyy}");
-                    if (detalle.Instruction.MaxPaymentDate != null)
-                    {
-                        builder.AppendLine($" / Max payment: {Convert.ToDateTime(detalle.Instruction.MaxPaymentDate):dd-MM-yyyy}");
-                    }
-                    builder.Append(Environment.NewLine);
-                    builder.AppendLine($"Payment matrix: {detalle.Instruction.PaymentMatrix.NaturalKey}");
-                    builder.AppendLine($"Reference code: {detalle.Instruction.PaymentMatrix.ReferenceCode}");
-                    tip.ToolTipTitle = "Instruction Information";
-                    tip.IsBalloon = true;
-                    tip.InitialDelay = 100;
-                    tip.AutoPopDelay = 20000;
-                    tip.SetToolTip(sender as Button, builder.ToString());
-                }
+                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
             }
-            catch (Exception)
-            {
-            }
+
+            TssLblProgBar.Value = 0;
+            TssLblMensaje.Text = "Operation completed.";
+            ReportModel.IsRuning = false;
+            IGridMain.Focus();
         }
-
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {   // Send email
-            ServiceSendMail.BatchSendMail();
-            ServiceReadMail.SaveParam();
-            if (BgwReadEmail.IsBusy) { BgwReadEmail.CancelAsync(); }
-            if (CancellationTk != null && !CancellationTk.IsCancellationRequested) { CancellationTk.Cancel(); }
-        }
-
-        #endregion FormMain methods
-
-        #region Convert PDF
 
         private void BtnPdfConvert_Click(object sender, EventArgs e)
         {
@@ -408,33 +420,14 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void BgwConvertPdf_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
-
-        private void BgwConvertPdf_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled == true)
-            {
-                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
-            }
-
-            TssLblProgBar.Value = 0;
-            TssLblMensaje.Text = "Operation completed.";
-            ReportModel.IsRuning = false;
-            IGridMain.Focus();
-        }
-
-        #endregion Convert PDF
+        #endregion PDF
 
         #region INSERTNV
 
         private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
         {
             if (ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Debtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
+            if (ReportModel != null && ReportModel.TaskType == TipoTask.GetDebtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
             List<Detalle> detallesPaso = new List<Detalle>();
             List<Detalle> detallesFinal = new List<Detalle>();
@@ -491,18 +484,19 @@ namespace Centralizador.WinApp.GUI
                 resp = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (resp == DialogResult.Yes)
                 {
+                    TssLblMensaje.Text = "Reading SII file, be patient...";
+                    await Task.Delay(3000); // 3 SECONDS.
                     Stopwatch watch = Stopwatch.StartNew();
                     try
                     {
                         watch.Start();
-                        ReportModel = new ProgressReportModel(TipoDetalle.Creditor, TipoTask.InsertNV)
+                        ReportModel = new ProgressReportModel(TipoTask.InsertNV)
                         {
                             IsRuning = true,
                             StopWatch = watch
                         };
                         ProgressReport = new Progress<ProgressReportModel>();
                         ProgressReport.ProgressChanged += ReportProgress;
-                        TssLblMensaje.Text = "Reading SII file, be patient...";
                         FileSii.GetValues(); // GET VALUES LIST FROM CSV.
                         DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
                         List<int> folios = await detalleI.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
@@ -552,7 +546,7 @@ namespace Centralizador.WinApp.GUI
 
         #endregion INSERTNV
 
-        #region CREDITOR
+        #region DEBTOR & CREDITOR
 
         private async void BtnCreditor_Click(object sender, EventArgs e)
         {
@@ -562,7 +556,7 @@ namespace Centralizador.WinApp.GUI
             try
             {
                 watch.Start();
-                ReportModel = new ProgressReportModel(TipoDetalle.Creditor, TipoTask.GetCreditor)
+                ReportModel = new ProgressReportModel(TipoTask.GetCreditor)
                 {
                     IsRuning = true,
                     StopWatch = watch
@@ -595,10 +589,6 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        #endregion CREDITOR
-
-        #region DEBTOR
-
         private async void BtnDebtor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
@@ -608,7 +598,7 @@ namespace Centralizador.WinApp.GUI
             {
                 string nameFile = @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
                 watch.Start();
-                ReportModel = new ProgressReportModel(TipoDetalle.Debtor, TipoTask.GetDebtor)
+                ReportModel = new ProgressReportModel(TipoTask.GetDebtor)
                 {
                     IsRuning = true,
                     StopWatch = watch
@@ -634,56 +624,9 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        #endregion DEBTOR
+        #endregion DEBTOR & CREDITOR
 
         #region COMMON
-
-        private void ReportProgress(object sender, ProgressReportModel e)
-        {
-            // Progress Bar
-            TssLblProgBar.Value = e.PercentageComplete;
-            TssLblMensaje.Text = e.Message;
-            BtnCancelTak.Enabled = true;
-            if (e.PercentageComplete == 100)
-            {
-                e.StopWatch.Stop();
-                BtnCancelTak.Enabled = false;
-                TssLblProgBar.Value = 0;
-                TssLblDBName.Text = "|DB: " + DataBaseName;
-
-                // VER ESTO LUEGO
-                //    // Send email
-                //    ServiceSendMail.BatchSendMail();
-
-                // Para controlar !!!
-                switch (e.TaskType)
-                {
-                    case TipoTask.GetDebtor:
-                        BtnPagar.Enabled = true;
-                        BtnInsertNv.Enabled = false;
-                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
-                        break;
-
-                    case TipoTask.GetCreditor:
-                        BtnPagar.Enabled = false;
-                        BtnInsertNv.Enabled = true;
-                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
-                        break;
-
-                    case TipoTask.InsertNV:
-                        BtnInsertNv.Enabled = false;
-                        TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
-                        break;
-
-                    case TipoTask.ConvertToPdf:
-                        break;
-
-                    default:
-                        break;
-                }
-                TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
-            }
-        }
 
         private void BtnCancelTak_Click(object sender, EventArgs e)
         {
@@ -692,23 +635,30 @@ namespace Centralizador.WinApp.GUI
                 CancellationTk?.Cancel();
                 CleanControls();
                 if (BgwReadEmail.IsBusy) { BgwReadEmail.CancelAsync(); }
+                if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy) { BgwConvertPdf.CancelAsync(); }
                 BtnCancelTak.Enabled = false;
-
-                //else if (BgwDebtor != null && !BgwDebtor.CancellationPending && BgwDebtor.IsBusy)
-                //{
-                //    BgwDebtor.CancelAsync();
-                //}
-                //else if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy)
-                //{
-                //    BgwConvertPdf.CancelAsync();
-                //}
-
                 //  CancellationTk.Dispose();
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        private void CleanControls()
+        {
+            TxtNmbItem.Text = "";
+            TxtFolioRef.Text = "";
+            TxtRznRef.Text = "";
+            TxtFmaPago.Text = "";
+            //TxtDscItem.Text = "";
+            TxtTpoDocRef.Text = "";
+
+            // Clean Colors
+            TxtFolioRef.BackColor = Color.Empty;
+            TxtFmaPago.BackColor = Color.Empty;
+            TxtRznRef.BackColor = Color.Empty;
+            TxtTpoDocRef.BackColor = Color.Empty;
         }
 
         private void IGridFill(List<ResultBilingType> types)
@@ -746,11 +696,11 @@ namespace Centralizador.WinApp.GUI
                     if (item.IsParticipant && item.Instruction != null)
                     {
                         //myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
-                        if (ReportModel.DetalleType == TipoDetalle.Creditor)
+                        if (ReportModel.TaskType == TipoTask.GetCreditor)
                         {
                             myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.Instruction.ParticipantDebtor.Name.ToLower());
                         }
-                        else if (ReportModel.DetalleType == TipoDetalle.Debtor)
+                        else if (ReportModel.TaskType == TipoTask.GetDebtor)
                         {
                             myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.Instruction.ParticipantCreditor.Name.ToLower());
                         }
@@ -759,7 +709,7 @@ namespace Centralizador.WinApp.GUI
                             myRow.Cells["rznsocial"].ImageList = fImageListSmall;
                             myRow.Cells["rznsocial"].ImageIndex = 3;
                             myRow.Cells["rznsocial"].ImageAlign = iGContentAlignment.MiddleLeft;
-                            myRow.Cells["rznsocial"].Value += "   ***  BILLED TO: " + item.Instruction.ParticipantNew.Name.ToLower();
+                            myRow.Cells["rznsocial"].Value += " / " + item.Instruction.ParticipantNew.Name.ToLower();
                         }
                         else
                         {
@@ -811,7 +761,7 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaRecepcion)) + "";
                     }
                     if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
-                    if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Creditor)
+                    if (ReportModel != null && ReportModel.TaskType == TipoTask.GetCreditor)
                     {
                         myRow.Cells["P1"].Type = iGCellType.Check;
                         myRow.Cells["P2"].Type = iGCellType.Check;
@@ -881,7 +831,7 @@ namespace Centralizador.WinApp.GUI
 
                         case StatusDetalle.Pending:
                             // Col Status
-                            if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && ReportModel != null && ReportModel.DetalleType == TipoDetalle.Debtor && item.Folio > 0) // Debtor
+                            if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && ReportModel != null && ReportModel.TaskType == TipoTask.GetDebtor && item.Folio > 0) // Debtor
                             {
                                 myRow.Cells["btnRejected"].ImageIndex = 6;
                                 myRow.Cells["btnRejected"].Enabled = iGBool.True;
@@ -912,7 +862,7 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
                 IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
                 // Footer Status
-                if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Creditor && rejNc > 0)
+                if (ReportModel != null && ReportModel.TaskType == TipoTask.GetCreditor && rejNc > 0)
                 {
                     IGridMain.Footer.Cells[0, "status"].ImageList = fImageListSmall;
                     IGridMain.Footer.Cells[0, "status"].ImageIndex = 5;
@@ -932,20 +882,51 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void CleanControls()
+        private void ReportProgress(object sender, ProgressReportModel e)
         {
-            TxtNmbItem.Text = "";
-            TxtFolioRef.Text = "";
-            TxtRznRef.Text = "";
-            TxtFmaPago.Text = "";
-            //TxtDscItem.Text = "";
-            TxtTpoDocRef.Text = "";
+            // Progress Bar
+            TssLblProgBar.Value = e.PercentageComplete;
+            TssLblMensaje.Text = e.Message;
+            BtnCancelTak.Enabled = true;
+            if (e.PercentageComplete == 100)
+            {
+                e.StopWatch.Stop();
+                BtnCancelTak.Enabled = false;
+                TssLblProgBar.Value = 0;
+                TssLblDBName.Text = "|DB: " + DataBaseName;
 
-            // Clean Colors
-            TxtFolioRef.BackColor = Color.Empty;
-            TxtFmaPago.BackColor = Color.Empty;
-            TxtRznRef.BackColor = Color.Empty;
-            TxtTpoDocRef.BackColor = Color.Empty;
+                // VER ESTO LUEGO
+                //    // Send email
+                //    ServiceSendMail.BatchSendMail();
+
+                // Para controlar !!!
+                switch (e.TaskType)
+                {
+                    case TipoTask.GetDebtor:
+                        BtnPagar.Enabled = true;
+                        BtnInsertNv.Enabled = false;
+                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
+                        break;
+
+                    case TipoTask.GetCreditor:
+                        BtnPagar.Enabled = false;
+                        BtnInsertNv.Enabled = true;
+                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
+                        break;
+
+                    case TipoTask.InsertNV:
+                        BtnInsertNv.Enabled = false;
+                        TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
+                        break;
+
+                    case TipoTask.ConvertToPdf:
+                        break;
+
+                    default:
+                        break;
+                }
+                TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
+            }
         }
 
         #endregion COMMON
@@ -957,11 +938,11 @@ namespace Centralizador.WinApp.GUI
             if (!ReportModel.IsRuning && DetallePrincipal != null && DetallePrincipal.Count > 0)
             {
                 ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
-                if (ReportModel.DetalleType == TipoDetalle.Creditor)
+                if (ReportModel.TaskType == TipoTask.GetCreditor)
                 {
                     serviceExcel.ExportToExcel(DetallePrincipal, true, CboMonths.SelectedItem);
                 }
-                else if (ReportModel.DetalleType == TipoDetalle.Debtor)
+                else if (ReportModel.TaskType == TipoTask.GetDebtor)
                 {
                     serviceExcel.ExportToExcel(DetallePrincipal, false, CboMonths.SelectedItem);
                 }
@@ -972,26 +953,149 @@ namespace Centralizador.WinApp.GUI
 
         #region IGRID
 
-        private void IGridMain_CustomDrawCellForeground(object sender, iGCustomDrawCellEventArgs e)
+        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
-            iGCell fCurCell = IGridMain.CurCell;
-            if (e.ColIndex == 0)
+            if (ReportModel != null && ReportModel.TaskType == TipoTask.GetCreditor)
             {
-                // Draw the hot and current row indicators.
-                e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
-                int myY = e.Bounds.Y + ((e.Bounds.Height - 7) / 2);
-                int myX = e.Bounds.X + ((e.Bounds.Width - 4) / 2);
-                Brush myBrush = null;
-                if (fCurCell != null && e.RowIndex == fCurCell.RowIndex)
+                return;
+            }
+            else
+            {
+                TssLblMensaje.Text = null;
+                Detalle detalle = null;
+                if (DetallePrincipal != null)
                 {
-                    myBrush = Brushes.Green;
+                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
-                if (myBrush != null)
+                if (detalle.StatusDetalle == StatusDetalle.Pending)
                 {
-                    e.Graphics.FillRectangle(myBrush, myX, myY, 1, 7);
-                    e.Graphics.FillRectangle(myBrush, myX + 1, myY + 1, 1, 5);
-                    e.Graphics.FillRectangle(myBrush, myX + 2, myY + 2, 1, 3);
-                    e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
+                    StringBuilder builder = new StringBuilder();
+                    builder.AppendLine($"Invoice F°: {detalle.Folio}");
+                    builder.AppendLine($"Amount $: {detalle.MntNeto:#,##}");
+                    builder.AppendLine($"Remaining time to reject: {8 - detalle.DataEvento.DiferenciaFecha} days");
+                    builder.Append(Environment.NewLine);
+                    builder.Append("Are you sure?");
+                    DialogResult result = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes)
+                    {
+                        if (Mail == null) { Mail = new ServiceSendMail(3, UserParticipant); } // 3 Threads
+                        // REJECT IN SII.
+                        // ACD: Acepta Contenido del Documento
+                        // RCD: Reclamo al Contenido del Documento
+                        // ERM: Otorga Recibo de Mercaderías o Servicios
+                        // RFP: Reclamo por Falta Parcial de Mercaderías
+                        // RFT: Reclamo por Falta Total de Mercaderías
+                        respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
+                        // TESTER
+                        //respuestaTo resp = new respuestaTo();
+                        //resp.codResp = 0;
+
+                        builder.Clear();
+                        builder.AppendLine("Results:");
+                        builder.AppendLine(Environment.NewLine);
+                        if (resp != null)
+                        {
+                            builder.AppendLine("Rejected in SII: Yes");
+                            if (detalle.IsParticipant && detalle.Instruction != null)
+                            {
+                                switch (resp.codResp)
+                                {
+                                    case 0: // Acción Completada OK.
+                                        detalle.StatusDetalle = StatusDetalle.Rejected;
+                                        // Send email
+                                        Mail.SendEmailToParticipant(detalle);
+                                        // Reject in CEN
+                                        ResultDte doc = Dte.SendDteDebtorAsync(detalle, TokenCen).Result;
+                                        if (doc != null)
+                                        {
+                                            detalle.Instruction.Dte = doc;
+                                            IGridMain.CurRow.Cells["P3"].Value = 1;
+                                            builder.AppendLine("Rejected in CEN: Yes");
+                                        }
+                                        else
+                                        {
+                                            builder.AppendLine("Rejected in CEN: No");
+                                        }
+                                        builder.AppendLine("Email Send: Yes");
+
+                                        break;
+
+                                    case 7: // Evento registrado previamente
+                                        break;
+
+                                    case 8: // Pasados 8 días después de la recepción no es posible registrar reclamos o eventos.
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                                //IGridFill(DetallesDebtor);
+                            }
+                            else
+                            {
+                                builder.AppendLine("Email Send: No");
+                                builder.AppendLine("Rejected in CEN: No");
+                            }
+                        }
+                        else
+                        {
+                            builder.AppendLine("Rejected in SII: No");
+                            builder.AppendLine("Email Send: No");
+                            builder.AppendLine("Rejected in CEN: No");
+                        }
+                        //Task.Delay(2000);
+                        Thread.Sleep(2000); // 2 segundos
+                        MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+        }
+
+        private void ChkIncludeCEN_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox chk = sender as CheckBox;
+            if (chk.Checked)
+            {
+                ChkNoIncludeCEN.Checked = false;
+            }
+        }
+
+        private void ChkNoIncludeCEN_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox chk = sender as CheckBox;
+            if (chk.Checked)
+            {
+                ChkIncludeCEN.Checked = false;
+            }
+        }
+
+        private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
+        {
+            if (!ReportModel.IsRuning)
+            {
+                Detalle detalle = null;
+                iGRow fCurRow = IGridMain.CurRow;
+                if (DetallePrincipal != null)
+                {
+                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
+                }
+                if (detalle.DTEDef != null)
+                {
+                    IGridMain.DrawAsFocused = true;
+                    try
+                    {
+                        Cursor.Current = Cursors.WaitCursor;
+                        ServicePdf.ConvertToPdf(detalle);
+                        IGridMain.Focus();
+                        IGridMain.DrawAsFocused = false;
+                        Cursor.Current = Cursors.Default;
+                    }
+                    catch (Exception)
+                    {
+                        TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                        string nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower() + ".pdf");
+                        new ErrorMsgCen($"The process cannot access the file '{nomenclatura}' because it is being used by another process.", MessageBoxIcon.Warning);
+                    }
                 }
             }
         }
@@ -1098,114 +1202,6 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
-        {
-            if (!ReportModel.IsRuning)
-            {
-                Detalle detalle = null;
-                iGRow fCurRow = IGridMain.CurRow;
-                if (DetallePrincipal != null)
-                {
-                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
-                }
-                if (detalle.DTEDef != null)
-                {
-                    IGridMain.DrawAsFocused = true;
-                    try
-                    {
-                        Cursor.Current = Cursors.WaitCursor;
-                        ServicePdf.ConvertToPdf(detalle);
-                        IGridMain.Focus();
-                        IGridMain.DrawAsFocused = false;
-                        Cursor.Current = Cursors.Default;
-                    }
-                    catch (Exception)
-                    {
-                        TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-                        string nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower() + ".pdf");
-                        new ErrorMsgCen($"The process cannot access the file '{nomenclatura}' because it is being used by another process.", MessageBoxIcon.Warning);
-                    }
-                }
-            }
-        }
-
-        private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
-        {
-            if (!ReportModel.IsRuning && e.ColIndex == 19) // Sii Events
-            {
-                Detalle detalle = null;
-                StringBuilder builder = new StringBuilder();
-                if (DetallePrincipal != null)
-                {
-                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
-                }
-                if (detalle != null && detalle.DataEvento != null)
-                {
-                    if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
-                    {
-                        builder.AppendLine("Events:");
-                        foreach (ListEvenHistDoc item in detalle.DataEvento.ListEvenHistDoc)
-                        {
-                            builder.AppendLine($"{item.FechaEvento:dd-MM-yyyy}");
-                            builder.AppendLine($" - {item.CodEvento}: {item.DescEvento}");
-                        }
-                        e.Text = builder.ToString();
-                    }
-                }
-            }
-            else if (!ReportModel.IsRuning && e.ColIndex == 18) // Email Aux send Xml
-            {
-                Detalle detalle = null;
-                if (ReportModel.DetalleType == TipoDetalle.Creditor)
-                {
-                    StringBuilder builder = new StringBuilder();
-                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
-                    if (detalle.DTEDef != null)
-                    {
-                        DTEDefTypeDocumento doc = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-                        if (detalle != null && !string.IsNullOrEmpty(doc.Encabezado.Receptor.CorreoRecep))
-                        {
-                            ResultParticipant aux = detalle.Instruction.ParticipantDebtor;
-                            builder.AppendLine($"Email Sent: [{doc.Encabezado.Receptor.CorreoRecep}]");
-                            //builder.AppendLine($"Email Today: [{aux.DteReceptionEmail}]");
-                            e.Text = builder.ToString();
-                        }
-                    }
-                }
-            }
-            else if (!ReportModel.IsRuning && e.ColIndex == 2) // History DTE
-            {
-                if (ReportModel.DetalleType == TipoDetalle.Creditor)
-                {
-                    StringBuilder builder = new StringBuilder();
-                    Detalle detalle = null;
-                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
-                    if (detalle != null && detalle.DteInfoRefs != null && detalle.DteInfoRefs.Count > 1)
-                    {
-                        builder.AppendLine("History:");
-                        foreach (DteInfoRef item in detalle.DteInfoRefs.OrderBy(x => x.Folio))
-                        {
-                            if (item.Folio != detalle.Folio && detalle.Instruction.PaymentMatrix.NaturalKey == item.Glosa && detalle.Instruction.PaymentMatrix.ReferenceCode == item.FolioRef)
-                            {
-                                if (item.AuxDocNum > 0)
-                                {
-                                    builder.AppendLine($"F° {item.Folio}-{item.Fecha:dd-MM-yyyy} / [{item.FolioRef}-{item.Glosa}] / NC: {item.AuxDocNum}-{item.AuxDocfec:dd-MM-yyyy}");
-                                }
-                                else
-                                {
-                                    builder.AppendLine($"F° {item.Folio}-{item.Fecha:dd-MM-yyyy} / [{item.FolioRef}-{item.Glosa}] / NC:");
-                                }
-                            }
-                        }
-                        if (builder.Length > 10)
-                        {
-                            e.Text = builder.ToString();
-                        }
-                    }
-                }
-            }
-        }
-
         private void IGridMain_CustomDrawCellEllipsisButtonForeground(object sender, iGCustomDrawEllipsisButtonEventArgs e)
         {
             if (e.ColIndex == 6)
@@ -1238,136 +1234,110 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void Bcm_CellButtonClick(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
+        private void IGridMain_CustomDrawCellForeground(object sender, iGCustomDrawCellEventArgs e)
         {
-            if (ReportModel != null && ReportModel.DetalleType == TipoDetalle.Creditor)
+            iGCell fCurCell = IGridMain.CurCell;
+            if (e.ColIndex == 0)
             {
-                return;
+                // Draw the hot and current row indicators.
+                e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
+                int myY = e.Bounds.Y + ((e.Bounds.Height - 7) / 2);
+                int myX = e.Bounds.X + ((e.Bounds.Width - 4) / 2);
+                Brush myBrush = null;
+                if (fCurCell != null && e.RowIndex == fCurCell.RowIndex)
+                {
+                    myBrush = Brushes.Green;
+                }
+                if (myBrush != null)
+                {
+                    e.Graphics.FillRectangle(myBrush, myX, myY, 1, 7);
+                    e.Graphics.FillRectangle(myBrush, myX + 1, myY + 1, 1, 5);
+                    e.Graphics.FillRectangle(myBrush, myX + 2, myY + 2, 1, 3);
+                    e.Graphics.FillRectangle(myBrush, myX + 3, myY + 3, 1, 1);
+                }
             }
-            else
+        }
+
+        private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
+        {
+            if (!ReportModel.IsRuning && e.ColIndex == 19) // Sii Events
             {
-                TssLblMensaje.Text = null;
                 Detalle detalle = null;
+                StringBuilder builder = new StringBuilder();
                 if (DetallePrincipal != null)
                 {
-                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
                 }
-                if (detalle.StatusDetalle == StatusDetalle.Pending)
+                if (detalle != null && detalle.DataEvento != null)
                 {
-                    StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"Invoice F°: {detalle.Folio}");
-                    builder.AppendLine($"Amount $: {detalle.MntNeto:#,##}");
-                    builder.AppendLine($"Remaining time to reject: {8 - detalle.DataEvento.DiferenciaFecha} days");
-                    builder.Append(Environment.NewLine);
-                    builder.Append("Are you sure?");
-                    DialogResult result = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (result == DialogResult.Yes)
+                    if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
                     {
-                        if (Mail == null)
+                        builder.AppendLine("Events:");
+                        foreach (ListEvenHistDoc item in detalle.DataEvento.ListEvenHistDoc)
                         {
-                            Mail = new ServiceSendMail(3, UserParticipant); // 3 Threads
+                            builder.AppendLine($"{item.FechaEvento:dd-MM-yyyy}");
+                            builder.AppendLine($" - {item.CodEvento}: {item.DescEvento}");
                         }
-                        // Reject in Sii
-                        // ACD: Acepta Contenido del Documento
-                        // RCD: Reclamo al Contenido del Documento
-                        // ERM: Otorga Recibo de Mercaderías o Servicios
-                        // RFP: Reclamo por Falta Parcial de Mercaderías
-                        // RFT: Reclamo por Falta Total de Mercaderías
-                        respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, "RCD");
-                        // Tester
-                        //respuestaTo resp = new respuestaTo();
-                        resp.codResp = 0;
-                        builder.Clear();
-                        builder.AppendLine("Results:");
-                        builder.AppendLine(Environment.NewLine);
-                        if (resp != null)
-                        {
-                            builder.AppendLine("Rejected in SII: Yes");
-                            if (detalle.IsParticipant && detalle.Instruction != null)
-                            {
-                                switch (resp.codResp)
-                                {
-                                    case 0: // Acción Completada OK.
-                                        detalle.StatusDetalle = StatusDetalle.Rejected;
-                                        // Send email
-                                        Mail.SendEmailToParticipant(detalle);
-                                        // Reject in CEN
-                                        ResultDte doc = Dte.SendDteDebtorAsync(detalle, TokenCen).Result;
-                                        if (doc != null)
-                                        {
-                                            detalle.Instruction.Dte = doc;
-                                            IGridMain.CurRow.Cells["P3"].Value = 1;
-                                            builder.AppendLine("Rejected in CEN: Yes");
-                                        }
-                                        else
-                                        {
-                                            builder.AppendLine("Rejected in CEN: No");
-                                        }
-                                        builder.AppendLine("Email Send: Yes");
-
-                                        break;
-
-                                    case 7: // Evento registrado previamente
-                                        break;
-
-                                    case 8: // Pasados 8 días después de la recepción no es posible registrar reclamos o eventos.
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                                //IGridFill(DetallesDebtor);
-                            }
-                            else
-                            {
-                                builder.AppendLine("Email Send: No");
-                                builder.AppendLine("Rejected in CEN: No");
-                            }
-                        }
-                        else
-                        {
-                            builder.AppendLine("Rejected in SII: No");
-                            builder.AppendLine("Email Send: No");
-                            builder.AppendLine("Rejected in CEN: No");
-                        }
-                        Thread.Sleep(2000); // 2 segundos
-                        MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        e.Text = builder.ToString();
                     }
                 }
             }
-        }
-
-        private void ChkIncludeCEN_CheckedChanged(object sender, EventArgs e)
-        {
-            CheckBox chk = sender as CheckBox;
-            if (chk.Checked)
+            else if (!ReportModel.IsRuning && e.ColIndex == 18) // Email Aux send Xml
             {
-                ChkNoIncludeCEN.Checked = false;
+                Detalle detalle = null;
+                if (ReportModel.TaskType == TipoTask.GetCreditor)
+                {
+                    StringBuilder builder = new StringBuilder();
+                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    if (detalle.DTEDef != null)
+                    {
+                        DTEDefTypeDocumento doc = (DTEDefTypeDocumento)detalle.DTEDef.Item;
+                        if (detalle != null && !string.IsNullOrEmpty(doc.Encabezado.Receptor.CorreoRecep))
+                        {
+                            ResultParticipant aux = detalle.Instruction.ParticipantDebtor;
+                            builder.AppendLine($"Email Sent: [{doc.Encabezado.Receptor.CorreoRecep}]");
+                            //builder.AppendLine($"Email Today: [{aux.DteReceptionEmail}]");
+                            e.Text = builder.ToString();
+                        }
+                    }
+                }
             }
-        }
-
-        private void ChkNoIncludeCEN_CheckedChanged(object sender, EventArgs e)
-        {
-            CheckBox chk = sender as CheckBox;
-            if (chk.Checked)
+            else if (!ReportModel.IsRuning && e.ColIndex == 2) // History DTE
             {
-                ChkIncludeCEN.Checked = false;
+                if (ReportModel.TaskType == TipoTask.GetCreditor)
+                {
+                    StringBuilder builder = new StringBuilder();
+                    Detalle detalle = null;
+                    detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    if (detalle != null && detalle.DteInfoRefs != null && detalle.DteInfoRefs.Count > 1)
+                    {
+                        builder.AppendLine("History:");
+                        foreach (DteInfoRef item in detalle.DteInfoRefs.OrderBy(x => x.Folio))
+                        {
+                            if (item.Folio != detalle.Folio && detalle.Instruction.PaymentMatrix.NaturalKey == item.Glosa && detalle.Instruction.PaymentMatrix.ReferenceCode == item.FolioRef)
+                            {
+                                if (item.AuxDocNum > 0)
+                                {
+                                    builder.AppendLine($"F° {item.Folio}-{item.Fecha:dd-MM-yyyy} / [{item.FolioRef}-{item.Glosa}] / NC: {item.AuxDocNum}-{item.AuxDocfec:dd-MM-yyyy}");
+                                }
+                                else
+                                {
+                                    builder.AppendLine($"F° {item.Folio}-{item.Fecha:dd-MM-yyyy} / [{item.FolioRef}-{item.Glosa}] / NC:");
+                                }
+                            }
+                        }
+                        if (builder.Length > 10)
+                        {
+                            e.Text = builder.ToString();
+                        }
+                    }
+                }
             }
         }
 
         #endregion IGRID
 
         #region OUTLOOK
-
-        private void BtnOutlook_Click(object sender, EventArgs e)
-        {
-            if (!BgwReadEmail.IsBusy)
-            {
-                BtnCancelTak.Enabled = true;
-                TssLblMensaje.Text = "Connecting to the mail server... Please wait.";
-                ServiceReadMail.GetXmlFromEmail(BgwReadEmail, TokenSii);
-            }
-        }
 
         private void BgwReadEmail_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -1393,9 +1363,41 @@ namespace Centralizador.WinApp.GUI
             IGridMain.Focus();
         }
 
+        private void BtnOutlook_Click(object sender, EventArgs e)
+        {
+            if (!BgwReadEmail.IsBusy)
+            {
+                BtnCancelTak.Enabled = true;
+                TssLblMensaje.Text = "Connecting to the mail server... Please wait.";
+                ServiceReadMail.GetXmlFromEmail(BgwReadEmail, TokenSii);
+            }
+        }
+
         #endregion OUTLOOK
 
         #region Pagar
+
+        private void BgwPay_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+
+        private async void BgwPay_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            TssLblProgBar.Value = 0;
+            if (e.Result != null)
+            {
+                TssLblMensaje.Text = "Success, check the Excel file.";
+                IGridFill(await BilingType.GetBilinTypesAsync());
+            }
+            else
+            {
+                TssLblMensaje.Text = "No instructions for pay.";
+            }
+
+            IGridMain.Focus();
+        }
 
         private void BtnPagar_Click(object sender, EventArgs e)
         {
@@ -1403,7 +1405,7 @@ namespace Centralizador.WinApp.GUI
             string msje = null;
 
             // Excluir Banco Security Rut 97.053.000-2
-            if (!BgwPay.IsBusy && ReportModel != null && ReportModel.DetalleType == TipoDetalle.Debtor && !ReportModel.IsRuning && IGridMain.Rows.Count > 0)
+            if (!BgwPay.IsBusy && ReportModel != null && ReportModel.TaskType == TipoTask.GetDebtor && !ReportModel.IsRuning && IGridMain.Rows.Count > 0)
             {
                 List<Detalle> detallesFinal = new List<Detalle>();
                 if (ChkIncludeCEN.CheckState == CheckState.Checked) // Only Participants
@@ -1464,28 +1466,12 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private async void BgwPay_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            TssLblProgBar.Value = 0;
-            if (e.Result != null)
-            {
-                TssLblMensaje.Text = "Success, check the Excel file.";
-                IGridFill(await BilingType.GetBilinTypesAsync());
-            }
-            else
-            {
-                TssLblMensaje.Text = "No instructions for pay.";
-            }
-
-            IGridMain.Focus();
-        }
-
-        private void BgwPay_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
-
         #endregion Pagar
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var algo = TokenSii;
+            ServiceReadMail.SaveFiles(@"C:\Centralizador\Temp\CLI_771654800_3700_765323584_20201211_0202.xml");
+        }
     }
 }
