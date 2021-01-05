@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
+using Centralizador.Models.AppFunctions;
 using MailKit;
 using MailKit.Net.Smtp;
 using MimeKit;
@@ -15,14 +16,19 @@ namespace Centralizador.Models.Outlook.MailKit
     public class SendEmailTo
     {
         private ResultParticipant UserParticipant { get; set; }
+        private IProgress<ProgressReportModel> Progress { get; set; }
+        private ProgressReportModel ProgressReport { get; set; }
 
-        public SendEmailTo(ResultParticipant userParticipant)
+        public SendEmailTo(ResultParticipant userParticipant, IProgress<ProgressReportModel> progress, ProgressReportModel reportModel)
         {
             UserParticipant = userParticipant;
+            Progress = progress;
+            ProgressReport = reportModel;
         }
 
-        public async Task SendMailToParticipantAsync(Detalle detalle, ResultParticipant participant)
+        public async Task SendMailToParticipantAsync(Detalle detalle, ResultParticipant participant, string EmailInDte)
         {
+            Progress.Report(ProgressReport);
             var bodyBuilder = new BodyBuilder();
             StringBuilder builderCEN = new StringBuilder();
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
@@ -72,35 +78,29 @@ namespace Centralizador.Models.Outlook.MailKit
                 $"<p>Monto neto: $ {detalle.MntNeto:#,##}</p>\r\n" +
                 $"<p>Motivo del rechazo: <br/> {builderCEN}</p>\r\n" +
                 "<p>&nbsp;</p>\r\n<p>&nbsp;</p>\r\n" +
-                "<p>&nbsp;</p>\r\n<p>Para mayor informaci&oacute;n sobre las exigencias del CEN: " +
+                "<p>&nbsp;</p>\r\n<p>*Para mayor informaci&oacute;n sobre las exigencias del CEN: " +
                 "<a href=\"https://www.coordinador.cl/corta/6\">https://www.coordinador.cl</a>&nbsp;" +
                 "</p>\r\n<hr />\r\n<p><strong><span style=\"color: #0000ff;\">" +
                 "Una herramienta Centralizador.</span></strong></p>";
             try
             {
                 MailboxAddress ffrom = new MailboxAddress(Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserEmail);
-                MailboxAddress tto = new MailboxAddress("sergiokml@outlook.com", "sergiokml@outlook.com");
                 MailboxAddress cc = new MailboxAddress(Properties.Settings.Default.CCEmail, Properties.Settings.Default.CCEmail);
 
                 var message = new MimeMessage();
                 message.From.Add(ffrom);
-                message.To.Add(tto);
+                // TESTER
+                //MailboxAddress tto = new MailboxAddress("sergiokml@outlook.com", "sergiokml@outlook.com");
+                //message.To.Add(tto);
+                //message.To.Add(tto);
+
                 message.Cc.Add(cc);
                 message.Subject = "Notifica rechazo factura CEN";
                 message.Priority = MessagePriority.Urgent;
+                message.Importance = MessageImportance.High;
+                message.ReplyTo.Add(new MailboxAddress(Properties.Settings.Default.CCEmail, Properties.Settings.Default.CCEmail));
 
-                message.Body = bodyBuilder.ToMessageBody();
-
-                using (var client = new SmtpClient())
-                {
-                    client.MessageSent += Client_MessageSent;
-                    await client.ConnectAsync("smtp.office365.com", 587, false);
-                    await client.AuthenticateAsync(Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword);
-                    await client.SendAsync(message);
-                    await client.DisconnectAsync(true);
-                }
-
-                // To
+                // TO ADDRESS.
                 if (detalle.Instruction != null)
                 {
                     if (detalle.Instruction.ParticipantCreditor.BillsContact.Email != null)
@@ -128,16 +128,49 @@ namespace Centralizador.Models.Outlook.MailKit
                         message.To.Add(new MailboxAddress(participant.PaymentsContact.Email, participant.PaymentsContact.Email));
                     }
                 }
+                if (EmailInDte != null)
+                {
+                    message.To.Add(new MailboxAddress(EmailInDte, EmailInDte));
+                }
+                message.Body = bodyBuilder.ToMessageBody();
+                if (message.To.Count > 0)
+                {
+                    using (var client = new SmtpClient())
+                    {
+                        client.MessageSent += Client_MessageSent;
+                        await client.ConnectAsync("smtp.office365.com", 587, false);
+                        await client.AuthenticateAsync(Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword);
+                        await client.SendAsync(message);
+                        await client.DisconnectAsync(true);
+                    }
+                }
             }
             catch (Exception)
             {
                 throw;
             }
+            finally
+            {
+            }
         }
 
         private void Client_MessageSent(object sender, MessageSentEventArgs e)
         {
-            MimeMessage res = e.Message;
+            MimeMessage mimeMessage = e.Message;
+            string nameFile = $"{UserParticipant.Name}_Reject_DTE_{mimeMessage.Date:dd-MM-yyyy-HH-mm-ss}" + ".eml";
+            try
+            {
+                // SAVE FILE EML.
+                new CreateFile(@"C:\Centralizador\Log\", mimeMessage, nameFile);
+                //mimeMessage.WriteTo(nameFile);
+                ProgressReport.Message = $"Email send to {mimeMessage.To.FirstOrDefault().Name}, check de Log file.";
+                ProgressReport.PercentageComplete--;
+                Progress.Report(ProgressReport);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

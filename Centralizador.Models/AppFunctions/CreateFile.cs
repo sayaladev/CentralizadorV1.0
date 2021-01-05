@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Text;
+using MimeKit;
 
 namespace Centralizador.Models.AppFunctions
 {
@@ -28,6 +29,23 @@ namespace Centralizador.Models.AppFunctions
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
+            }
+        }
+
+        public CreateFile(string path, MimeMessage mime, string nameFile)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            if (mime != null)
+            {
+                File.WriteAllText(path + nameFile + ".eml", mime.ToString());
+                //ProcessStartInfo process = new ProcessStartInfo(path + nameFile + ".eml")
+                //{
+                //    WindowStyle = ProcessWindowStyle.Normal
+                //};
+                //Process.Start(process);
             }
         }
     }

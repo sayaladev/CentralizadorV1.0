@@ -28,7 +28,8 @@ namespace Centralizador.Models
             GetDebtor,
             GetCreditor,
             InsertNV,
-            ConvertToPdf
+            ConvertToPdf,
+            ReadEmail
         }
     }
 }

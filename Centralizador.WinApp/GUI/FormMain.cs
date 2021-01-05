@@ -41,8 +41,10 @@ namespace Centralizador.WinApp.GUI
         public IEnumerable<ResultBilingType> BillingTypes { get; set; }
         public CancellationTokenSource CancellationTk { get; set; }
         public string DataBaseName { get; set; }
-        public ServiceSendMail Mail { get; private set; }
+
+        //  public ServiceSendMail Mail { get; private set; }
         public List<ResultParticipant> Participants { get; set; }
+
         public ProgressReportModel ReportModel { get; set; }
 
         // public StringBuilder StringLogging { get; set; }
@@ -125,7 +127,7 @@ namespace Centralizador.WinApp.GUI
             if (CboParticipants.SelectedIndex != 0)
             {
                 // SEND EMAIL PENDING.
-                ServiceSendMail.BatchSendMail();
+                //ServiceSendMail.BatchSendMail();
                 UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
                 // READ 'DATABASES' FILE.
                 Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -157,7 +159,7 @@ namespace Centralizador.WinApp.GUI
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {   // Send email
-            ServiceSendMail.BatchSendMail();
+            // ServiceSendMail.BatchSendMail();
             ServiceReadMail.SaveParam();
             if (BgwReadEmail.IsBusy) { BgwReadEmail.CancelAsync(); }
             if (CancellationTk != null && !CancellationTk.IsCancellationRequested) { CancellationTk.Cancel(); }
@@ -517,7 +519,8 @@ namespace Centralizador.WinApp.GUI
                                 int mayor = folios.Max();
                                 detalleI.StringLogging.AppendLine("");
                                 detalleI.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
-                                new CreateFile(@"C:\Centralizador\Log\", detalleI.StringLogging, nameFile);
+                                //new CreateFile(@"C:\Centralizador\Log\", detalleI.StringLogging, nameFile);
+                                detalleI.SaveLogging(@"C:\Centralizador\Log\", nameFile);
                             }
                         }
                     }
@@ -596,6 +599,8 @@ namespace Centralizador.WinApp.GUI
             finally
             {
                 ReportModel.IsRuning = false;
+                TssLblFechaHora.Image = null;
+                TssLblFechaHora.Text = "";
             }
         }
 
@@ -634,6 +639,9 @@ namespace Centralizador.WinApp.GUI
             finally
             {
                 ReportModel.IsRuning = false;
+                TssLblFechaHora.Image = fImageListSmall.Images[1];
+                TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
+                TssLblFechaHora.Text = "0";
             }
         }
 
@@ -680,6 +688,7 @@ namespace Centralizador.WinApp.GUI
             {
                 IGridMain.BeginUpdate();
                 IGridMain.Rows.Clear();
+                CleanControls();
                 iGRow myRow;
                 int c = 0, rejectedNeto = 0, rejectedExento = 0, rejectedIva = 0, rejectedTotal = 0, rej = 0, rejNc = 0;
                 TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
@@ -898,15 +907,25 @@ namespace Centralizador.WinApp.GUI
         private void ReportProgress(object sender, ProgressReportModel e)
         {
             // Progress Bar
-            TssLblProgBar.Value = e.PercentageComplete;
-            TssLblMensaje.Text = e.Message;
-            BtnCancelTak.Enabled = true;
+
+            if (e.TaskType == TipoTask.ReadEmail)
+            {
+                TssLblMensaje.Text = e.Message;
+                TssLblFechaHora.Text = e.PercentageComplete.ToString();
+            }
+            else
+            {
+                TssLblProgBar.Value = e.PercentageComplete;
+                TssLblMensaje.Text = e.Message;
+                BtnCancelTak.Enabled = true;
+            }
             if (e.PercentageComplete == 100)
             {
                 e.StopWatch.Stop();
                 BtnCancelTak.Enabled = false;
                 TssLblProgBar.Value = 0;
                 TssLblDBName.Text = "|DB: " + DataBaseName;
+                ReportModel.PercentageComplete = 0;
 
                 // Para controlar !!!
                 switch (e.TaskType)
@@ -987,18 +1006,16 @@ namespace Centralizador.WinApp.GUI
                     DialogResult result = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
-                        if (Mail == null) { Mail = new ServiceSendMail(1, UserParticipant); } // 3 Threads
                         // GET INFO FROM CEN
                         ResultParticipant participant = detalle.ParticipantMising;
-
                         // REJECT IN SII.
-                        //respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, RejectsSii.RCD);
+                        respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, RejectsSii.RCD);
 
                         // TESTER
-                        respuestaTo resp = new respuestaTo
-                        {
-                            codResp = 0
-                        };
+                        //respuestaTo resp = new respuestaTo
+                        //{
+                        //    codResp = 0
+                        //};
                         DTEDefTypeDocumento dte = null;
                         string EmailInDte = null;
                         if (detalle.DTEDef != null)
@@ -1025,38 +1042,30 @@ namespace Centralizador.WinApp.GUI
                             }
                             if (participant != null || EmailInDte != null)
                             {
-                                // Send email
-                                // Mail.SendEmailToParticipant(detalle, participant);
-
-                                // SEND EMAIL
-                                //ServiceSendmailByMicrosoft serv = new ServiceSendmailByMicrosoft(UserParticipant);
-                                //serv.Getalgo(detalle);
-                                // SEN EMAIL.
-                                SendEmailTo sendMailTo = new SendEmailTo(UserParticipant);
-                                await sendMailTo.SendMailToParticipantAsync(detalle);
-
-                                //TESTER
-                                // ServiceSendMail.BatchSendMail();
-                                builder.AppendLine("Email Send: Yes");
+                                // SEND EMAIL.
+                                ReportModel.TaskType = TipoTask.ReadEmail;
+                                ReportModel.PercentageComplete++;
+                                ReportModel.Message = "Sending EMAIL...";
+                                SendEmailTo sendMailTo = new SendEmailTo(UserParticipant, ProgressReport, ReportModel);
+                                await sendMailTo.SendMailToParticipantAsync(detalle, participant, EmailInDte);
                             }
                             else
                             {
-                                builder.AppendLine("Email Send: No");
+                                builder.AppendLine("Email Send: No [No Email present]");
                             }
                             if (detalle.Instruction != null)
                             {
-                                // Reject in CEN
-                                //ResultDte doc = Dte.SendDteDebtorAsync(detalle, TokenCen).Result;
-                                //if (doc != null)
-                                //{
-                                //    detalle.Instruction.Dte = doc;
-                                //    IGridMain.CurRow.Cells["P3"].Value = 1;
-                                //    builder.AppendLine("Rejected in CEN: Yes");
-                                //}
-                                //else
-                                //{
-                                //    builder.AppendLine("Rejected in CEN: No");
-                                //}
+                                // REJECT IN CEN.
+                                ResultDte doc = await Dte.SendDteDebtorAsync(detalle, TokenCen);
+                                if (doc != null)
+                                {
+                                    detalle.Instruction.Dte = doc;
+                                    IGridMain.CurRow.Cells["P3"].Value = 1;
+                                }
+                                else
+                                {
+                                    builder.AppendLine("Rejected in CEN: No");
+                                }
                             }
                         }
                         else
@@ -1065,10 +1074,8 @@ namespace Centralizador.WinApp.GUI
                             builder.AppendLine("Email Send: No");
                             builder.AppendLine("Rejected in CEN: No");
                         }
-                        //Task.Delay(2000);
-                        //Thread.Sleep(2000); // 2 segundos
-                        MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
+                    new ErrorMsgCen(builder.ToString(), MessageBoxIcon.Information);
                 }
             }
         }

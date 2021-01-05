@@ -387,6 +387,11 @@ namespace Centralizador.Models
             return folios;
         }
 
+        public void SaveLogging(string path, string nameFile)
+        {
+            new CreateFile(path, StringLogging, nameFile);
+        }
+
         private async Task<List<Detalle>> GetStatusDteAsync(string mode, string tokenSii, string tipoDte, List<Detalle> detallesList, ResultParticipant UserParticipant)
         {
             Conexion con = new Conexion(DataBaseName);
