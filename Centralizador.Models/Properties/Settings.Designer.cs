@@ -92,7 +92,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("113496")]
+        [global::System.Configuration.DefaultSettingValueAttribute("128574")]
         public string UIDRange {
             get {
                 return ((string)(this["UIDRange"]));
@@ -104,7 +104,7 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("11/12/2020 22:24:25")]
+        [global::System.Configuration.DefaultSettingValueAttribute("12/10/2020 22:24:00")]
         public global::System.DateTime DateTimeEmail {
             get {
                 return ((global::System.DateTime)(this["DateTimeEmail"]));

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -29,7 +28,7 @@ namespace Centralizador.Models.Outlook.MailKit
         public async Task SendMailToParticipantAsync(Detalle detalle, ResultParticipant participant, string EmailInDte)
         {
             Progress.Report(ProgressReport);
-            var bodyBuilder = new BodyBuilder();
+            BodyBuilder bodyBuilder = new BodyBuilder();
             StringBuilder builderCEN = new StringBuilder();
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             string RutReceptorEmail = null;
@@ -52,7 +51,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 {
                     builderCEN.AppendLine("&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;FmaPago&gt;" + "<br/>");
                 }
-                if (detalle.ValidatorFlag.Flag == AppFunctions.ValidatorFlag.LetterFlag.Blue) // MONTO
+                if (detalle.ValidatorFlag.Flag == ValidatorFlag.LetterFlag.Blue) // MONTO
                 {
                     builderCEN.AppendLine("&nbsp;&nbsp;&nbsp;&nbsp;-Monto no corresponde." + "<br/>");
                 }
@@ -87,7 +86,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 MailboxAddress ffrom = new MailboxAddress(Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserEmail);
                 MailboxAddress cc = new MailboxAddress(Properties.Settings.Default.CCEmail, Properties.Settings.Default.CCEmail);
 
-                var message = new MimeMessage();
+                MimeMessage message = new MimeMessage();
                 message.From.Add(ffrom);
                 // TESTER
                 //MailboxAddress tto = new MailboxAddress("sergiokml@outlook.com", "sergiokml@outlook.com");
@@ -135,7 +134,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 message.Body = bodyBuilder.ToMessageBody();
                 if (message.To.Count > 0)
                 {
-                    using (var client = new SmtpClient())
+                    using (SmtpClient client = new SmtpClient())
                     {
                         client.MessageSent += Client_MessageSent;
                         await client.ConnectAsync("smtp.office365.com", 587, false);

@@ -5,8 +5,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Xml.Xsl;
 
@@ -25,6 +27,10 @@ namespace Centralizador.Models.AppFunctions
         public ServicePdf(List<Detalle> detalles)
         {
             Detalles = detalles;
+        }
+
+        public ServicePdf()
+        {
         }
 
         /// <summary>
@@ -132,6 +138,44 @@ namespace Centralizador.Models.AppFunctions
                 return null;
             }
         }
+
+        public static async Task<EnvioDTE> TransformStringDTEDefTypeToObjectDTEAsync(XDocument xDoc)
+        {
+            try
+            {
+                XmlDocument xmlDoc = ToXmlDocument(xDoc);
+                xmlDoc.DocumentElement.SetAttribute("xmlns", "http://www.sii.cl/SiiDte");
+                XmlSerializer deserializer = new XmlSerializer(typeof(EnvioDTE));
+                using (StringReader reader = new StringReader(xmlDoc.InnerXml))
+                {
+                    EnvioDTE document = (EnvioDTE)deserializer.Deserialize(reader);
+                    return await Task.FromResult(document);
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public static XmlDocument ToXmlDocument(XDocument xDocument)
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            using (XmlReader xmlReader = xDocument.CreateReader())
+            {
+                xmlDocument.Load(xmlReader);
+            }
+            return xmlDocument;
+        }
+
+        //public static XDocument ToXDocument(this XmlDocument xmlDocument)
+        //{
+        //    using (var nodeReader = new XmlNodeReader(xmlDocument))
+        //    {
+        //        nodeReader.MoveToContent();
+        //        return XDocument.Load(nodeReader);
+        //    }
+        //}
 
         /// <summary>
         /// Method return a string (Object DTE to Xml).

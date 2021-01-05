@@ -1,44 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
-
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 using Centralizador.Models.AppFunctions;
 using Centralizador.Models.DataBase;
-
 using static Centralizador.Models.ApiSII.ServiceDetalle;
 using static Centralizador.Models.AppFunctions.ValidatorFlag;
 
-namespace Centralizador.Models
+namespace Centralizador.Models.Interfaces
 {
-    public class DetalleI : IDetalle
+    internal class DetalleCreditor : IDetalleC
     {
-        public DetalleI(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen, ProgressReportModel reportModel)
+        public string DataBaseName { get; set; }
+        public ResultParticipant UserParticipant { get; set; }
+        public string TokenSii { get; set; }
+        public string TokenCen { get; set; }
+        public ProgressReportModel ProgressReport { get; set; }
+        public StringBuilder StringLogging { get; set; }
+
+        public DetalleCreditor(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen, StringBuilder stringLogging)
         {
             DataBaseName = dataBaseName;
             UserParticipant = userParticipant;
             TokenSii = tokenSii;
             TokenCen = tokenCen;
-            ReportModel = reportModel;
-            StringLogging = new StringBuilder();
+            ProgressReport = new ProgressReportModel(ProgressReportModel.TipoTask.GetCreditor);
+            StringLogging = stringLogging;
         }
 
-        public string DataBaseName { get; set; }
-        public ResultParticipant UserParticipant { get; set; }
-        public string TokenSii { get; set; }
-        public string TokenCen { get; set; }
-        public ProgressReportModel ReportModel { get; set; }
-        public StringBuilder StringLogging { get; set; }
-
-        public async Task<List<Detalle>> GetDetalleCreditor(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress, CancellationToken token)
+        public async Task<List<Detalle>> GetDetalleCreditor(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress, CancellationToken tokenCancel)
         {
             int c = 0;
             float porcent;
@@ -153,144 +150,26 @@ namespace Centralizador.Models
                             }
                             detalles.Add(detalle);
                             d++;
-                            ReportModel.Message = $"Retrieving information from SOFTLAND and SII, wait please.  ({c}/{matrices.Count}) => ({d}/{InstructionsList.Count})";
-                            progress.Report(ReportModel);
-                            if (token.IsCancellationRequested) { token.ThrowIfCancellationRequested(); }
+                            ProgressReport.Message = $"Retrieving information from SOFTLAND and SII, wait please.  ({c}/{matrices.Count}) => ({d}/{InstructionsList.Count})";
+                            progress.Report(ProgressReport);
+                            if (tokenCancel.IsCancellationRequested) { tokenCancel.ThrowIfCancellationRequested(); }
                         }
                     }
-                    catch (OperationCanceledException) when (token.IsCancellationRequested)
+                    catch (OperationCanceledException) when (tokenCancel.IsCancellationRequested)
                     {
-                        ReportModel.PercentageComplete = 100;
-                        progress.Report(ReportModel);
-                        break;
+                        ProgressReport.Message = "Task canceled...  !";
+                        ProgressReport.PercentageComplete = 100;
+                        progress.Report(ProgressReport);
+                        return detalles;
                     }
                 }
                 c++;
                 porcent = (float)(100 * c) / matrices.Count;
-                ReportModel.PercentageComplete = (int)porcent;
-                ReportModel.Message = $"Searching 'PAY INSTRUCTIONS' from CEN, wait please.  ({c}/{matrices.Count})";
-                progress.Report(ReportModel);
+                ProgressReport.PercentageComplete = (int)porcent;
+                ProgressReport.Message = $"Searching 'PAY INSTRUCTIONS' from CEN, wait please.  ({c}/{matrices.Count})";
+                progress.Report(ProgressReport);
             }
             return detalles;
-        }
-
-        private Dictionary<string, int> GetReemplazosFile()
-        {
-            Dictionary<string, int> dic = new Dictionary<string, int>();
-            try
-            {
-                XDocument doc = XDocument.Load(@"C:\Centralizador\Reemplazos_.xml");
-                return doc.Descendants("Empresa").ToDictionary(d => (string)d.Attribute("id"), d => (int)d);
-            }
-            catch (Exception)
-            {
-                //new ErrorMsgCen(@"The file 'C:\Centralizador\Reemplazos_.xml' has problems.", ex, MessageBoxIcon.Stop);
-                throw;
-            }
-        }
-
-        public async void DeleteNV()
-        {
-            await NotaVenta.DeleteNvAsync(new Conexion(DataBaseName));
-        }
-
-        public async Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken token, string p)
-        {
-            int c = 0;
-            List<Detalle> detallesFinal = new List<Detalle>();
-            foreach (Detalle item in detalles)
-            {
-                // TESTER
-                //var folio = item.Folio;
-
-                try
-                {
-                    DTEDefType xmlObjeto = null;
-                    // GET XML FILE
-                    string nameFile = p + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
-                    if (File.Exists(nameFile)) { xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile); }
-                    // GET PARTICPANT INFO FROM CEN
-                    ResultParticipant participant = await Participant.GetParticipantByRutAsync(item.RutReceptor.ToString());
-                    if (participant != null && participant.Id > 0)
-                    {
-                        item.IsParticipant = true;
-                        item.ParticipantMising = participant;
-                    }
-                    if (xmlObjeto != null)
-                    {
-                        item.DTEDef = xmlObjeto;
-                        // GET REFERENCE SEN.
-                        DTEDefTypeDocumentoReferencia r = new GetReferenceCen(item).DocumentoReferencia;
-                        if (r != null && r.RazonRef != null)
-                        {
-                            // Get Window
-                            ResultBillingWindow window = await BillingWindow.GetBillingWindowByNaturalKeyAsync(r);
-                            // Get Matrix
-                            if (window != null && window.Id > 0)
-                            {
-                                List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
-                                if (matrices != null && matrices.Count > 0)
-                                {
-                                    ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(r.RazonRef.Trim(), StringComparison.OrdinalIgnoreCase));
-                                    if (matrix != null)
-                                    {
-                                        ResultInstruction instruction = await Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant);
-                                        if (instruction != null && instruction.Id > 0)
-                                        {
-                                            item.Instruction = instruction;
-                                            item.Instruction.ParticipantCreditor = participant;
-                                            item.Instruction.ParticipantDebtor = UserParticipant;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // FLAGS IF EXISTS XML FILE
-                    item.ValidatorFlag = new ValidatorFlag(item, false);
-                    // EVENTS FROM SII
-                    item.DataEvento = await ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant);
-                    // STATUS DOC
-                    if (item.DataEvento != null) { item.StatusDetalle = GetStatus(item); }
-                    // INSERT IN CEN
-                    if (item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null)
-                    {
-                        // 1 No Facturado y cuando hay más de 1 dte informado
-                        // 2 Facturado
-                        // 3 Facturado con retraso
-                        // Existe el DTE?
-                        ResultDte doc = await Dte.GetDteAsync(item, false);
-                        if (doc == null)
-                        {
-                            // Enviar el DTE
-                            ResultDte resultDte = await Dte.SendDteDebtorAsync(item, TokenCen);
-                            if (resultDte != null && resultDte.Folio > 0)
-                            {
-                                item.Instruction.Dte = resultDte;
-                            }
-                        }
-                        else
-                        {
-                            item.Instruction.Dte = doc;
-                        }
-                    }
-                    detallesFinal.Add(item);
-                    c++;
-                    float porcent = (float)(100 * c) / detalles.Count;
-                    ReportModel.PercentageComplete = (int)porcent;
-                    ReportModel.Message = $"Retrieving information from SII, wait please.  ({c}/{detalles.Count})";
-                    progress.Report(ReportModel);
-                    if (token.IsCancellationRequested) { token.ThrowIfCancellationRequested(); }
-                }
-                catch (OperationCanceledException) when (token.IsCancellationRequested)
-                {
-                    //ReportModel.Message = "Canceling Task...  !";
-                    ReportModel.PercentageComplete = 100;
-                    progress.Report(ReportModel);
-                    break;
-                }
-            }
-            return detallesFinal.OrderBy(x => x.FechaRecepcion).ToList();
         }
 
         public async Task<List<int>> InsertNv(List<Detalle> detalles, IProgress<ProgressReportModel> progress, List<ResultBilingType> types)
@@ -306,7 +185,7 @@ namespace Centralizador.Models
             foreach (Detalle item in detalles)
             {
                 //TESTER
-                var stop = item.Instruction.Id;
+                int stop = item.Instruction.Id;
                 AuxCsv a = FileSii.GetAuxCvsFromFile(item); // INFORMATION UPDATE FROM CSV FILE.
                 if (a != null)
                 {
@@ -380,11 +259,25 @@ namespace Centralizador.Models
                 }
                 c++;
                 porcent = (float)(100 * c) / detalles.Count;
-                ReportModel.PercentageComplete = (int)porcent;
-                ReportModel.Message = $"Inserting NV, wait please...   ({c}/{detalles.Count})  F°: {lastF})";
-                progress.Report(ReportModel);
+                ProgressReport.PercentageComplete = (int)porcent;
+                ProgressReport.Message = $"Inserting NV, wait please...   ({c}/{detalles.Count})  F°: {lastF})";
+                progress.Report(ProgressReport);
             }
             return folios;
+        }
+
+        private Dictionary<string, int> GetReemplazosFile()
+        {
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+            try
+            {
+                XDocument doc = XDocument.Load(@"C:\Centralizador\Reemplazos_.xml");
+                return doc.Descendants("Empresa").ToDictionary(d => (string)d.Attribute("id"), d => (int)d);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public void SaveLogging(string path, string nameFile)
@@ -392,10 +285,15 @@ namespace Centralizador.Models
             new CreateFile(path, StringLogging, nameFile);
         }
 
+        public async void DeleteNV()
+        {
+            await NotaVenta.DeleteNvAsync(new Conexion(DataBaseName));
+        }
+
         private async Task<List<Detalle>> GetStatusDteAsync(string mode, string tokenSii, string tipoDte, List<Detalle> detallesList, ResultParticipant UserParticipant)
         {
             Conexion con = new Conexion(DataBaseName);
-            foreach (var item in detallesList)
+            foreach (Detalle item in detallesList)
             {
                 // GET INFO FROM SII
                 DteInfoRef infoLastF = item.DteInfoRefs.First();

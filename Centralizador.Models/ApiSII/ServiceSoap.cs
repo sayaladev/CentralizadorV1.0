@@ -163,10 +163,7 @@ namespace Centralizador.Models.ApiSII
             _value = value;
         }
 
-        public string Value
-        {
-            get { return _value; }
-        }
+        public string Value => _value;
     }
 
     // NOTA: El código generado puede requerir, como mínimo, .NET Framework 4.5 o .NET Core/Standard 2.0.

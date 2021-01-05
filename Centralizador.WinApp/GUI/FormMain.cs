@@ -37,7 +37,7 @@ namespace Centralizador.WinApp.GUI
 
         public BackgroundWorker BgwConvertPdf { get; private set; }
         public BackgroundWorker BgwPay { get; private set; }
-        public BackgroundWorker BgwReadEmail { get; private set; }
+
         public IEnumerable<ResultBilingType> BillingTypes { get; set; }
         public CancellationTokenSource CancellationTk { get; set; }
         public string DataBaseName { get; set; }
@@ -45,7 +45,7 @@ namespace Centralizador.WinApp.GUI
         //  public ServiceSendMail Mail { get; private set; }
         public List<ResultParticipant> Participants { get; set; }
 
-        public ProgressReportModel ReportModel { get; set; }
+        //public ProgressReportModel ReportModel { get; set; }
 
         // public StringBuilder StringLogging { get; set; }
         public string TokenCen { get; set; }
@@ -66,7 +66,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnHiperLink_Click(object sender, EventArgs e)
         {
-            if (IGridMain.CurRow == null || ReportModel.IsRuning)
+            if (IGridMain.CurRow == null || GetStateReport)
             {
                 return;
             }
@@ -85,7 +85,7 @@ namespace Centralizador.WinApp.GUI
         {
             try
             {
-                if (IGridMain.CurRow == null && ReportModel.IsRuning)
+                if (IGridMain.CurRow == null && GetStateReport)
                 {
                     return;
                 }
@@ -94,7 +94,7 @@ namespace Centralizador.WinApp.GUI
                 {
                     detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
-                if (detalle != null && detalle.Instruction != null && !ReportModel.IsRuning)
+                if (detalle != null && detalle.Instruction != null && !GetStateReport)
                 {
                     ToolTip tip = new ToolTip();
                     StringBuilder builder = new StringBuilder();
@@ -158,10 +158,11 @@ namespace Centralizador.WinApp.GUI
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {   // Send email
-            // ServiceSendMail.BatchSendMail();
-            ServiceReadMail.SaveParam();
-            if (BgwReadEmail.IsBusy) { BgwReadEmail.CancelAsync(); }
+        {
+            if (GetTypeReport == TipoTask.ReadEmail)
+            {
+                ReadEmailFrom.SaveParam();
+            }
             if (CancellationTk != null && !CancellationTk.IsCancellationRequested) { CancellationTk.Cancel(); }
         }
 
@@ -196,15 +197,6 @@ namespace Centralizador.WinApp.GUI
             // User email
             TssLblUserEmail.Text = "|  " + Properties.Settings.Default.UserCEN;
 
-            // Worker read email
-            BgwReadEmail = new BackgroundWorker
-            {
-                WorkerReportsProgress = true,
-                WorkerSupportsCancellation = true
-            };
-            BgwReadEmail.ProgressChanged += BgwReadEmail_ProgressChanged;
-            BgwReadEmail.RunWorkerCompleted += BgwReadEmail_RunWorkerCompleted;
-
             // Worker Pay
             BgwPay = new BackgroundWorker
             {
@@ -217,7 +209,7 @@ namespace Centralizador.WinApp.GUI
             // StringLogging = new StringBuilder();
 
             // Date Time Outlook
-            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ServiceReadMail.GetLastDateTime());
+            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
 
             // Timer Hour (every hour)
             System.Timers.Timer timerHour = new System.Timers.Timer(3600000);
@@ -394,13 +386,13 @@ namespace Centralizador.WinApp.GUI
 
             TssLblProgBar.Value = 0;
             TssLblMensaje.Text = "Operation completed.";
-            ReportModel.IsRuning = false;
+            SetStateReport(false);
             IGridMain.Focus();
         }
 
         private void BtnPdfConvert_Click(object sender, EventArgs e)
         {
-            if (!ReportModel.IsRuning && IGridMain.Rows.Count > 0)
+            if (!GetStateReport && IGridMain.Rows.Count > 0)
             {
                 List<Detalle> lista = new List<Detalle>();
                 if (DetallePrincipal != null)
@@ -424,7 +416,7 @@ namespace Centralizador.WinApp.GUI
                     BgwConvertPdf.ProgressChanged += BgwConvertPdf_ProgressChanged;
                     BgwConvertPdf.RunWorkerCompleted += BgwConvertPdf_RunWorkerCompleted;
                     ServicePdf servicePdf = new ServicePdf(lista);
-                    ReportModel.IsRuning = true;
+                    SetStateReport(true);
                     servicePdf.ConvertToPdf(BgwConvertPdf);
                 }
             }
@@ -436,8 +428,8 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
         {
-            if (ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (ReportModel != null && ReportModel.TaskType == TipoTask.GetDebtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
+            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetTypeReport == TipoTask.GetDebtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
             List<Detalle> detallesPaso = new List<Detalle>();
             List<Detalle> detallesFinal = new List<Detalle>();
@@ -519,7 +511,6 @@ namespace Centralizador.WinApp.GUI
                                 int mayor = folios.Max();
                                 detalleI.StringLogging.AppendLine("");
                                 detalleI.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
-                                //new CreateFile(@"C:\Centralizador\Log\", detalleI.StringLogging, nameFile);
                                 detalleI.SaveLogging(@"C:\Centralizador\Log\", nameFile);
                             }
                         }
@@ -655,7 +646,8 @@ namespace Centralizador.WinApp.GUI
             {
                 CancellationTk?.Cancel();
                 CleanControls();
-                if (BgwReadEmail.IsBusy) { BgwReadEmail.CancelAsync(); }
+                BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
+
                 if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy) { BgwConvertPdf.CancelAsync(); }
                 BtnCancelTak.Enabled = false;
                 //  CancellationTk.Dispose();
@@ -908,7 +900,7 @@ namespace Centralizador.WinApp.GUI
         {
             // Progress Bar
 
-            if (e.TaskType == TipoTask.ReadEmail)
+            if (e.TaskType == TipoTask.SendEmail)
             {
                 TssLblMensaje.Text = e.Message;
                 TssLblFechaHora.Text = e.PercentageComplete.ToString();
@@ -921,39 +913,46 @@ namespace Centralizador.WinApp.GUI
             }
             if (e.PercentageComplete == 100)
             {
-                e.StopWatch.Stop();
                 BtnCancelTak.Enabled = false;
                 TssLblProgBar.Value = 0;
-                TssLblDBName.Text = "|DB: " + DataBaseName;
-                ReportModel.PercentageComplete = 0;
 
-                // Para controlar !!!
+                ReportModel.PercentageComplete = 0;
                 switch (e.TaskType)
                 {
                     case TipoTask.GetDebtor:
+                        e.StopWatch.Stop();
                         BtnPagar.Enabled = true;
                         BtnInsertNv.Enabled = false;
                         TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
+                        TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
+                        TssLblDBName.Text = "|DB: " + DataBaseName;
                         break;
 
                     case TipoTask.GetCreditor:
+                        e.StopWatch.Stop();
                         BtnPagar.Enabled = false;
                         BtnInsertNv.Enabled = true;
-                        // TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
+                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
+                        TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
+                        TssLblDBName.Text = "|DB: " + DataBaseName;
                         break;
 
                     case TipoTask.InsertNV:
                         BtnInsertNv.Enabled = false;
                         TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
+                        TssLblDBName.Text = "|DB: " + DataBaseName;
                         break;
 
-                    case TipoTask.ConvertToPdf:
+                    case TipoTask.ReadEmail:
+                        BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", e.FchOutlook);
+                        TssLblMensaje.Text = "Complete!";
                         break;
+
+                    case TipoTask.SendEmail:
 
                     default:
                         break;
                 }
-                TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
             }
         }
 
@@ -983,7 +982,7 @@ namespace Centralizador.WinApp.GUI
 
         private async void Bcm_CellButtonClickAsync(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
-            if (ReportModel != null && ReportModel.TaskType == TipoTask.GetCreditor || BgwReadEmail.IsBusy)
+            if (ReportModel != null && ReportModel.IsRuning)
             {
                 return;
             }
@@ -1043,7 +1042,7 @@ namespace Centralizador.WinApp.GUI
                             if (participant != null || EmailInDte != null)
                             {
                                 // SEND EMAIL.
-                                ReportModel.TaskType = TipoTask.ReadEmail;
+                                ReportModel.TaskType = TipoTask.SendEmail;
                                 ReportModel.PercentageComplete++;
                                 ReportModel.Message = "Sending EMAIL...";
                                 SendEmailTo sendMailTo = new SendEmailTo(UserParticipant, ProgressReport, ReportModel);
@@ -1365,41 +1364,33 @@ namespace Centralizador.WinApp.GUI
 
         #region OUTLOOK
 
-        private void BgwReadEmail_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private async void BtnOutlook_Click(object sender, EventArgs e)
         {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
+            // if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (ProgressReportModel.GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
 
-        private void BgwReadEmail_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            TssLblProgBar.Value = 0;
-            BtnOutlook.Enabled = true;
-            if (e.Cancelled)
+            try
             {
-                TssLblMensaje.Text = "Canceled!";
-                BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ServiceReadMail.GetLastDateTime());
-            }
-            else
-            {
-                BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", e.Result);
-                TssLblMensaje.Text = "Complete!";
-            }
+                ProgressReport = new Progress<ProgressReportModel>();
+                ProgressReport.ProgressChanged += ReportProgress;
+                CancellationTk = new CancellationTokenSource();
 
-            IGridMain.Focus();
-        }
-
-        private void BtnOutlook_Click(object sender, EventArgs e)
-        {
-            if (!BgwReadEmail.IsBusy)
-            {
-                BtnCancelTak.Enabled = true;
                 TssLblMensaje.Text = "Connecting to the mail server... Please wait.";
-                ServiceReadMail.GetXmlFromEmail(BgwReadEmail, TokenSii);
+                ReadEmailFrom readEmailFrom = new ReadEmailFrom(TokenSii, ProgressReport);
+                await readEmailFrom.ReadMailFromServer(CancellationTk.Token);
+                IGridMain.Focus();
             }
-            else
+            catch (Exception ex)
             {
-                BtnCancelTak.Enabled = true;
+                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
+                TssLblProgBar.Value = 0;
+                TssLblMensaje.Text = "There was an error loading the data.";
+                return;
+                throw;
+            }
+            finally
+            {
+                //ReportModel.IsRuning = false;
             }
         }
 

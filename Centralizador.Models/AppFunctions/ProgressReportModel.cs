@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Centralizador.Models
 {
@@ -6,22 +7,16 @@ namespace Centralizador.Models
     {
         public int PercentageComplete { get; set; } = 0;
         public string Message { get; set; }
-        public bool IsRuning { get; set; }
+        private static bool IsRuning { get; set; }
         public Stopwatch StopWatch { get; set; }
-
-        //public TipoDetalle DetalleType { get; set; }
-        public TipoTask TaskType { get; set; }
+        private static TipoTask TaskType { get; set; }
+        public DateTime? FchOutlook { get; set; }
 
         public ProgressReportModel(TipoTask taskType)
         {
             TaskType = taskType;
+            IsRuning = true;
         }
-
-        //public enum TipoDetalle
-        //{
-        //    Creditor,
-        //    Debtor
-        //}
 
         public enum TipoTask
         {
@@ -29,7 +24,29 @@ namespace Centralizador.Models
             GetCreditor,
             InsertNV,
             ConvertToPdf,
-            ReadEmail
+            ReadEmail,
+            SendEmail
+        }
+
+        public static bool GetStateReport
+        {
+            get
+            {
+                return IsRuning;
+            }
+        }
+
+        public static void SetStateReport(bool sett)
+        {
+            IsRuning = sett;
+        }
+
+        public static TipoTask GetTypeReport
+        {
+            get
+            {
+                return TaskType;
+            }
         }
     }
 }
