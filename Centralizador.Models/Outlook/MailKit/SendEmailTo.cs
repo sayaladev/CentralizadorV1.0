@@ -18,11 +18,11 @@ namespace Centralizador.Models.Outlook.MailKit
         private IProgress<ProgressReportModel> Progress { get; set; }
         private ProgressReportModel ProgressReport { get; set; }
 
-        public SendEmailTo(ResultParticipant userParticipant, IProgress<ProgressReportModel> progress, ProgressReportModel reportModel)
+        public SendEmailTo(ResultParticipant userParticipant, IProgress<ProgressReportModel> progress)
         {
             UserParticipant = userParticipant;
             Progress = progress;
-            ProgressReport = reportModel;
+            ProgressReport = new ProgressReportModel(ProgressReportModel.TipoTask.SendEmail);
         }
 
         public async Task SendMailToParticipantAsync(Detalle detalle, ResultParticipant participant, string EmailInDte)

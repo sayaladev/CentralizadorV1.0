@@ -19,6 +19,7 @@ using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 using Centralizador.Models.AppFunctions;
 using Centralizador.Models.DataBase;
+using Centralizador.Models.Interfaces;
 using Centralizador.Models.Outlook;
 using Centralizador.Models.Outlook.MailKit;
 using Centralizador.Models.registroreclamodteservice;
@@ -488,20 +489,13 @@ namespace Centralizador.WinApp.GUI
                 {
                     TssLblMensaje.Text = "Reading SII file, be patient...";
                     await Task.Delay(3000); // 3 SECONDS.
-                    Stopwatch watch = Stopwatch.StartNew();
                     try
                     {
-                        watch.Start();
-                        ReportModel = new ProgressReportModel(TipoTask.InsertNV)
-                        {
-                            IsRuning = true,
-                            StopWatch = watch
-                        };
                         ProgressReport = new Progress<ProgressReportModel>();
                         ProgressReport.ProgressChanged += ReportProgress;
                         FileSii.ReadFileSii(); // GET VALUES LIST FROM CSV.
-                        DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
-                        List<int> folios = await detalleI.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
+                        DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
+                        List<int> folios = await det.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
                         if (folios != null)
                         {
                             string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
@@ -509,9 +503,9 @@ namespace Centralizador.WinApp.GUI
                             {
                                 int menor = folios.Min();
                                 int mayor = folios.Max();
-                                detalleI.StringLogging.AppendLine("");
-                                detalleI.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
-                                detalleI.SaveLogging(@"C:\Centralizador\Log\", nameFile);
+                                det.StringLogging.AppendLine("");
+                                det.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
+                                det.SaveLogging(@"C:\Centralizador\Log\", nameFile);
                             }
                         }
                     }
@@ -519,10 +513,6 @@ namespace Centralizador.WinApp.GUI
                     {
                         new ErrorMsgCen("There was an error insert into the DB.", ex, MessageBoxIcon.Warning);
                         return;
-                    }
-                    finally
-                    {
-                        ReportModel.IsRuning = false;
                     }
                 }
                 else { TssLblMensaje.Text = "Cancel."; }
@@ -553,26 +543,26 @@ namespace Centralizador.WinApp.GUI
         private async void BtnCreditor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            Stopwatch watch = Stopwatch.StartNew();
+            // if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
+            //Stopwatch watch = Stopwatch.StartNew();
             try
             {
-                watch.Start();
-                ReportModel = new ProgressReportModel(TipoTask.GetCreditor)
-                {
-                    IsRuning = true,
-                    StopWatch = watch
-                };
+                //watch.Start();
+                //ReportModel = new ProgressReportModel(TipoTask.GetCreditor)
+                //{
+                //    IsRuning = true,
+                //    StopWatch = watch
+                //};
                 ProgressReport = new Progress<ProgressReportModel>();
                 ProgressReport.ProgressChanged += ReportProgress;
                 CancellationTk = new CancellationTokenSource();
                 List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
                 if (matrices != null && matrices.Count > 0)
                 {
-                    DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
-                    detalleI.DeleteNV(); // DELETE NV.
+                    DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
+                    det.DeleteNV(); // DELETE NV.
                     DteInfoRef.InsertTriggerRefCen(new Conexion(DataBaseName));  // INSERT TRIGGER.
-                    DetallePrincipal = await detalleI.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
+                    DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
                     if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
                 }
                 else
@@ -589,34 +579,34 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
-                ReportModel.IsRuning = false;
-                TssLblFechaHora.Image = null;
-                TssLblFechaHora.Text = "";
+                //ReportModel.IsRuning = false;
+                //TssLblFechaHora.Image = null;
+                //TssLblFechaHora.Text = "";
             }
         }
 
         private async void BtnDebtor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            Stopwatch watch = Stopwatch.StartNew();
+            // if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
+            // Stopwatch watch = Stopwatch.StartNew();
             try
             {
                 string nameFile = @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
-                watch.Start();
-                ReportModel = new ProgressReportModel(TipoTask.GetDebtor)
-                {
-                    IsRuning = true,
-                    StopWatch = watch
-                };
+                //watch.Start();
+                //ReportModel = new ProgressReportModel(TipoTask.GetDebtor)
+                //{
+                //    IsRuning = true,
+                //    StopWatch = watch
+                //};
                 ProgressReport = new Progress<ProgressReportModel>();
                 ProgressReport.ProgressChanged += ReportProgress;
                 CancellationTk = new CancellationTokenSource();
                 List<Detalle> detalles = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
                 if (detalles != null)
                 {
-                    DetalleI detalleI = new DetalleI(DataBaseName, UserParticipant, TokenSii, TokenCen, ReportModel);
-                    DetallePrincipal = await detalleI.GetDetalleDebtor(detalles, ProgressReport, CancellationTk.Token, nameFile);
+                    DetalleDebtor det = new DetalleDebtor(DataBaseName, UserParticipant, TokenSii, TokenCen);
+                    DetallePrincipal = await det.GetDetalleDebtor(detalles, ProgressReport, CancellationTk.Token, nameFile);
                     if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
                 }
             }
@@ -629,7 +619,8 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
-                ReportModel.IsRuning = false;
+                SetStateReport(false);  // OR PROP STATIC PUBLICA?
+                //ReportModel.IsRuning = false;
                 TssLblFechaHora.Image = fImageListSmall.Images[1];
                 TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
                 TssLblFechaHora.Text = "0";
@@ -716,11 +707,11 @@ namespace Centralizador.WinApp.GUI
                     // NAME
                     if (item.Instruction != null)
                     {
-                        if (ReportModel.TaskType == TipoTask.GetCreditor)
+                        if (GetTypeReport == TipoTask.GetCreditor)
                         {
                             myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.Instruction.ParticipantDebtor.Name.ToLower());
                         }
-                        else if (ReportModel.TaskType == TipoTask.GetDebtor)
+                        else if (GetTypeReport == TipoTask.GetDebtor)
                         {
                             myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.Instruction.ParticipantCreditor.Name.ToLower());
                         }
@@ -775,7 +766,7 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaRecepcion)) + "";
                     }
                     if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
-                    if (ReportModel != null && ReportModel.TaskType == TipoTask.GetCreditor)
+                    if (GetTypeReport == TipoTask.GetCreditor)
                     {
                         myRow.Cells["P1"].Type = iGCellType.Check;
                         myRow.Cells["P2"].Type = iGCellType.Check;
@@ -845,7 +836,7 @@ namespace Centralizador.WinApp.GUI
 
                         case StatusDetalle.Pending:
                             // STATUS
-                            if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && ReportModel != null && ReportModel.TaskType == TipoTask.GetDebtor && item.Folio > 0) // Debtor
+                            if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && GetTypeReport == TipoTask.GetDebtor && item.Folio > 0) // Debtor
                             {
                                 myRow.Cells["btnRejected"].ImageIndex = 6;
                                 myRow.Cells["btnRejected"].Enabled = iGBool.True;
@@ -876,7 +867,7 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
                 IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
                 // Footer Status
-                if (ReportModel != null && ReportModel.TaskType == TipoTask.GetCreditor && rejNc > 0)
+                if (GetTypeReport == TipoTask.GetCreditor && rejNc > 0)
                 {
                     IGridMain.Footer.Cells[0, "status"].ImageList = fImageListSmall;
                     IGridMain.Footer.Cells[0, "status"].ImageIndex = 5;
@@ -900,7 +891,7 @@ namespace Centralizador.WinApp.GUI
         {
             // Progress Bar
 
-            if (e.TaskType == TipoTask.SendEmail)
+            if (GetTypeReport == TipoTask.SendEmail)
             {
                 TssLblMensaje.Text = e.Message;
                 TssLblFechaHora.Text = e.PercentageComplete.ToString();
@@ -916,8 +907,8 @@ namespace Centralizador.WinApp.GUI
                 BtnCancelTak.Enabled = false;
                 TssLblProgBar.Value = 0;
 
-                ReportModel.PercentageComplete = 0;
-                switch (e.TaskType)
+                // ProgressReportModel.PercentageComplete = 0;
+                switch (GetTypeReport)
                 {
                     case TipoTask.GetDebtor:
                         e.StopWatch.Stop();
@@ -962,14 +953,14 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnExcelConvert_Click(object sender, EventArgs e)
         {
-            if (!ReportModel.IsRuning && DetallePrincipal != null && DetallePrincipal.Count > 0)
+            if (!GetStateReport && DetallePrincipal != null && DetallePrincipal.Count > 0)
             {
                 ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
-                if (ReportModel.TaskType == TipoTask.GetCreditor)
+                if (GetTypeReport == TipoTask.GetCreditor)
                 {
                     serviceExcel.ExportToExcel(DetallePrincipal, true, CboMonths.SelectedItem);
                 }
-                else if (ReportModel.TaskType == TipoTask.GetDebtor)
+                else if (GetTypeReport == TipoTask.GetDebtor)
                 {
                     serviceExcel.ExportToExcel(DetallePrincipal, false, CboMonths.SelectedItem);
                 }
@@ -982,7 +973,7 @@ namespace Centralizador.WinApp.GUI
 
         private async void Bcm_CellButtonClickAsync(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
-            if (ReportModel != null && ReportModel.IsRuning)
+            if (GetStateReport)
             {
                 return;
             }
@@ -1009,12 +1000,6 @@ namespace Centralizador.WinApp.GUI
                         ResultParticipant participant = detalle.ParticipantMising;
                         // REJECT IN SII.
                         respuestaTo resp = ServiceSoap.SendActionToSii(TokenSii, detalle, RejectsSii.RCD);
-
-                        // TESTER
-                        //respuestaTo resp = new respuestaTo
-                        //{
-                        //    codResp = 0
-                        //};
                         DTEDefTypeDocumento dte = null;
                         string EmailInDte = null;
                         if (detalle.DTEDef != null)
@@ -1028,7 +1013,6 @@ namespace Centralizador.WinApp.GUI
                                 }
                             }
                         }
-
                         builder.Clear();
                         builder.AppendLine("Results:");
                         builder.AppendLine(Environment.NewLine);
@@ -1042,10 +1026,10 @@ namespace Centralizador.WinApp.GUI
                             if (participant != null || EmailInDte != null)
                             {
                                 // SEND EMAIL.
-                                ReportModel.TaskType = TipoTask.SendEmail;
-                                ReportModel.PercentageComplete++;
-                                ReportModel.Message = "Sending EMAIL...";
-                                SendEmailTo sendMailTo = new SendEmailTo(UserParticipant, ProgressReport, ReportModel);
+                                //ReportModel.TaskType = TipoTask.SendEmail;
+                                //ReportModel.PercentageComplete++;
+                                //ReportModel.Message = "Sending EMAIL...";
+                                SendEmailTo sendMailTo = new SendEmailTo(UserParticipant, ProgressReport);
                                 await sendMailTo.SendMailToParticipantAsync(detalle, participant, EmailInDte);
                             }
                             else
@@ -1099,7 +1083,7 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
         {
-            if (!ReportModel.IsRuning)
+            if (!GetStateReport)
             {
                 Detalle detalle = null;
                 iGRow fCurRow = IGridMain.CurRow;
@@ -1139,7 +1123,7 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
-            if (!ReportModel.IsRuning && IGridMain.CurRow.Type != iGRowType.AutoGroupRow && IGridMain.CurRow != null)
+            if (!GetStateReport && IGridMain.CurRow.Type != iGRowType.AutoGroupRow && IGridMain.CurRow != null)
             {
                 CleanControls();
                 Detalle detalle = null;
@@ -1285,7 +1269,7 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
         {
-            if (!ReportModel.IsRuning && e.ColIndex == 19) // Sii Events
+            if (!GetStateReport && e.ColIndex == 19) // Sii Events
             {
                 Detalle detalle = null;
                 StringBuilder builder = new StringBuilder();
@@ -1307,10 +1291,10 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            else if (!ReportModel.IsRuning && e.ColIndex == 18) // Email Aux send Xml
+            else if (!GetStateReport && e.ColIndex == 18) // Email Aux send Xml
             {
                 Detalle detalle = null;
-                if (ReportModel.TaskType == TipoTask.GetCreditor)
+                if (GetTypeReport == TipoTask.GetCreditor)
                 {
                     StringBuilder builder = new StringBuilder();
                     detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
@@ -1327,9 +1311,9 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            else if (!ReportModel.IsRuning && e.ColIndex == 2) // History DTE
+            else if (!GetStateReport && e.ColIndex == 2) // History DTE
             {
-                if (ReportModel.TaskType == TipoTask.GetCreditor)
+                if (GetTypeReport == TipoTask.GetCreditor)
                 {
                     StringBuilder builder = new StringBuilder();
                     Detalle detalle = null;
@@ -1367,7 +1351,7 @@ namespace Centralizador.WinApp.GUI
         private async void BtnOutlook_Click(object sender, EventArgs e)
         {
             // if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (ProgressReportModel.GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
 
             try
             {
@@ -1426,7 +1410,7 @@ namespace Centralizador.WinApp.GUI
             string msje = null;
 
             // Excluir Banco Security Rut 97.053.000-2
-            if (!BgwPay.IsBusy && ReportModel != null && ReportModel.TaskType == TipoTask.GetDebtor && !ReportModel.IsRuning && IGridMain.Rows.Count > 0)
+            if (!BgwPay.IsBusy && GetTypeReport == TipoTask.GetDebtor && !GetStateReport && IGridMain.Rows.Count > 0)
             {
                 List<Detalle> detallesFinal = new List<Detalle>();
                 if (ChkIncludeCEN.CheckState == CheckState.Checked) // Only Participants
@@ -1489,12 +1473,12 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnRevertPay_ClickAsync(object sender, EventArgs e)
         {
-            if (ReportModel != null && ReportModel.IsRuning)
+            if (GetStateReport)
             {
                 TssLblMensaje.Text = "Bussy!";
                 return;
             }
-            else if (ReportModel.TaskType == TipoTask.GetDebtor)
+            else if (GetTypeReport == TipoTask.GetDebtor)
             {
                 DialogResult resp = MessageBox.Show($"You will delete all payments {Environment.NewLine} Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (resp == DialogResult.Yes)

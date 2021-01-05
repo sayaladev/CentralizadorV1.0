@@ -16,7 +16,7 @@ using static Centralizador.Models.AppFunctions.ValidatorFlag;
 
 namespace Centralizador.Models.Interfaces
 {
-    internal class DetalleCreditor : IDetalleC
+    public class DetalleCreditor : IDetalleC
     {
         public string DataBaseName { get; set; }
         public ResultParticipant UserParticipant { get; set; }
@@ -25,14 +25,14 @@ namespace Centralizador.Models.Interfaces
         public ProgressReportModel ProgressReport { get; set; }
         public StringBuilder StringLogging { get; set; }
 
-        public DetalleCreditor(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen, StringBuilder stringLogging)
+        public DetalleCreditor(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen)
         {
             DataBaseName = dataBaseName;
             UserParticipant = userParticipant;
             TokenSii = tokenSii;
             TokenCen = tokenCen;
             ProgressReport = new ProgressReportModel(ProgressReportModel.TipoTask.GetCreditor);
-            StringLogging = stringLogging;
+            StringLogging = new StringBuilder();
         }
 
         public async Task<List<Detalle>> GetDetalleCreditor(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress, CancellationToken tokenCancel)
@@ -252,16 +252,21 @@ namespace Centralizador.Models.Interfaces
                         }
                         folios.Add(lastF);
                     }
+                    c++;
+                    porcent = (float)(100 * c) / detalles.Count;
+                    ProgressReport.PercentageComplete = (int)porcent;
+                    ProgressReport.Message = $"Inserting NV, wait please...   ({c}/{detalles.Count})  F°: {lastF})";
+                    progress.Report(ProgressReport);
                 }
                 catch (Exception ex)
                 {
                     new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop);
                 }
-                c++;
-                porcent = (float)(100 * c) / detalles.Count;
-                ProgressReport.PercentageComplete = (int)porcent;
-                ProgressReport.Message = $"Inserting NV, wait please...   ({c}/{detalles.Count})  F°: {lastF})";
-                progress.Report(ProgressReport);
+                finally
+                {
+                    ProgressReportModel.SetStateReport(false);
+                    ProgressReport.PercentageComplete = 0;
+                }
             }
             return folios;
         }

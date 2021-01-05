@@ -12,7 +12,7 @@ using static Centralizador.Models.ApiSII.ServiceDetalle;
 
 namespace Centralizador.Models.Interfaces
 {
-    internal class DetalleDebtor : IDetalleD
+    public class DetalleDebtor : IDetalleD
     {
         public string DataBaseName { get; set; }
         public ResultParticipant UserParticipant { get; set; }
@@ -21,14 +21,14 @@ namespace Centralizador.Models.Interfaces
         public ProgressReportModel ProgressReport { get; set; }
         public StringBuilder StringLogging { get; set; }
 
-        public DetalleDebtor(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen, StringBuilder stringLogging)
+        public DetalleDebtor(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen)
         {
             DataBaseName = dataBaseName;
             UserParticipant = userParticipant;
             TokenSii = tokenSii;
             TokenCen = tokenCen;
             ProgressReport = new ProgressReportModel(ProgressReportModel.TipoTask.GetDebtor);
-            StringLogging = stringLogging;
+            StringLogging = new StringBuilder();
         }
 
         public async Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken tokenCancel, string p)
