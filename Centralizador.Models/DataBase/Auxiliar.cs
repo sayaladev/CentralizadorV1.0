@@ -154,6 +154,9 @@ namespace Centralizador.Models.DataBase
                 name = instruction.ParticipantDebtor.BusinessName;
             }
             // Get acteco from CEN
+            if (true)
+            {
+            }
             if (instruction.ParticipantDebtor.CommercialBusiness != null)
             {
                 if (instruction.ParticipantDebtor.CommercialBusiness.Length > 60)

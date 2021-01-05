@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 
 using Centralizador.Models.ApiSII;
@@ -35,7 +36,6 @@ namespace Centralizador.Models.AppFunctions
         {
         }
 
-        // Functions
         public static int GetFlagImageIndex(LetterFlag flag)
         {
             switch (flag)
@@ -90,49 +90,36 @@ namespace Centralizador.Models.AppFunctions
             {
                 if (detalle.Folio > 0 && detalle.IsParticipant) // Facturada
                 {
-                    // Set Default.
-                    Flag = LetterFlag.Green;
+                    Flag = LetterFlag.Green; // DEFAULT.
                     if (detalle.DTEDef != null)
                     {
                         DTEDefTypeDocumento dte = (DTEDefTypeDocumento)detalle.DTEDef.Item;
-                        // Valide FmaPago
-                        if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito)
+                        if (dte.Encabezado.IdDoc.FmaPago != DTEDefTypeDocumentoEncabezadoIdDocFmaPago.Crédito) // VALIDE FORMA PAGO.
                         {
                             Flag = LetterFlag.Yellow;
                             FmaPago = true;
                         }
-
-                        // Valide Reference
                         if (dte.Referencia != null)
                         {
                             DTEDefTypeDocumentoReferencia referencia = dte.Referencia.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
-                            if (referencia != null)
+                            if (referencia != null && detalle.Instruction != null)
                             {
-                                // Valide NroLinRef
-                                if (string.IsNullOrEmpty(referencia.NroLinRef))
-                                {
-                                    NroLinRef = true;
-                                }
-                                // Valide FolioRef ex: DE01724A17C14S0015
-                                if (detalle.Instruction != null && (string.Compare(referencia.FolioRef.Trim(), detalle.Instruction.PaymentMatrix.ReferenceCode, true) != 0)) // IgnoreCase
+                                if (string.IsNullOrEmpty(referencia.NroLinRef)) { NroLinRef = true; }
+                                if (Compare(referencia.FolioRef, detalle.Instruction.PaymentMatrix.ReferenceCode, true) == -1) // DE01724A17C14S0015
                                 {
                                     Flag = LetterFlag.Red;
                                     FolioRef = true;
                                 }
-                                // Valide RazonRef ex: SEN_[RBPA][Ene18-Dic18][R][V02] / Glosa
-                                if (detalle.Instruction != null && (string.Compare(referencia.RazonRef.Trim(), detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0)) // IgnoreCase
+                                if (Compare(referencia.RazonRef, detalle.Instruction.PaymentMatrix.NaturalKey, true) == -1) // SEN_[RBPA][Ene18-Dic18][R][V02]
                                 {
                                     Flag = LetterFlag.Red;
                                     RazonRef = true;
                                 }
-                                // Valide FchRef
-                                if (string.IsNullOrEmpty(referencia.FchRef.ToString()))
-                                {
-                                    FchRef = true;
-                                }
+                                if (string.IsNullOrEmpty(referencia.FchRef.ToString())) { FchRef = true; }
                             }
                             else
                             {
+                                // NO REF CEN.
                                 Flag = LetterFlag.Red;
                                 FolioRef = true;
                                 RazonRef = true;
@@ -141,6 +128,7 @@ namespace Centralizador.Models.AppFunctions
                         }
                         else
                         {
+                            // NO REFS.
                             Flag = LetterFlag.Red;
                             FolioRef = true;
                             RazonRef = true;
@@ -148,7 +136,7 @@ namespace Centralizador.Models.AppFunctions
                         }
 
                         // Valide Instruction (Only Debtor)
-                        if (detalle.Instruction == null)
+                        if (detalle.Instruction == null && isCreditor == false)
                         {
                             Flag = LetterFlag.Red;
                             FolioRef = true;
@@ -158,19 +146,7 @@ namespace Centralizador.Models.AppFunctions
                         else
                         {
                             // Valide Amount
-                            if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount)
-                            {
-                                Flag = LetterFlag.Blue;
-                            }
-                            // Valide DscItem ex: SEN_[RBPA][Ene18-Dic18][R][V02]
-                            //if (dte.Detalle != null && dte.Detalle.Length == 1 && dte.Detalle[0].DscItem != null )
-                            //{
-                            //    if (string.Compare(dte.Detalle[0].DscItem.TrimEnd(), detalle.Instruction.PaymentMatrix.NaturalKey, true) != 0) // IgnoreCase
-                            //    {
-                            //        Flag = LetterFlag.Yellow;
-                            //        DscItem = true;
-                            //    }
-                            //}
+                            if (Convert.ToUInt32(dte.Encabezado.Totales.MntNeto) != detalle.Instruction.Amount) { Flag = LetterFlag.Blue; }
                         }
                         // Valide excluide
                         // Enel Distribución Chile S.A. & Chilquinta Energía S.A && Cge S.A
@@ -205,6 +181,17 @@ namespace Centralizador.Models.AppFunctions
             Green,
             Complete,
             Clear
+        }
+
+        public static int Compare(string strA, string strB, bool ignoreCase)
+        {
+            // RETURN 0 TRUE
+            // RETURN -1 FALSE
+            if (ignoreCase)
+            {
+                return CultureInfo.CurrentCulture.CompareInfo.Compare(strA, strB, CompareOptions.IgnoreCase);
+            }
+            return CultureInfo.CurrentCulture.CompareInfo.Compare(strA, strB, CompareOptions.None);
         }
     }
 }

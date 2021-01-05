@@ -68,7 +68,8 @@
             this.CboYears = new System.Windows.Forms.ComboBox();
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.fImageListSmall = new System.Windows.Forms.ImageList(this.components);
-            this.button1 = new System.Windows.Forms.Button();
+            this.fImageListType = new System.Windows.Forms.ImageList(this.components);
+            this.BtnRevertPay = new System.Windows.Forms.Button();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -124,7 +125,7 @@
             // TssLblDBName
             // 
             this.TssLblDBName.AutoSize = false;
-            this.TssLblDBName.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.TssLblDBName.Font = new System.Drawing.Font("Segoe UI", 8F);
             this.TssLblDBName.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TssLblDBName.Name = "TssLblDBName";
             this.TssLblDBName.Size = new System.Drawing.Size(100, 17);
@@ -297,6 +298,7 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.BackColor = System.Drawing.SystemColors.Control;
+            this.groupBox2.Controls.Add(this.BtnRevertPay);
             this.groupBox2.Controls.Add(this.ChkNoIncludeCEN);
             this.groupBox2.Controls.Add(this.ChkIncludeCEN);
             this.groupBox2.Controls.Add(this.BtnInsertNv);
@@ -390,7 +392,6 @@
             // 
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.GroupBox1.Controls.Add(this.button1);
             this.GroupBox1.Controls.Add(this.BtnCancelTak);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.BtnDebtor);
@@ -565,15 +566,31 @@
             this.fImageListSmall.Images.SetKeyName(5, "");
             this.fImageListSmall.Images.SetKeyName(6, "");
             // 
-            // button1
+            // fImageListType
             // 
-            this.button1.Location = new System.Drawing.Point(10, 179);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(39, 26);
-            this.button1.TabIndex = 13;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.fImageListType.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("fImageListType.ImageStream")));
+            this.fImageListType.TransparentColor = System.Drawing.Color.Transparent;
+            this.fImageListType.Images.SetKeyName(0, "");
+            this.fImageListType.Images.SetKeyName(1, "");
+            this.fImageListType.Images.SetKeyName(2, "");
+            this.fImageListType.Images.SetKeyName(3, "");
+            this.fImageListType.Images.SetKeyName(4, "");
+            this.fImageListType.Images.SetKeyName(5, "");
+            this.fImageListType.Images.SetKeyName(6, "");
+            this.fImageListType.Images.SetKeyName(7, "");
+            this.fImageListType.Images.SetKeyName(8, "");
+            this.fImageListType.Images.SetKeyName(9, "");
+            this.fImageListType.Images.SetKeyName(10, "");
+            this.fImageListType.Images.SetKeyName(11, "");
+            // 
+            // BtnRevertPay
+            // 
+            this.BtnRevertPay.Location = new System.Drawing.Point(31, 154);
+            this.BtnRevertPay.Name = "BtnRevertPay";
+            this.BtnRevertPay.Size = new System.Drawing.Size(66, 13);
+            this.BtnRevertPay.TabIndex = 14;
+            this.BtnRevertPay.UseVisualStyleBackColor = true;
+            this.BtnRevertPay.Click += new System.EventHandler(this.BtnRevertPay_ClickAsync);
             // 
             // FormMain
             // 
@@ -649,6 +666,7 @@
         private System.Windows.Forms.Button BtnCancelTak;
         private System.Windows.Forms.ImageList fImageListSmall;
         private System.Windows.Forms.ToolStripStatusLabel TssLblDBName;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ImageList fImageListType;
+        private System.Windows.Forms.Button BtnRevertPay;
     }
 }

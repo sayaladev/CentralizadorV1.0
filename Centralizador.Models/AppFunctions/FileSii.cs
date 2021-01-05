@@ -56,7 +56,7 @@ namespace Centralizador.Models.AppFunctions
             //return null;
         }
 
-        public static void GetValues()
+        public static void ReadFileSii()
         {
             AuxCsvsList = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
         }

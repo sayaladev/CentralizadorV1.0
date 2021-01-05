@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
+using Centralizador.Models.DataBase;
 
 namespace Centralizador.Models
 {
@@ -15,5 +16,8 @@ namespace Centralizador.Models
         Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken cancellationToken, string p);
 
         Task<List<int>> InsertNv(List<Detalle> detalles, IProgress<ProgressReportModel> progress, List<ResultBilingType> types);
+
+        // Task<int> GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant);
+        // Task<List<Detalle>> GetStatusDteAsync(string mode, string tokenSii, string tipoDte, List<Detalle> detallesList, ResultParticipant UserParticipant);
     }
 }

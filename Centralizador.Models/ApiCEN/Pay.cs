@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
+using Centralizador.Models.ApiSII;
 using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN

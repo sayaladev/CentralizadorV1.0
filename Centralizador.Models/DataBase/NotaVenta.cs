@@ -26,12 +26,15 @@ namespace Centralizador.Models.DataBase
                 {
                     return Convert.ToInt32(result);
                 }
+                else
+                {
+                    return 1; // FOR NEW COMPANIES.
+                }
             }
             catch (Exception)
             {
                 throw;
             }
-            return 0;
         }
 
         /// <summary>
@@ -107,7 +110,7 @@ namespace Centralizador.Models.DataBase
         /// <param name="codProd"></param>
         /// <param name="conexion"></param>
         /// <returns></returns>
-        public static async Task<int> InsertNvAsync(ResultInstruction instruction, int folioNV, string codProd, Conexion conexion)
+        public static async Task<int> InsertNvAsync(ResultInstruction instruction, int? folioNV, string codProd, Conexion conexion)
         {
             try
             {

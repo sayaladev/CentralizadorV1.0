@@ -14,22 +14,26 @@ namespace Centralizador.Models.ApiSII
 {
     public class ServiceSoap
     {
-        public static string GETTokenFromSii(string serialDigitalCert)
+        public static X509Certificate2 Certificate { get; set; } = GetCertFromPc();
+
+        private static X509Certificate2 GetCertFromPc()
         {
-            // GET DIGITAL CERT.
-            DateTime now = DateTime.Now;
-            X509Certificate2 cert = null;
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
             foreach (X509Certificate2 item in store.Certificates)
             {
-                if (item.SerialNumber == serialDigitalCert && item.NotAfter > now)
+                if (item.SerialNumber == Properties.Settings.Default.SerialDigitalCert && item.NotAfter > DateTime.Now)
                 {
-                    cert = item;
+                    return item;
                 }
             }
             store.Close();
-            if (cert != null)
+            return null;
+        }
+
+        public static string GETTokenFromSii(string serialDigitalCert)
+        {
+            if (Certificate != null)
             {
                 try
                 {
@@ -46,7 +50,7 @@ namespace Centralizador.Models.ApiSII
                                 string xmlNofirmado = string.Format("<getToken><item><Semilla>{0}</Semilla></item></getToken>", xmlObjectCrSeedService.RESP_BODY.SEMILLA);
                                 using (GetTokenFromSeedService proxyGetTokenFromSeedService = new GetTokenFromSeedService())
                                 {
-                                    string responseGetTokenFromSeedService = proxyGetTokenFromSeedService.getToken(FirmarSeedDigital(xmlNofirmado, cert));
+                                    string responseGetTokenFromSeedService = proxyGetTokenFromSeedService.getToken(FirmarSeedDigital(xmlNofirmado, Certificate));
                                     XmlSerializer serializadorGetTokenFromSeedService = new XmlSerializer(typeof(RESPUESTA));
                                     using (TextReader readerGetTokenFromSeedService = new StringReader(responseGetTokenFromSeedService))
                                     {
@@ -116,14 +120,15 @@ namespace Centralizador.Models.ApiSII
             }
         }
 
-        public static respuestaTo SendActionToSii(string token, Detalle detalle, string accionDoc)
+        public static respuestaTo SendActionToSii(string token, Detalle detalle, RejectsSii rejects)
         {
             respuestaTo respuesta = new respuestaTo();
             try
             {
                 using (RegistroReclamoDteServiceEndpointService proxy = new RegistroReclamoDteServiceEndpointService(token))
                 {
-                    respuestaTo response = proxy.ingresarAceptacionReclamoDoc(detalle.RutReceptor.ToString(), detalle.DvReceptor, "33", detalle.Folio.ToString(), accionDoc);
+                    respuestaTo response = proxy.ingresarAceptacionReclamoDoc(detalle.RutReceptor.ToString(), detalle.DvReceptor, "33", detalle.Folio.ToString(), rejects.ToString());
+                    //respuestaTo response = proxy.ingresarAceptacionReclamoDoc("77064987", "0", "33", "73", rejects.ToString());
                     respuesta = response;
                 }
             }
@@ -132,6 +137,35 @@ namespace Centralizador.Models.ApiSII
                 throw;
             }
             return respuesta;
+        }
+    }
+
+    // ACD: Acepta Contenido del Documento
+    // RCD: Reclamo al Contenido del Documento
+    // ERM: Otorga Recibo de Mercaderías o Servicios
+    // RFP: Reclamo por Falta Parcial de Mercaderías
+    // RFT: Reclamo por Falta Total de Mercaderías
+    public enum RejectsSii
+    {
+        ACD,
+        RCD,
+        ERM,
+        RFP,
+        RFT
+    }
+
+    public class StringValue : Attribute
+    {
+        private readonly string _value;
+
+        public StringValue(string value)
+        {
+            _value = value;
+        }
+
+        public string Value
+        {
+            get { return _value; }
         }
     }
 

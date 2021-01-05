@@ -225,7 +225,7 @@ namespace Centralizador.Models.ApiSII
         public StatusDetalle StatusDetalle { get; set; }
         public ValidatorFlag ValidatorFlag { get; set; }
         public int NroInt { get; set; }
-        public bool RefMissing { get; set; }
+        public ResultParticipant ParticipantMising { get; set; }
         public string DTEFile { get; set; }
 
         public Detalle(string rutReceptor, string dvReceptor, string rznSocRecep, int mntNeto, ResultInstruction instruction, bool isParticipant)

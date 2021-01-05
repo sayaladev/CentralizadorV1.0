@@ -39,7 +39,7 @@ namespace Centralizador.Models.DataBase
             {
                 StringBuilder query = new StringBuilder();
                 query.Append($"IF (NOT EXISTS (SELECT * FROM softland.cwtgiro WHERE GirDes = '{descripcion}')) BEGIN ");
-                query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(GirCod) +1 from softland.cwtgiro), ");
+                query.Append("INSERT INTO softland.cwtgiro  (GirCod, GirDes) values ((select MAX(CAST(GirCod AS int)) +1 from softland.cwtgiro), ");
                 query.Append($"'{descripcion}') END");
                 conexion.Query = query.ToString();
                 return await Conexion.ExecuteNonQueryAsync(conexion);

@@ -44,6 +44,7 @@ namespace Centralizador.Models
             float porcent;
             List<Detalle> detalles = new List<Detalle>();
             Conexion con = new Conexion(DataBaseName);
+            Dictionary<string, int> dic = GetReemplazosFile();
             foreach (ResultPaymentMatrix m in matrices)
             {
                 // GET BILLING WINDOW.
@@ -55,7 +56,7 @@ namespace Centralizador.Models
                     try
                     {
                         DteInfoRef infoLastF = null;
-                        Dictionary<string, int> dic = GetReemplazosFile();
+
                         foreach (ResultInstruction instruction in InstructionsList)
                         {
                             // GET PARTICIPANT DEBTOR
@@ -85,31 +86,26 @@ namespace Centralizador.Models
                                 if (detalle.DteInfoRefs.Count >= 1)
                                 {
                                     infoLastF = detalle.DteInfoRefs.First(); // SHOW THE LAST DOC.
-                                    switch (detalle.DteInfoRefs.First().DteFiles.Count)
+                                    if (dteInfoRefs.First().DteFiles != null)
                                     {
-                                        case 1:
-                                            if (infoLastF.DteFiles[0].TipoXML == null)
-                                            {
-                                                detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles[0].Archivo);
-                                                detalle.DTEFile = infoLastF.DteFiles[0].Archivo;
-                                            }
-                                            break;
-
-                                        default:
-                                            {
-                                                detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
-                                                detalle.DTEFile = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo;
+                                        switch (detalle.DteInfoRefs.First().DteFiles.Count)
+                                        {
+                                            case 1:
+                                                if (infoLastF.DteFiles[0].TipoXML == null)
+                                                {
+                                                    detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles[0].Archivo);
+                                                    detalle.DTEFile = infoLastF.DteFiles[0].Archivo;
+                                                }
                                                 break;
-                                            }
+
+                                            default:
+                                                {
+                                                    detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
+                                                    detalle.DTEFile = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo;
+                                                    break;
+                                                }
+                                        }
                                     }
-                                    // SET REF MISSING
-                                    //if (infoLastF.EnviadoSII == 0) // No ha sido enviado a SII
-                                    //{
-                                    //    if (new GetReferenceCen(detalle).DocumentoReferencia == null || string.IsNullOrEmpty(infoLastF.Glosa) || string.IsNullOrEmpty(infoLastF.FolioRef))
-                                    //    {
-                                    //        detalle.RefMissing = true; // NO REF IN DTE
-                                    //    }
-                                    //}
                                     detalle.DteInfoRefLast = infoLastF;
                                     detalle.NroInt = infoLastF.NroInt;
                                     detalle.FechaEmision = infoLastF.Fecha.ToString();
@@ -122,7 +118,7 @@ namespace Centralizador.Models
                                     {
                                         detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
                                         // EVENTS FROM SII
-                                        DataEvento evento = await ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant, Properties.Settings.Default.SerialDigitalCert);
+                                        DataEvento evento = await ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant);
                                         if (evento != null)
                                         {
                                             detalle.DataEvento = evento;
@@ -149,8 +145,7 @@ namespace Centralizador.Models
                                         detalle.Instruction.StatusBilled = Instruction.StatusBilled.Facturado;
                                     }
                                 }
-                                bool validaCreditor = true;
-                                detalle.ValidatorFlag = new ValidatorFlag(detalle, validaCreditor);
+                                detalle.ValidatorFlag = new ValidatorFlag(detalle, true);
                             }
                             else
                             {
@@ -187,11 +182,11 @@ namespace Centralizador.Models
                 XDocument doc = XDocument.Load(@"C:\Centralizador\Reemplazos_.xml");
                 return doc.Descendants("Empresa").ToDictionary(d => (string)d.Attribute("id"), d => (int)d);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                new ErrorMsgCen(@"The file 'C:\Centralizador\Reemplazos_.xml' has problems.", ex, MessageBoxIcon.Stop);
+                //new ErrorMsgCen(@"The file 'C:\Centralizador\Reemplazos_.xml' has problems.", ex, MessageBoxIcon.Stop);
+                throw;
             }
-            return null;
         }
 
         public async void DeleteNV()
@@ -205,6 +200,9 @@ namespace Centralizador.Models
             List<Detalle> detallesFinal = new List<Detalle>();
             foreach (Detalle item in detalles)
             {
+                // TESTER
+                //var folio = item.Folio;
+
                 try
                 {
                     DTEDefType xmlObjeto = null;
@@ -213,10 +211,15 @@ namespace Centralizador.Models
                     if (File.Exists(nameFile)) { xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile); }
                     // GET PARTICPANT INFO FROM CEN
                     ResultParticipant participant = await Participant.GetParticipantByRutAsync(item.RutReceptor.ToString());
-                    if (participant != null && participant.Id > 0) { item.IsParticipant = true; }
+                    if (participant != null && participant.Id > 0)
+                    {
+                        item.IsParticipant = true;
+                        item.ParticipantMising = participant;
+                    }
                     if (xmlObjeto != null)
                     {
                         item.DTEDef = xmlObjeto;
+                        // GET REFERENCE SEN.
                         DTEDefTypeDocumentoReferencia r = new GetReferenceCen(item).DocumentoReferencia;
                         if (r != null && r.RazonRef != null)
                         {
@@ -244,14 +247,13 @@ namespace Centralizador.Models
                         }
                     }
                     // FLAGS IF EXISTS XML FILE
-                    bool validaCreditor = false;
-                    item.ValidatorFlag = new ValidatorFlag(item, validaCreditor);
+                    item.ValidatorFlag = new ValidatorFlag(item, false);
                     // EVENTS FROM SII
-                    item.DataEvento = await ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant, Properties.Settings.Default.SerialDigitalCert);
+                    item.DataEvento = await ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant);
                     // STATUS DOC
                     if (item.DataEvento != null) { item.StatusDetalle = GetStatus(item); }
                     // INSERT IN CEN
-                    if (item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null && item.Instruction.IsPaid == false)
+                    if (item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null)
                     {
                         // 1 No Facturado y cuando hay más de 1 dte informado
                         // 2 Facturado
@@ -303,6 +305,8 @@ namespace Centralizador.Models
 
             foreach (Detalle item in detalles)
             {
+                //TESTER
+                var stop = item.Instruction.Id;
                 AuxCsv a = FileSii.GetAuxCvsFromFile(item); // INFORMATION UPDATE FROM CSV FILE.
                 if (a != null)
                 {
@@ -381,6 +385,37 @@ namespace Centralizador.Models
                 progress.Report(ReportModel);
             }
             return folios;
+        }
+
+        private async Task<List<Detalle>> GetStatusDteAsync(string mode, string tokenSii, string tipoDte, List<Detalle> detallesList, ResultParticipant UserParticipant)
+        {
+            Conexion con = new Conexion(DataBaseName);
+            foreach (var item in detallesList)
+            {
+                // GET INFO FROM SII
+                DteInfoRef infoLastF = item.DteInfoRefs.First();
+                if (item.DteInfoRefLast.EnviadoSII == 1 && item.DteInfoRefLast.AceptadoCliente == 0) // 1 Enviado / 0 No enviado
+                {
+                    item.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
+                    // EVENTS FROM SII
+                    DataEvento evento = await ServiceEvento.GetStatusDteAsync(mode, tokenSii, tipoDte, item, UserParticipant);
+                    if (evento != null)
+                    {
+                        item.DataEvento = evento;
+                        item.StatusDetalle = GetStatus(item);
+                    }
+                }
+                if (item.StatusDetalle == StatusDetalle.Pending && infoLastF.AceptadoCliente == 1)
+                {
+                    item.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
+                    item.StatusDetalle = StatusDetalle.Accepted;
+                }
+                else if (item.StatusDetalle == StatusDetalle.Accepted && infoLastF.AceptadoCliente == 0)
+                {
+                    DteFiles.UpdateFiles(con, item); // UPDATE DTE_DocCab SET infoLastF.EnviadoCliente = 1
+                }
+            }
+            return detallesList;
         }
     }
 }

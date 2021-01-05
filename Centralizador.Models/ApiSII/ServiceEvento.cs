@@ -19,28 +19,18 @@ namespace Centralizador.Models.ApiSII
         [JsonProperty("metaData")]
         public MetaData MetaData { get; set; }
 
+        public static string RutToken { get; set; } = GetCertFromPc().Subject;
+
         public ServiceEvento(Data data, MetaData metaData)
         {
             Data = data;
             MetaData = metaData;
         }
 
-        public static async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant, string serialDigitalCert)
+        public static async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant)
         {
-            // Get digital cert
-            X509Certificate2 cert = null;
-            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
-            foreach (X509Certificate2 item in store.Certificates)
-            {
-                if (item.SerialNumber == serialDigitalCert)
-                {
-                    cert = item;
-                }
-            }
-            store.Close();
-            string rutToken = cert.Subject;
-            rutToken = rutToken.Substring(rutToken.IndexOf('=') + 1, 10);
+            string rutToken;
+            rutToken = RutToken.Substring(RutToken.IndexOf('=') + 1, 10);
             MetaData metaData = new MetaData
             {
                 Namespace = "cl.sii.sdi.lob.diii.registrorechazodtej6.data.api.interfaces.FacadeService/validarAccesoReceptor",
@@ -92,6 +82,21 @@ namespace Centralizador.Models.ApiSII
             {
                 throw;
             }
+            return null;
+        }
+
+        private static X509Certificate2 GetCertFromPc()
+        {
+            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+            foreach (X509Certificate2 item in store.Certificates)
+            {
+                if (item.SerialNumber == Properties.Settings.Default.SerialDigitalCert && item.NotAfter > DateTime.Now)
+                {
+                    return item;
+                }
+            }
+            store.Close();
             return null;
         }
     }
