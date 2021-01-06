@@ -64,9 +64,6 @@ namespace Centralizador.Models.DataBase
                 query.Append($"'{adressTemp}','S', 'S','N', 'N', 'S','{instruction.ParticipantDebtor.DteReceptionEmail}' ");
                 query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}, '{time}') END");
                 conexion.Query = query.ToString();
-                //aux.DirAux = adressTemp;
-                //aux.ComAux = comuna.ComDes;
-                //await Conexion.ExecuteNonQueryAsync(conexion);
                 if (await Conexion.ExecuteNonQueryAsync(conexion) == 2)
                 {
                     return new Auxiliar()

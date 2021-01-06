@@ -46,15 +46,12 @@ namespace Centralizador.Models.DataBase
             {
                 try
                 {
-                    cnn.Open();
+                    // cnn.Open();
                     using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
-                        using (SqlDataReader)
-                        {
-                            SqlDataReader.Close();
-                            int res = await cmd.ExecuteNonQueryAsync();
-                            return res;
-                        }
+                        await cmd.Connection.OpenAsync();
+                        int res = await cmd.ExecuteNonQueryAsync();
+                        return res;
                     }
                 }
                 catch (Exception)
@@ -76,9 +73,10 @@ namespace Centralizador.Models.DataBase
                 try
                 {
                     SqlCommand sqlCommand = cnn.CreateCommand();
-                    cnn.Open();
+                    //cnn.Open();
                     using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
+                        await cmd.Connection.OpenAsync();
                         await cmd.ExecuteNonQueryAsync();
                     }
                 }
@@ -93,7 +91,7 @@ namespace Centralizador.Models.DataBase
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
-                cnn.Open();
+                await cnn.OpenAsync();
                 SqlCommand sqlCommand = cnn.CreateCommand();
                 SqlTransaction sqlTransaction;
 
@@ -132,15 +130,23 @@ namespace Centralizador.Models.DataBase
             {
                 try
                 {
-                    cnn.Open();
+                    //cnn.Open();
                     using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
-                        using (SqlDataReader)
+                        await cmd.Connection.OpenAsync();
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            SqlDataReader = await cmd.ExecuteReaderAsync();
-                            DataTable dataTable = new DataTable();
-                            dataTable.Load(SqlDataReader);
-                            return dataTable;
+                            if (reader != null)
+                            {
+                                DataTable dataTable = new DataTable();
+                                dataTable.Load(reader);
+                                return dataTable;
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                            //SqlDataReader = await cmd.ExecuteReaderAsync();
                         }
                     }
                 }
@@ -162,21 +168,22 @@ namespace Centralizador.Models.DataBase
             {
                 try
                 {
-                    cnn.Open();
+                    //cnn.Open();
                     using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
-                        using (SqlDataReader)
+                        await cmd.Connection.OpenAsync();
+                        //using (SqlDataReader reader = await cmd.ExecuteScalarAsync())
+                        //{
+                        object obj = await cmd.ExecuteScalarAsync();
+                        if (obj != null && DBNull.Value != obj)
                         {
-                            object obj = await cmd.ExecuteScalarAsync();
-                            if (obj != null && DBNull.Value != obj)
-                            {
-                                return obj;
-                            }
-                            else
-                            {
-                                return null;
-                            }
+                            return obj;
                         }
+                        else
+                        {
+                            return null;
+                        }
+                        //}
                     }
                 }
                 catch (Exception)

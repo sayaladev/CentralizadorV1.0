@@ -623,7 +623,7 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void ReportProgress(object sender, ProgressReportModel e)
+        private async void ReportProgress(object sender, ProgressReportModel e)
         {
             // PROGRESS IFORMATION
             if (GetTypeReport == TipoTask.SendEmail)
@@ -661,6 +661,7 @@ namespace Centralizador.WinApp.GUI
                     case TipoTask.GetCreditor:
                         SetStateReport(false);
                         e.StopWatch.Stop();
+                        IGridFill(await BilingType.GetBilinTypesAsync());
                         BtnPagar.Enabled = false;
                         BtnInsertNv.Enabled = true;
                         TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
@@ -1139,7 +1140,10 @@ namespace Centralizador.WinApp.GUI
                 {
                     DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
                     DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
-                    if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
+                    if (DetallePrincipal != null && DetallePrincipal.Count > 0)
+                    {
+                        IGridFill(await BilingType.GetBilinTypesAsync());
+                    }
                 }
                 else
                 {

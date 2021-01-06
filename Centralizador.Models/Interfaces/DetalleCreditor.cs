@@ -42,10 +42,14 @@ namespace Centralizador.Models.Interfaces
             List<Detalle> detalles = new List<Detalle>();
             Conexion con = new Conexion(DataBaseName);
             Dictionary<string, int> dic = GetReemplazosFile();
-            DeleteNV(); // DELETE NV.
-            DteInfoRef.InsertTriggerRefCen(new Conexion(DataBaseName));  // INSERT TRIGGER.
+            // DELETE NV.
+            DeleteNV();
+            // INSERT TRIGGER.
+            DteInfoRef.InsertTriggerRefCen(new Conexion(DataBaseName));
             foreach (ResultPaymentMatrix m in matrices)
             {
+                //Parallel.ForEach(matrices, async (m) =>
+                //{
                 // GET BILLING WINDOW.
                 int d = 0;
                 m.BillingWindow = await BillingWindow.GetBillingWindowByIdAsync(m);
@@ -170,10 +174,14 @@ namespace Centralizador.Models.Interfaces
                 ProgressReport.PercentageComplete = (int)porcent;
                 ProgressReport.Message = $"Searching 'PAY INSTRUCTIONS' from CEN, wait please.  ({c}/{matrices.Count})";
                 progress.Report(ProgressReport);
+                //});
+
+                //return Task.FromResult(detalles);
             }
             return detalles;
         }
 
+        //private async
         public async Task<List<int>> InsertNv(List<Detalle> detalles, IProgress<ProgressReportModel> progress, List<ResultBilingType> types)
         {
             int c = 0;
