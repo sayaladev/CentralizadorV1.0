@@ -173,54 +173,5 @@ namespace Centralizador.Models.DataBase
                 throw;
             }
         }
-
-        /// <summary>
-        /// Check if Insert NV.
-        /// </summary>
-        /// <param name="instruction"></param>
-        /// <param name="conexion"></param>
-        /// <returns></returns>
-        //public static async Task<int> GetNvIfExistsAsync(ResultInstruction instruction, Conexion conexion)
-        //{
-        //    string date;
-        //    if (Environment.MachineName == "DEVELOPER")
-        //    {
-        //        // Developer
-        //        date = instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
-        //    }
-        //    else
-        //    {
-        //        date = instruction.PaymentMatrix.PublishDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-        //    }
-
-        //    StringBuilder query = new StringBuilder();
-        //    query.AppendLine("SELECT DISTINCT top (1) nv.nvnumero ");
-        //    query.AppendLine("FROM softland.nw_nventa nv ");
-        //    query.AppendLine("INNER JOIN softland.nw_detnv d ");
-        //    query.AppendLine("ON   nv.nvnumero = d.nvnumero ");
-        //    query.AppendLine("LEFT JOIN softland.nw_ffactncrednv() f ");
-        //    query.AppendLine("ON   f.nvnumero = d.nvnumero ");
-        //    query.AppendLine("     AND f.codprod = d.codprod ");
-        //    query.AppendLine("     AND f.nvcorrela = d.nvlinea ");
-        //    query.AppendLine($"WHERE nv.codaux = '{instruction.ParticipantDebtor.Rut}' ");
-        //    query.AppendLine($"    AND nv.nvsubtotal = {instruction.Amount} ");
-        //    query.AppendLine("     AND f.folio IS NULL ");
-        //    query.AppendLine($"    AND nv.fechahoracreacion >= '{date}'");
-
-        //    try
-        //    {
-        //        conexion.Query = query.ToString();
-        //        object result = await Conexion.ExecuteScalarAsync(conexion);
-        //        if (result != null)
-        //        {
-        //            return Convert.ToInt32(result);
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //    return 0;
-        //}
     }
 }

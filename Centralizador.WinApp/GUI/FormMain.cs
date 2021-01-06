@@ -20,7 +20,6 @@ using Centralizador.Models.ApiSII;
 using Centralizador.Models.AppFunctions;
 using Centralizador.Models.DataBase;
 using Centralizador.Models.Interfaces;
-using Centralizador.Models.Outlook;
 using Centralizador.Models.Outlook.MailKit;
 using Centralizador.Models.registroreclamodteservice;
 
@@ -368,269 +367,6 @@ namespace Centralizador.WinApp.GUI
             TokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
         }
 
-        #endregion METHODS
-
-        #region PDF
-
-        private void BgwConvertPdf_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
-
-        private void BgwConvertPdf_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled == true)
-            {
-                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
-            }
-
-            TssLblProgBar.Value = 0;
-            TssLblMensaje.Text = "Operation completed.";
-            SetStateReport(false);
-            IGridMain.Focus();
-        }
-
-        private void BtnPdfConvert_Click(object sender, EventArgs e)
-        {
-            if (!GetStateReport && IGridMain.Rows.Count > 0)
-            {
-                List<Detalle> lista = new List<Detalle>();
-                if (DetallePrincipal != null)
-                {
-                    foreach (Detalle item in DetallePrincipal)
-                    {
-                        if (item.DTEDef != null)
-                        {
-                            lista.Add(item);
-                        }
-                    }
-                }
-                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (DialogResult == DialogResult.Yes)
-                {
-                    BgwConvertPdf = new BackgroundWorker
-                    {
-                        WorkerReportsProgress = true,
-                        WorkerSupportsCancellation = true
-                    };
-                    BgwConvertPdf.ProgressChanged += BgwConvertPdf_ProgressChanged;
-                    BgwConvertPdf.RunWorkerCompleted += BgwConvertPdf_RunWorkerCompleted;
-                    ServicePdf servicePdf = new ServicePdf(lista);
-                    SetStateReport(true);
-                    servicePdf.ConvertToPdf(BgwConvertPdf);
-                }
-            }
-        }
-
-        #endregion PDF
-
-        #region INSERTNV
-
-        private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
-        {
-            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (GetTypeReport == TipoTask.GetDebtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
-            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            List<Detalle> detallesPaso = new List<Detalle>();
-            List<Detalle> detallesFinal = new List<Detalle>();
-
-            // DOWNLOAD SII FILE IF NOT EXISTS.
-            DialogResult resp;
-            while (!new FileSii().ExistsFile)
-            {
-                resp = MessageBox.Show($"The file '{FileSii.Path}' NOT found, please download...", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                if (resp == DialogResult.OK)
-                {
-                    Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
-                    return;
-                }
-                else if (resp == DialogResult.Cancel)
-                {
-                    return;
-                }
-            }
-            int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(new Conexion(DataBaseName));
-            // TESTER
-            //foliosDisp = 100;
-            int count = DetallePrincipal.Count;
-            StringBuilder builder = new StringBuilder();
-            foreach (Detalle item in DetallePrincipal)
-            {
-                if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
-                {
-                    if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
-                    {
-                        detallesPaso.Add(item);
-                    }
-                }
-                else
-                {
-                    if (item.Folio == 0 && item.MntNeto > 9) { detallesPaso.Add(item); } // only > $10
-                }
-            }
-            int c = 0;
-            int foliosDispBefore = foliosDisp;
-            while (foliosDisp > 0 && detallesPaso.Count > c)
-            {
-                detallesFinal.Add(detallesPaso[c]);
-                foliosDisp--;
-                c++;
-            }
-
-            if (detallesFinal.Count > 0)
-            {
-                builder.AppendLine($"There are {foliosDispBefore} F° available, so you can only insert {detallesFinal.Count} of {detallesPaso.Count} NV");
-                builder.AppendLine(); builder.AppendLine();
-                builder.AppendLine("WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.");
-
-                resp = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (resp == DialogResult.Yes)
-                {
-                    TssLblMensaje.Text = "Reading SII file, be patient...";
-                    await Task.Delay(3000); // 3 SECONDS.
-                    try
-                    {
-                        ProgressReport = new Progress<ProgressReportModel>();
-                        ProgressReport.ProgressChanged += ReportProgress;
-                        FileSii.ReadFileSii(); // GET VALUES LIST FROM CSV.
-                        DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
-                        List<int> folios = await det.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
-                        if (folios != null)
-                        {
-                            string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
-                            if (folios != null && folios.Count > 0)
-                            {
-                                int menor = folios.Min();
-                                int mayor = folios.Max();
-                                det.StringLogging.AppendLine("");
-                                det.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
-                                det.SaveLogging(@"C:\Centralizador\Log\", nameFile);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        new ErrorMsgCen("There was an error insert into the DB.", ex, MessageBoxIcon.Warning);
-                        return;
-                    }
-                }
-                else { TssLblMensaje.Text = "Cancel."; }
-            }
-            else
-            {
-                if (foliosDisp == 0 && detallesPaso.Count > 0)
-                {
-                    TssLblMensaje.Text = "F° Available: 0, you need get more in SII.";
-                    resp = MessageBox.Show("You will be redirected to the SII site...", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (resp == DialogResult.Yes)
-                    {
-                        Process.Start("https://palena.sii.cl/cvc_cgi/dte/of_solicita_folios");
-                        return;
-                    }
-                }
-                else if (true)
-                {
-                    TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
-                }
-            }
-        }
-
-        #endregion INSERTNV
-
-        #region DEBTOR & CREDITOR
-
-        private async void BtnCreditor_Click(object sender, EventArgs e)
-        {
-            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            // if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            //Stopwatch watch = Stopwatch.StartNew();
-            try
-            {
-                //watch.Start();
-                //ReportModel = new ProgressReportModel(TipoTask.GetCreditor)
-                //{
-                //    IsRuning = true,
-                //    StopWatch = watch
-                //};
-                ProgressReport = new Progress<ProgressReportModel>();
-                ProgressReport.ProgressChanged += ReportProgress;
-                CancellationTk = new CancellationTokenSource();
-                List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
-                if (matrices != null && matrices.Count > 0)
-                {
-                    DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
-                    det.DeleteNV(); // DELETE NV.
-                    DteInfoRef.InsertTriggerRefCen(new Conexion(DataBaseName));  // INSERT TRIGGER.
-                    DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
-                    if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
-                }
-                else
-                {
-                    TssLblMensaje.Text = $"There are no published instructions for:  {CboMonths.SelectedItem}-{CboYears.SelectedItem}.";
-                }
-            }
-            catch (Exception ex)
-            {
-                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
-                TssLblProgBar.Value = 0;
-                TssLblMensaje.Text = "There was an error loading the data.";
-                return;
-            }
-            finally
-            {
-                //ReportModel.IsRuning = false;
-                //TssLblFechaHora.Image = null;
-                //TssLblFechaHora.Text = "";
-            }
-        }
-
-        private async void BtnDebtor_Click(object sender, EventArgs e)
-        {
-            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            // if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            // Stopwatch watch = Stopwatch.StartNew();
-            try
-            {
-                string nameFile = @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
-                //watch.Start();
-                //ReportModel = new ProgressReportModel(TipoTask.GetDebtor)
-                //{
-                //    IsRuning = true,
-                //    StopWatch = watch
-                //};
-                ProgressReport = new Progress<ProgressReportModel>();
-                ProgressReport.ProgressChanged += ReportProgress;
-                CancellationTk = new CancellationTokenSource();
-                List<Detalle> detalles = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
-                if (detalles != null)
-                {
-                    DetalleDebtor det = new DetalleDebtor(DataBaseName, UserParticipant, TokenSii, TokenCen);
-                    DetallePrincipal = await det.GetDetalleDebtor(detalles, ProgressReport, CancellationTk.Token, nameFile);
-                    if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
-                }
-            }
-            catch (Exception ex)
-            {
-                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
-                TssLblProgBar.Value = 0;
-                TssLblMensaje.Text = "There was an error loading the data.";
-                return;
-            }
-            finally
-            {
-                SetStateReport(false);  // OR PROP STATIC PUBLICA?
-                //ReportModel.IsRuning = false;
-                TssLblFechaHora.Image = fImageListSmall.Images[1];
-                TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
-                TssLblFechaHora.Text = "0";
-            }
-        }
-
-        #endregion DEBTOR & CREDITOR
-
-        #region COMMON
-
         private void BtnCancelTak_Click(object sender, EventArgs e)
         {
             try
@@ -889,8 +625,7 @@ namespace Centralizador.WinApp.GUI
 
         private void ReportProgress(object sender, ProgressReportModel e)
         {
-            // Progress Bar
-
+            // PROGRESS IFORMATION
             if (GetTypeReport == TipoTask.SendEmail)
             {
                 TssLblMensaje.Text = e.Message;
@@ -906,11 +641,15 @@ namespace Centralizador.WinApp.GUI
             {
                 BtnCancelTak.Enabled = false;
                 TssLblProgBar.Value = 0;
-
-                // ProgressReportModel.PercentageComplete = 0;
                 switch (GetTypeReport)
                 {
                     case TipoTask.GetDebtor:
+                        SetStateReport(false);  // OR PROP STATIC PUBLICA?
+                        // ICON FOR EMAIL SENNDING.
+                        TssLblFechaHora.Image = fImageListSmall.Images[1];
+                        TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
+                        TssLblFechaHora.Text = "0";
+
                         e.StopWatch.Stop();
                         BtnPagar.Enabled = true;
                         BtnInsertNv.Enabled = false;
@@ -920,6 +659,7 @@ namespace Centralizador.WinApp.GUI
                         break;
 
                     case TipoTask.GetCreditor:
+                        SetStateReport(false);
                         e.StopWatch.Stop();
                         BtnPagar.Enabled = false;
                         BtnInsertNv.Enabled = true;
@@ -929,12 +669,14 @@ namespace Centralizador.WinApp.GUI
                         break;
 
                     case TipoTask.InsertNV:
+                        SetStateReport(false);
                         BtnInsertNv.Enabled = false;
                         TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
                         TssLblDBName.Text = "|DB: " + DataBaseName;
                         break;
 
                     case TipoTask.ReadEmail:
+                        SetStateReport(false);
                         BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", e.FchOutlook);
                         TssLblMensaje.Text = "Complete!";
                         break;
@@ -947,27 +689,62 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        #endregion COMMON
+        #endregion METHODS
 
-        #region EXCEL CONVERT
+        #region PDF
 
-        private void BtnExcelConvert_Click(object sender, EventArgs e)
+        private void BgwConvertPdf_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (!GetStateReport && DetallePrincipal != null && DetallePrincipal.Count > 0)
+            TssLblProgBar.Value = e.ProgressPercentage;
+            TssLblMensaje.Text = e.UserState.ToString();
+        }
+
+        private void BgwConvertPdf_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled == true)
             {
-                ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
-                if (GetTypeReport == TipoTask.GetCreditor)
+                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
+            }
+
+            TssLblProgBar.Value = 0;
+            TssLblMensaje.Text = "Operation completed.";
+            SetStateReport(false);
+            IGridMain.Focus();
+        }
+
+        private void BtnPdfConvert_Click(object sender, EventArgs e)
+        {
+            if (!GetStateReport && IGridMain.Rows.Count > 0)
+            {
+                List<Detalle> lista = new List<Detalle>();
+                if (DetallePrincipal != null)
                 {
-                    serviceExcel.ExportToExcel(DetallePrincipal, true, CboMonths.SelectedItem);
+                    foreach (Detalle item in DetallePrincipal)
+                    {
+                        if (item.DTEDef != null)
+                        {
+                            lista.Add(item);
+                        }
+                    }
                 }
-                else if (GetTypeReport == TipoTask.GetDebtor)
+                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (DialogResult == DialogResult.Yes)
                 {
-                    serviceExcel.ExportToExcel(DetallePrincipal, false, CboMonths.SelectedItem);
+                    BgwConvertPdf = new BackgroundWorker
+                    {
+                        WorkerReportsProgress = true,
+                        WorkerSupportsCancellation = true
+                    };
+                    BgwConvertPdf.ProgressChanged += BgwConvertPdf_ProgressChanged;
+                    BgwConvertPdf.RunWorkerCompleted += BgwConvertPdf_RunWorkerCompleted;
+                    ServicePdf servicePdf = new ServicePdf(lista);
+                    SetStateReport(true);
+                    servicePdf.ConvertToPdf(BgwConvertPdf);
                 }
             }
         }
 
-        #endregion EXCEL CONVERT
+        #endregion PDF
 
         #region IGRID
 
@@ -1346,7 +1123,182 @@ namespace Centralizador.WinApp.GUI
 
         #endregion IGRID
 
-        #region OUTLOOK
+        #region PRINCIPAL BUTTONS
+
+        private async void BtnCreditor_Click(object sender, EventArgs e)
+        {
+            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
+            try
+            {
+                ProgressReport = new Progress<ProgressReportModel>();
+                ProgressReport.ProgressChanged += ReportProgress;
+                CancellationTk = new CancellationTokenSource();
+                List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
+                if (matrices != null && matrices.Count > 0)
+                {
+                    DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
+                    DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
+                    if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
+                }
+                else
+                {
+                    TssLblMensaje.Text = $"There are no published instructions for:  {CboMonths.SelectedItem}-{CboYears.SelectedItem}.";
+                }
+            }
+            catch (Exception ex)
+            {
+                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
+                TssLblProgBar.Value = 0;
+                TssLblMensaje.Text = "There was an error loading the data.";
+                return;
+            }
+        }
+
+        private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
+        {
+            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetTypeReport == TipoTask.GetDebtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
+            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
+            List<Detalle> detallesPaso = new List<Detalle>();
+            List<Detalle> detallesFinal = new List<Detalle>();
+
+            // DOWNLOAD SII FILE IF NOT EXISTS.
+            DialogResult resp;
+            while (!new FileSii().ExistsFile)
+            {
+                resp = MessageBox.Show($"The file '{FileSii.Path}' NOT found, please download...", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (resp == DialogResult.OK)
+                {
+                    Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
+                    return;
+                }
+                else if (resp == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+            int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(new Conexion(DataBaseName));
+            // TESTER
+            //foliosDisp = 100;
+            int count = DetallePrincipal.Count;
+            StringBuilder builder = new StringBuilder();
+            foreach (Detalle item in DetallePrincipal)
+            {
+                if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
+                {
+                    if (item.DataEvento != null && item.DataEvento.ListEvenHistDoc.Count > 0 && item.DataEvento.ListEvenHistDoc.FirstOrDefault(x => x.CodEvento == "NCA") != null)
+                    {
+                        detallesPaso.Add(item);
+                    }
+                }
+                else
+                {
+                    if (item.Folio == 0 && item.MntNeto > 9) { detallesPaso.Add(item); } // only > $10
+                }
+            }
+            int c = 0;
+            int foliosDispBefore = foliosDisp;
+            while (foliosDisp > 0 && detallesPaso.Count > c)
+            {
+                detallesFinal.Add(detallesPaso[c]);
+                foliosDisp--;
+                c++;
+            }
+
+            if (detallesFinal.Count > 0)
+            {
+                builder.AppendLine($"There are {foliosDispBefore} F° available, so you can only insert {detallesFinal.Count} of {detallesPaso.Count} NV");
+                builder.AppendLine(); builder.AppendLine();
+                builder.AppendLine("WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.");
+
+                resp = MessageBox.Show(builder.ToString(), Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (resp == DialogResult.Yes)
+                {
+                    TssLblMensaje.Text = "Reading SII file, be patient...";
+                    //await Task.Delay(3000); // 3 SECONDS.
+                    try
+                    {
+                        ProgressReport = new Progress<ProgressReportModel>();
+                        ProgressReport.ProgressChanged += ReportProgress;
+                        FileSii.ReadFileSii(); // GET VALUES LIST FROM CSV.
+                        DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
+                        List<int> folios = await det.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
+                        if (folios != null)
+                        {
+                            string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
+                            if (folios != null && folios.Count > 0)
+                            {
+                                int menor = folios.Min();
+                                int mayor = folios.Max();
+                                det.StringLogging.AppendLine("");
+                                det.StringLogging.AppendLine($"Summary: From {menor} To-{mayor}");
+                                det.SaveLogging(@"C:\Centralizador\Log\", nameFile);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        new ErrorMsgCen("There was an error insert into the DB.", ex, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+                else { TssLblMensaje.Text = "Cancel."; }
+            }
+            else
+            {
+                if (foliosDisp == 0 && detallesPaso.Count > 0)
+                {
+                    TssLblMensaje.Text = "F° Available: 0, you need get more in SII.";
+                    resp = MessageBox.Show("You will be redirected to the SII site...", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (resp == DialogResult.Yes)
+                    {
+                        Process.Start("https://palena.sii.cl/cvc_cgi/dte/of_solicita_folios");
+                        return;
+                    }
+                }
+                else if (true)
+                {
+                    TssLblMensaje.Text = "There are already NV associated with these instructions, it cannot be inserted.";
+                }
+            }
+        }
+
+        private async void BtnDebtor_Click(object sender, EventArgs e)
+        {
+            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
+            try
+            {
+                string nameFile = @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
+
+                ProgressReport = new Progress<ProgressReportModel>();
+                ProgressReport.ProgressChanged += ReportProgress;
+                CancellationTk = new CancellationTokenSource();
+                List<Detalle> detalles = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
+                if (detalles != null)
+                {
+                    DetalleDebtor det = new DetalleDebtor(DataBaseName, UserParticipant, TokenSii, TokenCen);
+                    DetallePrincipal = await det.GetDetalleDebtor(detalles, ProgressReport, CancellationTk.Token, nameFile);
+                    if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
+                TssLblProgBar.Value = 0;
+                TssLblMensaje.Text = "There was an error loading the data.";
+                return;
+            }
+            finally
+            {
+                //SetStateReport(false);  // OR PROP STATIC PUBLICA?
+
+                //TssLblFechaHora.Image = fImageListSmall.Images[1];
+                //TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
+                //TssLblFechaHora.Text = "0";
+            }
+        }
 
         private async void BtnOutlook_Click(object sender, EventArgs e)
         {
@@ -1372,13 +1324,26 @@ namespace Centralizador.WinApp.GUI
                 return;
                 throw;
             }
-            finally
+        }
+
+        private void BtnExcelConvert_Click(object sender, EventArgs e)
+        {
+            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (DetallePrincipal != null && DetallePrincipal.Count > 0)
             {
-                //ReportModel.IsRuning = false;
+                ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
+                if (GetTypeReport == TipoTask.GetCreditor)
+                {
+                    serviceExcel.ExportToExcel(DetallePrincipal, true, CboMonths.SelectedItem);
+                }
+                else if (GetTypeReport == TipoTask.GetDebtor)
+                {
+                    serviceExcel.ExportToExcel(DetallePrincipal, false, CboMonths.SelectedItem);
+                }
             }
         }
 
-        #endregion OUTLOOK
+        #endregion PRINCIPAL BUTTONS
 
         #region Pagar
 
@@ -1508,11 +1473,5 @@ namespace Centralizador.WinApp.GUI
         //}
 
         #endregion Pagar
-
-        //private void button1_Click(object sender, EventArgs e)
-        //{
-        //    var algo = TokenSii;
-        //    ServiceReadMail.SaveFiles(@"C:\Centralizador\Temp\CLI_771654800_3700_765323584_20201211_0202.xml");
-        //}
     }
 }

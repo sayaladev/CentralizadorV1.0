@@ -42,6 +42,8 @@ namespace Centralizador.Models.Interfaces
             List<Detalle> detalles = new List<Detalle>();
             Conexion con = new Conexion(DataBaseName);
             Dictionary<string, int> dic = GetReemplazosFile();
+            DeleteNV(); // DELETE NV.
+            DteInfoRef.InsertTriggerRefCen(new Conexion(DataBaseName));  // INSERT TRIGGER.
             foreach (ResultPaymentMatrix m in matrices)
             {
                 // GET BILLING WINDOW.
@@ -262,11 +264,6 @@ namespace Centralizador.Models.Interfaces
                 {
                     new ErrorMsgCen("There was an error Inserting the data.", ex, MessageBoxIcon.Stop);
                 }
-                finally
-                {
-                    ProgressReportModel.SetStateReport(false);
-                    ProgressReport.PercentageComplete = 0;
-                }
             }
             return folios;
         }
@@ -290,7 +287,7 @@ namespace Centralizador.Models.Interfaces
             new CreateFile(path, StringLogging, nameFile);
         }
 
-        public async void DeleteNV()
+        private async void DeleteNV()
         {
             await NotaVenta.DeleteNvAsync(new Conexion(DataBaseName));
         }

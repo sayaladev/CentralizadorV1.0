@@ -35,7 +35,6 @@ namespace Centralizador.Models.Outlook.MailKit
 
         public async Task ReadMailFromServer(CancellationToken token)
         {
-            //ProgressReport = new ProgressReportModel(TipoTask.ReadEmail);
             using (ImapClient client = new ImapClient())
             {
                 string pathTemp = @"C:\Centralizador\Temp\";
@@ -116,7 +115,6 @@ namespace Centralizador.Models.Outlook.MailKit
                 {
                     SaveParam();
                     await client.DisconnectAsync(true);
-                    SetStateReport(false);
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace Centralizador.Models
             TaskType = taskType;
             IsRuning = true;
             PercentageComplete = 0;
-            if (TaskType == TipoTask.GetCreditor || TaskType == TipoTask.GetCreditor)
+            if (TaskType == TipoTask.GetCreditor || TaskType == TipoTask.GetDebtor)
             {
                 StopWatch = Stopwatch.StartNew();
             }
