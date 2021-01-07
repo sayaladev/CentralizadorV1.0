@@ -22,7 +22,7 @@ namespace Centralizador.Models.ApiSII
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
             foreach (X509Certificate2 item in store.Certificates)
             {
-                if (item.SerialNumber == Properties.Settings.Default.SerialDigitalCert && item.NotAfter > DateTime.Now)
+                if (item.SerialNumber == Properties.Settings.Default.SerialNumber && item.NotAfter > DateTime.Now)
                 {
                     return item;
                 }

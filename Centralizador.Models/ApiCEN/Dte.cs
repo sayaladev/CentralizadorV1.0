@@ -100,7 +100,7 @@ namespace Centralizador.Models.ApiCEN
                 {
                     using (CustomWebClient wc = new CustomWebClient())
                     {
-                        Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/operations/dtes/create/");
+                        Uri uri = new Uri(Properties.Settings.Default.UrlCen, "api/v1/operations/dtes/create/");
                         string d = JsonConvert.SerializeObject(dte);
                         wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                         NameValueCollection postData = new NameValueCollection() { { "data", d } };
@@ -156,7 +156,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/operations/dtes/create/");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, "api/v1/operations/dtes/create/");
                     string d = JsonConvert.SerializeObject(dte);
                     wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                     wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
@@ -187,7 +187,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/v1/resources/auxiliary-files/");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, "api/v1/resources/auxiliary-files/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                     wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                     wc.Headers.Add("Content-Disposition", "attachment; filename=" + fileName + ".xml");
@@ -212,7 +212,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&folio={detalle.Folio}&instruccion={detalle.Instruction.Id}&creditor={detalle.Instruction.Creditor}");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/resources/dtes/?reported_by_creditor={isCreditor}&folio={detalle.Folio}&instruccion={detalle.Instruction.Id}&creditor={detalle.Instruction.Creditor}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.DownloadStringTaskAsync(uri);  // GET
                     if (res != null)

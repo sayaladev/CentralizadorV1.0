@@ -83,8 +83,8 @@ namespace Centralizador.Models.Outlook.MailKit
                 "Una herramienta Centralizador.</span></strong></p>";
             try
             {
-                MailboxAddress ffrom = new MailboxAddress(Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserEmail);
-                MailboxAddress cc = new MailboxAddress(Properties.Settings.Default.CCEmail, Properties.Settings.Default.CCEmail);
+                MailboxAddress ffrom = new MailboxAddress(Properties.Settings.Default.User365, Properties.Settings.Default.Password365);
+                MailboxAddress cc = new MailboxAddress(Properties.Settings.Default.UserCC365, Properties.Settings.Default.UserCC365);
 
                 MimeMessage message = new MimeMessage();
                 message.From.Add(ffrom);
@@ -97,7 +97,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 message.Subject = "Notifica rechazo factura CEN";
                 message.Priority = MessagePriority.Urgent;
                 message.Importance = MessageImportance.High;
-                message.ReplyTo.Add(new MailboxAddress(Properties.Settings.Default.CCEmail, Properties.Settings.Default.CCEmail));
+                message.ReplyTo.Add(new MailboxAddress(Properties.Settings.Default.UserCC365, Properties.Settings.Default.UserCC365));
 
                 // TO ADDRESS.
                 if (detalle.Instruction != null)
@@ -138,7 +138,7 @@ namespace Centralizador.Models.Outlook.MailKit
                     {
                         client.MessageSent += Client_MessageSent;
                         await client.ConnectAsync("smtp.office365.com", 587, false);
-                        await client.AuthenticateAsync(Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword);
+                        await client.AuthenticateAsync(Properties.Settings.Default.User365, Properties.Settings.Default.Password365);
                         await client.SendAsync(message);
                         await client.DisconnectAsync(true);
                     }

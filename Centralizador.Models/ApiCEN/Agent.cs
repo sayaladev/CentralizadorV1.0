@@ -18,7 +18,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/agents/?email={userCEN}");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/resources/agents/?email={userCEN}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)
@@ -49,7 +49,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, "api/token-auth/");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, "api/token-auth/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.UploadStringTaskAsync(uri, WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)); // POST
                     if (res != null)

@@ -401,7 +401,7 @@ namespace Centralizador.WinApp.GUI
             TxtTpoDocRef.BackColor = Color.Empty;
         }
 
-        private void IGridFill(List<ResultBilingType> types)
+        public void IGridFill(List<ResultBilingType> types)
         {
             try
             {
@@ -623,7 +623,7 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private async void ReportProgress(object sender, ProgressReportModel e)
+        private void ReportProgress(object sender, ProgressReportModel e)
         {
             // PROGRESS IFORMATION
             if (GetTypeReport == TipoTask.SendEmail)
@@ -659,14 +659,17 @@ namespace Centralizador.WinApp.GUI
                         break;
 
                     case TipoTask.GetCreditor:
-                        SetStateReport(false);
-                        e.StopWatch.Stop();
-                        IGridFill(await BilingType.GetBilinTypesAsync());
-                        BtnPagar.Enabled = false;
-                        BtnInsertNv.Enabled = true;
-                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
-                        TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
-                        TssLblDBName.Text = "|DB: " + DataBaseName;
+                        if (DetallePrincipal != null)
+                        {
+                            SetStateReport(false);
+                            e.StopWatch.Stop();
+                            BtnPagar.Enabled = false;
+                            BtnInsertNv.Enabled = true;
+                            TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
+                            TssLblMensaje.Text += "         *[" + e.StopWatch.Elapsed.TotalSeconds.ToString("0.0000") + " seconds.]";
+                            TssLblDBName.Text = "|DB: " + DataBaseName;
+                        }
+
                         break;
 
                     case TipoTask.InsertNV:
@@ -1140,10 +1143,27 @@ namespace Centralizador.WinApp.GUI
                 {
                     DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
                     DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
-                    if (DetallePrincipal != null && DetallePrincipal.Count > 0)
+
+                    // TESTER
+                    //  List<ResultInstruction> send = await det.GetInstructionsAsync(matrices, ProgressReport);
+
+                    //var d1 = GetRootDetalle(send);
+
+                    //var d2 = GetInfoInvoice(d1);
+                    //var d3 = GetInfoSii(d2);
+                    //var d4 = SendToCEN(d3);
+                    //DetallePrincipal = d4;
+                    //await det.GetDetallesAsync(send, ProgressReport, CancellationTk.Token).ContinueWith(async taskInfo =>
+                    //{
+                    //    DetallePrincipal = taskInfo.Result;
+                    //    IGridFill(await BilingType.GetBilinTypesAsync());
+                    //});
+
+                    if (DetallePrincipal != null)
                     {
                         IGridFill(await BilingType.GetBilinTypesAsync());
                     }
+                    SetStateReport(false);
                 }
                 else
                 {
@@ -1156,6 +1176,197 @@ namespace Centralizador.WinApp.GUI
                 TssLblProgBar.Value = 0;
                 TssLblMensaje.Text = "There was an error loading the data.";
                 return;
+            }
+        }
+
+        private List<Detalle> GetRootDetalle(List<ResultInstruction> InstructionsList)
+        {
+            List<Detalle> detalles = new List<Detalle>();
+            Dictionary<string, int> dic = GetReemplazosFile();
+
+            Task<List<Detalle>> task = new Task<List<Detalle>>(() =>
+            {
+                Parallel.ForEach(InstructionsList, (instruction) =>
+               {
+                   Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} GetRootDetalle: {instruction.Id}");
+                   // GET PARTICIPANT DEBTOR
+                   instruction.ParticipantDebtor = Participant.GetParticipantByIdAsync(instruction.Debtor).Result;
+                   // REEMPLAZOS
+                   if (dic.ContainsKey(instruction.ParticipantDebtor.Id.ToString()))
+                   {
+                       instruction.ParticipantNew = Participant.GetParticipantByIdAsync(dic[instruction.ParticipantDebtor.Id.ToString()]).Result;
+                   }
+                   // ROOT CLASS.
+                   Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
+                   detalles.Add(detalle);
+               });
+
+                Thread.Sleep(3000);
+                return detalles;
+            });
+            task.Start();
+            return task.Result;
+        }
+
+        private List<Detalle> GetInfoInvoice(List<Detalle> detalles)
+        {
+            Conexion con = new Conexion(DataBaseName);
+            Task<List<Detalle>> task = new Task<List<Detalle>>(() =>
+            {
+                DteInfoRef infoLastF = null;
+                Parallel.ForEach(detalles, async (detalle) =>
+                {
+                    // GET INFO OF INVOICES.
+                    if (detalle != null)
+                    {
+                        List<DteInfoRef> dteInfos = await DteInfoRef.GetInfoRefAsync(detalle.Instruction, con, "F");
+                        List<DteInfoRef> dteInfoRefs = new List<DteInfoRef>();
+                        if (dteInfos != null)
+                        {
+                            foreach (DteInfoRef item in dteInfos)
+                            {
+                                if (string.Compare(item.Glosa, detalle.Instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0)
+                                {
+                                    dteInfoRefs.Add(item);
+                                }
+                            }
+                            // ATTACH FILES.
+                            detalle.DteInfoRefs = dteInfoRefs;
+                            // ATTACH PRINCIPAL DOC.
+                            if (detalle.DteInfoRefs.Count >= 1)
+                            {
+                                infoLastF = detalle.DteInfoRefs.First(); // SHOW THE LAST DOC.
+                                if (dteInfoRefs.First().DteFiles != null)
+                                {
+                                    switch (detalle.DteInfoRefs.First().DteFiles.Count)
+                                    {
+                                        case 1:
+                                            if (infoLastF.DteFiles[0].TipoXML == null)
+                                            {
+                                                detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles[0].Archivo);
+                                                detalle.DTEFile = infoLastF.DteFiles[0].Archivo;
+                                            }
+                                            break;
+
+                                        default:
+                                            {
+                                                detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
+                                                detalle.DTEFile = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo;
+                                                break;
+                                            }
+                                    }
+                                }
+                                detalle.DteInfoRefLast = infoLastF;
+                                detalle.NroInt = infoLastF.NroInt;
+                                detalle.FechaEmision = infoLastF.Fecha.ToString();
+                                detalle.Folio = infoLastF.Folio;
+                                detalle.MntNeto = infoLastF.NetoAfecto;
+                                detalle.MntIva = infoLastF.IVA;
+                                detalle.MntTotal = infoLastF.Total;
+                                Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} GetInfoInvoice: {detalle.Folio}");
+                            }
+                        }
+                        else
+                        {
+                            detalle.ValidatorFlag = new ValidatorFlag() { Flag = LetterFlag.Clear };
+                        }
+
+                        detalles.Add(detalle);
+                    }
+                });
+
+                Thread.Sleep(3000);
+                return detalles;
+            });
+
+            task.Start();
+            return task.Result;
+        }
+
+        private List<Detalle> GetInfoSii(List<Detalle> detalles)
+        {
+            DteInfoRef infoLastF = null;
+            Conexion con = new Conexion(DataBaseName);
+            Task<List<Detalle>> task = new Task<List<Detalle>>(() =>
+            {
+                Parallel.ForEach(detalles, async (detalle) =>
+                {
+                    if (detalle.DteInfoRefs != null && detalle.DteInfoRefs.Count >= 1)
+                    {
+                        infoLastF = detalle.DteInfoRefs.First(); // SHOW THE LAST DOC.
+                        // GET INFO FROM SII
+                        if (infoLastF.EnviadoSII == 1 && infoLastF.AceptadoCliente == 0) // 1 Enviado / 0 No enviado
+                        {
+                            detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
+                            // EVENTS FROM SII
+                            DataEvento evento = await ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant);
+                            if (evento != null)
+                            {
+                                detalle.DataEvento = evento;
+                                detalle.StatusDetalle = GetStatus(detalle);
+                            }
+                        }
+                        if (detalle.StatusDetalle == StatusDetalle.Pending && infoLastF.AceptadoCliente == 1)
+                        {
+                            detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
+                            detalle.StatusDetalle = StatusDetalle.Accepted;
+                        }
+                        else if (detalle.StatusDetalle == StatusDetalle.Accepted && infoLastF.AceptadoCliente == 0)
+                        {
+                            DteFiles.UpdateFiles(con, detalle); // UPDATE DTE_DocCab SET infoLastF.EnviadoCliente = 1
+                        }
+                    }
+                    Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} GetInfoSii: {detalle.Folio}");
+                    detalles.Add(detalle);
+                });
+
+                Thread.Sleep(3000);
+                return detalles;
+            });
+
+            task.Start();
+            return task.Result;
+        }
+
+        private List<Detalle> SendToCEN(List<Detalle> detalles)
+        {
+            Task<List<Detalle>> task = new Task<List<Detalle>>(() =>
+            {
+                Parallel.ForEach(detalles, async (detalle) =>
+                {
+                    // SEND DTE TO CEN.
+                    if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
+                    {
+                        ResultDte resultDte = await Dte.SendDteCreditorAsync(detalle, TokenCen, detalle.DTEFile);
+                        if (resultDte != null)
+                        {
+                            detalle.Instruction.Dte = resultDte;
+                            detalle.Instruction.StatusBilled = Instruction.StatusBilled.Facturado;
+                        }
+                    }
+                    Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} SendToCEN: {detalle.Folio}");
+                    detalles.Add(detalle);
+                });
+
+                Thread.Sleep(3000);
+                return detalles;
+            });
+
+            task.Start();
+            return task.Result;
+        }
+
+        private Dictionary<string, int> GetReemplazosFile()
+        {
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+            try
+            {
+                XDocument doc = XDocument.Load(@"C:\Centralizador\Reemplazos_.xml");
+                return doc.Descendants("Empresa").ToDictionary(d => (string)d.Attribute("id"), d => (int)d);
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
@@ -1471,10 +1682,6 @@ namespace Centralizador.WinApp.GUI
                 }
             }
         }
-
-        //private void IGridMain_ColHdrStartDrag(object sender, iGColHdrStartDragEventArgs e)
-        //{
-        //}
 
         #endregion Pagar
     }

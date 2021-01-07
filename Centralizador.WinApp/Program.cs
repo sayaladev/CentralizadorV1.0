@@ -30,7 +30,7 @@ namespace Centralizador.WinApp
             {
                 tokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
                 // GET PARTICIPANTS CEN.
-                participants = await Participant.GetParticipants(Properties.Settings.Default.UserCEN);
+                participants = await Participant.GetParticipants(Models.Properties.Settings.Default.UserCen);
                 // GET TOKEN CEN.
                 tokenCen = await Agent.GetTokenCenAsync(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN);
                 // PREVENT OPEN 2 FORM.

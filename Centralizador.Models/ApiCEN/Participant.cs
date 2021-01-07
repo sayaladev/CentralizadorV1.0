@@ -111,7 +111,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/participants/?id={id}");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/resources/participants/?id={id}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.DownloadStringTaskAsync(uri);  // GET
                     if (res != null)
@@ -134,7 +134,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/participants/?rut={rut}");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/resources/participants/?rut={rut}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)

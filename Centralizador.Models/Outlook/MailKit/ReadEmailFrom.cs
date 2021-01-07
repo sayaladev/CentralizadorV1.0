@@ -43,7 +43,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 try
                 {
                     await client.ConnectAsync("outlook.office365.com", 993, true);
-                    await client.AuthenticateAsync(Properties.Settings.Default.UserEmail, Properties.Settings.Default.UserPassword);
+                    await client.AuthenticateAsync(Properties.Settings.Default.User365, Properties.Settings.Default.Password365);
 
                     IList<IMailFolder> folders = await client.GetFoldersAsync(client.PersonalNamespaces[0]);
                     foreach (IMailFolder f in folders)
@@ -52,7 +52,7 @@ namespace Centralizador.Models.Outlook.MailKit
                         {
                             await f.OpenAsync(FolderAccess.ReadOnly);
                             UniqueIdRange range = new UniqueIdRange(new UniqueId(Convert.ToUInt32(Properties.Settings.Default.UIDRange)), UniqueId.MaxValue);
-                            BinarySearchQuery query = SearchQuery.DeliveredAfter(Properties.Settings.Default.DateTimeEmail).And(SearchQuery.ToContains(Properties.Settings.Default.UserEmail));
+                            BinarySearchQuery query = SearchQuery.DeliveredAfter(Properties.Settings.Default.DateTimeEmail).And(SearchQuery.ToContains(Properties.Settings.Default.User365));
                             IList<UniqueId> listM = await f.SearchAsync(range, query);
                             int total = listM.Count;
 

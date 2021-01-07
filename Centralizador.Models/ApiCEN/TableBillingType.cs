@@ -45,7 +45,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/resources/billing-types");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/resources/billing-types");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)

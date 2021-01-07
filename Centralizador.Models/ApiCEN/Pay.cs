@@ -52,7 +52,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.BaseAddress, $"api/v1/operations/payments/create/");
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/operations/payments/create/");
                     string d = JsonConvert.SerializeObject(pay);
                     wc.Headers[HttpRequestHeader.Authorization] = $"Token {tokenCen}";
                     NameValueCollection postData = new NameValueCollection() { { "data", d } };

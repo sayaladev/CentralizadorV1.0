@@ -54,42 +54,6 @@ namespace Centralizador.Models.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("facturacionchile@capvertenergie.com")]
-        public string UserEmail {
-            get {
-                return ((string)(this["UserEmail"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Che@2019!")]
-        public string UserPassword {
-            get {
-                return ((string)(this["UserPassword"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://ppagos-sen.coordinador.cl/")]
-        public global::System.Uri BaseAddress {
-            get {
-                return ((global::System.Uri)(this["BaseAddress"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10.13.0.114\\SQL2014")]
-        public string ServerName {
-            get {
-                return ((string)(this["ServerName"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("128574")]
@@ -111,42 +75,6 @@ namespace Centralizador.Models.Properties {
             }
             set {
                 this["DateTimeEmail"] = value;
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("sa")]
-        public string DBUser {
-            get {
-                return ((string)(this["DBUser"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Softland358")]
-        public string DBPassword {
-            get {
-                return ((string)(this["DBPassword"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("04E4E7")]
-        public string SerialDigitalCert {
-            get {
-                return ((string)(this["SerialDigitalCert"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("francisca.negron@cvegroup.com")]
-        public string CCEmail {
-            get {
-                return ((string)(this["CCEmail"]));
             }
         }
     }

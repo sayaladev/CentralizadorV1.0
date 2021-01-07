@@ -17,7 +17,7 @@ namespace Centralizador.Models.DataBase
             }
             else
             {
-                serverName = Properties.Settings.Default.ServerName;
+                serverName = Properties.Settings.Default.DBServer;
             }
             DBName = dataBaseName;
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder
