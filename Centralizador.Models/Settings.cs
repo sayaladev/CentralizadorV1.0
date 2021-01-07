@@ -14,7 +14,7 @@ namespace Centralizador.Models.Properties
     {
         public string DBServer { get; private set; }
         public string UserCen { get; private set; }
-        public string PasswordCEN { get; private set; }
+        public string PasswordCeN { get; private set; }
         public Uri UrlCen { get; private set; }
         public string User365 { get; private set; }
         public string Password365 { get; private set; }
@@ -43,7 +43,7 @@ namespace Centralizador.Models.Properties
                 DBPassword = doc.Root.Element("DataBase").Element("DBPassword").Value;
                 //CEN
                 UserCen = doc.Root.Element("CEN").Element("UserCen").Value;
-                PasswordCEN = doc.Root.Element("CEN").Element("PasswordCEN").Value;
+                PasswordCeN = doc.Root.Element("CEN").Element("PasswordCen").Value;
                 UrlCen = new Uri(doc.Root.Element("CEN").Element("UrlCen").Value);
                 //OUTLOOK
                 User365 = doc.Root.Element("Outlook365").Element("User365").Value;

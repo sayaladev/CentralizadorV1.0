@@ -14,6 +14,17 @@ namespace Centralizador.Models.ApiSII
 {
     public class ServiceSoap
     {
+        private static string SerialDigitalCert { get; set; }
+
+        public ServiceSoap(string serialDigitalCert)
+        {
+            SerialDigitalCert = serialDigitalCert;
+        }
+
+        public ServiceSoap()
+        {
+        }
+
         public static X509Certificate2 Certificate { get; set; } = GetCertFromPc();
 
         private static X509Certificate2 GetCertFromPc()
@@ -22,7 +33,7 @@ namespace Centralizador.Models.ApiSII
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
             foreach (X509Certificate2 item in store.Certificates)
             {
-                if (item.SerialNumber == Properties.Settings.Default.SerialNumber && item.NotAfter > DateTime.Now)
+                if (item.SerialNumber == SerialDigitalCert && item.NotAfter > DateTime.Now)
                 {
                     return item;
                 }
@@ -31,7 +42,7 @@ namespace Centralizador.Models.ApiSII
             return null;
         }
 
-        public static string GETTokenFromSii(string serialDigitalCert)
+        public string GETTokenFromSii()
         {
             if (Certificate != null)
             {

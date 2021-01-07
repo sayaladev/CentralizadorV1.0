@@ -154,11 +154,11 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        public static async Task<List<ResultParticipant>> GetParticipants(string userCEN)
+        public static async Task<List<ResultParticipant>> GetParticipants(string userCEN, Uri url)
         {
             try
             {
-                ResultAgent agent = await Agent.GetAgetByEmailAsync(userCEN);
+                ResultAgent agent = await Agent.GetAgetByEmailAsync(userCEN, url);
                 if (agent != null)
                 {
                     List<ResultParticipant> participants = new List<ResultParticipant>();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using System.Xml.Linq;
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 using Centralizador.WinApp.GUI;
@@ -28,11 +28,20 @@ namespace Centralizador.WinApp
 
             try
             {
-                tokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
+                // LOAD XML CONFIG
+                // LOAD THE XML CONFIG
+                XDocument doc = XDocument.Load(@"C:\Centralizador\Centralizador_config.xml");
+                string UserCen = doc.Root.Element("CEN").Element("UserCen").Value;
+                string PasswordCeN = doc.Root.Element("CEN").Element("PasswordCen").Value;
+                Uri UrlCen = new Uri(doc.Root.Element("CEN").Element("UrlCen").Value);
+                //CERT
+                string SerialNumber = doc.Root.Element("CertificadoDigital").Element("SerialNumber").Value;
+                ServiceSoap s = new ServiceSoap(SerialNumber);
+                tokenSii = s.GETTokenFromSii();
                 // GET PARTICIPANTS CEN.
-                participants = await Participant.GetParticipants(Models.Properties.Settings.Default.UserCen);
+                participants = await Participant.GetParticipants(UserCen, UrlCen);
                 // GET TOKEN CEN.
-                tokenCen = await Agent.GetTokenCenAsync(Properties.Settings.Default.UserCEN, Properties.Settings.Default.PasswordCEN);
+                tokenCen = await Agent.GetTokenCenAsync(UserCen, PasswordCeN);
                 // PREVENT OPEN 2 FORM.
                 Mutex mutex = new Mutex(true, "FormMain", out bool active);
                 if (!active)

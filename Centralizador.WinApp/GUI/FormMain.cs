@@ -195,7 +195,7 @@ namespace Centralizador.WinApp.GUI
             CboYears.SelectedItem = DateTime.Now.Year;
 
             // User email
-            TssLblUserEmail.Text = "|  " + Properties.Settings.Default.UserCEN;
+            TssLblUserEmail.Text = "|  " + Models.Properties.Settings.Default.UserCen;
 
             // Worker Pay
             BgwPay = new BackgroundWorker
@@ -364,7 +364,8 @@ namespace Centralizador.WinApp.GUI
 
         private void TimerHour_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            TokenSii = ServiceSoap.GETTokenFromSii(Models.Properties.Settings.Default.SerialDigitalCert);
+            ServiceSoap s = new ServiceSoap(Models.Properties.Settings.Default.SerialNumber);
+            TokenSii = s.GETTokenFromSii();
         }
 
         private void BtnCancelTak_Click(object sender, EventArgs e)

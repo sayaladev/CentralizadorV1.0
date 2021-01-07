@@ -12,13 +12,13 @@ namespace Centralizador.Models.ApiCEN
         [JsonProperty("results")]
         public List<ResultAgent> Results { get; set; }
 
-        public static async Task<ResultAgent> GetAgetByEmailAsync(string userCEN)
+        public static async Task<ResultAgent> GetAgetByEmailAsync(string userCEN, Uri url)
         {
             try
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/resources/agents/?email={userCEN}");
+                    Uri uri = new Uri(url, $"api/v1/resources/agents/?email={userCEN}");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.DownloadStringTaskAsync(uri); // GET
                     if (res != null)
