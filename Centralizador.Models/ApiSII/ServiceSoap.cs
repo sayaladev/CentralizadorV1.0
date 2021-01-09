@@ -14,26 +14,24 @@ namespace Centralizador.Models.ApiSII
 {
     public class ServiceSoap
     {
-        private static string SerialDigitalCert { get; set; }
-
         public ServiceSoap(string serialDigitalCert)
         {
-            SerialDigitalCert = serialDigitalCert;
+            Certificate = GetCertFromPc(serialDigitalCert);
         }
 
         public ServiceSoap()
         {
         }
 
-        public static X509Certificate2 Certificate { get; set; } = GetCertFromPc();
+        public static X509Certificate2 Certificate { get; set; }
 
-        private static X509Certificate2 GetCertFromPc()
+        private static X509Certificate2 GetCertFromPc(string serialDigitalCert)
         {
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
             foreach (X509Certificate2 item in store.Certificates)
             {
-                if (item.SerialNumber == SerialDigitalCert && item.NotAfter > DateTime.Now)
+                if (item.SerialNumber == serialDigitalCert && item.NotAfter > DateTime.Now)
                 {
                     return item;
                 }

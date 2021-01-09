@@ -20,6 +20,7 @@ namespace Centralizador.Models.Properties
         public string Password365 { get; private set; }
         public string UserCC365 { get; private set; }
         public string SerialNumber { get; private set; }
+        public Dictionary<string, int> DicReem { get; private set; }
         public string DBUser { get; private set; }
         public string DBPassword { get; private set; }
         public Dictionary<string, string> DicCompanies { get; private set; }
@@ -45,12 +46,16 @@ namespace Centralizador.Models.Properties
                 UserCen = doc.Root.Element("CEN").Element("UserCen").Value;
                 PasswordCeN = doc.Root.Element("CEN").Element("PasswordCen").Value;
                 UrlCen = new Uri(doc.Root.Element("CEN").Element("UrlCen").Value);
+
                 //OUTLOOK
                 User365 = doc.Root.Element("Outlook365").Element("User365").Value;
                 Password365 = doc.Root.Element("Outlook365").Element("Password365").Value;
                 UserCC365 = doc.Root.Element("Outlook365").Element("UserCC365").Value;
                 //CERT
                 SerialNumber = doc.Root.Element("CertificadoDigital").Element("SerialNumber").Value;
+
+                //REEMPLAZOS
+                DicReem = doc.Root.Element("Reemplazos").Descendants("Empresa").ToDictionary(d => (string)d.Attribute("id"), d => (int)d);
             }
             catch (Exception)
             {

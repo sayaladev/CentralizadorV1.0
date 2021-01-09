@@ -41,7 +41,7 @@ namespace Centralizador.WinApp
                 // GET PARTICIPANTS CEN.
                 participants = await Participant.GetParticipants(UserCen, UrlCen);
                 // GET TOKEN CEN.
-                tokenCen = await Agent.GetTokenCenAsync(UserCen, PasswordCeN);
+                tokenCen = await Agent.GetTokenCenAsync(UserCen, PasswordCeN, UrlCen);
                 // PREVENT OPEN 2 FORM.
                 Mutex mutex = new Mutex(true, "FormMain", out bool active);
                 if (!active)

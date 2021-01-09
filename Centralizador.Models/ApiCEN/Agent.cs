@@ -38,7 +38,7 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
-        public static async Task<string> GetTokenCenAsync(string userCEN, string passwordCEN)
+        public static async Task<string> GetTokenCenAsync(string userCEN, string passwordCEN, Uri url)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>
                 {
@@ -49,7 +49,7 @@ namespace Centralizador.Models.ApiCEN
             {
                 using (CustomWebClient wc = new CustomWebClient())
                 {
-                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, "api/token-auth/");
+                    Uri uri = new Uri(url, "api/token-auth/");
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     string res = await wc.UploadStringTaskAsync(uri, WebRequestMethods.Http.Post, JsonConvert.SerializeObject(dic, Formatting.Indented)); // POST
                     if (res != null)

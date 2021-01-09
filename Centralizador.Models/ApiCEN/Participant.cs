@@ -128,6 +128,29 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
+        public static async Task<ResultParticipant> GetParticipantByIdAsync(int id, Uri url)
+        {
+            try
+            {
+                using (CustomWebClient wc = new CustomWebClient())
+                {
+                    Uri uri = new Uri(url, $"api/v1/resources/participants/?id={id}");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri);  // GET
+                    if (res != null)
+                    {
+                        Participant p = JsonConvert.DeserializeObject<Participant>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        return p.Results[0];
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return null;
+        }
+
         public static async Task<ResultParticipant> GetParticipantByRutAsync(string rut)
         {
             try
@@ -164,7 +187,7 @@ namespace Centralizador.Models.ApiCEN
                     List<ResultParticipant> participants = new List<ResultParticipant>();
                     foreach (ResultParticipant item in agent.Participants)
                     {
-                        ResultParticipant participant = await GetParticipantByIdAsync(item.ParticipantId);
+                        ResultParticipant participant = await GetParticipantByIdAsync(item.ParticipantId, url);
                         participants.Add(participant);
                     }
                     // Add Cve 76.532.358-4
