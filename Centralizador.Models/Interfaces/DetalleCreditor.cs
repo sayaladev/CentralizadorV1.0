@@ -182,257 +182,45 @@ namespace Centralizador.Models.Interfaces
             return detalles;
         }
 
-        // TESTER 1
-        public async Task<List<Detalle>> GetDetalles(List<ResultInstruction> InstructionsList)
-        {
-            DteInfoRef infoLastF = null;
-            List<Detalle> detalles = new List<Detalle>();
-            Conexion con = new Conexion(DataBaseName);
-            Dictionary<string, int> dic = Properties.Settings.Default.DicReem;
-
-            return await Task.Run(async () =>
-            {
-                foreach (ResultInstruction instruction in InstructionsList)
-                {
-                    // GET PARTICIPANT DEBTOR
-                    instruction.ParticipantDebtor = await Participant.GetParticipantByIdAsync(instruction.Debtor);
-                    //REEMPLAZOS
-                    if (dic.ContainsKey(instruction.ParticipantDebtor.Id.ToString()))
-                    {
-                        instruction.ParticipantNew = await Participant.GetParticipantByIdAsync(dic[instruction.ParticipantDebtor.Id.ToString()]);
-                    }
-                    // ROOT CLASS.
-                    Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
-                    // GET INFO OF INVOICES.
-                    List<DteInfoRef> dteInfos = await DteInfoRef.GetInfoRefAsync(instruction, con, "F");
-                    List<DteInfoRef> dteInfoRefs = new List<DteInfoRef>();
-                    if (dteInfos != null)
-                    {
-                        foreach (DteInfoRef item in dteInfos)
-                        {
-                            if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0)
-                            {
-                                dteInfoRefs.Add(item);
-                            }
-                        }
-                        // ATTACH FILES.
-                        detalle.DteInfoRefs = dteInfoRefs;
-                        // ATTACH PRINCIPAL DOC.
-                        if (detalle.DteInfoRefs.Count >= 1)
-                        {
-                            infoLastF = detalle.DteInfoRefs.First(); // SHOW THE LAST DOC.
-                            if (dteInfoRefs.First().DteFiles != null)
-                            {
-                                switch (detalle.DteInfoRefs.First().DteFiles.Count)
-                                {
-                                    case 1:
-                                        if (infoLastF.DteFiles[0].TipoXML == null)
-                                        {
-                                            detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles[0].Archivo);
-                                            detalle.DTEFile = infoLastF.DteFiles[0].Archivo;
-                                        }
-                                        break;
-
-                                    default:
-                                        {
-                                            detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
-                                            detalle.DTEFile = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo;
-                                            break;
-                                        }
-                                }
-                            }
-                            detalle.DteInfoRefLast = infoLastF;
-                            detalle.NroInt = infoLastF.NroInt;
-                            detalle.FechaEmision = infoLastF.Fecha.ToString();
-                            detalle.Folio = infoLastF.Folio;
-                            detalle.MntNeto = infoLastF.NetoAfecto;
-                            detalle.MntIva = infoLastF.IVA;
-                            detalle.MntTotal = infoLastF.Total;
-                            // GET INFO FROM SII
-                            if (infoLastF.EnviadoSII == 1 && infoLastF.AceptadoCliente == 0) // 1 Enviado / 0 No enviado
-                            {
-                                detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
-                                // EVENTS FROM SII
-                                DataEvento evento = await ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant);
-                                if (evento != null)
-                                {
-                                    detalle.DataEvento = evento;
-                                    detalle.StatusDetalle = GetStatus(detalle);
-                                }
-                            }
-                            if (detalle.StatusDetalle == StatusDetalle.Pending && infoLastF.AceptadoCliente == 1)
-                            {
-                                detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
-                                detalle.StatusDetalle = StatusDetalle.Accepted;
-                            }
-                            else if (detalle.StatusDetalle == StatusDetalle.Accepted && infoLastF.AceptadoCliente == 0)
-                            {
-                                DteFiles.UpdateFiles(con, detalle); // UPDATE DTE_DocCab SET infoLastF.EnviadoCliente = 1
-                            }
-                        }
-                        // SEND DTE TO CEN.
-                        if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
-                        {
-                            ResultDte resultDte = await Dte.SendDteCreditorAsync(detalle, TokenCen, detalle.DTEFile);
-                            if (resultDte != null)
-                            {
-                                detalle.Instruction.Dte = resultDte;
-                                detalle.Instruction.StatusBilled = Instruction.StatusBilled.Facturado;
-                            }
-                        }
-                        detalle.ValidatorFlag = new ValidatorFlag(detalle, true);
-                    }
-                    else
-                    {
-                        detalle.ValidatorFlag = new ValidatorFlag() { Flag = LetterFlag.Clear };
-                    }
-                    detalles.Add(detalle);
-                    Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} PROCESANDO:{instruction.Id}");
-                }
-
-                return detalles;
-            });
-        }
-
         // TESTER todos
-        public async Task<List<ResultInstruction>> GetInstructions(List<ResultPaymentMatrix> matrices)
+        public async Task<List<ResultInstruction>> GetInstructions(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress)
         {
-            return await Task.Run(async () =>
-            {
-                List<ResultInstruction> instructions = new List<ResultInstruction>();
-                foreach (ResultPaymentMatrix m in matrices)
-                {
-                    m.BillingWindow = await BillingWindow.GetBillingWindowByIdAsync(m);
-                    var listResult = await Instruction.GetInstructionCreditorAsync(m, UserParticipant);
-                    if (listResult != null)
-                    {
-                        instructions.AddRange(listResult);
-                    }
-                    Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} PROCESANDO:{m.Id}");
-                }
-                return instructions;
-            });
-        }
+            int c = 0;
+            float porcent;
+            List<ResultInstruction> instructions = new List<ResultInstruction>();
+            var tareas = new List<Task<List<ResultInstruction>>>();
 
-        // TESTER 2
-        public async Task<Detalle> GetDetallesByOne(ResultInstruction instruction)
-        {
-            DteInfoRef infoLastF = null;
-            Conexion con = new Conexion(DataBaseName);
-            Dictionary<string, int> dic = Properties.Settings.Default.DicReem;
-
-            return await Task.Run(async () =>
-            {
-                // GET PARTICIPANT DEBTOR
-                instruction.ParticipantDebtor = await Participant.GetParticipantByIdAsync(instruction.Debtor);
-                //REEMPLAZOS
-                if (dic.ContainsKey(instruction.ParticipantDebtor.Id.ToString()))
-                {
-                    instruction.ParticipantNew = await Participant.GetParticipantByIdAsync(dic[instruction.ParticipantDebtor.Id.ToString()]);
-                }
-                // ROOT CLASS.
-                Detalle detalle = new Detalle(instruction.ParticipantDebtor.Rut, instruction.ParticipantDebtor.VerificationCode, instruction.ParticipantDebtor.BusinessName, instruction.Amount, instruction, true);
-                // GET INFO OF INVOICES.
-                List<DteInfoRef> dteInfos = await DteInfoRef.GetInfoRefAsync(instruction, con, "F");
-                List<DteInfoRef> dteInfoRefs = new List<DteInfoRef>();
-                if (dteInfos != null)
-                {
-                    foreach (DteInfoRef item in dteInfos)
-                    {
-                        if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0)
-                        {
-                            dteInfoRefs.Add(item);
-                        }
-                    }
-                    // ATTACH FILES.
-                    detalle.DteInfoRefs = dteInfoRefs;
-                    // ATTACH PRINCIPAL DOC.
-                    if (detalle.DteInfoRefs.Count >= 1)
-                    {
-                        infoLastF = detalle.DteInfoRefs.First(); // SHOW THE LAST DOC.
-                        if (dteInfoRefs.First().DteFiles != null)
-                        {
-                            switch (detalle.DteInfoRefs.First().DteFiles.Count)
-                            {
-                                case 1:
-                                    if (infoLastF.DteFiles[0].TipoXML == null)
-                                    {
-                                        detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles[0].Archivo);
-                                        detalle.DTEFile = infoLastF.DteFiles[0].Archivo;
-                                    }
-                                    break;
-
-                                default:
-                                    {
-                                        detalle.DTEDef = ServicePdf.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
-                                        detalle.DTEFile = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo;
-                                        break;
-                                    }
-                            }
-                        }
-                        detalle.DteInfoRefLast = infoLastF;
-                        detalle.NroInt = infoLastF.NroInt;
-                        detalle.FechaEmision = infoLastF.Fecha.ToString();
-                        detalle.Folio = infoLastF.Folio;
-                        detalle.MntNeto = infoLastF.NetoAfecto;
-                        detalle.MntIva = infoLastF.IVA;
-                        detalle.MntTotal = infoLastF.Total;
-                        // GET INFO FROM SII
-                        if (infoLastF.EnviadoSII == 1 && infoLastF.AceptadoCliente == 0) // 1 Enviado / 0 No enviado
-                        {
-                            detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
-                            // EVENTS FROM SII
-                            DataEvento evento = await ServiceEvento.GetStatusDteAsync("Creditor", TokenSii, "33", detalle, UserParticipant);
-                            if (evento != null)
-                            {
-                                detalle.DataEvento = evento;
-                                detalle.StatusDetalle = GetStatus(detalle);
-                            }
-                        }
-                        if (detalle.StatusDetalle == StatusDetalle.Pending && infoLastF.AceptadoCliente == 1)
-                        {
-                            detalle.FechaRecepcion = infoLastF.FechaEnvioSII.ToString("dd-MM-yyyy");
-                            detalle.StatusDetalle = StatusDetalle.Accepted;
-                        }
-                        else if (detalle.StatusDetalle == StatusDetalle.Accepted && infoLastF.AceptadoCliente == 0)
-                        {
-                            DteFiles.UpdateFiles(con, detalle); // UPDATE DTE_DocCab SET infoLastF.EnviadoCliente = 1
-                        }
-                    }
-                    // SEND DTE TO CEN.
-                    if (detalle.StatusDetalle == StatusDetalle.Accepted && detalle.Instruction != null && detalle.Instruction.StatusBilled == Instruction.StatusBilled.NoFacturado)
-                    {
-                        ResultDte resultDte = await Dte.SendDteCreditorAsync(detalle, TokenCen, detalle.DTEFile);
-                        if (resultDte != null)
-                        {
-                            detalle.Instruction.Dte = resultDte;
-                            detalle.Instruction.StatusBilled = Instruction.StatusBilled.Facturado;
-                        }
-                    }
-                    detalle.ValidatorFlag = new ValidatorFlag(detalle, true);
-                }
-                else
-                {
-                    detalle.ValidatorFlag = new ValidatorFlag() { Flag = LetterFlag.Clear };
-                }
-
-                return detalle;
-            });
+            tareas = matrices.Select(async m =>
+             {
+                 m.BillingWindow = await BillingWindow.GetBillingWindowByIdAsync(m);
+                 var listResult = await Instruction.GetInstructionCreditorAsync(m, UserParticipant);
+                 if (listResult != null)
+                 {
+                     instructions.AddRange(listResult);
+                 }
+                 c++;
+                 porcent = (float)(100 * c) / matrices.Count;
+                 ProgressReport.PercentageComplete = (int)porcent;
+                 ProgressReport.Message = $"Processing 'Pay Instructions Matrix' {m.Id}, wait please.  ({c}/{matrices.Count})";
+                 progress.Report(ProgressReport);
+                 return instructions;
+             }).ToList();
+            await Task.WhenAll(tareas);
+            return instructions;
         }
 
         // TESTER 3
-        public async Task<List<Detalle>> GetDetallesTaskWhenAll(List<ResultInstruction> InstructionsList)
+        public async Task<List<Detalle>> GetDetallesTaskWhenAll(List<ResultInstruction> InstructionsList, IProgress<ProgressReportModel> progress)
         {
             DteInfoRef infoLastF = null;
             List<Detalle> detalles = new List<Detalle>();
             Conexion con = new Conexion(DataBaseName);
             Dictionary<string, int> dic = Properties.Settings.Default.DicReem;
             int c = 0;
+            float porcent;
             var tareas = new List<Task<List<Detalle>>>();
             tareas = InstructionsList.Select(async instruction =>
                 {
-                    //return await Task.Run(async () =>
-                    //{
                     // GET PARTICIPANT DEBTOR
                     instruction.ParticipantDebtor = await Participant.GetParticipantByIdAsync(instruction.Debtor);
                     //REEMPLAZOS
@@ -527,8 +315,10 @@ namespace Centralizador.Models.Interfaces
                     }
                     detalles.Add(detalle);
                     c++;
-                    Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} PROCESANDO:{c} de {InstructionsList.Count}");
-
+                    porcent = (float)(100 * c) / InstructionsList.Count;
+                    ProgressReport.PercentageComplete = (int)porcent;
+                    ProgressReport.Message = $"Processing 'Pay Instructions' {instruction.Id}, wait please.  ({c}/{InstructionsList.Count})";
+                    progress.Report(ProgressReport);
                     return detalles;
                     //});
                 }).ToList();

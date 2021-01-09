@@ -642,7 +642,7 @@ namespace Centralizador.WinApp.GUI
                         BtnPagar.Enabled = true;
                         BtnInsertNv.Enabled = false;
                         TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
-                        TssLblMensaje.Text += $"         *[{ e.StopWatch.ElapsedMilliseconds / 100.0} seconds.]";
+                        TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
                         TssLblDBName.Text = "|DB: " + DataBaseName;
                         break;
 
@@ -654,7 +654,7 @@ namespace Centralizador.WinApp.GUI
                             BtnPagar.Enabled = false;
                             BtnInsertNv.Enabled = true;
                             TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
-                            TssLblMensaje.Text += $"         *[{ e.StopWatch.ElapsedMilliseconds / 100.0} seconds.]";
+                            TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
                             TssLblDBName.Text = "|DB: " + DataBaseName;
                         }
 
@@ -1119,7 +1119,7 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnCreditor_Click(object sender, EventArgs e)
         {
-            //if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
             try
             {
@@ -1132,31 +1132,13 @@ namespace Centralizador.WinApp.GUI
                     DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
                     // TESTER DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
 
-                    var stopwatch = new Stopwatch();
-                    stopwatch.Start();
                     List<Detalle> detalles = new List<Detalle>();
-                    List<ResultInstruction> instructions = await det.GetInstructions(matrices);
-                    // OPCION 1
-                    //detalles = await det.GetDetalles(instructions);
-
-                    // OPCION 2 : UNO POR UNO
-
-                    //await Task.Run(async () =>
-                    //{
-                    //    foreach (var item in instructions)
-                    //    {
-                    //        var resul = await det.GetDetallesByOne(item);
-
-                    //        detalles.Add(resul);
-                    //        Console.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId} PROCESANDO:{item.Id}");
-                    //    }
-                    //});
+                    List<ResultInstruction> instructions = new List<ResultInstruction>();
+                    instructions = await det.GetInstructions(matrices, ProgressReport);
 
                     // TESTER 3 WHENALL
-                    detalles = await det.GetDetallesTaskWhenAll(instructions);
+                    detalles = await det.GetDetallesTaskWhenAll(instructions, ProgressReport);
 
-                    stopwatch.Stop();
-                    Console.WriteLine($"TIEMPO CONSUMIDO: {stopwatch.Elapsed.TotalSeconds:0.0000} SEGUNDOS");
                     DetallePrincipal = detalles;
                     //**************************************
                     if (DetallePrincipal != null)
