@@ -162,7 +162,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 // SAVE FILE EML.
                 new CreateFile(@"C:\Centralizador\Log\", mimeMessage, nameFile);
                 //mimeMessage.WriteTo(nameFile);
-                ProgressReport.Message = $"Email send to {mimeMessage.To.FirstOrDefault().Name}, check de Log file.";
+                ProgressReport.SetMessage($"Email send to {mimeMessage.To.FirstOrDefault().Name}, check de Log file.");
                 ProgressReport.PercentageComplete--;
                 Progress.Report(ProgressReport);
             }

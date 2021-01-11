@@ -31,103 +31,94 @@ namespace Centralizador.Models.Interfaces
             StringLogging = new StringBuilder();
         }
 
-        public async Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken tokenCancel, string p)
+        public async Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, string p)
         {
             int c = 0;
             List<Detalle> detallesFinal = new List<Detalle>();
-            foreach (Detalle item in detalles)
+            var tareas = new List<Task<List<Detalle>>>();
+            tareas = detalles.Select(async item =>
             {
-                // TESTER
-                //var folio = item.Folio;
-
-                try
+                DTEDefType xmlObjeto = null;
+                // GET XML FILE
+                string nameFile = p + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
+                if (File.Exists(nameFile)) { xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile); }
+                // GET PARTICPANT INFO FROM CEN
+                ResultParticipant participant = await Participant.GetParticipantByRutAsync(item.RutReceptor.ToString());
+                if (participant != null && participant.Id > 0)
                 {
-                    DTEDefType xmlObjeto = null;
-                    // GET XML FILE
-                    string nameFile = p + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
-                    if (File.Exists(nameFile)) { xmlObjeto = ServicePdf.TransformXmlDTEDefTypeToObjectDTE(nameFile); }
-                    // GET PARTICPANT INFO FROM CEN
-                    ResultParticipant participant = await Participant.GetParticipantByRutAsync(item.RutReceptor.ToString());
-                    if (participant != null && participant.Id > 0)
+                    item.IsParticipant = true;
+                    item.ParticipantMising = participant;
+                }
+                if (xmlObjeto != null && item.IsParticipant)
+                {
+                    item.DTEDef = xmlObjeto;
+                    // GET REFERENCE SEN.
+                    DTEDefTypeDocumentoReferencia r = null;
+                    var doc = new GetReferenceCen(item);
+                    if (doc != null) { r = doc.DocumentoReferencia; }
+                    if (r != null && r.RazonRef != null)
                     {
-                        item.IsParticipant = true;
-                        item.ParticipantMising = participant;
-                    }
-                    if (xmlObjeto != null)
-                    {
-                        item.DTEDef = xmlObjeto;
-                        // GET REFERENCE SEN.
-                        DTEDefTypeDocumentoReferencia r = new GetReferenceCen(item).DocumentoReferencia;
-                        if (r != null && r.RazonRef != null)
+                        // GET WINDOW.
+                        ResultBillingWindow window = await BillingWindow.GetBillingWindowByNaturalKeyAsync(r);
+                        // GET MATRIX.
+                        if (window != null && window.Id > 0)
                         {
-                            // Get Window
-                            ResultBillingWindow window = await BillingWindow.GetBillingWindowByNaturalKeyAsync(r);
-                            // Get Matrix
-                            if (window != null && window.Id > 0)
+                            List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
+                            if (matrices != null && matrices.Count > 0)
                             {
-                                List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
-                                if (matrices != null && matrices.Count > 0)
+                                ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(r.RazonRef.Trim(), StringComparison.OrdinalIgnoreCase));
+                                if (matrix != null)
                                 {
-                                    ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(r.RazonRef.Trim(), StringComparison.OrdinalIgnoreCase));
-                                    if (matrix != null)
+                                    ResultInstruction instruction = await Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant);
+                                    if (instruction != null && instruction.Id > 0)
                                     {
-                                        ResultInstruction instruction = await Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant);
-                                        if (instruction != null && instruction.Id > 0)
-                                        {
-                                            item.Instruction = instruction;
-                                            item.Instruction.ParticipantCreditor = participant;
-                                            item.Instruction.ParticipantDebtor = UserParticipant;
-                                        }
+                                        item.Instruction = instruction;
+                                        item.Instruction.ParticipantCreditor = participant;
+                                        item.Instruction.ParticipantDebtor = UserParticipant;
                                     }
                                 }
                             }
                         }
                     }
-                    // FLAGS IF EXISTS XML FILE
-                    item.ValidatorFlag = new ValidatorFlag(item, false);
-                    // EVENTS FROM SII
-                    item.DataEvento = await ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant);
-                    // STATUS DOC
-                    if (item.DataEvento != null) { item.StatusDetalle = GetStatus(item); }
-                    // INSERT IN CEN
-                    if (item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null)
+                }
+                // FLAGS IF EXISTS XML FILE
+                item.ValidatorFlag = new ValidatorFlag(item, false);
+                // EVENTS FROM SII
+                item.DataEvento = await ServiceEvento.GetStatusDteAsync("Debtor", TokenSii, "33", item, UserParticipant);
+                // STATUS DOC
+                if (item.DataEvento != null) { item.StatusDetalle = GetStatus(item); }
+                // INSERT IN CEN
+                if (item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null)
+                {
+                    // 1 No Facturado y cuando hay más de 1 dte informado
+                    // 2 Facturado
+                    // 3 Facturado con retraso
+                    // Existe el DTE?
+                    ResultDte doc = await Dte.GetDteAsync(item, false);
+                    if (doc == null)
                     {
-                        // 1 No Facturado y cuando hay más de 1 dte informado
-                        // 2 Facturado
-                        // 3 Facturado con retraso
-                        // Existe el DTE?
-                        ResultDte doc = await Dte.GetDteAsync(item, false);
-                        if (doc == null)
+                        // Enviar el DTE
+                        ResultDte resultDte = await Dte.SendDteDebtorAsync(item, TokenCen);
+                        if (resultDte != null && resultDte.Folio > 0)
                         {
-                            // Enviar el DTE
-                            ResultDte resultDte = await Dte.SendDteDebtorAsync(item, TokenCen);
-                            if (resultDte != null && resultDte.Folio > 0)
-                            {
-                                item.Instruction.Dte = resultDte;
-                            }
-                        }
-                        else
-                        {
-                            item.Instruction.Dte = doc;
+                            item.Instruction.Dte = resultDte;
                         }
                     }
-                    detallesFinal.Add(item);
-                    c++;
-                    float porcent = (float)(100 * c) / detalles.Count;
-                    ProgressReport.PercentageComplete = (int)porcent;
-                    ProgressReport.Message = $"Retrieving information from SII, wait please.  ({c}/{detalles.Count})";
-                    progress.Report(ProgressReport);
-                    if (tokenCancel.IsCancellationRequested) { tokenCancel.ThrowIfCancellationRequested(); }
+                    else
+                    {
+                        item.Instruction.Dte = doc;
+                    }
                 }
-                catch (OperationCanceledException) when (tokenCancel.IsCancellationRequested)
-                {
-                    ProgressReport.Message = "Task canceled...  !";
-                    ProgressReport.PercentageComplete = 100;
-                    progress.Report(ProgressReport);
-                    return detallesFinal.OrderBy(x => x.FechaRecepcion).ToList();
-                }
-            }
-            return detallesFinal.OrderBy(x => x.FechaRecepcion).ToList();
+                detallesFinal.Add(item);
+                c++;
+                float porcent = (float)(100 * c) / detalles.Count;
+                ProgressReport.PercentageComplete = (int)porcent;
+                ProgressReport.SetMessage($"Retrieving information from SII, wait please.  ({c}/{detalles.Count})");
+                progress.Report(ProgressReport);
+                return detalles;
+            }).ToList();
+            await Task.WhenAll(tareas);
+            return detalles.OrderBy(x => x.FechaRecepcion).ToList();
         }
     }
 }

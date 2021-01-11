@@ -62,6 +62,37 @@ namespace Centralizador.Models.DataBase
             }
         }
 
+        public static async Task<string> GetNameDB(Conexion conexion, string empresa)
+        {
+            try
+            {
+                StringBuilder query = new StringBuilder();
+                query.Append("DECLARE @dbname nvarchar(128) ");
+                query.Append($"SET @dbname = N'{empresa}' ");
+                query.Append("IF (EXISTS (SELECT ");
+                query.Append("    name ");
+                query.Append("  FROM master.dbo.sysdatabases ");
+                query.Append("  WHERE ('[' + name + ']' = @dbname ");
+                query.Append("  OR name = @dbname)) ");
+                query.Append("  ) ");
+                query.Append("BEGIN ");
+                query.Append("  SELECT  'TRUE' ");
+                query.Append("END ");
+                query.Append("ELSE ");
+                query.Append("BEGIN ");
+                query.Append("  SELECT  'FALSE' ");
+                query.Append("END ");
+
+                conexion.Query = query.ToString();
+                var res = (string)await Conexion.ExecuteScalarAsync(conexion);
+                return res;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public static async Task<List<DteInfoRef>> GetInfoRefAsync(ResultInstruction instruction, Conexion conexion, string tipo)
         {
             try

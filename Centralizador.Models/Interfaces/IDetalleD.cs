@@ -19,6 +19,6 @@ namespace Centralizador.Models.Interfaces
 
         StringBuilder StringLogging { get; set; }
 
-        Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, CancellationToken cancellationToken, string p);
+        Task<List<Detalle>> GetDetalleDebtor(List<Detalle> detalles, IProgress<ProgressReportModel> progress, string p);
     }
 }

@@ -6,8 +6,31 @@ namespace Centralizador.Models
     public class ProgressReportModel
     {
         public int PercentageComplete { get; set; }
-        public string Message { get; set; }
-        private static bool IsRuning { get; set; }
+
+        private string message;
+
+        public string GetMessage()
+        {
+            return message;
+        }
+
+        public void SetMessage(string value)
+        {
+            message = value;
+        }
+
+        private static bool isRuning;
+
+        public static bool GetIsRuning()
+        {
+            return isRuning;
+        }
+
+        public static void SetIsRuning(bool value)
+        {
+            isRuning = value;
+        }
+
         public Stopwatch StopWatch { get; set; }
         private static TipoTask TaskType { get; set; }
         public DateTime? FchOutlook { get; set; }
@@ -15,7 +38,7 @@ namespace Centralizador.Models
         public ProgressReportModel(TipoTask taskType)
         {
             TaskType = taskType;
-            IsRuning = true;
+            SetIsRuning(true);
             PercentageComplete = 0;
             if (TaskType == TipoTask.GetCreditor || TaskType == TipoTask.GetDebtor)
             {
@@ -31,24 +54,6 @@ namespace Centralizador.Models
             ConvertToPdf,
             ReadEmail,
             SendEmail
-        }
-
-        public static bool GetStateReport
-        {
-            get
-            {
-                return IsRuning;  // SERA MEJOR LLAMAR DIRECTAMENTE A LOS CAMPOS STATICOS PUBLICOS?
-            }
-        }
-
-        public static void SetStateReport(bool sett)
-        {
-            IsRuning = sett;
-        }
-
-        public void SetPorcent(int c)
-        {
-            PercentageComplete += c;
         }
 
         public static TipoTask GetTypeReport

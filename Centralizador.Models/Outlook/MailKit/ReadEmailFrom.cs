@@ -55,7 +55,6 @@ namespace Centralizador.Models.Outlook.MailKit
                             BinarySearchQuery query = SearchQuery.DeliveredAfter(Properties.Settings.Default.DateTimeEmail).And(SearchQuery.ToContains(Properties.Settings.Default.User365));
                             IList<UniqueId> listM = await f.SearchAsync(range, query);
                             int total = listM.Count;
-
                             foreach (UniqueId uid in await f.SearchAsync(range, query))
                             {
                                 MimeMessage message = await f.GetMessageAsync(uid);
@@ -94,7 +93,7 @@ namespace Centralizador.Models.Outlook.MailKit
                                     Properties.Settings.Default.UIDRange = uid.ToString();
                                     c++;
                                     float porcent = (float)(100 * c) / total;
-                                    ProgressReport.Message = $"Dowloading messages... [{string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", message.Date.DateTime)}] ({c}/{total})  Subject: {message.Subject} ";
+                                    ProgressReport.SetMessage($"Dowloading messages... [{string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", message.Date.DateTime)}] ({c}/{total})  Subject: {message.Subject} ");
                                     ProgressReport.PercentageComplete = (int)porcent;
                                     ProgressReport.FchOutlook = Properties.Settings.Default.DateTimeEmail;
                                     Progress.Report(ProgressReport);
@@ -106,7 +105,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 }
                 catch (OperationCanceledException) when (token.IsCancellationRequested)
                 {
-                    ProgressReport.Message = "Task canceled...  !";
+                    ProgressReport.SetMessage("Task canceled...  !");
                     ProgressReport.PercentageComplete = 100;
                     Progress.Report(ProgressReport);
                     return;

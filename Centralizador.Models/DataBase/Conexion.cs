@@ -40,7 +40,7 @@ namespace Centralizador.Models.DataBase
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public static async Task<int> ExecuteNonQueryAsync(Conexion conn)
+        public static async Task<object> ExecuteNonQueryAsync(Conexion conn)
         {
             using (SqlConnection cnn = new SqlConnection(conn.Cnn))
             {
@@ -50,7 +50,7 @@ namespace Centralizador.Models.DataBase
                     using (SqlCommand cmd = new SqlCommand(conn.Query, cnn))
                     {
                         await cmd.Connection.OpenAsync();
-                        int res = await cmd.ExecuteNonQueryAsync();
+                        object res = await cmd.ExecuteNonQueryAsync();
                         return res;
                     }
                 }

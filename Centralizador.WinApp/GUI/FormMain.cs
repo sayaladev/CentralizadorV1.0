@@ -39,7 +39,6 @@ namespace Centralizador.WinApp.GUI
         public BackgroundWorker BgwPay { get; private set; }
 
         public IEnumerable<ResultBilingType> BillingTypes { get; set; }
-        public CancellationTokenSource CancellationTk { get; set; }
         public string DataBaseName { get; set; }
 
         //  public ServiceSendMail Mail { get; private set; }
@@ -54,10 +53,11 @@ namespace Centralizador.WinApp.GUI
         private List<Detalle> DetallePrincipal { get; set; }
         private Progress<ProgressReportModel> ProgressReport { get; set; }
         private ResultParticipant UserParticipant { get; set; }
+        public CancellationTokenSource CancelToken { get; private set; }
 
         #endregion VARIABLES
 
-        #region METHODS
+        #region METHODS FORM
 
         public FormMain()
         {
@@ -66,7 +66,7 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnHiperLink_Click(object sender, EventArgs e)
         {
-            if (IGridMain.CurRow == null || GetStateReport)
+            if (IGridMain.CurRow == null || GetIsRuning())
             {
                 return;
             }
@@ -85,7 +85,7 @@ namespace Centralizador.WinApp.GUI
         {
             try
             {
-                if (IGridMain.CurRow == null && GetStateReport)
+                if (IGridMain.CurRow == null && GetIsRuning())
                 {
                     return;
                 }
@@ -94,7 +94,7 @@ namespace Centralizador.WinApp.GUI
                 {
                     detalle = DetallePrincipal.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
-                if (detalle != null && detalle.Instruction != null && !GetStateReport)
+                if (detalle != null && detalle.Instruction != null && !GetIsRuning())
                 {
                     ToolTip tip = new ToolTip();
                     StringBuilder builder = new StringBuilder();
@@ -119,7 +119,7 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void CboParticipants_SelectionChangeCommittedAsync(object sender, EventArgs e)
+        private async void CboParticipants_SelectionChangeCommitted(object sender, EventArgs e)
         {
             TxtCtaCteParticipant.Text = "";
             TxtRutParticipant.Text = "";
@@ -129,18 +129,25 @@ namespace Centralizador.WinApp.GUI
                 UserParticipant = (ResultParticipant)CboParticipants.SelectedItem;
 
                 Dictionary<string, string> dic = Models.Properties.Settings.Default.DicCompanies;
-                if (dic.ContainsKey(UserParticipant.Id.ToString()))
-                {
-                    DataBaseName = dic[UserParticipant.Id.ToString()];
-                    TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
-                    TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
-                }
-                else
+                if (!dic.ContainsKey(UserParticipant.Id.ToString()))
                 {
                     MessageBox.Show("This company does not have an associated database in the config file (Xml)", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     TssLblMensaje.Text = @"Please, edit 'C:\Centralizador\Softland_DB_Names.xml' file with ID => " + UserParticipant.Id.ToString();
                     CboParticipants.SelectedIndex = 0;
+                    return;
                 }
+                DataBaseName = dic[UserParticipant.Id.ToString()];
+                // CHECK THE DB IN SQL SERVER.
+                if (await DteInfoRef.GetNameDB(new Conexion("master"), DataBaseName) == "FALSE")
+                {
+                    MessageBox.Show("This company does not exists on Sql server.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    TssLblMensaje.Text = "";
+                    CboParticipants.SelectedIndex = 0;
+                    return;
+                }
+
+                TxtCtaCteParticipant.Text = UserParticipant.BankAccount;
+                TxtRutParticipant.Text = UserParticipant.Rut.ToString() + "-" + UserParticipant.VerificationCode;
             }
         }
 
@@ -150,7 +157,6 @@ namespace Centralizador.WinApp.GUI
             {
                 ReadEmailFrom.SaveParam();
             }
-            if (CancellationTk != null && !CancellationTk.IsCancellationRequested) { CancellationTk.Cancel(); }
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -353,24 +359,6 @@ namespace Centralizador.WinApp.GUI
         {
             ServiceSoap s = new ServiceSoap(Models.Properties.Settings.Default.SerialNumber);
             TokenSii = s.GETTokenFromSii();
-        }
-
-        private void BtnCancelTak_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                CancellationTk?.Cancel();
-                CleanControls();
-                BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
-
-                if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy) { BgwConvertPdf.CancelAsync(); }
-                BtnCancelTak.Enabled = false;
-                //  CancellationTk.Dispose();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
         }
 
         private void CleanControls()
@@ -616,28 +604,25 @@ namespace Centralizador.WinApp.GUI
             // PROGRESS IFORMATION
             if (GetTypeReport == TipoTask.SendEmail)
             {
-                TssLblMensaje.Text = e.Message;
+                TssLblMensaje.Text = e.GetMessage();
                 TssLblFechaHora.Text = e.PercentageComplete.ToString();
             }
             else
             {
                 TssLblProgBar.Value = e.PercentageComplete;
-                TssLblMensaje.Text = e.Message;
-                BtnCancelTak.Enabled = true;
+                TssLblMensaje.Text = e.GetMessage();
             }
             if (e.PercentageComplete == 100)
             {
-                BtnCancelTak.Enabled = false;
+                SetIsRuning(false);
                 TssLblProgBar.Value = 0;
                 switch (GetTypeReport)
                 {
                     case TipoTask.GetDebtor:
-                        SetStateReport(false);  // OR PROP STATIC PUBLICA?
                         // ICON FOR EMAIL SENNDING.
                         TssLblFechaHora.Image = fImageListSmall.Images[1];
                         TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
                         TssLblFechaHora.Text = "0";
-
                         e.StopWatch.Stop();
                         BtnPagar.Enabled = true;
                         BtnInsertNv.Enabled = false;
@@ -647,33 +632,33 @@ namespace Centralizador.WinApp.GUI
                         break;
 
                     case TipoTask.GetCreditor:
-                        if (DetallePrincipal != null)
+                        if (DetallePrincipal != null && DetallePrincipal.Count > 0)
                         {
-                            SetStateReport(false);
                             e.StopWatch.Stop();
                             BtnPagar.Enabled = false;
                             BtnInsertNv.Enabled = true;
                             TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
                             TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
                             TssLblDBName.Text = "|DB: " + DataBaseName;
+                            BtnInsertNv.Enabled = true;
                         }
-
                         break;
 
                     case TipoTask.InsertNV:
-                        SetStateReport(false);
                         BtnInsertNv.Enabled = false;
                         TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
                         TssLblDBName.Text = "|DB: " + DataBaseName;
                         break;
 
                     case TipoTask.ReadEmail:
-                        SetStateReport(false);
                         BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", e.FchOutlook);
                         TssLblMensaje.Text = "Complete!";
+                        BtnCancelTak.Enabled = false;
                         break;
 
-                    case TipoTask.SendEmail:
+                    case TipoTask.ConvertToPdf:
+                        SetIsRuning(false);
+                        break;
 
                     default:
                         break;
@@ -681,7 +666,7 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        #endregion METHODS
+        #endregion METHODS FORM
 
         #region PDF
 
@@ -700,13 +685,14 @@ namespace Centralizador.WinApp.GUI
 
             TssLblProgBar.Value = 0;
             TssLblMensaje.Text = "Operation completed.";
-            SetStateReport(false);
+
             IGridMain.Focus();
         }
 
         private void BtnPdfConvert_Click(object sender, EventArgs e)
         {
-            if (!GetStateReport && IGridMain.Rows.Count > 0)
+            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (IGridMain.Rows.Count > 0)
             {
                 List<Detalle> lista = new List<Detalle>();
                 if (DetallePrincipal != null)
@@ -730,7 +716,7 @@ namespace Centralizador.WinApp.GUI
                     BgwConvertPdf.ProgressChanged += BgwConvertPdf_ProgressChanged;
                     BgwConvertPdf.RunWorkerCompleted += BgwConvertPdf_RunWorkerCompleted;
                     ServicePdf servicePdf = new ServicePdf(lista);
-                    SetStateReport(true);
+                    SetIsRuning(true);
                     servicePdf.ConvertToPdf(BgwConvertPdf);
                 }
             }
@@ -742,7 +728,7 @@ namespace Centralizador.WinApp.GUI
 
         private async void Bcm_CellButtonClickAsync(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
-            if (GetStateReport)
+            if (GetIsRuning())
             {
                 return;
             }
@@ -852,7 +838,7 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
         {
-            if (!GetStateReport)
+            if (!GetIsRuning())
             {
                 Detalle detalle = null;
                 iGRow fCurRow = IGridMain.CurRow;
@@ -892,7 +878,7 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
-            if (!GetStateReport && IGridMain.CurRow.Type != iGRowType.AutoGroupRow && IGridMain.CurRow != null)
+            if (!GetIsRuning() && IGridMain.CurRow.Type != iGRowType.AutoGroupRow && IGridMain.CurRow != null)
             {
                 CleanControls();
                 Detalle detalle = null;
@@ -1038,7 +1024,7 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
         {
-            if (!GetStateReport && e.ColIndex == 19) // Sii Events
+            if (!GetIsRuning() && e.ColIndex == 19) // Sii Events
             {
                 Detalle detalle = null;
                 StringBuilder builder = new StringBuilder();
@@ -1060,7 +1046,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            else if (!GetStateReport && e.ColIndex == 18) // Email Aux send Xml
+            else if (!GetIsRuning() && e.ColIndex == 18) // Email Aux send Xml
             {
                 Detalle detalle = null;
                 if (GetTypeReport == TipoTask.GetCreditor)
@@ -1080,7 +1066,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            else if (!GetStateReport && e.ColIndex == 2) // History DTE
+            else if (!GetIsRuning() && e.ColIndex == 2) // History DTE
             {
                 if (GetTypeReport == TipoTask.GetCreditor)
                 {
@@ -1119,33 +1105,39 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnCreditor_Click(object sender, EventArgs e)
         {
-            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
+            BtnInsertNv.Enabled = false;
             try
             {
                 ProgressReport = new Progress<ProgressReportModel>();
                 ProgressReport.ProgressChanged += ReportProgress;
-                CancellationTk = new CancellationTokenSource();
                 List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
                 if (matrices != null && matrices.Count > 0)
                 {
                     DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
                     // TESTER DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
+                    // NUEVO !
+                    // SQL SI EXISTE DB !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                    List<Detalle> detalles = new List<Detalle>();
-                    List<ResultInstruction> instructions = new List<ResultInstruction>();
-                    instructions = await det.GetInstructions(matrices, ProgressReport);
+                    try
+                    {
+                        List<ResultInstruction> instructions = new List<ResultInstruction>();
+                        instructions = await det.GetInstructions(matrices, ProgressReport);
+                        if (instructions.Count > 0)
+                        {
+                            DetallePrincipal = await det.GetDetallesTaskWhenAll(instructions, ProgressReport);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
 
-                    // TESTER 3 WHENALL
-                    detalles = await det.GetDetallesTaskWhenAll(instructions, ProgressReport);
-
-                    DetallePrincipal = detalles;
-                    //**************************************
                     if (DetallePrincipal != null)
                     {
                         IGridFill(await BilingType.GetBilinTypesAsync());
                     }
-                    SetStateReport(false);
                 }
                 else
                 {
@@ -1159,11 +1151,15 @@ namespace Centralizador.WinApp.GUI
                 TssLblMensaje.Text = "There was an error loading the data.";
                 return;
             }
+            finally
+            {
+                SetIsRuning(false);
+            }
         }
 
         private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
         {
-            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
             if (GetTypeReport == TipoTask.GetDebtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
             List<Detalle> detallesPaso = new List<Detalle>();
@@ -1185,8 +1181,7 @@ namespace Centralizador.WinApp.GUI
                 }
             }
             int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(new Conexion(DataBaseName));
-            // TESTER
-            //foliosDisp = 100;
+
             int count = DetallePrincipal.Count;
             StringBuilder builder = new StringBuilder();
             foreach (Detalle item in DetallePrincipal)
@@ -1272,7 +1267,7 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnDebtor_Click(object sender, EventArgs e)
         {
-            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
             try
             {
@@ -1280,12 +1275,11 @@ namespace Centralizador.WinApp.GUI
 
                 ProgressReport = new Progress<ProgressReportModel>();
                 ProgressReport.ProgressChanged += ReportProgress;
-                CancellationTk = new CancellationTokenSource();
                 List<Detalle> detalles = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
                 if (detalles != null)
                 {
                     DetalleDebtor det = new DetalleDebtor(DataBaseName, UserParticipant, TokenSii, TokenCen);
-                    DetallePrincipal = await det.GetDetalleDebtor(detalles, ProgressReport, CancellationTk.Token, nameFile);
+                    DetallePrincipal = await det.GetDetalleDebtor(detalles, ProgressReport, nameFile);
                     if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
                 }
             }
@@ -1298,28 +1292,21 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
-                //SetStateReport(false);  // OR PROP STATIC PUBLICA?
-
-                //TssLblFechaHora.Image = fImageListSmall.Images[1];
-                //TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
-                //TssLblFechaHora.Text = "0";
             }
         }
 
         private async void BtnOutlook_Click(object sender, EventArgs e)
         {
-            // if (ReportModel != null && ReportModel.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
-
+            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
             try
             {
+                BtnCancelTak.Enabled = true;
                 ProgressReport = new Progress<ProgressReportModel>();
                 ProgressReport.ProgressChanged += ReportProgress;
-                CancellationTk = new CancellationTokenSource();
-
+                CancelToken = new CancellationTokenSource();
                 TssLblMensaje.Text = "Connecting to the mail server... Please wait.";
                 ReadEmailFrom readEmailFrom = new ReadEmailFrom(TokenSii, ProgressReport);
-                await readEmailFrom.ReadMailFromServer(CancellationTk.Token);
+                await readEmailFrom.ReadMailFromServer(CancelToken.Token);
                 IGridMain.Focus();
             }
             catch (Exception ex)
@@ -1327,14 +1314,31 @@ namespace Centralizador.WinApp.GUI
                 new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
                 TssLblProgBar.Value = 0;
                 TssLblMensaje.Text = "There was an error loading the data.";
-                return;
+                throw;
+            }
+        }
+
+        private void BtnCancelTak_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (GetTypeReport == TipoTask.ReadEmail)
+                {
+                    CancelToken.Cancel();
+                }
+                CleanControls();
+                BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
+                if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy) { BgwConvertPdf.CancelAsync(); }
+            }
+            catch (Exception)
+            {
                 throw;
             }
         }
 
         private void BtnExcelConvert_Click(object sender, EventArgs e)
         {
-            if (GetStateReport) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
             if (DetallePrincipal != null && DetallePrincipal.Count > 0)
             {
                 ServiceExcel serviceExcel = new ServiceExcel(UserParticipant);
@@ -1381,7 +1385,7 @@ namespace Centralizador.WinApp.GUI
             string msje = null;
 
             // Excluir Banco Security Rut 97.053.000-2
-            if (!BgwPay.IsBusy && GetTypeReport == TipoTask.GetDebtor && !GetStateReport && IGridMain.Rows.Count > 0)
+            if (!BgwPay.IsBusy && GetTypeReport == TipoTask.GetDebtor && !GetIsRuning() && IGridMain.Rows.Count > 0)
             {
                 List<Detalle> detallesFinal = new List<Detalle>();
                 if (ChkIncludeCEN.CheckState == CheckState.Checked) // Only Participants
@@ -1444,7 +1448,7 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnRevertPay_ClickAsync(object sender, EventArgs e)
         {
-            if (GetStateReport)
+            if (GetIsRuning())
             {
                 TssLblMensaje.Text = "Bussy!";
                 return;

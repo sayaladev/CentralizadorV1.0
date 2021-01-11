@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
+            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -49,6 +50,7 @@
             this.TxtFolioRef = new System.Windows.Forms.TextBox();
             this.TxtNmbItem = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.BtnRevertPay = new System.Windows.Forms.Button();
             this.ChkNoIncludeCEN = new System.Windows.Forms.CheckBox();
             this.ChkIncludeCEN = new System.Windows.Forms.CheckBox();
             this.BtnInsertNv = new System.Windows.Forms.Button();
@@ -69,7 +71,6 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.fImageListSmall = new System.Windows.Forms.ImageList(this.components);
             this.fImageListType = new System.Windows.Forms.ImageList(this.components);
-            this.BtnRevertPay = new System.Windows.Forms.Button();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -173,7 +174,7 @@
             this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
+            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -311,6 +312,15 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
+            // BtnRevertPay
+            // 
+            this.BtnRevertPay.Location = new System.Drawing.Point(31, 154);
+            this.BtnRevertPay.Name = "BtnRevertPay";
+            this.BtnRevertPay.Size = new System.Drawing.Size(66, 13);
+            this.BtnRevertPay.TabIndex = 14;
+            this.BtnRevertPay.UseVisualStyleBackColor = true;
+            this.BtnRevertPay.Click += new System.EventHandler(this.BtnRevertPay_ClickAsync);
+            // 
             // ChkNoIncludeCEN
             // 
             this.ChkNoIncludeCEN.AutoSize = true;
@@ -410,9 +420,10 @@
             // 
             // BtnCancelTak
             // 
+            this.BtnCancelTak.Enabled = false;
             this.BtnCancelTak.ImageIndex = 17;
             this.BtnCancelTak.ImageList = this.FListPics;
-            this.BtnCancelTak.Location = new System.Drawing.Point(171, 164);
+            this.BtnCancelTak.Location = new System.Drawing.Point(184, 220);
             this.BtnCancelTak.Name = "BtnCancelTak";
             this.BtnCancelTak.Size = new System.Drawing.Size(30, 23);
             this.BtnCancelTak.TabIndex = 12;
@@ -530,7 +541,7 @@
             this.CboParticipants.Name = "CboParticipants";
             this.CboParticipants.Size = new System.Drawing.Size(191, 23);
             this.CboParticipants.TabIndex = 0;
-            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommittedAsync);
+            this.CboParticipants.SelectionChangeCommitted += new System.EventHandler(this.CboParticipants_SelectionChangeCommitted);
             // 
             // CboYears
             // 
@@ -582,15 +593,6 @@
             this.fImageListType.Images.SetKeyName(9, "");
             this.fImageListType.Images.SetKeyName(10, "");
             this.fImageListType.Images.SetKeyName(11, "");
-            // 
-            // BtnRevertPay
-            // 
-            this.BtnRevertPay.Location = new System.Drawing.Point(31, 154);
-            this.BtnRevertPay.Name = "BtnRevertPay";
-            this.BtnRevertPay.Size = new System.Drawing.Size(66, 13);
-            this.BtnRevertPay.TabIndex = 14;
-            this.BtnRevertPay.UseVisualStyleBackColor = true;
-            this.BtnRevertPay.Click += new System.EventHandler(this.BtnRevertPay_ClickAsync);
             // 
             // FormMain
             // 

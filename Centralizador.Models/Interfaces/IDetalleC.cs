@@ -15,11 +15,11 @@ namespace Centralizador.Models.Interfaces
         ResultParticipant UserParticipant { get; set; }
         string TokenSii { get; set; }
         string TokenCen { get; set; }
-        ProgressReportModel ProgressReport { get; set; }
+        // ProgressReportModel ProgressReport { get; set; }
 
         StringBuilder StringLogging { get; set; }
 
-        Task<List<Detalle>> GetDetalleCreditor(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress, CancellationToken cancellationToke);
+        //  Task<List<Detalle>> GetDetalleCreditor(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress, CancellationToken cancellationToke);
 
         Task<List<int>> InsertNv(List<Detalle> detalles, IProgress<ProgressReportModel> progress, List<ResultBilingType> types);
     }

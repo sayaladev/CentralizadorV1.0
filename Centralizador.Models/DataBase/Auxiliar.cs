@@ -64,7 +64,8 @@ namespace Centralizador.Models.DataBase
                 query.Append($"'{adressTemp}','S', 'S','N', 'N', 'S','{instruction.ParticipantDebtor.DteReceptionEmail}' ");
                 query.Append($",'Softland','Centralizador', 'IW',{comuna.Id_Region}, '{time}') END");
                 conexion.Query = query.ToString();
-                if (await Conexion.ExecuteNonQueryAsync(conexion) == 2)
+                var res = await Conexion.ExecuteNonQueryAsync(conexion);
+                if ((int)res == 2)
                 {
                     return new Auxiliar()
                     {
@@ -184,8 +185,9 @@ namespace Centralizador.Models.DataBase
                 query.Append($"DirAux = '{adressTemp}', ");
                 query.Append($"eMailDTE='{instruction.ParticipantDebtor.DteReceptionEmail}' WHERE CodAux='{instruction.ParticipantDebtor.Rut}'");
                 conexion.Query = query.ToString();
-                int res = await Conexion.ExecuteNonQueryAsync(conexion);
-                return res;
+                var res = await Conexion.ExecuteNonQueryAsync(conexion);
+
+                return (int)res;
             }
             catch (Exception)
             {
