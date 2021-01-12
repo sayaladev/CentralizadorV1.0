@@ -62,8 +62,8 @@ namespace Centralizador.Models.Properties {
         
         /// <summary>
         ///   Busca una cadena traducida similar a &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot; xmlns:sii=&quot;http://www.sii.cl/SiiDte&quot; xmlns:str=&quot;http://exslt.org/strings&quot; version=&quot;1.0&quot; &gt;
-        ///  &lt;xsl:output method=&quot;xml&quot; indent=&quot;yes&quot;/&gt;
+        ///&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot; xmlns:sii=&quot;http://www.sii.cl/SiiDte&quot; xmlns:str=&quot;http://exslt.org/strings&quot; version=&quot;1.0&quot;&gt;
+        ///  &lt;xsl:output method=&quot;xml&quot; indent=&quot;yes&quot; /&gt;
         ///  &lt;!--&lt;xsl:template match=&quot;@* | node()&quot;&gt; : Atributo + comentarios + Texto nodo y elemento. LO MISMO: attribute::* | child::node()
         ///      &lt;xsl:template match=&quot;@* | *&quot;&gt;      : Atributo y elemento.
         ///      &lt;xsl:template match=&quot;/&quot;&gt;           : Nodo raíz.--&gt;
@@ -77,21 +77,31 @@ namespace Centralizador.Models.Properties {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a IF NOT EXISTS (select * from sys.objects where type = &apos;TR&apos; and name = &apos;[softland].[IW_GSAEN_REF_DTE_CEN]&apos;)
-        ///EXEC dbo.sp_executesql @statement = N&apos;
+        ///   Busca una cadena traducida similar a IF NOT EXISTS (
+        ///		SELECT *
+        ///		FROM sys.objects
+        ///		WHERE name = &apos;IW_GSAEN_REF_DTE_CEN&apos;
+        ///			AND type = &apos;TR&apos;
+        ///		)
+        ///	EXEC dbo.sp_executesql @statement = 
+        ///		N&apos;
         ///
-        ///CREATE TRIGGER [softland].[IW_GSAEN_REF_DTE_CEN] 
-        ///   ON  [softland].[iw_gsaen_refdte]
-        ///   AFTER  INSERT
-        ///AS 
+        ///CREATE TRIGGER [softland].[IW_GSAEN_REF_DTE_CEN] ON [softland].[iw_gsaen_refdte]
+        ///AFTER INSERT
+        ///AS
+        ///DECLARE @TipoDte VARCHAR(1);
+        ///
+        ///SELECT @TipoDte = (
+        ///		SELECT i.Tipo
+        ///		FROM inserted i
+        ///		);--F / N
+        ///
+        ///IF @TipoDte = &apos;&apos;F&apos;&apos;
         ///BEGIN
-        ///	-- SET NOCOUNT ON added to prevent extra result sets from
-        ///	-- interfering with SELECT statements.
         ///	SET NOCOUNT ON;
-        ///DECLARE @FolioRef varchar(20); -- DE04457A19C47
-        ///DECLARE @RazonRef varchar(20); --SEN_[]
-        ///DECLARE @FchRef DATETIME; 
-        ///declare [resto de la cadena truncado]&quot;;.
+        ///	DECLARE @FolioRef VARCHAR(40);-- DE04457A19C47
+        ///	DECLARE @RazonRef VARCHAR(40);--SEN_[]
+        ///	DECLARE @Fc [resto de la cadena truncado]&quot;;.
         /// </summary>
         internal static string sql_insert_Trigger {
             get {

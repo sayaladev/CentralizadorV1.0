@@ -41,17 +41,13 @@ namespace Centralizador.WinApp.GUI
         public IEnumerable<ResultBilingType> BillingTypes { get; set; }
         public string DataBaseName { get; set; }
 
-        //  public ServiceSendMail Mail { get; private set; }
         public List<ResultParticipant> Participants { get; set; }
 
-        //public ProgressReportModel ReportModel { get; set; }
-
-        // public StringBuilder StringLogging { get; set; }
         public string TokenCen { get; set; }
 
         public string TokenSii { get; set; }
         private List<Detalle> DetallePrincipal { get; set; }
-        private Progress<ProgressReportModel> ProgressReport { get; set; }
+        private Progress<ProgressReportModel> Progress { get; set; }
         private ResultParticipant UserParticipant { get; set; }
         public CancellationTokenSource CancelToken { get; private set; }
 
@@ -161,6 +157,10 @@ namespace Centralizador.WinApp.GUI
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            // VARIABLES INIT.
+            Progress = new Progress<ProgressReportModel>();
+            Progress.ProgressChanged += Progress_ProgressChanged;
+
             // VERSION
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
             if (Environment.Is64BitProcess)
@@ -174,16 +174,12 @@ namespace Centralizador.WinApp.GUI
             // BUTTONS
             BtnCancelTak.Enabled = false;
 
-            //Load ComboBox participants
+            //LOAD COMBOBOX.
             CboParticipants.DisplayMember = "Name";
             CboParticipants.DataSource = Participants;
             CboParticipants.SelectedIndex = 0;
-
-            //Load ComboBox months
             CboMonths.DataSource = DateTimeFormatInfo.InvariantInfo.MonthNames.Take(12).ToList();
             CboMonths.SelectedIndex = DateTime.Today.Month - 1;
-            //Load ComboBox years
-
             CboYears.DataSource = Enumerable.Range(2019, DateTime.Now.Year - 2018).ToList();
             CboYears.SelectedItem = DateTime.Now.Year;
 
@@ -209,6 +205,78 @@ namespace Centralizador.WinApp.GUI
             timerHour.Elapsed += TimerHour_Elapsed;
             timerHour.Enabled = true;
             timerHour.AutoReset = true;
+        }
+
+        private void Progress_ProgressChanged(object sender, ProgressReportModel e)
+        {
+            // PROGRESS IFORMATION
+            if (GetTypeReport == TipoTask.SendEmail)
+            {
+                TssLblMensaje.Text = e.GetMessage();
+                TssLblFechaHora.Text = e.PercentageComplete.ToString();
+            }
+            else
+            {
+                var algo = CveStoreDoc.CancelToken.IsCancellationRequested;
+                // CveStoreDoc.CancelToken.Cancel();
+                algo = CveStoreDoc.CancelToken.IsCancellationRequested;
+
+                TssLblProgBar.Value = e.PercentageComplete;
+                TssLblMensaje.Text = e.GetMessage();
+            }
+            if (e.PercentageComplete == 100)
+            {
+                SetIsRuning(false);
+                TssLblProgBar.Value = 0;
+                switch (GetTypeReport)
+                {
+                    case TipoTask.GetDebtor:
+                        // ICON FOR EMAIL SENNDING.
+                        TssLblFechaHora.Image = fImageListSmall.Images[1];
+                        TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
+                        TssLblFechaHora.Text = "0";
+                        e.StopWatch.Stop();
+                        BtnPagar.Enabled = true;
+                        BtnInsertNv.Enabled = false;
+                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
+                        TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
+                        TssLblDBName.Text = "|DB: " + DataBaseName;
+                        break;
+
+                    case TipoTask.GetCreditor:
+                        if (DetallePrincipal != null && DetallePrincipal.Count > 0)
+                        {
+                            e.StopWatch.Stop();
+                            BtnPagar.Enabled = false;
+                            BtnInsertNv.Enabled = true;
+                            TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
+                            TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
+                            TssLblDBName.Text = "|DB: " + DataBaseName;
+                            BtnInsertNv.Enabled = true;
+                        }
+                        break;
+
+                    case TipoTask.InsertNV:
+                        BtnInsertNv.Enabled = false;
+                        TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
+                        TssLblDBName.Text = "|DB: " + DataBaseName;
+                        break;
+
+                    case TipoTask.ReadEmail:
+                        BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", e.FchOutlook);
+                        TssLblMensaje.Text = "Complete!";
+                        BtnCancelTak.Enabled = false;
+                        break;
+
+                    case TipoTask.ConvertToPdf:
+                        TssLblMensaje.Text = "Complete!";
+                        SetIsRuning(false);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
         }
 
         private void FormMain_Shown(object sender, EventArgs e)
@@ -599,130 +667,7 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        private void ReportProgress(object sender, ProgressReportModel e)
-        {
-            // PROGRESS IFORMATION
-            if (GetTypeReport == TipoTask.SendEmail)
-            {
-                TssLblMensaje.Text = e.GetMessage();
-                TssLblFechaHora.Text = e.PercentageComplete.ToString();
-            }
-            else
-            {
-                TssLblProgBar.Value = e.PercentageComplete;
-                TssLblMensaje.Text = e.GetMessage();
-            }
-            if (e.PercentageComplete == 100)
-            {
-                SetIsRuning(false);
-                TssLblProgBar.Value = 0;
-                switch (GetTypeReport)
-                {
-                    case TipoTask.GetDebtor:
-                        // ICON FOR EMAIL SENNDING.
-                        TssLblFechaHora.Image = fImageListSmall.Images[1];
-                        TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
-                        TssLblFechaHora.Text = "0";
-                        e.StopWatch.Stop();
-                        BtnPagar.Enabled = true;
-                        BtnInsertNv.Enabled = false;
-                        TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
-                        TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
-                        TssLblDBName.Text = "|DB: " + DataBaseName;
-                        break;
-
-                    case TipoTask.GetCreditor:
-                        if (DetallePrincipal != null && DetallePrincipal.Count > 0)
-                        {
-                            e.StopWatch.Stop();
-                            BtnPagar.Enabled = false;
-                            BtnInsertNv.Enabled = true;
-                            TssLblMensaje.Text = $"{DetallePrincipal.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
-                            TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
-                            TssLblDBName.Text = "|DB: " + DataBaseName;
-                            BtnInsertNv.Enabled = true;
-                        }
-                        break;
-
-                    case TipoTask.InsertNV:
-                        BtnInsertNv.Enabled = false;
-                        TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
-                        TssLblDBName.Text = "|DB: " + DataBaseName;
-                        break;
-
-                    case TipoTask.ReadEmail:
-                        BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", e.FchOutlook);
-                        TssLblMensaje.Text = "Complete!";
-                        BtnCancelTak.Enabled = false;
-                        break;
-
-                    case TipoTask.ConvertToPdf:
-                        SetIsRuning(false);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
         #endregion METHODS FORM
-
-        #region PDF
-
-        private void BgwConvertPdf_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            TssLblProgBar.Value = e.ProgressPercentage;
-            TssLblMensaje.Text = e.UserState.ToString();
-        }
-
-        private void BgwConvertPdf_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled == true)
-            {
-                TssLblMensaje.Text = $"Canceled! {DataBaseName}";
-            }
-
-            TssLblProgBar.Value = 0;
-            TssLblMensaje.Text = "Operation completed.";
-
-            IGridMain.Focus();
-        }
-
-        private void BtnPdfConvert_Click(object sender, EventArgs e)
-        {
-            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (IGridMain.Rows.Count > 0)
-            {
-                List<Detalle> lista = new List<Detalle>();
-                if (DetallePrincipal != null)
-                {
-                    foreach (Detalle item in DetallePrincipal)
-                    {
-                        if (item.DTEDef != null)
-                        {
-                            lista.Add(item);
-                        }
-                    }
-                }
-                DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (DialogResult == DialogResult.Yes)
-                {
-                    BgwConvertPdf = new BackgroundWorker
-                    {
-                        WorkerReportsProgress = true,
-                        WorkerSupportsCancellation = true
-                    };
-                    BgwConvertPdf.ProgressChanged += BgwConvertPdf_ProgressChanged;
-                    BgwConvertPdf.RunWorkerCompleted += BgwConvertPdf_RunWorkerCompleted;
-                    ServicePdf servicePdf = new ServicePdf(lista);
-                    SetIsRuning(true);
-                    servicePdf.ConvertToPdf(BgwConvertPdf);
-                }
-            }
-        }
-
-        #endregion PDF
 
         #region IGRID
 
@@ -784,7 +729,7 @@ namespace Centralizador.WinApp.GUI
                                 //ReportModel.TaskType = TipoTask.SendEmail;
                                 //ReportModel.PercentageComplete++;
                                 //ReportModel.Message = "Sending EMAIL...";
-                                SendEmailTo sendMailTo = new SendEmailTo(UserParticipant, ProgressReport);
+                                SendEmailTo sendMailTo = new SendEmailTo(UserParticipant, Progress);
                                 await sendMailTo.SendMailToParticipantAsync(detalle, participant, EmailInDte);
                             }
                             else
@@ -1110,8 +1055,6 @@ namespace Centralizador.WinApp.GUI
             BtnInsertNv.Enabled = false;
             try
             {
-                ProgressReport = new Progress<ProgressReportModel>();
-                ProgressReport.ProgressChanged += ReportProgress;
                 List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixAsync(new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1));
                 if (matrices != null && matrices.Count > 0)
                 {
@@ -1119,14 +1062,15 @@ namespace Centralizador.WinApp.GUI
                     // TESTER DetallePrincipal = await det.GetDetalleCreditor(matrices, ProgressReport, CancellationTk.Token);
                     // NUEVO !
                     // SQL SI EXISTE DB !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+                    List<ResultInstruction> instructions = new List<ResultInstruction>();
+                    // var algo = new CveCreditor(UserParticipant,ReportModel,);
+                    // instructions = await algo.GetInstructions(matrices, Progress);
                     try
                     {
-                        List<ResultInstruction> instructions = new List<ResultInstruction>();
-                        instructions = await det.GetInstructions(matrices, ProgressReport);
+                        instructions = await det.GetInstructions(matrices, Progress);
                         if (instructions.Count > 0)
                         {
-                            DetallePrincipal = await det.GetDetallesTaskWhenAll(instructions, ProgressReport);
+                            DetallePrincipal = await det.GetDetallesTaskWhenAll(instructions, Progress);
                         }
                     }
                     catch (Exception)
@@ -1220,11 +1164,9 @@ namespace Centralizador.WinApp.GUI
                     //await Task.Delay(3000); // 3 SECONDS.
                     try
                     {
-                        ProgressReport = new Progress<ProgressReportModel>();
-                        ProgressReport.ProgressChanged += ReportProgress;
                         FileSii.ReadFileSii(); // GET VALUES LIST FROM CSV.
                         DetalleCreditor det = new DetalleCreditor(DataBaseName, UserParticipant, TokenSii, TokenCen);
-                        List<int> folios = await det.InsertNv(detallesFinal, ProgressReport, await BilingType.GetBilinTypesAsync());
+                        List<int> folios = await det.InsertNv(detallesFinal, Progress, await BilingType.GetBilinTypesAsync());
                         if (folios != null)
                         {
                             string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
@@ -1272,14 +1214,11 @@ namespace Centralizador.WinApp.GUI
             try
             {
                 string nameFile = @"C:\Centralizador\Inbox\" + CboYears.SelectedItem + @"\" + (CboMonths.SelectedIndex + 1);
-
-                ProgressReport = new Progress<ProgressReportModel>();
-                ProgressReport.ProgressChanged += ReportProgress;
                 List<Detalle> detalles = await GetLibroAsync("Debtor", UserParticipant, "33", $"{CboYears.SelectedItem}-{string.Format("{0:00}", CboMonths.SelectedIndex + 1)}", TokenSii);
                 if (detalles != null)
                 {
                     DetalleDebtor det = new DetalleDebtor(DataBaseName, UserParticipant, TokenSii, TokenCen);
-                    DetallePrincipal = await det.GetDetalleDebtor(detalles, ProgressReport, nameFile);
+                    DetallePrincipal = await det.GetDetalleDebtor(detalles, Progress, nameFile);
                     if (DetallePrincipal != null) { IGridFill(await BilingType.GetBilinTypesAsync()); }
                 }
             }
@@ -1301,11 +1240,9 @@ namespace Centralizador.WinApp.GUI
             try
             {
                 BtnCancelTak.Enabled = true;
-                ProgressReport = new Progress<ProgressReportModel>();
-                ProgressReport.ProgressChanged += ReportProgress;
                 CancelToken = new CancellationTokenSource();
                 TssLblMensaje.Text = "Connecting to the mail server... Please wait.";
-                ReadEmailFrom readEmailFrom = new ReadEmailFrom(TokenSii, ProgressReport);
+                ReadEmailFrom readEmailFrom = new ReadEmailFrom(TokenSii, Progress);
                 await readEmailFrom.ReadMailFromServer(CancelToken.Token);
                 IGridMain.Focus();
             }
@@ -1322,17 +1259,23 @@ namespace Centralizador.WinApp.GUI
         {
             try
             {
-                if (GetTypeReport == TipoTask.ReadEmail)
-                {
-                    CancelToken.Cancel();
-                }
-                CleanControls();
-                BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
-                if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy) { BgwConvertPdf.CancelAsync(); }
+                //await ConvertDocs.CancelTask();
+
+                //if (GetTypeReport == TipoTask.ReadEmail)
+                //{
+                //    CancelToken.Cancel();
+                //}
+                //CleanControls();
+                //BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
+                //if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy) { BgwConvertPdf.CancelAsync(); }
             }
             catch (Exception)
             {
                 throw;
+            }
+            finally
+            {
+                //CancelToken.Dispose();
             }
         }
 
@@ -1349,6 +1292,47 @@ namespace Centralizador.WinApp.GUI
                 else if (GetTypeReport == TipoTask.GetDebtor)
                 {
                     serviceExcel.ExportToExcel(DetallePrincipal, false, CboMonths.SelectedItem);
+                }
+            }
+        }
+
+        private async void BtnPdfConvert_Click(object sender, EventArgs e)
+        {
+            if (GetIsRuning()) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (IGridMain.Rows.Count > 0)
+            {
+                List<Detalle> lista = new List<Detalle>();
+                if (DetallePrincipal != null)
+                {
+                    foreach (Detalle item in DetallePrincipal)
+                    {
+                        if (item.DTEDef != null)
+                        {
+                            lista.Add(item);
+                        }
+                    }
+                }
+                if (lista.Count > 0)
+                {
+                    DialogResult = MessageBox.Show($"You are going to convert {lista.Count} documents,{Environment.NewLine}Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (DialogResult == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            BtnCancelTak.Enabled = true;
+                            TssLblMensaje.Text = "Converting docs to PDF, wait please.";
+                            await new ConvertDocs(Progress, UserParticipant).ConvertXmlToPdf(lista);
+                            BtnCancelTak.Enabled = false;
+                        }
+                        catch (Exception)
+                        {
+                            throw;
+                        }
+                    }
+                }
+                else
+                {
+                    TssLblMensaje.Text = "No documents to convert.";
                 }
             }
         }

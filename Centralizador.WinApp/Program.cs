@@ -38,6 +38,7 @@ namespace Centralizador.WinApp
                 string SerialNumber = doc.Root.Element("CertificadoDigital").Element("SerialNumber").Value;
                 ServiceSoap s = new ServiceSoap(SerialNumber);
                 tokenSii = s.GETTokenFromSii();
+
                 // GET PARTICIPANTS CEN.
                 participants = await Participant.GetParticipants(UserCen, UrlCen);
                 // GET TOKEN CEN.

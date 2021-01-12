@@ -23,7 +23,7 @@ namespace Centralizador.Models.Interfaces
         public ResultParticipant UserParticipant { get; set; }
         public string TokenSii { get; set; }
         public string TokenCen { get; set; }
-        private ProgressReportModel ProgressReport { get; set; }
+        private ProgressReportModel ReportModel { get; set; }
         public StringBuilder StringLogging { get; set; }
 
         public DetalleCreditor(string dataBaseName, ResultParticipant userParticipant, string tokenSii, string tokenCen)
@@ -32,7 +32,7 @@ namespace Centralizador.Models.Interfaces
             UserParticipant = userParticipant;
             TokenSii = tokenSii;
             TokenCen = tokenCen;
-            ProgressReport = new ProgressReportModel(ProgressReportModel.TipoTask.GetCreditor);
+            ReportModel = new ProgressReportModel(ProgressReportModel.TipoTask.GetCreditor);
             StringLogging = new StringBuilder();
         }
 
@@ -171,7 +171,7 @@ namespace Centralizador.Models.Interfaces
         //    return detalles;
         //}
 
-        public async Task<List<ResultInstruction>> GetInstructions(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> progress)
+        public async Task<List<ResultInstruction>> GetInstructions(List<ResultPaymentMatrix> matrices, IProgress<ProgressReportModel> report)
         {
             int c = 0;
             float porcent;
@@ -193,9 +193,9 @@ namespace Centralizador.Models.Interfaces
                  }
                  c++;
                  porcent = (float)(100 * c) / matrices.Count;
-                 ProgressReport.PercentageComplete = (int)porcent;
-                 ProgressReport.SetMessage($"Processing 'Pay Instructions Matrix' {m.Id}, wait please.  ({c}/{matrices.Count})");
-                 progress.Report(ProgressReport);
+                 ReportModel.PercentageComplete = (int)porcent;
+                 ReportModel.SetMessage($"Processing 'Pay Instructions Matrix' N° {m.Id}, wait please.  ({c}/{matrices.Count})");
+                 report.Report(ReportModel);
                  return instructions;
              }).ToList();
             await Task.WhenAll(tareas);
@@ -310,9 +310,9 @@ namespace Centralizador.Models.Interfaces
                         detalles.Add(detalle);
                         c++;
                         porcent = (float)(100 * c) / InstructionsList.Count;
-                        ProgressReport.PercentageComplete = (int)porcent;
-                        ProgressReport.SetMessage($"Processing 'Pay Instructions' {instruction.Id}, wait please.  ({c}/{InstructionsList.Count})");
-                        progress.Report(ProgressReport);
+                        ReportModel.PercentageComplete = (int)porcent;
+                        ReportModel.SetMessage($"Processing 'Pay Instructions' {instruction.Id}, wait please.  ({c}/{InstructionsList.Count})");
+                        progress.Report(ReportModel);
                         return detalles;
                     }
                     catch (Exception)
@@ -406,9 +406,9 @@ namespace Centralizador.Models.Interfaces
                     }
                     c++;
                     porcent = (float)(100 * c) / detalles.Count;
-                    ProgressReport.PercentageComplete = (int)porcent;
-                    ProgressReport.SetMessage($"Inserting NV, wait please...   ({c}/{detalles.Count})  F°: {lastF})");
-                    progress.Report(ProgressReport);
+                    ReportModel.PercentageComplete = (int)porcent;
+                    ReportModel.SetMessage($"Inserting NV, wait please...   ({c}/{detalles.Count})  F°: {lastF})");
+                    progress.Report(ReportModel);
                 }
                 catch (Exception ex)
                 {

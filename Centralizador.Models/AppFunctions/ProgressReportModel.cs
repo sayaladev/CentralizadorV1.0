@@ -40,7 +40,7 @@ namespace Centralizador.Models
             TaskType = taskType;
             SetIsRuning(true);
             PercentageComplete = 0;
-            if (TaskType == TipoTask.GetCreditor || TaskType == TipoTask.GetDebtor)
+            if (TaskType == TipoTask.GetCreditor || TaskType == TipoTask.GetDebtor || taskType == TipoTask.ConvertToPdf)
             {
                 StopWatch = Stopwatch.StartNew();
             }

@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Centralizador.Models</RootNamespace>
     <AssemblyName>Centralizador.Models</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -58,11 +59,11 @@
       <HintPath>..\packages\Portable.BouncyCastle.1.8.8\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="MailKit, Version=2.10.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
-      <HintPath>..\packages\MailKit.2.10.1\lib\net46\MailKit.dll</HintPath>
+      <HintPath>..\packages\MailKit.2.10.1\lib\net48\MailKit.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="MimeKit, Version=2.10.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
-      <HintPath>..\packages\MimeKit.2.10.1\lib\net46\MimeKit.dll</HintPath>
+      <HintPath>..\packages\MimeKit.2.10.1\lib\net48\MimeKit.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -71,7 +72,7 @@
       <HintPath>..\packages\OpenHtmlToPdf.1.12.0.0\lib\net45\OpenHtmlToPdf.dll</HintPath>
     </Reference>
     <Reference Include="Pdf417EncoderLibrary, Version=2.11.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Pdf417EncoderLibrary.2.1.0\lib\netstandard2.0\Pdf417EncoderLibrary.dll</HintPath>
+      <HintPath>..\packages\Pdf417EncoderLibrary.2.1.0\lib\net462\Pdf417EncoderLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Spire.License, Version=1.3.8.40, Culture=neutral, PublicKeyToken=b1144360237c8b3f, processorArchitecture=MSIL">
       <HintPath>..\packages\FreeSpire.XLS.10.10.0\lib\net40\Spire.License.dll</HintPath>
@@ -119,6 +120,7 @@
     <Compile Include="ApiSII\ServiceEvento.cs" />
     <Compile Include="ApiSII\ServiceDetalle.cs" />
     <Compile Include="ApiSII\ServiceSoap.cs" />
+    <Compile Include="AppFunctions\ConvertDocs.cs" />
     <Compile Include="AppFunctions\FileSii.cs" />
     <Compile Include="AppFunctions\ComunaInput.cs" />
     <Compile Include="AppFunctions\CreateFile.cs" />
@@ -133,6 +135,8 @@
     <Compile Include="DataBase\DteFiles.cs" />
     <Compile Include="DataBase\NotaVenta.cs" />
     <Compile Include="DataBase\DteInfoRef.cs" />
+    <Compile Include="Interfaces\CveCreditor.cs" />
+    <Compile Include="Interfaces\CveStoreDoc.cs" />
     <Compile Include="Interfaces\DetalleCreditor.cs" />
     <Compile Include="Interfaces\DetalleDebtor.cs" />
     <Compile Include="AppFunctions\MsgErrorCustom.cs" />
