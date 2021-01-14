@@ -6,27 +6,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using Centralizador.Models.AppFunctions;
+using Centralizador.Models.Helpers;
 using Centralizador.Models.registroreclamodteservice;
 using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Search;
 using MimeKit;
-using static Centralizador.Models.ProgressReportModel;
+using static Centralizador.Models.HPgModel;
 
 namespace Centralizador.Models.Outlook.MailKit
 {
     public class ReadEmailFrom
     {
         private string TokenSii { get; set; }
-        private IProgress<ProgressReportModel> Progress { get; set; }
-        private ProgressReportModel ProgressReport { get; set; }
+        private IProgress<HPgModel> Progress { get; set; }
+        private HPgModel ProgressReport { get; set; }
 
-        public ReadEmailFrom(string tokenSii, IProgress<ProgressReportModel> progress)
+        public ReadEmailFrom(string tokenSii, IProgress<HPgModel> progress)
         {
             TokenSii = tokenSii;
             Progress = progress;
-            ProgressReport = new ProgressReportModel(TipoTask.ReadEmail);
+            ProgressReport = new HPgModel();
         }
 
         public ReadEmailFrom()
@@ -93,7 +93,7 @@ namespace Centralizador.Models.Outlook.MailKit
                                     Properties.Settings.Default.UIDRange = uid.ToString();
                                     c++;
                                     float porcent = (float)(100 * c) / total;
-                                    ProgressReport.SetMessage($"Dowloading messages... [{string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", message.Date.DateTime)}] ({c}/{total})  Subject: {message.Subject} ");
+                                    ProgressReport.Msg = $"Dowloading messages... [{string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", message.Date.DateTime)}] ({c}/{total})  Subject: {message.Subject} ";
                                     ProgressReport.PercentageComplete = (int)porcent;
                                     ProgressReport.FchOutlook = Properties.Settings.Default.DateTimeEmail;
                                     Progress.Report(ProgressReport);
@@ -105,7 +105,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 }
                 catch (OperationCanceledException) when (token.IsCancellationRequested)
                 {
-                    ProgressReport.SetMessage("Task canceled...  !");
+                    ProgressReport.Msg = "Task canceled...  !";
                     ProgressReport.PercentageComplete = 100;
                     Progress.Report(ProgressReport);
                     return;
@@ -154,7 +154,7 @@ namespace Centralizador.Models.Outlook.MailKit
             string nameFolder;
             string nameFile;
             // DESERIALIZE.
-            EnvioDTE xmlObjeto = ServicePdf.TransformStringDTEDefTypeToObjectDTEAsync(xDocument).Result;
+            EnvioDTE xmlObjeto = HSerialize.TransformStringDTEDefTypeToObjectDTEAsync(xDocument).Result;
             if (xmlObjeto != null)
             {
                 foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
@@ -209,7 +209,7 @@ namespace Centralizador.Models.Outlook.MailKit
             {
                 string path = @"C:\Centralizador\Inbox\" + nameFolder;
                 new CreateFile(path);
-                File.WriteAllText(path + @"\" + nameFile + ".xml", ServicePdf.TransformObjectToXml(dte));
+                File.WriteAllText(path + @"\" + nameFile + ".xml", HSerialize.TransformObjectToXml(dte));
             }
             catch (Exception)
             {

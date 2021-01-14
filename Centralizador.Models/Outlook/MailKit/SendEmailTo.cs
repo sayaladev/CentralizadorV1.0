@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
-using Centralizador.Models.AppFunctions;
+using Centralizador.Models.Helpers;
 using MailKit;
 using MailKit.Net.Smtp;
 using MimeKit;
@@ -15,14 +15,14 @@ namespace Centralizador.Models.Outlook.MailKit
     public class SendEmailTo
     {
         private ResultParticipant UserParticipant { get; set; }
-        private IProgress<ProgressReportModel> Progress { get; set; }
-        private ProgressReportModel ProgressReport { get; set; }
+        private IProgress<HPgModel> Progress { get; set; }
+        private HPgModel ProgressReport { get; set; }
 
-        public SendEmailTo(ResultParticipant userParticipant, IProgress<ProgressReportModel> progress)
+        public SendEmailTo(ResultParticipant userParticipant, IProgress<HPgModel> progress)
         {
             UserParticipant = userParticipant;
             Progress = progress;
-            ProgressReport = new ProgressReportModel(ProgressReportModel.TipoTask.SendEmail);
+            ProgressReport = new HPgModel();
         }
 
         public async Task SendMailToParticipantAsync(Detalle detalle, ResultParticipant participant, string EmailInDte)
@@ -51,7 +51,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 {
                     builderCEN.AppendLine("&nbsp;&nbsp;&nbsp;&nbsp;-No se encuentra el Tag :  &lt;FmaPago&gt;" + "<br/>");
                 }
-                if (detalle.ValidatorFlag.Flag == ValidatorFlag.LetterFlag.Blue) // MONTO
+                if (detalle.ValidatorFlag.Flag == Helpers.HFlagValidator.LetterFlag.Blue) // MONTO
                 {
                     builderCEN.AppendLine("&nbsp;&nbsp;&nbsp;&nbsp;-Monto no corresponde." + "<br/>");
                 }
@@ -162,7 +162,7 @@ namespace Centralizador.Models.Outlook.MailKit
                 // SAVE FILE EML.
                 new CreateFile(@"C:\Centralizador\Log\", mimeMessage, nameFile);
                 //mimeMessage.WriteTo(nameFile);
-                ProgressReport.SetMessage($"Email send to {mimeMessage.To.FirstOrDefault().Name}, check de Log file.");
+                ProgressReport.Msg = $"Email send to {mimeMessage.To.FirstOrDefault().Name}, check de Log file.";
                 ProgressReport.PercentageComplete--;
                 Progress.Report(ProgressReport);
             }

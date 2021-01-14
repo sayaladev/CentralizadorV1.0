@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
-using Centralizador.Models.AppFunctions;
-using Centralizador.Models.DataBase;
 
+using Centralizador.Models.DataBase;
+using Centralizador.Models.Helpers;
 using Newtonsoft.Json;
 
 using static Centralizador.Models.ApiSII.ServiceDetalle;
+using static Centralizador.Models.Helpers.HFlagValidator;
 
 namespace Centralizador.Models.ApiSII
 {
@@ -101,69 +102,6 @@ namespace Centralizador.Models.ApiSII
             }
             return null;
         }
-
-        public enum StatusDetalle
-        {
-            Accepted,
-            Rejected,
-            Pending,
-            Factoring
-        }
-
-        public static StatusDetalle GetStatus(Detalle detalle)
-        {
-            // http://www.sii.cl/factura_electronica/Webservice_Registro_Reclamo_DTE_V1.2.pdf
-            if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
-            {
-                // Ordeno por el evento más reciente
-                List<ListEvenHistDoc> eventos = detalle.DataEvento.ListEvenHistDoc.OrderByDescending(x => x.FechaEvento).ToList();
-                ListEvenHistDoc res = eventos.FirstOrDefault();
-
-                switch (res.CodEvento)
-                {
-                    case "ACD": // Acepta Contenido del Documento
-                        return StatusDetalle.Accepted;
-
-                    case "RCD": // Reclamo al Contenido del Documento
-                        return StatusDetalle.Rejected;
-
-                    case "PAG": // Pago Contado
-                        return StatusDetalle.Accepted;
-
-                    case "ERM": // Acuse de  Recibo de Mercaderías y Servicios Ley 19.983
-                        return StatusDetalle.Accepted;
-
-                    case "ENC": // Recepción de NC, distinta de anulación, que referencia al documento.
-                        return StatusDetalle.Accepted;
-
-                    case "RFT": // Receclamo por falta total de mercaderías.
-                        return StatusDetalle.Rejected;
-
-                    case "RFP": // Receclamo por falta parcial de mercaderías.
-                        return StatusDetalle.Rejected;
-
-                    case "NCA": // Recepción de NC de anulación que referencia al documento.
-                        return StatusDetalle.Rejected;
-
-                    case "CED": // DTE Cedido.
-                        return StatusDetalle.Factoring;
-
-                    default:
-                        return StatusDetalle.Pending;
-                }
-            }
-            else
-            {
-                if (detalle.DataEvento.MayorOchoDias)
-                {
-                    return StatusDetalle.Accepted;
-                }
-                else
-                {
-                    return StatusDetalle.Pending;
-                }
-            }
-        }
     }
 
     public class Detalle
@@ -223,7 +161,7 @@ namespace Centralizador.Models.ApiSII
         public DataEvento DataEvento { get; set; }
         public bool IsParticipant { get; set; }
         public StatusDetalle StatusDetalle { get; set; }
-        public ValidatorFlag ValidatorFlag { get; set; }
+        public HFlagValidator ValidatorFlag { get; set; }
         public int NroInt { get; set; }
         public ResultParticipant ParticipantMising { get; set; }
         public string DTEFile { get; set; }

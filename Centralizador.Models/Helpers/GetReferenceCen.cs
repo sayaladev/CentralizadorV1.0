@@ -2,7 +2,7 @@
 
 using Centralizador.Models.ApiSII;
 
-namespace Centralizador.Models.AppFunctions
+namespace Centralizador.Models.Helpers
 {
     public class GetReferenceCen
     {
@@ -19,10 +19,13 @@ namespace Centralizador.Models.AppFunctions
             {
                 DTEDefTypeDocumento obj = (DTEDefTypeDocumento)detalle.DTEDef.Item;
                 DTEDefTypeDocumentoReferencia[] refr = obj.Referencia;
-                DTEDefTypeDocumentoReferencia r = refr.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
-                if (r != null)
+                if (refr != null)
                 {
-                    return r;
+                    DTEDefTypeDocumentoReferencia r = refr.FirstOrDefault(x => x.TpoDocRef.ToUpper() == "SEN");
+                    if (r != null)
+                    {
+                        return r;
+                    }
                 }
             }
             catch (System.Exception)

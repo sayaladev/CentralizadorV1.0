@@ -5,7 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Centralizador.Models.ApiSII;
-using Centralizador.Models.AppFunctions;
+
+using Centralizador.Models.Helpers;
 
 namespace Centralizador.Models.DataBase
 {
@@ -76,6 +77,11 @@ namespace Centralizador.Models.DataBase
             } while (comunaobj == null);
 
             return await Task.FromResult(comunaobj);
+        }
+
+        internal static Task<Comuna> GetComunaFromInput(Detalle item, object con, bool v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -12,7 +12,7 @@ using Centralizador.Models.ApiSII;
 
 using Spire.Xls;
 
-namespace Centralizador.Models.AppFunctions
+namespace Centralizador.Models.Helpers
 {
     public class ServiceExcel
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using MimeKit;
 
-namespace Centralizador.Models.AppFunctions
+namespace Centralizador.Models.Helpers
 {
     public class CreateFile
     {

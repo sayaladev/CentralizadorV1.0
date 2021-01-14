@@ -68,7 +68,7 @@ namespace Centralizador.WinApp
                         return;
                     }
                     // OPEN MAIN FORM.
-                    FormMain main = new FormMain() { TokenCen = tokenCen, TokenSii = tokenSii, Participants = participants };
+                    FormMain main = new FormMain(tokenCen, tokenSii, participants);
                     main.WindowState = FormWindowState.Normal;
                     main.BringToFront();
                     //main.TopMost = true;

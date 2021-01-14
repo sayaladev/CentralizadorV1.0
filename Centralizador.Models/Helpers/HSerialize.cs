@@ -1,25 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using System.Xml.Xsl;
 
 using Centralizador.Models.ApiSII;
 
-using OpenHtmlToPdf;
-
-using Pdf417EncoderLibrary;
-
-namespace Centralizador.Models.AppFunctions
+namespace Centralizador.Models.Helpers
 {
-    public static class ServicePdf
+    public static class HSerialize
     {
         public static EnvioDTE TransformXmlEnvioDTEToObject(string pathFile)
         {
@@ -37,43 +28,6 @@ namespace Centralizador.Models.AppFunctions
                 return null;
             }
         }
-
-        //public static RespuestaDTE TransformXmlRespuestaDTEToObject(string pathFile)
-        //{
-        //    try
-        //    {
-        //        XmlSerializer deserializer = new XmlSerializer(typeof(RespuestaDTE));
-        //        using (StreamReader reader = new StreamReader(pathFile, Encoding.Default))
-        //        {
-        //            RespuestaDTE document = (RespuestaDTE)deserializer.Deserialize(reader);
-        //            return document;
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return null;
-        //    }
-
-        //}
-        //public static string TransformObjectToXml(RespuestaDTEResultadoResultadoDTE obj)
-        //{
-        //    try
-        //    {
-        //        XmlSerializer serializer = new XmlSerializer(typeof(RespuestaDTEResultadoResultadoDTE), new XmlRootAttribute("ResultadoDTE"));
-        //        using (Utf8StringWriter stringWriter = new Utf8StringWriter())
-        //        {
-        //            using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
-        //            {
-        //                serializer.Serialize(xmlWriter, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
-        //            }
-        //            return stringWriter.ToString();
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return null;
-        //    }
-        //}
 
         public static DTEDefType TransformXmlDTEDefTypeToObjectDTE(string filePath)
         {

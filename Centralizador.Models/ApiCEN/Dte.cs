@@ -10,6 +10,7 @@ using Centralizador.Models.ApiSII;
 using Newtonsoft.Json;
 
 using static Centralizador.Models.ApiSII.ServiceDetalle;
+using static Centralizador.Models.Helpers.HFlagValidator;
 
 namespace Centralizador.Models.ApiCEN
 {

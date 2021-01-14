@@ -5,7 +5,7 @@ using System.Linq;
 
 using Centralizador.Models.ApiSII;
 
-namespace Centralizador.Models.AppFunctions
+namespace Centralizador.Models.Helpers
 {
     public class FileSii
     {
