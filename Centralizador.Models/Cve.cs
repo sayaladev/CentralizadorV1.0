@@ -57,7 +57,7 @@ namespace Centralizador.Models
                     string nameFile = @"C:\Centralizador\Inbox\" + period.Year + @"\" + period.Month;
                     string p = $"{period.Year}-{string.Format("{0:00}", period.Month)}";
                     List<Detalle> lista = await ServiceDetalle.GetLibroAsync("Debtor", UserParticipant, "33", p, TokenSii);
-                    if (lista.Count > 0)
+                    if (lista != null && lista.Count > 0)
                     {
                         try
                         {

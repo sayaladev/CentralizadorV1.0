@@ -134,14 +134,14 @@ namespace Centralizador.Models
                                     case 1:
                                         if (infoLastF.DteFiles[0].TipoXML == null)
                                         {
-                                            detalle.DTEDef = HSerialize.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles[0].Archivo);
+                                            detalle.DTEDef = HSerialize.DTE_To_Object(infoLastF.DteFiles[0].Archivo);
                                             detalle.DTEFile = infoLastF.DteFiles[0].Archivo;
                                         }
                                         break;
 
                                     default:
                                         {
-                                            detalle.DTEDef = HSerialize.TransformStringDTEDefTypeToObjectDTE(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
+                                            detalle.DTEDef = HSerialize.DTE_To_Object(infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo);
                                             detalle.DTEFile = infoLastF.DteFiles.FirstOrDefault(x => x.TipoXML == "D").Archivo;
                                             break;
                                         }
@@ -230,7 +230,7 @@ namespace Centralizador.Models
             return instructions;
         }
 
-        public async Task ConvertXmlToPdf()
+        public async Task ConvertXmlToPdf(TipoTask task)
         {
             // INFO
             PgModel.StopWatch.Start();
@@ -251,31 +251,80 @@ namespace Centralizador.Models
                 IPdfDocument pdfDocument = null;
                 string path = @"C:\Centralizador\Pdf\" + UserParticipant.BusinessName;
                 new CreateFile($"{path}");
-                await Task.Run(() =>
+                try
                 {
-                    tareas = lista.Select(async item =>
+                    await Task.Run(() =>
                     {
-                        if (item.DTEDef != null)
+                        tareas = lista.Select(async item =>
                         {
-                            await HFiles.EncodeTimbre417(item).ContinueWith(async x =>
+                            if (item.DTEDef != null)
                             {
-                                await HFiles.HtmlToXmlTransform(item, path);
-                            });
-                        }
-                        c++;
-                        float porcent = (float)(100 * c) / lista.Count;
-                        await ReportProgress(porcent, $"Converting doc N° [{item.Folio}] to PDF.    ({c}/{lista.Count})");
-                        return pdfDocument;
-                    }).ToList();
-                });
-                await Task.WhenAll(tareas).ContinueWith(x =>
+                                await HFiles.EncodeTimbre417(item, task).ContinueWith(async x =>
+                                {
+                                    await HFiles.HtmlToXmlTransform(item, path);
+                                });
+                            }
+                            c++;
+                            float porcent = (float)(100 * c) / lista.Count;
+                            await ReportProgress(porcent, $"Converting doc N° [{item.Folio}] to PDF.    ({c}/{lista.Count})");
+                            return pdfDocument;
+                        }).ToList();
+                    });
+                    await Task.WhenAll(tareas).ContinueWith(x =>
+                    {
+                        Process.Start(path);
+                    });
+                }
+                catch (Exception)
                 {
-                    Process.Start(path);
+                    throw;
+                }
+                finally
+                {
+                    // INFO
+                    PgModel.StopWatch.Stop();
+                    PgModel.IsBussy = false;
+                }
+            }
+        }
+
+        public async Task ConvertXmlToPdf(Detalle d, TipoTask task)
+        {
+            // INFO
+            PgModel.StopWatch.Start();
+            PgModel.IsBussy = true;
+            IPdfDocument pdfDocument = null;
+            try
+            {
+                //TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                string path = @"C:\Centralizador\Pdf\" + UserParticipant.BusinessName;
+                new CreateFile($"{path}");
+                string nomenclatura = null;
+                await Task.Run(async () =>
+                {
+                    if (d.DTEDef != null)
+                    {
+                        await HFiles.EncodeTimbre417(d, task);
+                        nomenclatura = await HFiles.HtmlToXmlTransform(d, path);
+                    }
+                    return pdfDocument;
+                }).ContinueWith(x =>
+                {
+                    //string nomenclatura = d.Folio + "_" + ti.ToTitleCase(d.RznSocRecep.ToLower());
+                    //Process.Start(path + "\\" + nomenclatura + ".pdf");
+                    Process.Start(nomenclatura);
                 });
             }
-            // INFO
-            PgModel.StopWatch.Stop();
-            PgModel.IsBussy = false;
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                // INFO
+                PgModel.StopWatch.Stop();
+                PgModel.IsBussy = false;
+            }
         }
 
         public async Task<List<Detalle>> GetDebtor(List<Detalle> detalles, string p)
@@ -288,7 +337,7 @@ namespace Centralizador.Models
                 DTEDefType xmlObjeto = null;
                 // GET XML FILE
                 string nameFile = p + $"\\{UserParticipant.Rut}-{UserParticipant.VerificationCode}\\{item.RutReceptor}-{item.DvReceptor}__33__{item.Folio}.xml";
-                if (File.Exists(nameFile)) { xmlObjeto = HSerialize.TransformXmlDTEDefTypeToObjectDTE(nameFile); }
+                if (File.Exists(nameFile)) { xmlObjeto = HSerialize.DTE_To_Object(nameFile); }
                 // GET PARTICPANT INFO FROM CEN
                 ResultParticipant participant = await Participant.GetParticipantByRutAsync(item.RutReceptor.ToString());
                 if (participant != null && participant.Id > 0)
@@ -296,32 +345,35 @@ namespace Centralizador.Models
                     item.IsParticipant = true;
                     item.ParticipantMising = participant;
                 }
-                if (xmlObjeto != null && item.IsParticipant)
+                if (xmlObjeto != null)
                 {
                     item.DTEDef = xmlObjeto;
-                    // GET REFERENCE SEN.
-                    DTEDefTypeDocumentoReferencia r = null;
-                    GetReferenceCen doc = new GetReferenceCen(item);
-                    if (doc != null) { r = doc.DocumentoReferencia; }
-                    if (r != null && r.RazonRef != null)
+                    if (item.IsParticipant)
                     {
-                        // GET WINDOW.
-                        ResultBillingWindow window = await BillingWindow.GetBillingWindowByNaturalKeyAsync(r);
-                        // GET MATRIX.
-                        if (window != null && window.Id > 0)
+                        // GET REFERENCE SEN.
+                        DTEDefTypeDocumentoReferencia r = null;
+                        GetReferenceCen doc = new GetReferenceCen(item);
+                        if (doc != null) { r = doc.DocumentoReferencia; }
+                        if (r != null && r.RazonRef != null)
                         {
-                            List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
-                            if (matrices != null && matrices.Count > 0)
+                            // GET WINDOW.
+                            ResultBillingWindow window = await BillingWindow.GetBillingWindowByNaturalKeyAsync(r);
+                            // GET MATRIX.
+                            if (window != null && window.Id > 0)
                             {
-                                ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(r.RazonRef.Trim(), StringComparison.OrdinalIgnoreCase));
-                                if (matrix != null)
+                                List<ResultPaymentMatrix> matrices = await PaymentMatrix.GetPaymentMatrixByBillingWindowIdAsync(window);
+                                if (matrices != null && matrices.Count > 0)
                                 {
-                                    ResultInstruction instruction = await Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant);
-                                    if (instruction != null && instruction.Id > 0)
+                                    ResultPaymentMatrix matrix = matrices.FirstOrDefault(x => x.NaturalKey.Equals(r.RazonRef.Trim(), StringComparison.OrdinalIgnoreCase));
+                                    if (matrix != null)
                                     {
-                                        item.Instruction = instruction;
-                                        item.Instruction.ParticipantCreditor = participant;
-                                        item.Instruction.ParticipantDebtor = UserParticipant;
+                                        ResultInstruction instruction = await Instruction.GetInstructionDebtorAsync(matrix, participant, UserParticipant);
+                                        if (instruction != null && instruction.Id > 0)
+                                        {
+                                            item.Instruction = instruction;
+                                            item.Instruction.ParticipantCreditor = participant;
+                                            item.Instruction.ParticipantDebtor = UserParticipant;
+                                        }
                                     }
                                 }
                             }

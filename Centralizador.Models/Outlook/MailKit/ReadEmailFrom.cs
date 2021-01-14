@@ -79,9 +79,14 @@ namespace Centralizador.Models.Outlook.MailKit
                                             if (xDocument.Root.Name.LocalName == "EnvioDTE")
                                             {
                                                 int res = SaveFiles(xDocument);
-                                                if (res != 0)
+                                                if (res == 0)
                                                 {
-                                                    MessageBox.Show("Error", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                    // ok
+                                                }
+                                                else if (res == 1)
+                                                {
+                                                    //MessageBox.Show("Error", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                    // ERROR SII.
                                                 }
                                             }
                                         }
@@ -154,7 +159,7 @@ namespace Centralizador.Models.Outlook.MailKit
             string nameFolder;
             string nameFile;
             // DESERIALIZE.
-            EnvioDTE xmlObjeto = HSerialize.TransformStringDTEDefTypeToObjectDTEAsync(xDocument).Result;
+            EnvioDTE xmlObjeto = HSerialize.ENVIODTE_To_Object(xDocument);
             if (xmlObjeto != null)
             {
                 foreach (DTEDefType dte in xmlObjeto.SetDTE.DTE)
@@ -168,9 +173,10 @@ namespace Centralizador.Models.Outlook.MailKit
                         {
                             using (RegistroReclamoDteServiceEndpointService dateTimeDte = new RegistroReclamoDteServiceEndpointService(TokenSii))
                             {
+                                var tipo = Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE);
                                 response = dateTimeDte.consultarFechaRecepcionSii(emisor.GetValue(0).ToString(),
                                 emisor.GetValue(1).ToString(),
-                                Convert.ToInt32(document.Encabezado.IdDoc.TipoDTE).ToString(),
+                                tipo.ToString(),
                                 document.Encabezado.IdDoc.Folio);
                             }
 
@@ -209,7 +215,7 @@ namespace Centralizador.Models.Outlook.MailKit
             {
                 string path = @"C:\Centralizador\Inbox\" + nameFolder;
                 new CreateFile(path);
-                File.WriteAllText(path + @"\" + nameFile + ".xml", HSerialize.TransformObjectToXml(dte));
+                File.WriteAllText(path + @"\" + nameFile + ".xml", HSerialize.DTE_To_Xml(dte));
             }
             catch (Exception)
             {

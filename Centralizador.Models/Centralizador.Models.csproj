@@ -125,7 +125,6 @@
     <Compile Include="ApiSII\ServiceSoap.cs" />
     <Compile Include="Cve.cs" />
     <Compile Include="CveStore.cs" />
-    <Compile Include="Helpers\ConvertDocs.cs" />
     <Compile Include="Helpers\FileSii.cs" />
     <Compile Include="Helpers\ComunaInput.cs" />
     <Compile Include="Helpers\CreateFile.cs" />

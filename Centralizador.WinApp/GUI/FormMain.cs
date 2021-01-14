@@ -55,23 +55,6 @@ namespace Centralizador.WinApp.GUI
             InitializeComponent();
         }
 
-        private void BtnHiperLink_Click(object sender, EventArgs e)
-        {
-            if (IGridMain.CurRow == null || !CveObj.PgModel.IsBussy)
-            {
-                return;
-            }
-            Detalle detalle = null;
-            if (CveObj.DetalleList != null)
-            {
-                detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
-            }
-            if (detalle != null && detalle.Instruction != null)
-            {
-                Process.Start($"https://ppagos-sen.coordinador.cl/pagos/instrucciones/{detalle.Instruction.Id}/");
-            }
-        }
-
         private void BtnHiperLink_MouseHover(object sender, EventArgs e)
         {
             try
@@ -206,57 +189,8 @@ namespace Centralizador.WinApp.GUI
         private void Progress_ProgressChanged(object sender, HPgModel e)
         {
             // PROGRESS IFORMATION
-
             TssLblMensaje.Text = e.Msg;
-            TssLblFechaHora.Text = e.PercentageComplete.ToString();
-
-            //if (e.PercentageComplete == 100)
-            //{
-            //    // e.IsBussy = false;
-
-            //    TssLblProgBar.Value = 0;
-            //    switch (e.TaskType)
-            //    {
-            //        case TipoTask.GetDebtor:
-            //            // ICON FOR EMAIL SENNDING.
-            //            TssLblFechaHora.Image = fImageListSmall.Images[1];
-            //            TssLblFechaHora.Font = new Font("Verdana", 8, FontStyle.Bold);
-            //            TssLblFechaHora.Text = "0";
-            //            e.StopWatch.Stop();
-            //            BtnPagar.Enabled = true;
-            //            BtnInsertNv.Enabled = false;
-            //            // TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
-            //            TssLblMensaje.Text += $"         *[{ e.StopWatch.Elapsed.TotalSeconds.ToString("0.00")} seconds.]";
-            //            TssLblDBName.Text = "|DB: " + DataBaseName;
-            //            break;
-
-            //        case TipoTask.GetCreditor:
-            //            if (CveObj.DetalleList != null && CveObj.DetalleList.Count > 0)
-            //            {
-            //            }
-            //            break;
-
-            //        case TipoTask.InsertNV:
-            //            BtnInsertNv.Enabled = false;
-            //            TssLblMensaje.Text = $"Check the log file for Execute to FPL.";
-            //            TssLblDBName.Text = "|DB: " + DataBaseName;
-            //            break;
-
-            //        case TipoTask.ReadEmail:
-            //            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", e.FchOutlook);
-            //            TssLblMensaje.Text = "Complete!";
-            //            BtnCancelTak.Enabled = false;
-            //            break;
-
-            //        case TipoTask.ConvertToPdf:
-            //            TssLblMensaje.Text = "Complete!";
-            //            Cve.IsBussy = false;
-            //            break;
-
-            //        default:
-            //            break;
-            //    }
-            //}
+            TssLblProgBar.Value = e.PercentageComplete;
         }
 
         private void FormMain_Shown(object sender, EventArgs e)
@@ -448,16 +382,7 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["inst"].Value = item.Instruction.Id;
                         myRow.Cells["codProd"].Value = CveObj.BilingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     }
-                    //else
-                    //{
-                    //    if (item.IsParticipant && item.DTEDef != null)
-                    //    {
-                    //        myRow.Cells["inst"].Value = "*";
-                    //    }
-                    //}
                     myRow.Cells["rut"].Value = item.RutReceptor + "-" + item.DvReceptor;
-                    // myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.RznSocRecep.ToLower());
-
                     if (item.IsParticipant) // ICON FOR PARTICIPANTS.
                     {
                         myRow.Cells["rznsocial"].ImageList = fImageListType;
@@ -627,7 +552,7 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
                 IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
                 // Footer Status
-                if (CveObj.Mode == Cve.TipoTask.Creditor && rejNc > 0)
+                if (CveObj.Mode == TipoTask.Creditor && rejNc > 0)
                 {
                     IGridMain.Footer.Cells[0, "status"].ImageList = fImageListSmall;
                     IGridMain.Footer.Cells[0, "status"].ImageIndex = 5;
@@ -758,37 +683,6 @@ namespace Centralizador.WinApp.GUI
             if (chk.Checked)
             {
                 ChkIncludeCEN.Checked = false;
-            }
-        }
-
-        private void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
-        {
-            if (!CveObj.PgModel.IsBussy)
-            {
-                Detalle detalle = null;
-                iGRow fCurRow = IGridMain.CurRow;
-                if (CveObj.DetalleList != null)
-                {
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
-                }
-                if (detalle.DTEDef != null)
-                {
-                    IGridMain.DrawAsFocused = true;
-                    try
-                    {
-                        Cursor.Current = Cursors.WaitCursor;
-                        HSerialize.ConvertToPdf(detalle);
-                        IGridMain.Focus();
-                        IGridMain.DrawAsFocused = false;
-                        Cursor.Current = Cursors.Default;
-                    }
-                    catch (Exception)
-                    {
-                        TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-                        string nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower() + ".pdf");
-                        new ErrorMsgCen($"The process cannot access the file '{nomenclatura}' because it is being used by another process.", MessageBoxIcon.Warning);
-                    }
-                }
             }
         }
 
@@ -1040,13 +934,16 @@ namespace Centralizador.WinApp.GUI
                 CveObj.Mode = TipoTask.Creditor;
                 DateTime period = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
                 await CveObj.GetDocFromStore(period);
-                if (CveObj.DetalleList.Count > 0)
+                if (CveObj != null && CveObj.DetalleList != null && CveObj.DetalleList.Count > 0)
                 {
                     IGridFill(CveObj.DetalleList);
+                    TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {CveObj.UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
+                    TssLblMensaje.Text += $"         *[{ CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
+                    TssLblDBName.Text = "|DB: " + CveObj.Conn.DBName;
                 }
                 else
                 {
-                    TssLblMensaje.Text = $"There are no instructions for the selected month {period}";
+                    TssLblMensaje.Text = $"There are no instructions for the selected month '{period.Year}-{period.Month}'";
                 }
             }
             catch (Exception ex)
@@ -1059,9 +956,6 @@ namespace Centralizador.WinApp.GUI
             {
                 BtnPagar.Enabled = false;
                 BtnInsertNv.Enabled = true;
-                TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {CveObj.UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
-                TssLblMensaje.Text += $"         *[{ CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
-                TssLblDBName.Text = "|DB: " + CveObj.Conn.DBName;
                 TssLblProgBar.Value = 0;
             }
         }
@@ -1090,7 +984,7 @@ namespace Centralizador.WinApp.GUI
                 }
             }
             int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(CveObj.Conn);
-            foliosDisp = 100;
+            //foliosDisp = 100;
             int count = CveObj.DetalleList.Count;
             StringBuilder builder = new StringBuilder();
             foreach (Detalle item in CveObj.DetalleList)
@@ -1175,6 +1069,9 @@ namespace Centralizador.WinApp.GUI
                 if (CveObj.DetalleList.Count > 0)
                 {
                     IGridFill(CveObj.DetalleList);
+                    TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {CveObj.UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
+                    TssLblMensaje.Text += $"         *[{ CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
+                    TssLblDBName.Text = "|DB: " + CveObj.Conn.DBName;
                 }
                 else
                 {
@@ -1191,16 +1088,13 @@ namespace Centralizador.WinApp.GUI
             {
                 BtnPagar.Enabled = true;
                 BtnInsertNv.Enabled = false;
-                TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {CveObj.UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
-                TssLblMensaje.Text += $"         *[{ CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
-                TssLblDBName.Text = "|DB: " + CveObj.Conn.DBName;
                 TssLblProgBar.Value = 0;
             }
         }
 
         private async void BtnOutlook_Click(object sender, EventArgs e)
         {
-            if (CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (CveObj != null && CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
             try
             {
                 BtnCancelTak.Enabled = true;
@@ -1223,14 +1117,6 @@ namespace Centralizador.WinApp.GUI
             try
             {
                 await CveObj.CancelTask();
-
-                //if (Cve.Mode == Cve.TipoTask.ReadEmail)
-                //{
-                //    CancelToken.Cancel();
-                //}
-                //CleanControls();
-                //BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
-                //if (BgwConvertPdf != null && !BgwConvertPdf.CancellationPending && BgwConvertPdf.IsBusy) { BgwConvertPdf.CancelAsync(); }
             }
             catch (Exception)
             {
@@ -1238,7 +1124,7 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
-                //CancelToken.Dispose();
+                CancelToken.Dispose();
             }
         }
 
@@ -1248,11 +1134,11 @@ namespace Centralizador.WinApp.GUI
             if (CveObj.DetalleList != null && CveObj.DetalleList.Count > 0)
             {
                 ServiceExcel serviceExcel = new ServiceExcel(CveObj.UserParticipant);
-                if (CveObj.Mode == Cve.TipoTask.Creditor)
+                if (CveObj.Mode == TipoTask.Creditor)
                 {
                     serviceExcel.ExportToExcel(CveObj.DetalleList, true, CboMonths.SelectedItem);
                 }
-                else if (CveObj.Mode == Cve.TipoTask.Debtor)
+                else if (CveObj.Mode == TipoTask.Debtor)
                 {
                     serviceExcel.ExportToExcel(CveObj.DetalleList, false, CboMonths.SelectedItem);
                 }
@@ -1265,7 +1151,7 @@ namespace Centralizador.WinApp.GUI
             try
             {
                 TssLblMensaje.Text = "Converting docs to PDF, wait please.";
-                await CveObj.ConvertXmlToPdf();
+                await CveObj.ConvertXmlToPdf(CveObj.Mode);
                 TssLblMensaje.Text = "Converting docs to PDF, Complete... Please check the folder.";
                 TssLblMensaje.Text += $"         *[{CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
             }
@@ -1275,6 +1161,57 @@ namespace Centralizador.WinApp.GUI
             }
             finally
             {
+                TssLblProgBar.Value = 0;
+            }
+        }
+
+        private void BtnHiperLink_Click(object sender, EventArgs e)
+        {
+            if (IGridMain.CurRow == null || CveObj.PgModel.IsBussy)
+            {
+                return;
+            }
+            Detalle detalle = null;
+            if (CveObj.DetalleList != null)
+            {
+                detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+            }
+            if (detalle != null && detalle.Instruction != null)
+            {
+                Process.Start($"https://ppagos-sen.coordinador.cl/pagos/instrucciones/{detalle.Instruction.Id}/");
+            }
+        }
+
+        // CONVERT TO PDF.
+        private async void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
+        {
+            if (!CveObj.PgModel.IsBussy)
+            {
+                Detalle detalle = null;
+                iGRow fCurRow = IGridMain.CurRow;
+                if (CveObj.DetalleList != null)
+                {
+                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
+                    IGridMain.DrawAsFocused = true;
+                    try
+                    {
+                        Cursor.Current = Cursors.WaitCursor;
+                        await CveObj.ConvertXmlToPdf(detalle, CveObj.Mode);
+                        IGridMain.Focus();
+                        IGridMain.DrawAsFocused = false;
+                        Cursor.Current = Cursors.Default;
+                    }
+                    catch (Exception)
+                    {
+                        TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                        string nomenclatura = detalle.Folio + "_" + ti.ToTitleCase(detalle.RznSocRecep.ToLower() + ".pdf");
+                        new ErrorMsgCen($"The process cannot access the file '{nomenclatura}' because it is being used by another process.", MessageBoxIcon.Warning);
+                    }
+                    finally
+                    {
+                        TssLblProgBar.Value = 0;
+                    }
+                }
             }
         }
 
