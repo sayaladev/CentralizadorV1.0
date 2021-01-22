@@ -40,11 +40,11 @@ namespace Centralizador.Models.registroreclamodteservice {
         private System.Threading.SendOrPostCallback listarEventosHistDocOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
-        
-        private string TokenSii;
 
+        private string TokenSii;
         /// <remarks/>
         public RegistroReclamoDteServiceEndpointService(string tokenSii) {
+            TokenSii = tokenSii;
             this.Url = global::Centralizador.Models.Properties.Settings.Default.Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointService;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
@@ -53,9 +53,14 @@ namespace Centralizador.Models.registroreclamodteservice {
             else {
                 this.useDefaultCredentialsSetExplicitly = true;
             }
-            TokenSii = tokenSii;
         }
-        
+        protected override System.Net.WebRequest GetWebRequest(Uri uri)
+        {
+
+            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)base.GetWebRequest(uri);
+            request.Headers.Add("Cookie", string.Concat("TOKEN=", TokenSii));
+            return request;
+        }
         public new string Url {
             get {
                 return base.Url;

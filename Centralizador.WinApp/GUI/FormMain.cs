@@ -9,7 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using Centralizador.Models;
@@ -17,12 +17,14 @@ using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
 
 using Centralizador.Models.DataBase;
+using Centralizador.Models.FunctionsApp;
 using Centralizador.Models.Helpers;
 using Centralizador.Models.Outlook.MailKit;
 using Centralizador.Models.registroreclamodteservice;
 
 using TenTec.Windows.iGridLib;
-using static Centralizador.Models.CveStore;
+
+using static Centralizador.Models.Helpers.HEnum;
 using static Centralizador.Models.Helpers.HFlagValidator;
 
 namespace Centralizador.WinApp.GUI
@@ -37,14 +39,14 @@ namespace Centralizador.WinApp.GUI
             InitializeComponent();
         }
 
-        // PRINCIPAL CLASS.
-        private Cve CveObj { get; set; }
+        private ICveFunction cveFunction;
 
-        private string TokenCen { get; set; }
-        private string TokenSii { get; set; }
+        private ResultParticipant UserParticipant;
+        private string DataBase;
+        public string TokenCen { get; set; }
+        public string TokenSii { get; set; }
         private List<ResultParticipant> Participants { get; set; }
         private Progress<HPgModel> Progress { get; set; }
-        public CancellationTokenSource CancelToken { get; private set; }
 
         public BackgroundWorker BgwPay { get; private set; }
 
@@ -59,16 +61,16 @@ namespace Centralizador.WinApp.GUI
         {
             try
             {
-                if (IGridMain.CurRow == null || CveObj.PgModel.IsBussy)
+                if (IGridMain.CurRow == null || cveFunction.IsRuning)
                 {
                     return;
                 }
                 Detalle detalle = null;
-                if (CveObj.DetalleList != null)
+                if (cveFunction.DetalleList != null)
                 {
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                    detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
-                if (detalle != null && detalle.Instruction != null && !CveObj.PgModel.IsBussy)
+                if (detalle != null && detalle.Instruction != null && !cveFunction.IsRuning)
                 {
                     ToolTip tip = new ToolTip();
                     StringBuilder builder = new StringBuilder();
@@ -100,8 +102,8 @@ namespace Centralizador.WinApp.GUI
             TssLblMensaje.Text = "";
             if (CboParticipants.SelectedIndex != 0)
             {
-                var up = (ResultParticipant)CboParticipants.SelectedItem;
-
+                ResultParticipant up = (ResultParticipant)CboParticipants.SelectedItem;
+                UserParticipant = up;
                 Dictionary<string, string> dic = Models.Properties.Settings.Default.DicCompanies;
                 if (!dic.ContainsKey(up.Id.ToString()))
                 {
@@ -110,9 +112,9 @@ namespace Centralizador.WinApp.GUI
                     CboParticipants.SelectedIndex = 0;
                     return;
                 }
-                var db = dic[up.Id.ToString()];
+                DataBase = dic[up.Id.ToString()];
                 // CHECK THE DB IN SQL SERVER.
-                if (await DteInfoRef.GetNameDB(new Conexion("master"), db) == "FALSE")
+                if (await DteInfoRef.GetNameDB(new Conexion("master"), DataBase) == "FALSE")
                 {
                     MessageBox.Show("This company does not exists on Sql server.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     TssLblMensaje.Text = "";
@@ -120,17 +122,9 @@ namespace Centralizador.WinApp.GUI
                     return;
                 }
                 // NEW OBJECT.
-                CveObj = new Cve(up, Progress, db, TokenSii, TokenCen);
+                // cveFunction = new Cve(up, Progress, db, TokenSii, TokenCen);
                 TxtCtaCteParticipant.Text = up.BankAccount;
                 TxtRutParticipant.Text = up.Rut.ToString() + "-" + up.VerificationCode;
-            }
-        }
-
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (CveObj.Mode == Cve.TipoTask.Debtor)
-            {
-                ReadEmailFrom.SaveParam();
             }
         }
 
@@ -139,6 +133,10 @@ namespace Centralizador.WinApp.GUI
             // VARIABLES INIT.
             Progress = new Progress<HPgModel>();
             Progress.ProgressChanged += Progress_ProgressChanged;
+
+            //cveOutook = new CveOutlook(TokenSii, Progress);
+            //cveDebtor = new CveDebtor();
+            // cveCreditor = new CveCreditor();
 
             // VERSION
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
@@ -150,8 +148,6 @@ namespace Centralizador.WinApp.GUI
             {
                 Text = string.Format("{0}    Version: {1}.{2}", Application.ProductName, ver.Major, ver.Minor) + " (32 bits)";
             }
-            // BUTTONS
-            BtnCancelTak.Enabled = false;
 
             //LOAD COMBOBOX.
             CboParticipants.DisplayMember = "Name";
@@ -177,7 +173,7 @@ namespace Centralizador.WinApp.GUI
             // StringLogging = new StringBuilder();
 
             // Date Time Outlook
-            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", ReadEmailFrom.GetLastDateTime());
+            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", new CveOutlook().GetLastDateTime());
 
             // Timer Hour (every hour)
             System.Timers.Timer timerHour = new System.Timers.Timer(3600000);
@@ -380,7 +376,7 @@ namespace Centralizador.WinApp.GUI
                     if (item.Instruction != null)
                     {
                         myRow.Cells["inst"].Value = item.Instruction.Id;
-                        myRow.Cells["codProd"].Value = CveObj.BilingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
+                        myRow.Cells["codProd"].Value = cveFunction.BilingTypes.FirstOrDefault(x => x.Id == item.Instruction.PaymentMatrix.BillingWindow.BillingType).DescriptionPrefix;
                     }
                     myRow.Cells["rut"].Value = item.RutReceptor + "-" + item.DvReceptor;
                     if (item.IsParticipant) // ICON FOR PARTICIPANTS.
@@ -392,11 +388,11 @@ namespace Centralizador.WinApp.GUI
                     // NAME
                     if (item.Instruction != null)
                     {
-                        if (CveObj.Mode == TipoTask.Creditor)
+                        if (cveFunction.Mode == TipoTask.Creditor)
                         {
                             myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.Instruction.ParticipantDebtor.Name.ToLower());
                         }
-                        else if (CveObj.Mode == Cve.TipoTask.Debtor)
+                        else if (cveFunction.Mode == TipoTask.Debtor)
                         {
                             myRow.Cells["rznsocial"].Value = ti.ToTitleCase(item.Instruction.ParticipantCreditor.Name.ToLower());
                         }
@@ -451,7 +447,7 @@ namespace Centralizador.WinApp.GUI
                         myRow.Cells["fechaEnvio"].Value = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaRecepcion)) + "";
                     }
                     if (item.DTEDef != null) { myRow.Cells["flagxml"].TypeFlags = iGCellTypeFlags.HasEllipsisButton; }
-                    if (CveObj.Mode == Cve.TipoTask.Creditor)
+                    if (cveFunction.Mode == HEnum.TipoTask.Creditor)
                     {
                         myRow.Cells["P1"].Type = iGCellType.Check;
                         myRow.Cells["P2"].Type = iGCellType.Check;
@@ -521,7 +517,7 @@ namespace Centralizador.WinApp.GUI
 
                         case StatusDetalle.Pending:
                             // STATUS
-                            if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && CveObj.Mode == Cve.TipoTask.Debtor && item.Folio > 0) // Debtor
+                            if (item.ValidatorFlag != null && item.ValidatorFlag.Flag != LetterFlag.Green && cveFunction.Mode == HEnum.TipoTask.Debtor && item.Folio > 0) // Debtor
                             {
                                 myRow.Cells["btnRejected"].ImageIndex = 6;
                                 myRow.Cells["btnRejected"].Enabled = iGBool.True;
@@ -552,14 +548,14 @@ namespace Centralizador.WinApp.GUI
                 IGridMain.Footer.Cells[0, "iva"].Value = rejectedIva;
                 IGridMain.Footer.Cells[0, "total"].Value = rejectedTotal;
                 // Footer Status
-                if (CveObj.Mode == TipoTask.Creditor && rejNc > 0)
+                if (cveFunction.Mode == TipoTask.Creditor && rejNc > 0)
                 {
                     IGridMain.Footer.Cells[0, "status"].ImageList = fImageListSmall;
                     IGridMain.Footer.Cells[0, "status"].ImageIndex = 5;
                     IGridMain.Footer.Cells[0, "status"].ImageAlign = iGContentAlignment.MiddleLeft;
                     IGridMain.Footer.Cells[0, "status"].Value = $"{rej} of {rejNc}";
                 }
-                //TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
+                //TssLblMensaje.Text = $"{cveFunction.DetalleList.Count} invoices loaded for {UserParticipant.Name.ToUpper()} company.";
             }
             catch (Exception ex)
             {
@@ -578,7 +574,7 @@ namespace Centralizador.WinApp.GUI
 
         private async void Bcm_CellButtonClickAsync(object sender, IGButtonColumnManager.IGCellButtonClickEventArgs e)
         {
-            if (CveObj.PgModel.IsBussy)
+            if (cveFunction.IsRuning)
             {
                 return;
             }
@@ -586,9 +582,9 @@ namespace Centralizador.WinApp.GUI
             {
                 TssLblMensaje.Text = null;
                 Detalle detalle = null;
-                if (CveObj.DetalleList != null)
+                if (cveFunction.DetalleList != null)
                 {
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                    detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
                 if (detalle.StatusDetalle == StatusDetalle.Pending)
                 {
@@ -634,7 +630,7 @@ namespace Centralizador.WinApp.GUI
                                 //ReportModel.TaskType = TipoTask.SendEmail;
                                 //ReportModel.PercentageComplete++;
                                 //ReportModel.Message = "Sending EMAIL...";
-                                SendEmailTo sendMailTo = new SendEmailTo(CveObj.UserParticipant, Progress);
+                                SendEmailTo sendMailTo = new SendEmailTo(cveFunction.UserParticipant, Progress);
                                 await sendMailTo.SendMailToParticipantAsync(detalle, participant, EmailInDte);
                             }
                             else
@@ -663,7 +659,7 @@ namespace Centralizador.WinApp.GUI
                             builder.AppendLine("Rejected in CEN: No");
                         }
                     }
-                    new ErrorMsgCen(builder.ToString(), MessageBoxIcon.Information);
+                    //new ErrorMsgCen(builder.ToString(), MessageBoxIcon.Information);
                 }
             }
         }
@@ -697,13 +693,13 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_CurRowChanged(object sender, EventArgs e)
         {
-            if (!CveObj.PgModel.IsBussy && IGridMain.CurRow.Type != iGRowType.AutoGroupRow && IGridMain.CurRow != null)
+            if (!cveFunction.IsRuning && IGridMain.CurRow.Type != iGRowType.AutoGroupRow && IGridMain.CurRow != null)
             {
                 CleanControls();
                 Detalle detalle = null;
-                if (CveObj.DetalleList != null)
+                if (cveFunction.DetalleList != null)
                 {
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                    detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
                 }
                 if (detalle != null && detalle.DTEDef != null)
                 {
@@ -843,15 +839,15 @@ namespace Centralizador.WinApp.GUI
 
         private void IGridMain_RequestCellToolTipText(object sender, iGRequestCellToolTipTextEventArgs e)
         {
-            if (!CveObj.PgModel.IsBussy && e.ColIndex == 19) // Sii Events
+            if (!cveFunction.IsRuning && e.ColIndex == 19) // Sii Events
             {
                 Detalle detalle = null;
                 StringBuilder builder = new StringBuilder();
-                if (CveObj.DetalleList != null)
+                if (cveFunction.DetalleList != null)
                 {
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
                 }
-                if (detalle != null && detalle.DataEvento != null)
+                if (detalle != null && detalle.DataEvento != null && detalle.DataEvento.ListEvenHistDoc != null)
                 {
                     if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
                     {
@@ -865,13 +861,13 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            else if (!CveObj.PgModel.IsBussy && e.ColIndex == 18) // Email Aux send Xml
+            else if (!cveFunction.IsRuning && e.ColIndex == 18) // Email Aux send Xml
             {
                 Detalle detalle = null;
-                if (CveObj.Mode == Cve.TipoTask.Creditor)
+                if (cveFunction.Mode == TipoTask.Creditor && cveFunction.DetalleList != null)
                 {
                     StringBuilder builder = new StringBuilder();
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
                     if (detalle.DTEDef != null)
                     {
                         DTEDefTypeDocumento doc = (DTEDefTypeDocumento)detalle.DTEDef.Item;
@@ -885,13 +881,13 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            else if (!CveObj.PgModel.IsBussy && e.ColIndex == 2) // History DTE
+            else if (!cveFunction.IsRuning && e.ColIndex == 2) // History DTE
             {
-                if (CveObj.Mode == Cve.TipoTask.Creditor)
+                if (cveFunction.Mode == TipoTask.Creditor)
                 {
                     StringBuilder builder = new StringBuilder();
                     Detalle detalle = null;
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
+                    detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.Cells[e.RowIndex, 1].Value));
                     if (detalle != null && detalle.DteInfoRefs != null && detalle.DteInfoRefs.Count > 1)
                     {
                         builder.AppendLine("History:");
@@ -925,46 +921,51 @@ namespace Centralizador.WinApp.GUI
         private async void BtnCreditor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            if (CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (cveFunction != null && cveFunction.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
             BtnInsertNv.Enabled = false;
-
             try
             {
-                // USE THE OBJECT.
-                CveObj.Mode = TipoTask.Creditor;
                 DateTime period = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
-                await CveObj.GetDocFromStore(period);
-                if (CveObj != null && CveObj.DetalleList != null && CveObj.DetalleList.Count > 0)
+                using (cveFunction = new CveCreditor(UserParticipant, Progress, DataBase, TokenSii, TokenCen))
                 {
-                    IGridFill(CveObj.DetalleList);
-                    TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {CveObj.UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
-                    TssLblMensaje.Text += $"         *[{ CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
-                    TssLblDBName.Text = "|DB: " + CveObj.Conn.DBName;
-                }
-                else
-                {
-                    TssLblMensaje.Text = $"There are no instructions for the selected month '{period.Year}-{period.Month}'";
+                    await cveFunction.GetDocFromStore(period);
+                    if (cveFunction.DetalleList != null && cveFunction.DetalleList.Count > 0)
+                    {
+                        IGridFill(cveFunction.DetalleList);
+                        TssLblMensaje.Text = $"{cveFunction.DetalleList.Count} invoices loaded for {cveFunction.UserParticipant.Name.ToUpper()} company.   [CREDITOR]";
+                        TssLblMensaje.Text += $"         *[{ cveFunction.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
+                        TssLblDBName.Text = "|DB: " + cveFunction.Conn.DBName;
+                        BtnInsertNv.Enabled = true;
+                    }
+                    else
+                    {
+                        string p = $"{period.Year}-{string.Format("{0:00}", period.Month)}";
+                        TssLblMensaje.Text = $"There are no instructions for the selected month '{p}'";
+                        IGridMain.Rows.Clear();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
+                // new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
                 TssLblMensaje.Text = "There was an error loading the data.";
                 return;
             }
             finally
             {
                 BtnPagar.Enabled = false;
-                BtnInsertNv.Enabled = true;
                 TssLblProgBar.Value = 0;
+                BtnExcelConvert.Enabled = true;
+                BtnPdfConvert.Enabled = true;
             }
         }
 
         private async void BtnInsertNv_ClickAsync(object sender, EventArgs e)
         {
-            if (CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (CveObj.Mode == TipoTask.Debtor || IGridMain.Rows.Count == 0) { TssLblMensaje.Text = "Plesase select Creditor!"; return; }
-            if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
+            if (cveFunction.DetalleList == null)
+            {
+                return;
+            }
             List<Detalle> detallesPaso = new List<Detalle>();
             List<Detalle> detallesFinal = new List<Detalle>();
 
@@ -983,11 +984,11 @@ namespace Centralizador.WinApp.GUI
                     return;
                 }
             }
-            int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(CveObj.Conn);
+            int foliosDisp = await NotaVenta.GetFoliosDisponiblesDTEAsync(cveFunction.Conn);
             //foliosDisp = 100;
-            int count = CveObj.DetalleList.Count;
+            int count = cveFunction.DetalleList.Count;
             StringBuilder builder = new StringBuilder();
-            foreach (Detalle item in CveObj.DetalleList)
+            foreach (Detalle item in cveFunction.DetalleList)
             {
                 if (ChkIncludeReclaimed.CheckState == CheckState.Checked)
                 {
@@ -1012,6 +1013,7 @@ namespace Centralizador.WinApp.GUI
 
             if (detallesFinal.Count > 0)
             {
+                builder.Clear();
                 builder.AppendLine($"There are {foliosDispBefore} F° available, so you can only insert {detallesFinal.Count} of {detallesPaso.Count} NV");
                 builder.AppendLine(); builder.AppendLine();
                 builder.AppendLine("WARNING: You must run the 'FPL' process NOW or these NV will be deleted from DB.");
@@ -1022,8 +1024,12 @@ namespace Centralizador.WinApp.GUI
                     TssLblMensaje.Text = "Reading SII file, be patient...";
                     try
                     {
-                        await CveObj.InsertNotaVenta();
-                        TssLblMensaje.Text = $"Check the log file for Execute to FPL. =>Summary: From {CveObj.FoliosNv.Min()} To-{CveObj.FoliosNv.Max()}";
+                        using (CveCreditor creditor = new CveCreditor(DataBase, Progress, UserParticipant))
+                        {
+                            BtnInsertNv.Enabled = false;
+                            await creditor.InsertNotaVenta(detallesFinal);
+                            TssLblMensaje.Text = $"Check the log file for Execute to FPL. =>Summary: From {creditor.FoliosNv.Min()} To-{creditor.FoliosNv.Max()}";
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -1059,28 +1065,29 @@ namespace Centralizador.WinApp.GUI
         private async void BtnDebtor_Click(object sender, EventArgs e)
         {
             if (CboParticipants.SelectedIndex == 0) { TssLblMensaje.Text = "Plesase select a Company!"; return; }
-            if (CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (cveFunction != null && cveFunction.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
             try
             {
-                // USE THE OBJECT.
-                CveObj.Mode = TipoTask.Debtor;
                 DateTime period = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
-                await CveObj.GetDocFromStore(period);
-                if (CveObj.DetalleList.Count > 0)
+                using (cveFunction = new CveDebtor(DataBase, Progress, TokenCen, TokenSii, UserParticipant))
                 {
-                    IGridFill(CveObj.DetalleList);
-                    TssLblMensaje.Text = $"{CveObj.DetalleList.Count} invoices loaded for {CveObj.UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
-                    TssLblMensaje.Text += $"         *[{ CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
-                    TssLblDBName.Text = "|DB: " + CveObj.Conn.DBName;
-                }
-                else
-                {
-                    TssLblMensaje.Text = $"There are no instructions for the selected month {period}";
+                    await cveFunction.GetDocFromStore(period);
+                    if (cveFunction.DetalleList != null && cveFunction.DetalleList.Count > 0)
+                    {
+                        IGridFill(cveFunction.DetalleList);
+                        TssLblMensaje.Text = $"{cveFunction.DetalleList.Count} invoices loaded for {cveFunction.UserParticipant.Name.ToUpper()} company.   [DEBTOR]";
+                        TssLblMensaje.Text += $"         *[{ cveFunction.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
+                        TssLblDBName.Text = "|DB: " + cveFunction.Conn.DBName;
+                    }
+                    else
+                    {
+                        IGridMain.Rows.Clear();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
+                //new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
                 TssLblMensaje.Text = "There was an error loading the data.";
                 return;
             }
@@ -1089,71 +1096,87 @@ namespace Centralizador.WinApp.GUI
                 BtnPagar.Enabled = true;
                 BtnInsertNv.Enabled = false;
                 TssLblProgBar.Value = 0;
+                BtnExcelConvert.Enabled = true;
+                BtnPdfConvert.Enabled = true;
             }
         }
 
         private async void BtnOutlook_Click(object sender, EventArgs e)
         {
-            if (CveObj != null && CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (cveFunction != null && cveFunction.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
+            BtnCreditor.Enabled = false;
+            BtnDebtor.Enabled = false;
+            BtnCancelTask.Enabled = true;
             try
             {
-                BtnCancelTak.Enabled = true;
-                CancelToken = new CancellationTokenSource();
                 TssLblMensaje.Text = "Connecting to the mail server... Please wait.";
-                await new ReadEmailFrom(TokenSii, Progress).ReadMailFromServer(CancelToken.Token);
+                using (cveFunction = new CveOutlook(TokenSii, Progress))
+                {
+                    await cveFunction.GetDocFromStore(new DateTime());
+                }
+                TssLblMensaje.Text = "Complete => Read email server.";
                 IGridMain.Focus();
+            }
+            catch (TaskCanceledException)
+            {
+                TssLblMensaje.Text = "Cancel task => Read email server.";
+                BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", new CveOutlook().GetLastDateTime());
             }
             catch (Exception ex)
             {
                 new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
-                TssLblProgBar.Value = 0;
                 TssLblMensaje.Text = "There was an error loading the data.";
-                throw;
-            }
-        }
-
-        private async void BtnCancelTak_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                await CveObj.CancelTask();
-            }
-            catch (Exception)
-            {
                 throw;
             }
             finally
             {
-                CancelToken.Dispose();
+                TssLblProgBar.Value = 0;
+                BtnCreditor.Enabled = true;
+                BtnDebtor.Enabled = true;
+                BtnCancelTask.Enabled = false;
             }
         }
 
         private void BtnExcelConvert_Click(object sender, EventArgs e)
         {
-            if (CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
-            if (CveObj.DetalleList != null && CveObj.DetalleList.Count > 0)
+            if (cveFunction.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (cveFunction.DetalleList != null && cveFunction.DetalleList.Count > 0)
             {
-                ServiceExcel serviceExcel = new ServiceExcel(CveObj.UserParticipant);
-                if (CveObj.Mode == TipoTask.Creditor)
+                ServiceExcel serviceExcel = new ServiceExcel(cveFunction.UserParticipant);
+                if (cveFunction.Mode == TipoTask.Creditor)
                 {
-                    serviceExcel.ExportToExcel(CveObj.DetalleList, true, CboMonths.SelectedItem);
+                    serviceExcel.ExportToExcel(cveFunction.DetalleList, true, CboMonths.SelectedItem);
                 }
-                else if (CveObj.Mode == TipoTask.Debtor)
+                else if (cveFunction.Mode == TipoTask.Debtor)
                 {
-                    serviceExcel.ExportToExcel(CveObj.DetalleList, false, CboMonths.SelectedItem);
+                    serviceExcel.ExportToExcel(cveFunction.DetalleList, false, CboMonths.SelectedItem);
                 }
             }
         }
 
         private async void BtnPdfConvert_Click(object sender, EventArgs e)
         {
-            if (CveObj.PgModel.IsBussy) { TssLblMensaje.Text = "Bussy!"; return; }
+            if (cveFunction.IsRuning) { TssLblMensaje.Text = "Bussy!"; return; }
             try
             {
-                TssLblMensaje.Text = "Converting docs to PDF, wait please.";
-                await CveObj.ConvertXmlToPdf(CveObj.Mode);
-                TssLblMensaje.Text = "Converting docs to PDF, Complete... Please check the folder.";
-                TssLblMensaje.Text += $"         *[{CveObj.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
+                if (cveFunction.DetalleList != null && cveFunction.DetalleList.Count > 0)
+                {
+                    List<Detalle> lista = new List<Detalle>();
+                    foreach (Detalle item in cveFunction.DetalleList)
+                    {
+                        if (item.DTEDef != null)
+                        {
+                            lista.Add(item);
+                        }
+                    }
+                    if (lista.Count > 0)
+                    {
+                        TssLblMensaje.Text = "Converting docs to PDF, wait please.";
+                        await cveFunction.ConvertXmlToPdf(cveFunction.Mode, lista);
+                        TssLblMensaje.Text = "Converting docs to PDF, Complete... Please check the folder.";
+                        TssLblMensaje.Text += $"         *[{cveFunction.PgModel.StopWatch.Elapsed.TotalSeconds:0.00} seconds.]";
+                    }
+                }
             }
             catch (Exception)
             {
@@ -1167,14 +1190,14 @@ namespace Centralizador.WinApp.GUI
 
         private void BtnHiperLink_Click(object sender, EventArgs e)
         {
-            if (IGridMain.CurRow == null || CveObj.PgModel.IsBussy)
+            if (IGridMain.CurRow == null || cveFunction.IsRuning)
             {
                 return;
             }
             Detalle detalle = null;
-            if (CveObj.DetalleList != null)
+            if (cveFunction.DetalleList != null)
             {
-                detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
+                detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToUInt32(IGridMain.CurRow.Cells[1].Value));
             }
             if (detalle != null && detalle.Instruction != null)
             {
@@ -1182,21 +1205,26 @@ namespace Centralizador.WinApp.GUI
             }
         }
 
-        // CONVERT TO PDF.
+        private async void BtnCancelTask_Click(object sender, EventArgs e)
+        {
+            await cveFunction.CancelTask();
+            BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", new CveOutlook().GetLastDateTime());
+        }
+
         private async void IGridMain_CellEllipsisButtonClick(object sender, iGEllipsisButtonClickEventArgs e)
         {
-            if (!CveObj.PgModel.IsBussy)
+            if (!cveFunction.IsRuning)
             {
+                Cursor.Current = Cursors.WaitCursor;
                 Detalle detalle = null;
                 iGRow fCurRow = IGridMain.CurRow;
-                if (CveObj.DetalleList != null)
+                if (cveFunction.DetalleList != null)
                 {
-                    detalle = CveObj.DetalleList.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
+                    detalle = cveFunction.DetalleList.First(x => x.Nro == Convert.ToInt32(fCurRow.Cells[1].Value));
                     IGridMain.DrawAsFocused = true;
                     try
                     {
-                        Cursor.Current = Cursors.WaitCursor;
-                        await CveObj.ConvertXmlToPdf(detalle, CveObj.Mode);
+                        await cveFunction.ConvertXmlToPdf(detalle, cveFunction.Mode);
                         IGridMain.Focus();
                         IGridMain.DrawAsFocused = false;
                         Cursor.Current = Cursors.Default;
@@ -1210,6 +1238,7 @@ namespace Centralizador.WinApp.GUI
                     finally
                     {
                         TssLblProgBar.Value = 0;
+                        IGridMain.BackgroundImage = null;
                     }
                 }
             }
@@ -1247,12 +1276,12 @@ namespace Centralizador.WinApp.GUI
             string msje = null;
 
             // Excluir Banco Security Rut 97.053.000-2
-            if (!BgwPay.IsBusy && CveObj.Mode == Cve.TipoTask.Debtor && !CveObj.PgModel.IsBussy && IGridMain.Rows.Count > 0)
+            if (!BgwPay.IsBusy && cveFunction.Mode == TipoTask.Debtor && !cveFunction.IsRuning && IGridMain.Rows.Count > 0)
             {
                 List<Detalle> detallesFinal = new List<Detalle>();
                 if (ChkIncludeCEN.CheckState == CheckState.Checked) // Only Participants
                 {
-                    foreach (Detalle item in CveObj.DetalleList)
+                    foreach (Detalle item in cveFunction.DetalleList)
                     {
                         if (item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null && item.RutReceptor != "97053000")
                         {
@@ -1267,7 +1296,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 else if (ChkNoIncludeCEN.CheckState == CheckState.Checked) // Only NO Participants
                 {
-                    foreach (Detalle item in CveObj.DetalleList)
+                    foreach (Detalle item in cveFunction.DetalleList)
                     {
                         if (!item.IsParticipant && item.StatusDetalle == StatusDetalle.Accepted && item.RutReceptor != "97053000")
                         {
@@ -1279,7 +1308,7 @@ namespace Centralizador.WinApp.GUI
                 }
                 else if (ChkNoIncludeCEN.CheckState == CheckState.Unchecked && ChkIncludeCEN.CheckState == CheckState.Unchecked)  // All
                 {
-                    foreach (Detalle item in CveObj.DetalleList)
+                    foreach (Detalle item in cveFunction.DetalleList)
                     {
                         if (item.StatusDetalle == StatusDetalle.Accepted && item.RutReceptor != "97053000")
                         {
@@ -1297,7 +1326,7 @@ namespace Centralizador.WinApp.GUI
 
                     if (resp == DialogResult.Yes)
                     {
-                        ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, CveObj.UserParticipant, TokenCen);
+                        ServiceExcel serviceExcel = new ServiceExcel(detallesFinal, cveFunction.UserParticipant, TokenCen);
                         serviceExcel.CreateNomina(BgwPay);
                     }
                 }
@@ -1310,17 +1339,17 @@ namespace Centralizador.WinApp.GUI
 
         private async void BtnRevertPay_ClickAsync(object sender, EventArgs e)
         {
-            if (CveObj.PgModel.IsBussy)
+            if (cveFunction.IsRuning)
             {
                 TssLblMensaje.Text = "Bussy!";
                 return;
             }
-            else if (CveObj.Mode == Cve.TipoTask.Debtor)
+            else if (cveFunction.Mode == TipoTask.Debtor)
             {
                 DialogResult resp = MessageBox.Show($"You will delete all payments {Environment.NewLine} Are you sure?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (resp == DialogResult.Yes)
                 {
-                    foreach (Detalle item in CveObj.DetalleList)
+                    foreach (Detalle item in cveFunction.DetalleList)
                     {
                         if (item.Instruction != null && (item.Instruction.StatusPaid == Pay.StatusPay.Pagado || item.Instruction.StatusPaid == Pay.StatusPay.PagadoAtraso))
                         {

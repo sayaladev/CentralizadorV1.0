@@ -8,14 +8,14 @@
     <Setting Name="Centralizador_Models_GetTokenFromSeed_GetTokenFromSeedService" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://palena.sii.cl/DTEWS/GetTokenFromSeed.jws</Value>
     </Setting>
-    <Setting Name="Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">https://ws1.sii.cl/WSREGISTRORECLAMODTE/registroreclamodteservice</Value>
-    </Setting>
     <Setting Name="UIDRange" Type="System.String" Scope="User">
-      <Value Profile="(Default)">128574</Value>
+      <Value Profile="(Default)">147518</Value>
     </Setting>
     <Setting Name="DateTimeEmail" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">12/10/2020 22:24:00</Value>
+      <Value Profile="(Default)">01/17/2021 15:05:57</Value>
+    </Setting>
+    <Setting Name="Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://ws1.sii.cl/WSREGISTRORECLAMODTE/registroreclamodteservice</Value>
     </Setting>
   </Settings>
 </SettingsFile>

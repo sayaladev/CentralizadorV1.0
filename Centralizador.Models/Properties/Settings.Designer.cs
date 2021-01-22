@@ -43,20 +43,9 @@ namespace Centralizador.Models.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://ws1.sii.cl/WSREGISTRORECLAMODTE/registroreclamodteservice")]
-        public string Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointService {
-            get {
-                return ((string)(this["Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointS" +
-                    "ervice"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("128574")]
+        [global::System.Configuration.DefaultSettingValueAttribute("147518")]
         public string UIDRange {
             get {
                 return ((string)(this["UIDRange"]));
@@ -68,13 +57,24 @@ namespace Centralizador.Models.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("12/10/2020 22:24:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("01/17/2021 15:05:57")]
         public global::System.DateTime DateTimeEmail {
             get {
                 return ((global::System.DateTime)(this["DateTimeEmail"]));
             }
             set {
                 this["DateTimeEmail"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://ws1.sii.cl/WSREGISTRORECLAMODTE/registroreclamodteservice")]
+        public string Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointService {
+            get {
+                return ((string)(this["Centralizador_Models_registroreclamodteservice_RegistroReclamoDteServiceEndpointS" +
+                    "ervice"]));
             }
         }
     }

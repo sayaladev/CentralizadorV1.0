@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -58,7 +57,7 @@
             this.BtnPagar = new System.Windows.Forms.Button();
             this.BtnInsertRef = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
-            this.BtnCancelTak = new System.Windows.Forms.Button();
+            this.BtnCancelTask = new System.Windows.Forms.Button();
             this.FListPics = new System.Windows.Forms.ImageList(this.components);
             this.BtnCreditor = new System.Windows.Forms.Button();
             this.BtnDebtor = new System.Windows.Forms.Button();
@@ -174,7 +173,7 @@
             this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
+            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -205,6 +204,7 @@
             // BtnExcelConvert
             // 
             this.BtnExcelConvert.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnExcelConvert.Enabled = false;
             this.BtnExcelConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnExcelConvert.Image")));
             this.BtnExcelConvert.Location = new System.Drawing.Point(98, 19);
             this.BtnExcelConvert.Name = "BtnExcelConvert";
@@ -216,6 +216,7 @@
             // BtnPdfConvert
             // 
             this.BtnPdfConvert.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnPdfConvert.Enabled = false;
             this.BtnPdfConvert.Image = ((System.Drawing.Image)(resources.GetObject("BtnPdfConvert.Image")));
             this.BtnPdfConvert.Location = new System.Drawing.Point(20, 19);
             this.BtnPdfConvert.Name = "BtnPdfConvert";
@@ -346,6 +347,7 @@
             // BtnInsertNv
             // 
             this.BtnInsertNv.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnInsertNv.Enabled = false;
             this.BtnInsertNv.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnInsertNv.Image = ((System.Drawing.Image)(resources.GetObject("BtnInsertNv.Image")));
             this.BtnInsertNv.Location = new System.Drawing.Point(11, 18);
@@ -371,6 +373,7 @@
             // BtnPagar
             // 
             this.BtnPagar.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnPagar.Enabled = false;
             this.BtnPagar.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnPagar.Image = ((System.Drawing.Image)(resources.GetObject("BtnPagar.Image")));
             this.BtnPagar.Location = new System.Drawing.Point(31, 110);
@@ -402,7 +405,7 @@
             // 
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.GroupBox1.Controls.Add(this.BtnCancelTak);
+            this.GroupBox1.Controls.Add(this.BtnCancelTask);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.BtnDebtor);
             this.GroupBox1.Controls.Add(this.TxtCtaCteParticipant);
@@ -418,17 +421,17 @@
             this.GroupBox1.TabIndex = 0;
             this.GroupBox1.TabStop = false;
             // 
-            // BtnCancelTak
+            // BtnCancelTask
             // 
-            this.BtnCancelTak.Enabled = false;
-            this.BtnCancelTak.ImageIndex = 17;
-            this.BtnCancelTak.ImageList = this.FListPics;
-            this.BtnCancelTak.Location = new System.Drawing.Point(184, 220);
-            this.BtnCancelTak.Name = "BtnCancelTak";
-            this.BtnCancelTak.Size = new System.Drawing.Size(30, 23);
-            this.BtnCancelTak.TabIndex = 12;
-            this.BtnCancelTak.UseVisualStyleBackColor = true;
-            this.BtnCancelTak.Click += new System.EventHandler(this.BtnCancelTak_Click);
+            this.BtnCancelTask.Enabled = false;
+            this.BtnCancelTask.ImageIndex = 17;
+            this.BtnCancelTask.ImageList = this.FListPics;
+            this.BtnCancelTask.Location = new System.Drawing.Point(186, 220);
+            this.BtnCancelTask.Name = "BtnCancelTask";
+            this.BtnCancelTask.Size = new System.Drawing.Size(23, 23);
+            this.BtnCancelTask.TabIndex = 12;
+            this.BtnCancelTask.UseVisualStyleBackColor = true;
+            this.BtnCancelTask.Click += new System.EventHandler(this.BtnCancelTask_Click);
             // 
             // FListPics
             // 
@@ -604,8 +607,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FormMain";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;           
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.StatusStrip.ResumeLayout(false);
@@ -665,10 +667,10 @@
         private System.Windows.Forms.CheckBox ChkIncludeCEN;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox ChkNoIncludeCEN;
-        private System.Windows.Forms.Button BtnCancelTak;
         private System.Windows.Forms.ImageList fImageListSmall;
         private System.Windows.Forms.ToolStripStatusLabel TssLblDBName;
         private System.Windows.Forms.ImageList fImageListType;
         private System.Windows.Forms.Button BtnRevertPay;
+        private System.Windows.Forms.Button BtnCancelTask;
     }
 }

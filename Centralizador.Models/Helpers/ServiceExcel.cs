@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
-
+using Centralizador.Models.DataBase;
 using Spire.Xls;
 
 namespace Centralizador.Models.Helpers
@@ -62,11 +62,15 @@ namespace Centralizador.Models.Helpers
 
             foreach (Detalle item in detalles)
             {
+                if (item.MntNeto <= 9)
+                {
+                    continue;
+                }
                 DataRow row = table.NewRow();
                 c++;
                 row[0] = c;
                 row[1] = item.Folio;
-                row[2] = item.FechaEmision;
+                row[2] = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaEmision));
                 row[3] = item.RutReceptor + "-" + item.DvReceptor;
                 row[4] = item.RznSocRecep;
                 if (item.Instruction != null)
@@ -101,8 +105,25 @@ namespace Centralizador.Models.Helpers
                     row[15] = item.Instruction.PaymentMatrix.ReferenceCode;
                     row[16] = item.Instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy");
                 }
-
                 table.Rows.Add(row);
+                if (item.DteInfoRefs != null && item.DteInfoRefs.Count > 1)
+                {
+                    foreach (DteInfoRef r in item.DteInfoRefs.OrderBy(x => x.Folio))
+                    {
+                        if (r.Folio != item.Folio && item.Instruction.PaymentMatrix.NaturalKey == r.Glosa && item.Instruction.PaymentMatrix.ReferenceCode == r.FolioRef)
+                        {
+                            row = table.NewRow();
+                            row[1] = r.Folio;
+                            row[2] = r.AuxDocfec.ToString("dd-MM-yyyy");
+                            if (r.AuxDocNum > 0)
+                            {
+                                row[13] = r.AuxDocNum;
+                            }
+                            row[6] = r.NetoAfecto * -1;
+                            table.Rows.Add(row);
+                        }
+                    }
+                }
             }
             // Save Excel
             if (table.Rows.Count > 0)
@@ -113,11 +134,11 @@ namespace Centralizador.Models.Helpers
                 worksheet.InsertDataTable(table, true, 1, 1);
                 if (isCreditor)
                 {
-                    nameFile = $"{UserParticipant.Name}_Creditor_{month}_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
+                    nameFile = $"{UserParticipant.Name}_Creditor{month.ToString().ToUpper()}_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 }
                 else
                 {
-                    nameFile = $"{UserParticipant.Name}_Debtor_{month}_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
+                    nameFile = $"{UserParticipant.Name}_Debtor{month.ToString().ToUpper()}_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}" + ".xlsx";
                 }
 
                 string path = @"C:\Centralizador\Log\";

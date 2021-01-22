@@ -25,14 +25,31 @@ namespace Centralizador.Models.ApiSII
         [JsonProperty("metaData")]
         public MetaData MetaData { get; set; }
 
+        [JsonIgnore]
+        public static HPgModel PgModel { get; set; } = new HPgModel();
+
+        [JsonIgnore]
+        public static IProgress<HPgModel> Progress { get; set; }
+
         public ServiceDetalle(MetaData metaData, Data data)
         {
             MetaData = metaData;
             Data = data;
         }
 
-        public static async Task<List<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token)
+        public static Task ReportProgress(float p, string msg)
         {
+            return Task.Run(() =>
+            {
+                PgModel.PercentageComplete = (int)p;
+                PgModel.Msg = msg;
+                Progress.Report(PgModel);
+            });
+        }
+
+        public static async Task<List<Detalle>> GetLibroAsync(string tipoUser, ResultParticipant userParticipant, string tipoDoc, string periodo, string token, IProgress<HPgModel> progress)
+        {
+            Progress = progress;
             string ns = "", url = "", op = "";
             switch (tipoUser)
             {
@@ -79,7 +96,8 @@ namespace Centralizador.Models.ApiSII
                         switch (detalleLibro.RespEstado.CodRespuesta)
                         {
                             case 2:
-                                MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                await ReportProgress(0, $"There are no documents registered for the period {periodo}.");
+                                //MessageBox.Show($"There are no documents registered for the period {periodo}.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return null;
 
                             case 0:
@@ -90,7 +108,8 @@ namespace Centralizador.Models.ApiSII
                                 break;
 
                             case 1:
-                                MessageBox.Show("This option only maintains the detail of the last six months", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                                // MessageBox.Show("This option only maintains the detail of the last six months", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                                await ReportProgress(0, "This option only maintains the detail of the last six months.");
                                 break;
                         }
                     }
@@ -154,6 +173,7 @@ namespace Centralizador.Models.ApiSII
         // PROPERTIES.
         public int Nro { get; set; }
 
+        public string Tipo { get; set; }
         public ResultInstruction Instruction { get; set; }
         public DteInfoRef DteInfoRefLast { get; set; }
         public List<DteInfoRef> DteInfoRefs { get; set; }

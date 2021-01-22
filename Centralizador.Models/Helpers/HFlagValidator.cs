@@ -199,7 +199,7 @@ namespace Centralizador.Models.Helpers
         public static StatusDetalle GetStatus(Detalle detalle)
         {
             // http://www.sii.cl/factura_electronica/Webservice_Registro_Reclamo_DTE_V1.2.pdf
-            if (detalle.DataEvento.ListEvenHistDoc.Count > 0)
+            if (detalle.DataEvento != null && detalle.DataEvento.ListEvenHistDoc != null && detalle.DataEvento.ListEvenHistDoc.Count > 0)
             {
                 // Ordeno por el evento más reciente
                 List<ListEvenHistDoc> eventos = detalle.DataEvento.ListEvenHistDoc.OrderByDescending(x => x.FechaEvento).ToList();

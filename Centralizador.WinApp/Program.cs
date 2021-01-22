@@ -4,8 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using Centralizador.Models;
 using Centralizador.Models.ApiCEN;
 using Centralizador.Models.ApiSII;
+using Centralizador.Models.Outlook.MailKit;
 using Centralizador.WinApp.GUI;
 
 namespace Centralizador.WinApp
@@ -28,6 +30,27 @@ namespace Centralizador.WinApp
 
             try
             {
+                // TESTER
+                //XDocument docc = XDocument.Load(@"C:\Centralizador\Centralizador_config.xml");
+                //string SerialNumberr = docc.Root.Element("CertificadoDigital").Element("SerialNumber").Value;
+                //ServiceSoap ss = new ServiceSoap(SerialNumberr);
+                //tokenSii = ss.GETTokenFromSii();
+                //XDocument xDocument = XDocument.Load(@"C:\Centralizador\Temp\33_76026828-3_138024_20210107_0b07bb3d-6463-443b-b7ab-40cb36c021af.xml");
+                //if (xDocument.Root.Name.LocalName == "EnvioDTE")
+                //{
+                //    ReadEmailFrom readEmail = new ReadEmailFrom(tokenSii, new Progress<HPgModel>());
+                //    int res = readEmail.SaveFiles(xDocument);
+                //    if (res == 0)
+                //    {
+                //        // ok
+                //    }
+                //    else if (res == 1)
+                //    {
+                //        //MessageBox.Show("Error", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //        // ERROR SII.
+                //    }
+                //}
+
                 // LOAD XML CONFIG
                 // LOAD THE XML CONFIG
                 XDocument doc = XDocument.Load(@"C:\Centralizador\Centralizador_config.xml");
@@ -38,7 +61,6 @@ namespace Centralizador.WinApp
                 string SerialNumber = doc.Root.Element("CertificadoDigital").Element("SerialNumber").Value;
                 ServiceSoap s = new ServiceSoap(SerialNumber);
                 tokenSii = s.GETTokenFromSii();
-
                 // GET PARTICIPANTS CEN.
                 participants = await Participant.GetParticipants(UserCen, UrlCen);
                 // GET TOKEN CEN.
@@ -54,22 +76,25 @@ namespace Centralizador.WinApp
                     // Checking
                     if (string.IsNullOrEmpty(tokenSii))
                     {
-                        new ErrorMsgCen("The token has not been obtained from SII.", "Impossible to start the Application.", MessageBoxIcon.Stop);
+                        new Models.ErrorMsgCen("The token has not been obtained from SII.", "Impossible to start the Application.", MessageBoxIcon.Stop);
                         return;
                     }
                     else if (string.IsNullOrEmpty(tokenCen) || participants == null)
                     {
-                        new ErrorMsgCen("The token has not been obtained from CEN.", "Impossible to start the Application.", MessageBoxIcon.Stop);
+                        new Models.ErrorMsgCen("The token has not been obtained from CEN.", "Impossible to start the Application.", MessageBoxIcon.Stop);
                         return;
                     }
                     else if (participants.Count == 0)
                     {
-                        new ErrorMsgCen("No participants found...", "Impossible to start the Application.", MessageBoxIcon.Stop);
+                        new Models.ErrorMsgCen("No participants found...", "Impossible to start the Application.", MessageBoxIcon.Stop);
                         return;
                     }
                     // OPEN MAIN FORM.
-                    FormMain main = new FormMain(tokenCen, tokenSii, participants);
-                    main.WindowState = FormWindowState.Normal;
+
+                    FormMain main = new FormMain(tokenCen, tokenSii, participants)
+                    {
+                        WindowState = FormWindowState.Normal
+                    };
                     main.BringToFront();
                     //main.TopMost = true;
                     main.Focus();
@@ -79,7 +104,7 @@ namespace Centralizador.WinApp
             }
             catch (Exception ex)
             {
-                new ErrorMsgCen("Impossible to start the Application.", ex, MessageBoxIcon.Stop);
+                new Models.ErrorMsgCen("Impossible to start the Application.", ex, MessageBoxIcon.Stop);
                 return;
             }
         }

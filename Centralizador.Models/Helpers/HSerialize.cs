@@ -114,8 +114,6 @@ namespace Centralizador.Models.Helpers
             }
         }
 
-        #endregion OBJECT TO XML
-
         public static string TED_To_Xml(DTEDefTypeDocumentoTED obj)
         {
             try
@@ -123,7 +121,7 @@ namespace Centralizador.Models.Helpers
                 XmlSerializer serializer = new XmlSerializer(typeof(DTEDefTypeDocumentoTED), new XmlRootAttribute("TED"));
                 using (Utf8StringWriter stringWriter = new Utf8StringWriter())
                 {
-                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true }))
+                    using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter))
                     {
                         serializer.Serialize(xmlWriter, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
                     }
@@ -135,5 +133,7 @@ namespace Centralizador.Models.Helpers
                 return null;
             }
         }
+
+        #endregion OBJECT TO XML
     }
 }

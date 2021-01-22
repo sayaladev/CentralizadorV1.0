@@ -9,13 +9,14 @@ using Centralizador.Models.ApiSII;
 using OpenHtmlToPdf;
 using ZXing;
 using ZXing.PDF417;
-using static Centralizador.Models.CveStore;
+
+using static Centralizador.Models.Helpers.HEnum;
 
 namespace Centralizador.Models.Helpers
 {
-    internal class HFiles
+    internal class HConvertToPdf
     {
-        public static async Task<string> HtmlToXmlTransform(Detalle d, string path)
+        public static async Task<string> XmlToPdf(Detalle d, string path)
         {
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             string nomenclatura = path + "\\" + d.Folio + "_" + ti.ToTitleCase(d.RznSocRecep.ToLower());

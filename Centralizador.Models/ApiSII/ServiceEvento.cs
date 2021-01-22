@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,14 @@ namespace Centralizador.Models.ApiSII
         [JsonProperty("metaData")]
         public MetaData MetaData { get; set; }
 
+        [JsonIgnore]
         public static string RutToken { get; set; } = GetCertFromPc().Subject;
+
+        [JsonIgnore]
+        public HttpClient wc { get; set; }
+
+        [JsonIgnore]
+        public string Token { get; set; }
 
         public ServiceEvento(Data data, MetaData metaData)
         {
@@ -27,7 +35,16 @@ namespace Centralizador.Models.ApiSII
             MetaData = metaData;
         }
 
-        public static async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant)
+        public ServiceEvento(string token)
+        {
+            wc = new HttpClient(new HttpClientHandler { UseCookies = false });
+            Token = token;
+            var uri = new Uri("https://www4.sii.cl/registrorechazodtej6ui/services/data/facadeService/validarAccesoReceptor");
+            wc.BaseAddress = uri;
+            //  Client.DefaultRequestHeaders.Add("Cookie", $"TOKEN={Token}");
+        }
+
+        public async Task<DataEvento> GetStatusDteAsync(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant)
         {
             string rutToken;
             rutToken = RutToken.Substring(RutToken.IndexOf('=') + 1, 10);
@@ -77,6 +94,94 @@ namespace Centralizador.Models.ApiSII
                         }
                     }
                 }
+            }
+            catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError || ex.Status == WebExceptionStatus.ReceiveFailure)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return null;
+        }
+
+        public async Task<DataEvento> GetStatusDteAsync2(string tipoUser, string token, string tipoDoc, Detalle detalle, ResultParticipant userParticipant)
+        {
+            string rutToken;
+            rutToken = RutToken.Substring(RutToken.IndexOf('=') + 1, 10);
+            MetaData metaData = new MetaData
+            {
+                Namespace = "cl.sii.sdi.lob.diii.registrorechazodtej6.data.api.interfaces.FacadeService/validarAccesoReceptor",
+                ConversationId = token,
+                TransactionId = "0"
+            };
+            Data data = new Data();
+            if (tipoUser == "Debtor")
+            {
+                data.RutEmisor = detalle.RutReceptor.ToString();
+                data.DvEmisor = detalle.DvReceptor;
+                data.TipoDoc = tipoDoc;
+                data.Folio = detalle.Folio.ToString();
+                data.RutToken = rutToken.Split('-').GetValue(0).ToString();
+                data.DvToken = rutToken.Split('-').GetValue(1).ToString();
+            }
+            else if (tipoUser == "Creditor")
+            {
+                data.RutEmisor = userParticipant.Rut.ToString();
+                data.DvEmisor = userParticipant.VerificationCode;
+                data.TipoDoc = tipoDoc;
+                data.Folio = detalle.Folio.ToString();
+                data.RutToken = rutToken.Split('-').GetValue(0).ToString();
+                data.DvToken = rutToken.Split('-').GetValue(1).ToString();
+            }
+
+            string url = "https://www4.sii.cl/registrorechazodtej6ui/services/data/facadeService/validarAccesoReceptor";
+            ServiceEvento serviceEvento = new ServiceEvento(data, metaData);
+            try
+            {
+                ResultEvent detalleLibro = null;
+                // request.AddHeader("Cookie", "TOKEN=XAUCXIUL7IYNG");
+                //using (WebClient wc = new WebClient() { Encoding = Encoding.UTF8 })
+                //{
+                string jSon = JsonConvert.SerializeObject(serviceEvento, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                StringContent content = new StringContent(jSon.ToString(), Encoding.UTF8, "application/json");
+
+                //using (var httpClient = new HttpClient(new HttpClientHandler { UseCookies = false }))
+                //{
+                wc.DefaultRequestHeaders.Add("Cookie", $"TOKEN={Token}");
+                await Task.Run(async () =>
+                {
+                    HttpResponseMessage response = await wc.PostAsync(url, content);
+                    //await Task.Delay(1000);
+                    string s = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        detalleLibro = JsonConvert.DeserializeObject<ResultEvent>(s, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    }
+                });
+                if (detalleLibro != null && detalleLibro.MetaData.Errors == null)
+                {
+                    return detalleLibro.DataEvento;
+                }
+
+                // }
+
+                // wc.Headers[HttpRequestHeader.Cookie] = $"TOKEN={token}";
+
+                //if (result != null)
+                //{
+                //    ResultEvent detalleLibro = JsonConvert.DeserializeObject<ResultEvent>(result, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                //    if (detalleLibro.MetaData.Errors == null)
+                //    {
+                //        return detalleLibro.DataEvento;
+                //    }
+                //}
+                // }
+            }
+            catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError || ex.Status == WebExceptionStatus.ReceiveFailure)
+            {
+                throw;
             }
             catch (Exception)
             {
