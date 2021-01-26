@@ -328,6 +328,11 @@ namespace Centralizador.Models.FunctionsApp
                     {
                         foreach (DteInfoRef item in dteInfos)
                         {
+                            //if (!item.Glosa.Contains("SEN_"))
+                            //{
+                            //    item.Glosa = "SEN_" + item.Glosa;
+                            //}
+
                             if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0)
                             {
                                 dteInfoRefs.Add(item);
