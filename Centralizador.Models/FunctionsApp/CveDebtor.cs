@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Centralizador.Models.ApiCEN;
+using Centralizador.Models.ApiSII;
+using Centralizador.Models.DataBase;
+using Centralizador.Models.Helpers;
+
+using OpenHtmlToPdf;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,11 +13,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Centralizador.Models.ApiCEN;
-using Centralizador.Models.ApiSII;
-using Centralizador.Models.DataBase;
-using Centralizador.Models.Helpers;
-using OpenHtmlToPdf;
 
 using static Centralizador.Models.Helpers.HEnum;
 using static Centralizador.Models.Helpers.HFlagValidator;

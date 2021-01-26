@@ -1,4 +1,10 @@
-﻿using System;
+﻿using Centralizador.Models.ApiCEN;
+using Centralizador.Models.ApiSII;
+using Centralizador.Models.DataBase;
+
+using Spire.Xls;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -6,11 +12,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-
-using Centralizador.Models.ApiCEN;
-using Centralizador.Models.ApiSII;
-using Centralizador.Models.DataBase;
-using Spire.Xls;
 
 namespace Centralizador.Models.Helpers
 {
@@ -62,10 +63,10 @@ namespace Centralizador.Models.Helpers
 
             foreach (Detalle item in detalles)
             {
-                if (item.MntNeto <= 9)
-                {
-                    continue;
-                }
+                //if (item.MntNeto <= 9)
+                //{
+                //    continue;
+                //}
                 DataRow row = table.NewRow();
                 c++;
                 row[0] = c;
@@ -106,6 +107,7 @@ namespace Centralizador.Models.Helpers
                     row[16] = item.Instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy");
                 }
                 table.Rows.Add(row);
+                // NEW ROW FOR HISTORY.
                 if (item.DteInfoRefs != null && item.DteInfoRefs.Count > 1)
                 {
                     foreach (DteInfoRef r in item.DteInfoRefs.OrderBy(x => x.Folio))
@@ -115,10 +117,7 @@ namespace Centralizador.Models.Helpers
                             row = table.NewRow();
                             row[1] = r.Folio;
                             row[2] = r.AuxDocfec.ToString("dd-MM-yyyy");
-                            if (r.AuxDocNum > 0)
-                            {
-                                row[13] = r.AuxDocNum;
-                            }
+                            if (r.AuxDocNum > 0) { row[13] = r.AuxDocNum; }
                             row[6] = r.NetoAfecto * -1;
                             table.Rows.Add(row);
                         }

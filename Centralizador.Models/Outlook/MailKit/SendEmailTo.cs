@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Centralizador.Models.ApiCEN;
+using Centralizador.Models.ApiSII;
+using Centralizador.Models.Helpers;
+
+using MailKit;
+using MailKit.Net.Smtp;
+
+using MimeKit;
+
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Centralizador.Models.ApiCEN;
-using Centralizador.Models.ApiSII;
-using Centralizador.Models.Helpers;
-using MailKit;
-using MailKit.Net.Smtp;
-using MimeKit;
 
 namespace Centralizador.Models.Outlook.MailKit
 {

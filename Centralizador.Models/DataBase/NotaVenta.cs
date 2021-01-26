@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Centralizador.Models.ApiCEN;
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
-
-using Centralizador.Models.ApiCEN;
 
 namespace Centralizador.Models.DataBase
 {
@@ -146,10 +146,12 @@ namespace Centralizador.Models.DataBase
                     rut = instruction.ParticipantDebtor.Rut;
                 }
 
+                string solicitadoPor = instruction.PaymentMatrix.NaturalKey.Remove(0, 4);
+
                 query1.Append("INSERT INTO softland.nw_nventa (CodAux,CveCod,NomCon,nvFeEnt,nvFem,NVNumero,nvObser,VenCod,nvSubTotal, ");
                 query1.Append("nvNetoAfecto,nvNetoExento,nvMonto,proceso,nvEquiv,CodMon,nvEstado,FechaHoraCreacion, CodlugarDesp, SolicitadoPor) values ( ");
                 query1.Append($"'{rut}','1','.','{date}','{date}',{folioNV}, '{concepto}', '1',{neto},{neto},0,{total}, ");
-                query1.Append($"'Centralizador',1,'01','A','{now}','{instruction.PaymentMatrix.ReferenceCode}', '{instruction.PaymentMatrix.NaturalKey}') ");
+                query1.Append($"'Centralizador',1,'01','A','{now}','{instruction.PaymentMatrix.ReferenceCode}', '{solicitadoPor}') ");
 
                 query2.Append("INSERT INTO softland.nw_detnv (NVNumero,nvLinea,nvFecCompr,CodProd,nvCant,nvPrecio,nvSubTotal,nvTotLinea,CodUMed,CantUVta,nvEquiv)VALUES(");
                 query2.Append($"{folioNV},1,'{date}','{codProd}',1,{neto},{neto},{neto},'UN',1,1)");

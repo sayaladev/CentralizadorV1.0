@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Centralizador.Models.ApiCEN;
+
+using System;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using Centralizador.Models.ApiCEN;
 
 namespace Centralizador.Models.DataBase
 {

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Centralizador.Models.ApiSII;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
-using Centralizador.Models.ApiSII;
 
 namespace Centralizador.Models.Helpers
 {
@@ -13,7 +13,7 @@ namespace Centralizador.Models.Helpers
 
         private static List<AuxCsv> AuxCsvsList { get; set; }
 
-        public static string Path => $"ce_empresas_dwnld_{DateTime.Now.Year}{string.Format("{0:00}", DateTime.Now.Month)}{string.Format("{0:00}", DateTime.Now.Day)}.csv";
+        public static string Path => $"{@"C:\Centralizador\"}ce_empresas_dwnld_{DateTime.Now.Year}{string.Format("{0:00}", DateTime.Now.Month)}{string.Format("{0:00}", DateTime.Now.Day)}.csv";
 
         public FileSii()
         {
@@ -24,7 +24,7 @@ namespace Centralizador.Models.Helpers
         {
             try
             {
-                return File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path);
+                return File.Exists(Path);
             }
             catch (Exception)
             {
@@ -37,28 +37,18 @@ namespace Centralizador.Models.Helpers
             AuxCsv auxCsv = new AuxCsv();
             try
             {
-                // List<AuxCsv> res = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
                 auxCsv = AuxCsvsList.FirstOrDefault(x => x.Rut == detalle.Instruction.ParticipantDebtor.Rut + "-" + detalle.Instruction.ParticipantDebtor.VerificationCode);
                 return auxCsv;
-                //Task.Run(() =>
-                //{
-                //    List<AuxCsv> res = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
-
-                //    auxCsv = res.FirstOrDefault(x => x.Rut == detalle.Instruction.ParticipantDebtor.Rut + "-" + detalle.Instruction.ParticipantDebtor.VerificationCode);
-                //    return auxCsv;
-
-                //}).ConfigureAwait(false);
             }
             catch (Exception)
             {
                 return null;
             }
-            //return null;
         }
 
         public static void ReadFileSii()
         {
-            AuxCsvsList = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
+            AuxCsvsList = File.ReadAllLines(Path).Skip(1).Select(v => AuxCsv.GetFronCsv(v)).ToList();
         }
     }
 

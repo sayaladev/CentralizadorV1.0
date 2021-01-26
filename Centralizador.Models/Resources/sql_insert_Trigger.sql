@@ -33,7 +33,7 @@ BEGIN
 			FROM inserted i
 			);
 
-	SELECT @FolioRef = (
+	SELECT @FolioRef = ''SEN'' + (
 			SELECT TOP (1) nv.codlugardesp
 			FROM softland.iw_gsaen_refdte n
 			JOIN softland.iw_gsaen g ON g.nroint = n.nroint

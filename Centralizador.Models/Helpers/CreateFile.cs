@@ -1,7 +1,8 @@
-﻿using System.Diagnostics;
+﻿using MimeKit;
+
+using System.Diagnostics;
 using System.IO;
 using System.Text;
-using MimeKit;
 
 namespace Centralizador.Models.Helpers
 {

@@ -945,7 +945,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
                 TssLblMensaje.Text = "There was an error loading the data.";
@@ -973,7 +973,7 @@ namespace Centralizador.WinApp.GUI
             DialogResult resp;
             while (!new FileSii().ExistsFile)
             {
-                resp = MessageBox.Show($"The file '{FileSii.Path}' NOT found, please download...", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                resp = MessageBox.Show($"The file '{@"C:\Centralizador\"}{FileSii.Path}' NOT found, please download...", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (resp == DialogResult.OK)
                 {
                     Process.Start("https://palena.sii.cl/cvc_cgi/dte/ce_consulta_rut");
@@ -1085,7 +1085,7 @@ namespace Centralizador.WinApp.GUI
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //new ErrorMsgCen("There was an error loading the data.", ex, MessageBoxIcon.Warning);
                 TssLblMensaje.Text = "There was an error loading the data.";

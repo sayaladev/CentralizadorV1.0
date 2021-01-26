@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Centralizador.Models.ApiSII;
+
+using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-using Centralizador.Models.ApiSII;
-
-using Newtonsoft.Json;
-
-using static Centralizador.Models.ApiSII.ServiceDetalle;
 using static Centralizador.Models.Helpers.HFlagValidator;
 
 namespace Centralizador.Models.ApiCEN

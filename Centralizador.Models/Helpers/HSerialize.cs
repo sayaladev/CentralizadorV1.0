@@ -5,8 +5,6 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
-using Centralizador.Models.ApiSII;
-
 namespace Centralizador.Models.Helpers
 {
     public static class HSerialize

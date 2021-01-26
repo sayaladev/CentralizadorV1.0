@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
-
-using Newtonsoft.Json;
 
 namespace Centralizador.Models.ApiCEN
 {
