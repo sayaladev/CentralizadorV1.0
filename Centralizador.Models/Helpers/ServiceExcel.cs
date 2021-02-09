@@ -70,8 +70,12 @@ namespace Centralizador.Models.Helpers
                 DataRow row = table.NewRow();
                 c++;
                 row[0] = c;
-                row[1] = item.Folio;
-                row[2] = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaEmision));
+                if (item.Folio > 0)
+                {
+                    row[1] = item.Folio;
+                    row[2] = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy}", Convert.ToDateTime(item.FechaEmision));
+                }
+
                 row[3] = item.RutReceptor + "-" + item.DvReceptor;
                 row[4] = item.RznSocRecep;
                 if (item.Instruction != null)

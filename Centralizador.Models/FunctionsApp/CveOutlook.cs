@@ -17,6 +17,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 
 using static Centralizador.Models.Helpers.HEnum;
@@ -230,8 +231,17 @@ namespace Centralizador.Models.FunctionsApp
                                                 await part.Content.DecodeToAsync(memory, Cancellation.Token);
                                             }
                                             memory.Position = 0;
-                                            XDocument xDocument = XDocument.Load(memory);
-                                            if (xDocument.Root.Name.LocalName == "EnvioDTE")
+                                            XDocument xDocument = null;
+                                            try
+                                            {
+                                                xDocument = XDocument.Load(memory);
+                                            }
+                                            catch (XmlException)
+                                            {
+                                                //throw;
+                                            }
+
+                                            if (xDocument != null && xDocument.Root.Name.LocalName == "EnvioDTE")
                                             {
                                                 int res = SaveFiles(xDocument);
                                                 if (res == 0)
@@ -291,6 +301,11 @@ namespace Centralizador.Models.FunctionsApp
         }
 
         public Task ConvertXmlToPdf(Detalle d, TipoTask task)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetDocFromStoreAnual(int period)
         {
             throw new NotImplementedException();
         }

@@ -102,6 +102,29 @@ namespace Centralizador.Models.ApiCEN
             return null;
         }
 
+        public static async Task<List<ResultPaymentMatrix>> GetPaymentMatrixAsync(int year)
+        {
+            try
+            {
+                using (CustomWebClient wc = new CustomWebClient())
+                {
+                    Uri uri = new Uri(Properties.Settings.Default.UrlCen, $"api/v1/resources/payment-matrices/?created_after={year - 1}-12-31&created_before={year + 1}-01-01");
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    string res = await wc.DownloadStringTaskAsync(uri); // GET
+                    if (res != null)
+                    {
+                        PaymentMatrix p = JsonConvert.DeserializeObject<PaymentMatrix>(res, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        return p.Results;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return null;
+        }
+
         public static async Task<List<ResultPaymentMatrix>> GetPaymentMatrixByBillingWindowIdAsync(ResultBillingWindow window)
         {
             try

@@ -37,6 +37,8 @@ namespace Centralizador.Models.FunctionsApp
 
         Task GetDocFromStore(DateTime period);
 
+        Task GetDocFromStoreAnual(int period);
+
         Task ConvertXmlToPdf(TipoTask task, List<Detalle> lista);
 
         Task ConvertXmlToPdf(Detalle d, TipoTask task);

@@ -48,6 +48,7 @@ namespace Centralizador.Models.FunctionsApp
             Conn = new Conexion(dataBaseName);
             Progress = progress;
             IsRuning = true;
+            DetalleList = new List<Detalle>();
         }
 
         // CTOR FOR NV INSERT.
@@ -125,8 +126,7 @@ namespace Centralizador.Models.FunctionsApp
 
         public async Task ConvertXmlToPdf(Detalle d, TipoTask task)
         {
-            // INFO
-            // PgModel.StopWatch.Start();
+            // INFO PgModel.StopWatch.Start();
 
             IPdfDocument pdfDocument = null;
             try
@@ -156,8 +156,7 @@ namespace Centralizador.Models.FunctionsApp
             }
             finally
             {
-                // INFO
-                // PgModel.StopWatch.Stop();
+                // INFO PgModel.StopWatch.Stop();
             }
         }
 
@@ -176,7 +175,7 @@ namespace Centralizador.Models.FunctionsApp
                 {
                     try
                     {
-                        DetalleList = await GetCreditor(i);
+                        DetalleList.AddRange(await GetCreditor(i));
                     }
                     catch (Exception)
                     {
@@ -185,8 +184,18 @@ namespace Centralizador.Models.FunctionsApp
                 }
                 else
                 {
-                    DetalleList = null;
+                    // DetalleList = null;
                 }
+            }
+        }
+
+        public async Task GetDocFromStoreAnual(int period)
+        {
+            //DetalleList = new List<Detalle>();
+            for (int i = 1; i < 13; i++)
+            {
+                DateTime fecha = new DateTime(period, i, 01);
+                await GetDocFromStore(fecha);
             }
         }
 
@@ -290,6 +299,12 @@ namespace Centralizador.Models.FunctionsApp
                 StringLogging.AppendLine($"Summary: From {FoliosNv.Min()} To-{FoliosNv.Max()}");
                 SaveLogging(@"C:\Centralizador\Log\", nameFile);
             }
+            else if (StringLogging.Length > 0)
+            {
+                string nameFile = $"{UserParticipant.Name}_InsertNv_{DateTime.Now:dd-MM-yyyy-HH-mm-ss}";
+                StringLogging.AppendLine("");
+                SaveLogging(@"C:\Centralizador\Log\", nameFile);
+            }
         }
 
         public void Dispose()
@@ -328,11 +343,6 @@ namespace Centralizador.Models.FunctionsApp
                     {
                         foreach (DteInfoRef item in dteInfos)
                         {
-                            //if (!item.Glosa.Contains("SEN_"))
-                            //{
-                            //    item.Glosa = "SEN_" + item.Glosa;
-                            //}
-
                             if (string.Compare(item.Glosa, instruction.PaymentMatrix.NaturalKey, StringComparison.OrdinalIgnoreCase) == 0)
                             {
                                 dteInfoRefs.Add(item);
@@ -412,7 +422,7 @@ namespace Centralizador.Models.FunctionsApp
                     detalles.Add(detalle);
                     c++;
                     porcent = (float)(100 * c) / list.Count;
-                    await ReportProgress(porcent, $"Processing 'Pay Instructions' {instruction.Id}, wait please.  ({c}/{list.Count})");
+                    await ReportProgress(porcent, $"Processing 'Pay Instructions' {instruction.Id}-{instruction.PaymentMatrix.PublishDate.ToString("dd-MM-yyyy")}, wait please.  ({c}/{list.Count})");
                     return detalles;
                 }
                 catch (Exception)

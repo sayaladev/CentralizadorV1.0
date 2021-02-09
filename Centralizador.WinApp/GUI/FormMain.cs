@@ -121,8 +121,7 @@ namespace Centralizador.WinApp.GUI
                     CboParticipants.SelectedIndex = 0;
                     return;
                 }
-                // NEW OBJECT.
-                // cveFunction = new Cve(up, Progress, db, TokenSii, TokenCen);
+                // NEW OBJECT. cveFunction = new Cve(up, Progress, db, TokenSii, TokenCen);
                 TxtCtaCteParticipant.Text = up.BankAccount;
                 TxtRutParticipant.Text = up.Rut.ToString() + "-" + up.VerificationCode;
             }
@@ -169,8 +168,7 @@ namespace Centralizador.WinApp.GUI
             BgwPay.ProgressChanged += BgwPay_ProgressChanged;
             BgwPay.RunWorkerCompleted += BgwPay_RunWorkerCompleted;
 
-            // Logging file
-            // StringLogging = new StringBuilder();
+            // Logging file StringLogging = new StringBuilder();
 
             // Date Time Outlook
             BtnOutlook.Text = string.Format(CultureInfo.InvariantCulture, "{0:d-MM-yyyy HH:mm}", new CveOutlook().GetLastDateTime());
@@ -928,7 +926,17 @@ namespace Centralizador.WinApp.GUI
                 DateTime period = new DateTime((int)CboYears.SelectedItem, CboMonths.SelectedIndex + 1, 1);
                 using (cveFunction = new CveCreditor(UserParticipant, Progress, DataBase, TokenSii, TokenCen))
                 {
-                    await cveFunction.GetDocFromStore(period);
+                    if (ChkIsAnual.Checked)
+                    {
+                        await cveFunction.GetDocFromStoreAnual(Convert.ToInt32(CboYears.SelectedItem));
+                        // CREAR UN LOOP QUE CONSULTE MES POR MES Y VAYA AGREGANDO DATOS A
+                        // DETALLELIST. NO USAR OTRO MÉTODO!
+                    }
+                    else
+                    {
+                        await cveFunction.GetDocFromStore(period);
+                    }
+
                     if (cveFunction.DetalleList != null && cveFunction.DetalleList.Count > 0)
                     {
                         IGridFill(cveFunction.DetalleList);
@@ -1028,7 +1036,14 @@ namespace Centralizador.WinApp.GUI
                         {
                             BtnInsertNv.Enabled = false;
                             await creditor.InsertNotaVenta(detallesFinal);
-                            TssLblMensaje.Text = $"Check the log file for Execute to FPL. =>Summary: From {creditor.FoliosNv.Min()} To-{creditor.FoliosNv.Max()}";
+                            if (creditor.FoliosNv.Count > 0)
+                            {
+                                TssLblMensaje.Text = $"Check the log file for Execute to FPL. =>Summary: From {creditor.FoliosNv.Min()} To-{creditor.FoliosNv.Max()}";
+                            }
+                            else
+                            {
+                                TssLblMensaje.Text = "Check the log file";
+                            }
                         }
                     }
                     catch (Exception ex)

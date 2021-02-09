@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
+            TenTec.Windows.iGridLib.iGPenStyle iGPenStyle1 = new TenTec.Windows.iGridLib.iGPenStyle();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.TssLblFechaHora = new System.Windows.Forms.ToolStripStatusLabel();
             this.TssLblUserEmail = new System.Windows.Forms.ToolStripStatusLabel();
@@ -70,6 +71,7 @@
             this.CboMonths = new System.Windows.Forms.ComboBox();
             this.fImageListSmall = new System.Windows.Forms.ImageList(this.components);
             this.fImageListType = new System.Windows.Forms.ImageList(this.components);
+            this.ChkIsAnual = new System.Windows.Forms.CheckBox();
             this.StatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -173,7 +175,7 @@
             this.IGridMain.Header.Height = 16;
             this.IGridMain.Header.HotTrackFlags = ((TenTec.Windows.iGridLib.iGHdrHotTrackFlags)((TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Icon | TenTec.Windows.iGridLib.iGHdrHotTrackFlags.Text)));
             this.IGridMain.Header.HotTrackForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(191)))), ((int)(((byte)(65)))));
-            this.IGridMain.Header.SeparatingLine = new TenTec.Windows.iGridLib.iGPenStyle(System.Drawing.SystemColors.ControlDark, 1, System.Drawing.Drawing2D.DashStyle.Solid);
+            this.IGridMain.Header.SeparatingLine = iGPenStyle1;
             this.IGridMain.Location = new System.Drawing.Point(0, 0);
             this.IGridMain.Name = "IGridMain";
             this.IGridMain.RowHeader.BackColor = System.Drawing.SystemColors.Info;
@@ -405,6 +407,7 @@
             // 
             this.GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBox1.Controls.Add(this.ChkIsAnual);
             this.GroupBox1.Controls.Add(this.BtnCancelTask);
             this.GroupBox1.Controls.Add(this.BtnCreditor);
             this.GroupBox1.Controls.Add(this.BtnDebtor);
@@ -597,6 +600,15 @@
             this.fImageListType.Images.SetKeyName(10, "");
             this.fImageListType.Images.SetKeyName(11, "");
             // 
+            // ChkIsAnual
+            // 
+            this.ChkIsAnual.AutoSize = true;
+            this.ChkIsAnual.Location = new System.Drawing.Point(95, 100);
+            this.ChkIsAnual.Name = "ChkIsAnual";
+            this.ChkIsAnual.Size = new System.Drawing.Size(15, 14);
+            this.ChkIsAnual.TabIndex = 13;
+            this.ChkIsAnual.UseVisualStyleBackColor = true;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -607,7 +619,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FormMain";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;           
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.StatusStrip.ResumeLayout(false);
@@ -672,5 +684,6 @@
         private System.Windows.Forms.ImageList fImageListType;
         private System.Windows.Forms.Button BtnRevertPay;
         private System.Windows.Forms.Button BtnCancelTask;
+        private System.Windows.Forms.CheckBox ChkIsAnual;
     }
 }

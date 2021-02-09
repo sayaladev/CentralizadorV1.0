@@ -273,10 +273,8 @@ namespace Centralizador.Models.FunctionsApp
                 // INSERT IN CEN
                 if (item.StatusDetalle == StatusDetalle.Accepted && item.Instruction != null)
                 {
-                    // 1 No Facturado y cuando hay más de 1 dte informado
-                    // 2 Facturado
-                    // 3 Facturado con retraso
-                    // Existe el DTE?
+                    // 1 No Facturado y cuando hay más de 1 dte informado 2 Facturado 3 Facturado
+                    // con retraso Existe el DTE?
                     ResultDte doc = await Dte.GetDteAsync(item, false);
                     if (doc == null)
                     {
@@ -300,6 +298,11 @@ namespace Centralizador.Models.FunctionsApp
             }).ToList();
             await Task.WhenAll(tareas);
             return detalles.OrderBy(x => x.FechaRecepcion).ToList();
+        }
+
+        public Task GetDocFromStoreAnual(int period)
+        {
+            throw new NotImplementedException();
         }
     }
 }
